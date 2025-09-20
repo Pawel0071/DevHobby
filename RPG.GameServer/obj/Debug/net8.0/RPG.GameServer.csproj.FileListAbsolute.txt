@@ -1,0 +1,6 @@
+/Volumes/Data/Repositories/DevHobby/DevHobby/RPG.GameServer/obj/Debug/net8.0/RPG.GameServer.csproj.AssemblyReference.cache
+/Volumes/Data/Repositories/DevHobby/DevHobby/RPG.GameServer/obj/Debug/net8.0/RPG.GameServer.GeneratedMSBuildEditorConfig.editorconfig
+/Volumes/Data/Repositories/DevHobby/DevHobby/RPG.GameServer/obj/Debug/net8.0/RPG.GameServer.AssemblyInfoInputs.cache
+/Volumes/Data/Repositories/DevHobby/DevHobby/RPG.GameServer/obj/Debug/net8.0/RPG.GameServer.AssemblyInfo.cs
+/Volumes/Data/Repositories/DevHobby/DevHobby/RPG.GameServer/obj/Debug/net8.0/RPG.GameServer.csproj.CoreCompileInputs.cache
+/Volumes/Data/Repositories/DevHobby/DevHobby/RPG.GameServer/obj/Debug/net8.0/RPG.GameServer.MvcApplicationPartsAssemblyInfo.cache

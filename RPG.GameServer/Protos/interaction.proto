@@ -1,0 +1,64 @@
+syntax = "proto3";
+option csharp_namespace = "RPG.GameServer.Protos";
+package rpg;
+
+enum CombatActionType {
+  MELEE = 0;
+  RANGED = 1;
+  SPELL = 2;
+  USE_ITEM = 3;
+  FLEE = 4;
+}
+
+enum InteractionType {
+  TALK = 0;
+  TRADE = 1;
+  GIVE_ITEM = 2;
+  INSPECT = 3;
+}
+
+enum StatusEffect {
+  NONE = 0;
+  STUNNED = 1;
+  POISONED = 2;
+  BURNING = 3;
+  FROZEN = 4;
+  BUFFED = 5;
+  DEBUFFED = 6;
+}
+
+message CombatActionRequest {
+  string attackerId = 1;
+  string targetId = 2;
+  CombatActionType actionType = 3;
+  string skillId = 4;       // optional
+  string itemId = 5;        // optional
+}
+
+message CombatResultReply {
+  bool success = 1;
+  int32 damage = 2;
+  repeated StatusEffect effectsApplied = 3;
+  bool targetDefeated = 4;
+  string logMessage = 5;
+}
+
+message InteractionRequest {
+  string initiatorId = 1;
+  string targetId = 2;
+  InteractionType type = 3;
+  string itemId = 4;        // optional
+  string message = 5;       // optional (for TALK)
+}
+
+message InteractionReply {
+  bool success = 1;
+  string responseMessage = 2;
+  bool itemTransferred = 3;
+  bool tradeAccepted = 4;
+}
+
+service InteractionService {
+  rpc ExecuteCombatAction (CombatActionRequest) returns (CombatResultReply);
+  rpc ExecuteInteraction (InteractionRequest) returns (InteractionReply);
+}

@@ -1,0 +1,6 @@
+/Volumes/Data/Repositories/DevHobby/DevHobby/RPG.SessionKeeper/obj/Debug/net8.0/RPG.SessionKeeper.csproj.AssemblyReference.cache
+/Volumes/Data/Repositories/DevHobby/DevHobby/RPG.SessionKeeper/obj/Debug/net8.0/RPG.SessionKeeper.GeneratedMSBuildEditorConfig.editorconfig
+/Volumes/Data/Repositories/DevHobby/DevHobby/RPG.SessionKeeper/obj/Debug/net8.0/RPG.SessionKeeper.AssemblyInfoInputs.cache
+/Volumes/Data/Repositories/DevHobby/DevHobby/RPG.SessionKeeper/obj/Debug/net8.0/RPG.SessionKeeper.AssemblyInfo.cs
+/Volumes/Data/Repositories/DevHobby/DevHobby/RPG.SessionKeeper/obj/Debug/net8.0/RPG.SessionKeeper.csproj.CoreCompileInputs.cache
+/Volumes/Data/Repositories/DevHobby/DevHobby/RPG.SessionKeeper/obj/Debug/net8.0/RPG.SessionKeeper.MvcApplicationPartsAssemblyInfo.cache

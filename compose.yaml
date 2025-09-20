@@ -1,0 +1,104 @@
+﻿version: '3.8'
+
+services:
+  rpg.sessionkeeper:
+    image: rpg.sessionkeeper
+    build:
+      context: .
+      dockerfile: RPG.SessionKeeper/Dockerfile
+    environment:
+      MONGO_URI: mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: rabbit_user
+      RABBITMQ_PASS: rabbit_pass
+    depends_on:
+      - redis
+      - mongodb
+      - rabbitmq
+    networks:
+      - backend
+
+  cache.wormup:
+    image: cache.wormup
+    build:
+      context: .
+      dockerfile: Cache.WormUp/Dockerfile
+    environment:
+      MONGO_URI: mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      - redis
+      - mongodb
+    networks:
+      - backend
+
+  circuitbreaker:
+    image: circuitbreaker
+    build:
+      context: .
+      dockerfile: CricuitBraker/Dockerfile
+    environment:
+      MONGO_URI: mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: rabbit_user
+      RABBITMQ_PASS: rabbit_pass
+    depends_on:
+      - redis
+      - mongodb
+      - rabbitmq
+    networks:
+      - backend
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo_user
+      MONGO_INITDB_ROOT_PASSWORD: mongo_pass
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit_user
+      RABBITMQ_DEFAULT_PASS: rabbit_pass
+    networks:
+      - backend
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+volumes:
+  mongodb_data:
+
+networks:
+  backend:
+    driver: bridge
+      
+        persistenceservice:
+    image: persistenceservice
+    build:
+      context: .
+      dockerfile: PersistenceService/Dockerfile
+

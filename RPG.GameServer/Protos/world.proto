@@ -1,0 +1,25 @@
+syntax = "proto3";
+import "Protos/character.proto";
+
+option csharp_namespace = "RPG.GameServer.Protos";
+
+package rpg;
+
+service WorldService {
+  rpc GetWorldState (WorldRequest) returns (WorldReply);
+}
+
+message WorldState {
+  repeated Character visibleCharacters = 1;
+  repeated Character visibleNPCs = 2;
+  int64 timestamp = 3;
+}
+
+message WorldRequest {
+  string characterId = 1;
+  Location location = 2;
+}
+
+message WorldReply {
+  WorldState state = 1;
+}

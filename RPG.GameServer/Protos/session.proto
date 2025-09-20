@@ -1,0 +1,35 @@
+syntax = "proto3";
+option csharp_namespace = "RPG.GameServer.Protos";
+package rpg;
+import "Protos/character.proto";
+
+service SessionService {
+  rpc CreateSession (CreateSessionRequest) returns (SessionReply);
+  rpc GetSession (SessionIdRequest) returns (SessionReply);
+  rpc EndSession (EndSessionRequest) returns (SessionReply);
+}
+
+message Session {
+  string id = 1;
+  string characterId = 2;
+  int64 startedAt = 3;
+  Location lastKnownLocation = 4;
+  bool active = 5;
+}
+
+message CreateSessionRequest {
+  string characterId = 1;
+}
+
+message EndSessionRequest {
+  string sessionId = 1;
+}
+
+message SessionIdRequest {
+  string sessionId = 1;
+}
+
+message SessionReply {
+  Session session = 1;
+}
+

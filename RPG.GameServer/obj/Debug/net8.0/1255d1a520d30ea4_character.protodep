@@ -1,0 +1,2 @@
+obj/Debug/net8.0/Protos/Character.cs \
+obj/Debug/net8.0/Protos/CharacterGrpc.cs: Protos/character.proto
