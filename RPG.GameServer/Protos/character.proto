@@ -153,34 +153,7 @@ message CharacterReply {
 }
 
 message CharacterIdReply {
-  bool characterId = 1;
-}
-
-message ProtobufSkill {
-  int32 id = 1;
-  string name = 2;
-  SkillType type = 3;
-  int32 manaCost = 4;
-  float cooldownSeconds = 5;
-}
-
-message ProtobufEquipmentSlots {
-  Item head = 1;
-  Item chest = 2;
-  Item weapon = 3;
-  Item shield = 4;
-  Item boots = 5;
-  Item gloves = 6;
-  repeated Item rings = 7;
-  Item amulet = 8;
-}
-
-message ProtobufItem {
-  string id = 1;
-  string name = 2;
-  ItemType type = 3;
-  map<string, int32> modifiers = 4;
-  int32 requiredLevel = 5;
+  string characterId = 1;
 }
 
 service CharacterService {

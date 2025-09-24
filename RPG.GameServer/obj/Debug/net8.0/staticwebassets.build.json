@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "I3JtLYe5LVUHgMbWcd0pIB4XTKro5shgXyLuoVU2qco=",
+  "Source": "RPG.GameServer",
+  "BasePath": "_content/RPG.GameServer",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

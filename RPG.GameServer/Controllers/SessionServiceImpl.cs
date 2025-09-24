@@ -5,7 +5,7 @@ using RabbitMQ.Client;
 using RPG.GameServer.Protos;
 using StackExchange.Redis;
 
-namespace RPG.GameServer.Services;
+namespace RPG.GameServer.Controlers;
 
 public class SessionServiceImpl : SessionService.SessionServiceBase
 {

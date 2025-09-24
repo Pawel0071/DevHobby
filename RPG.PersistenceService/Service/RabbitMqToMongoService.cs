@@ -8,7 +8,7 @@ using RPG.Core.Domain.Entities;
 
 namespace RPG.PersistanceService.Infrastructure;
 
-public class RabbitMqToMongoService
+public class RabbitMqToMongoService : IRabbitMqToMongoService
 {
     private readonly IMongoCollection<PlayerCharacter> _mongoCollection;
     private readonly IModel _rabbitChannel;

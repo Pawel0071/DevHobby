@@ -2389,11 +2389,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Volumes/Data/Repositories/DevHobby/PersistenceService/PersistenceService.csproj",
-      "projectName": "PersistenceService",
-      "projectPath": "/Volumes/Data/Repositories/DevHobby/PersistenceService/PersistenceService.csproj",
+      "projectUniqueName": "/Volumes/Data/Repositories/DevHobby/RPG.PersistenceService/RPG.PersistenceService.csproj",
+      "projectName": "RPG.PersistenceService",
+      "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.PersistenceService/RPG.PersistenceService.csproj",
       "packagesPath": "/Users/pawel/.nuget/packages/",
-      "outputPath": "/Volumes/Data/Repositories/DevHobby/PersistenceService/obj/",
+      "outputPath": "/Volumes/Data/Repositories/DevHobby/RPG.PersistenceService/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/pawel/.nuget/NuGet/NuGet.Config"

@@ -10,8 +10,8 @@ service WorldService {
 }
 
 message WorldState {
-  repeated Character visibleCharacters = 1;
-  repeated Character visibleNPCs = 2;
+  repeated PlayerCharacter visibleCharacters = 1;
+  repeated PlayerCharacter visibleNPCs = 2;
   int64 timestamp = 3;
 }
 

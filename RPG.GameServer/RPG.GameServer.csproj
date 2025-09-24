@@ -37,16 +37,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Application\" />
       <Folder Include="Inrastructure\" />
       <Folder Include="Middleware\" />
       <Folder Include="Services\" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Include="../CharacterGrpc.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Include="../Character.cs" />
     </ItemGroup>
 
 </Project>

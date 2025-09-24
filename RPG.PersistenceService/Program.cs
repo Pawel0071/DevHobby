@@ -1,4 +1,6 @@
+using MongoDB.Driver;
 using PersistenceService;
+using RabbitMQ.Client;
 using RPG.PersistanceService.Infrastructure;
 
 var builder = Host.CreateApplicationBuilder(args);

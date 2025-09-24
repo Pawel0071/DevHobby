@@ -8,6 +8,6 @@ public class EquipmentSlots
     public Item? Shield { get; set; }
     public Item? Boots { get; set; }
     public Item? Gloves { get; set; }
-    public List<Item?> Rings { get; set; } = [];
+    public List<Item>? Rings { get; set; } = [];
     public Item? Amulet { get; set; }
 }

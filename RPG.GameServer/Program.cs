@@ -1,6 +1,7 @@
 using RabbitMQ.Client;
+using RPG.GameServer.Controlers;
+using RPG.GameServer.Controllers;
 using RPG.GameServer.Infrastructure;
-using RPG.GameServer.Services;
 using RPG.GameServer.Interfaces;
 using StackExchange.Redis;
 

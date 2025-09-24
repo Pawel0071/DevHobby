@@ -1,15 +1,14 @@
 using Grpc.Core;
 using RabbitMQ.Client;
 using RPG.GameServer.Interfaces;
+using RPG.GameServer.Protos;
 using StackExchange.Redis;
 using DomainPlayerCharacter = RPG.Core.Domain.Entities.PlayerCharacter;
-using RPG.GameServer.Protos;
 using ProtobufBaseCharacter = RPG.GameServer.Protos.BaseCharacter;
 using ProtobufPlayerCharacter = RPG.GameServer.Protos.PlayerCharacter;
 using ProtobufStats = RPG.GameServer.Protos.Stats;
 using ProtobufLocation = RPG.GameServer.Protos.Location;
 using ProtobufSkill = RPG.GameServer.Protos.Skill;
-using ProtobufSkillType = RPG.GameServer.Protos.SkillType;
 using ProtobufEquipmentSlots = RPG.GameServer.Protos.EquipmentSlots;
 using ProtobufItem = RPG.GameServer.Protos.Item;
 
@@ -23,20 +22,16 @@ using DomainItem = RPG.Core.Domain.Entities.Common.Item;
 using DomainItemType = RPG.Core.Domain.Entities.Common.ItemType;
 using DomainSkillType = RPG.Core.Domain.Entities.Enums.SkillType;
 
-namespace RPG.GameServer.Services;
+namespace RPG.GameServer.Controllers;
 
-public class CharacterServiceImpl : CharacterService.CharacterServiceBase
+public class CharacterServiceImpl(
+    IConnectionMultiplexer redis,
+    IModel rabbitChannel,
+    ICharacterRepository characterRepository)
+    : CharacterService.CharacterServiceBase
 {
-    private readonly IDatabase _redis;
-    private readonly IModel _rabbitChannel;
-    private readonly ICharacterRepository _characterRepository;
-
-    public CharacterServiceImpl (IConnectionMultiplexer redis, IModel rabbitChannel, ICharacterRepository characterRepository)
-    {
-        _redis = redis.GetDatabase();
-        _rabbitChannel = rabbitChannel;
-        _characterRepository = characterRepository;
-    }
+    private readonly IDatabase _redis = redis.GetDatabase();
+    private readonly IModel _rabbitChannel = rabbitChannel;
 
     // Update mapping logic to align with regenerated Protobuf classes
     private static DomainPlayerCharacter MapToDomainPlayerCharacter(ProtobufPlayerCharacter character)
@@ -98,9 +93,10 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
     }
 
     // Update MapToProtobufPlayerCharacter to include all properties
-    private ProtobufPlayerCharacter MapToProtobufPlayerCharacter(DomainPlayerCharacter character)
+    private static ProtobufPlayerCharacter? MapToProtobufPlayerCharacter(DomainPlayerCharacter character)
     {
         if (character.Equipment.Rings != null)
+        {
             return new ProtobufPlayerCharacter
             {
                 BaseCharacter = new ProtobufBaseCharacter
@@ -161,7 +157,9 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
                 SkillLevels = { character.SkillLevels },
                 SessionId = character.SessionId.ToString()
             };
-    }
+        }
+        else return null;
+}
 
     // Handle nullability in MapToDomainItem
     private static DomainItem MapToDomainItem(ProtobufItem? item)
@@ -220,13 +218,13 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Character is required"));
         }
         var domainCharacter = MapToDomainPlayerCharacter(request.Character);
-        var character = await _characterRepository.CreateAsync(domainCharacter);
+        var character = await characterRepository.CreateAsync(domainCharacter);
         return new CharacterIdReply { CharacterId = character.Id };
     }
 
     public override async Task<CharacterReply> GetCharacter(CharacterIdRequest request, ServerCallContext context)
     {
-        var character = await _characterRepository.GetAsync(request.CharacterId);
+        var character = await characterRepository.GetAsync(request.CharacterId);
         if (character == null)
         {
             throw new RpcException(new Status(StatusCode.NotFound, "Character not found"));
@@ -241,13 +239,13 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Character or Character ID is required"));
         }
         var domainCharacter = MapToDomainPlayerCharacter(request.Character);
-        var character = await _characterRepository.UpdateAsync(domainCharacter);
+        var character = await characterRepository.UpdateAsync(domainCharacter);
         return new CharacterIdReply {   CharacterId = character.Id };
     }
 
     public override async Task<CharacterIdReply> DeleteCharacter(CharacterIdRequest request, ServerCallContext context)
     {
-        var success = await _characterRepository.DeleteAsync(request.CharacterId);
+        var success = await characterRepository.DeleteAsync(request.CharacterId);
         return new CharacterIdReply { CharacterId = success ? request.CharacterId : string.Empty };
     }
 }
