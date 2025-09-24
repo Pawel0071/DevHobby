@@ -9,3 +9,8 @@
 /Volumes/Data/Repositories/DevHobby/DevHobby/RPG.Core/obj/Debug/net8.0/refint/RPG.Core.dll
 /Volumes/Data/Repositories/DevHobby/DevHobby/RPG.Core/obj/Debug/net8.0/RPG.Core.pdb
 /Volumes/Data/Repositories/DevHobby/DevHobby/RPG.Core/obj/Debug/net8.0/ref/RPG.Core.dll
+/Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/RPG.Core.GeneratedMSBuildEditorConfig.editorconfig
+/Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/RPG.Core.AssemblyInfoInputs.cache
+/Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/RPG.Core.AssemblyInfo.cs
+/Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/RPG.Core.csproj.CoreCompileInputs.cache
+/Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/RPG.Core.sourcelink.json

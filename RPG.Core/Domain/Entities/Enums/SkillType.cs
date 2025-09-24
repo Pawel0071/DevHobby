@@ -1,0 +1,30 @@
+namespace RPG.Core.Domain.Entities.Enums;
+public enum SkillType
+{
+    MeleeAttack,
+    RangedAttack,
+    MagicDamage,
+    AreaOfEffect,
+    DamageOverTime,
+    Shield,
+    Dodge,
+    ArmorBoost,
+    ResistanceBoost,
+    Heal,
+    ManaRestore,
+    Buff,
+    Debuff,
+    Summon,
+    Stun,
+    Freeze,
+    Slow,
+    Knockback,
+    Passive,
+    Aura,
+    Teleport,
+    Trap,
+    Curse,
+    Charm,
+    Reveal,
+    Detect
+}

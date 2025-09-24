@@ -46,29 +46,21 @@ namespace RPG.GameServer.Protos {
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::RPG.GameServer.Protos.CreateCharacterRequest> __Marshaller_rpg_CreateCharacterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::RPG.GameServer.Protos.CreateCharacterRequest.Parser));
+    static readonly grpc::Marshaller<global::RPG.GameServer.Protos.CharacterRequest> __Marshaller_rpg_CharacterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::RPG.GameServer.Protos.CharacterRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::RPG.GameServer.Protos.CharacterReply> __Marshaller_rpg_CharacterReply = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::RPG.GameServer.Protos.CharacterReply.Parser));
+    static readonly grpc::Marshaller<global::RPG.GameServer.Protos.CharacterIdReply> __Marshaller_rpg_CharacterIdReply = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::RPG.GameServer.Protos.CharacterIdReply.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Marshaller<global::RPG.GameServer.Protos.CharacterIdRequest> __Marshaller_rpg_CharacterIdRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::RPG.GameServer.Protos.CharacterIdRequest.Parser));
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::RPG.GameServer.Protos.UpdateCharacterRequest> __Marshaller_rpg_UpdateCharacterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::RPG.GameServer.Protos.UpdateCharacterRequest.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::RPG.GameServer.Protos.MoveCharacterRequest> __Marshaller_rpg_MoveCharacterRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::RPG.GameServer.Protos.MoveCharacterRequest.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::RPG.GameServer.Protos.EquipItemRequest> __Marshaller_rpg_EquipItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::RPG.GameServer.Protos.EquipItemRequest.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::RPG.GameServer.Protos.UnequipItemRequest> __Marshaller_rpg_UnequipItemRequest = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::RPG.GameServer.Protos.UnequipItemRequest.Parser));
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Marshaller<global::RPG.GameServer.Protos.DeleteReply> __Marshaller_rpg_DeleteReply = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::RPG.GameServer.Protos.DeleteReply.Parser));
+    static readonly grpc::Marshaller<global::RPG.GameServer.Protos.CharacterReply> __Marshaller_rpg_CharacterReply = grpc::Marshallers.Create(__Helper_SerializeMessage, context => __Helper_DeserializeMessage(context, global::RPG.GameServer.Protos.CharacterReply.Parser));
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::RPG.GameServer.Protos.CreateCharacterRequest, global::RPG.GameServer.Protos.CharacterReply> __Method_CreateCharacter = new grpc::Method<global::RPG.GameServer.Protos.CreateCharacterRequest, global::RPG.GameServer.Protos.CharacterReply>(
+    static readonly grpc::Method<global::RPG.GameServer.Protos.CharacterRequest, global::RPG.GameServer.Protos.CharacterIdReply> __Method_CreateCharacter = new grpc::Method<global::RPG.GameServer.Protos.CharacterRequest, global::RPG.GameServer.Protos.CharacterIdReply>(
         grpc::MethodType.Unary,
         __ServiceName,
         "CreateCharacter",
-        __Marshaller_rpg_CreateCharacterRequest,
-        __Marshaller_rpg_CharacterReply);
+        __Marshaller_rpg_CharacterRequest,
+        __Marshaller_rpg_CharacterIdReply);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     static readonly grpc::Method<global::RPG.GameServer.Protos.CharacterIdRequest, global::RPG.GameServer.Protos.CharacterReply> __Method_GetCharacter = new grpc::Method<global::RPG.GameServer.Protos.CharacterIdRequest, global::RPG.GameServer.Protos.CharacterReply>(
@@ -79,44 +71,20 @@ namespace RPG.GameServer.Protos {
         __Marshaller_rpg_CharacterReply);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::RPG.GameServer.Protos.UpdateCharacterRequest, global::RPG.GameServer.Protos.CharacterReply> __Method_UpdateCharacter = new grpc::Method<global::RPG.GameServer.Protos.UpdateCharacterRequest, global::RPG.GameServer.Protos.CharacterReply>(
+    static readonly grpc::Method<global::RPG.GameServer.Protos.CharacterRequest, global::RPG.GameServer.Protos.CharacterIdReply> __Method_UpdateCharacter = new grpc::Method<global::RPG.GameServer.Protos.CharacterRequest, global::RPG.GameServer.Protos.CharacterIdReply>(
         grpc::MethodType.Unary,
         __ServiceName,
         "UpdateCharacter",
-        __Marshaller_rpg_UpdateCharacterRequest,
-        __Marshaller_rpg_CharacterReply);
+        __Marshaller_rpg_CharacterRequest,
+        __Marshaller_rpg_CharacterIdReply);
 
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::RPG.GameServer.Protos.MoveCharacterRequest, global::RPG.GameServer.Protos.CharacterReply> __Method_MoveCharacter = new grpc::Method<global::RPG.GameServer.Protos.MoveCharacterRequest, global::RPG.GameServer.Protos.CharacterReply>(
-        grpc::MethodType.Unary,
-        __ServiceName,
-        "MoveCharacter",
-        __Marshaller_rpg_MoveCharacterRequest,
-        __Marshaller_rpg_CharacterReply);
-
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::RPG.GameServer.Protos.EquipItemRequest, global::RPG.GameServer.Protos.CharacterReply> __Method_EquipItem = new grpc::Method<global::RPG.GameServer.Protos.EquipItemRequest, global::RPG.GameServer.Protos.CharacterReply>(
-        grpc::MethodType.Unary,
-        __ServiceName,
-        "EquipItem",
-        __Marshaller_rpg_EquipItemRequest,
-        __Marshaller_rpg_CharacterReply);
-
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::RPG.GameServer.Protos.UnequipItemRequest, global::RPG.GameServer.Protos.CharacterReply> __Method_UnequipItem = new grpc::Method<global::RPG.GameServer.Protos.UnequipItemRequest, global::RPG.GameServer.Protos.CharacterReply>(
-        grpc::MethodType.Unary,
-        __ServiceName,
-        "UnequipItem",
-        __Marshaller_rpg_UnequipItemRequest,
-        __Marshaller_rpg_CharacterReply);
-
-    [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-    static readonly grpc::Method<global::RPG.GameServer.Protos.CharacterIdRequest, global::RPG.GameServer.Protos.DeleteReply> __Method_DeleteCharacter = new grpc::Method<global::RPG.GameServer.Protos.CharacterIdRequest, global::RPG.GameServer.Protos.DeleteReply>(
+    static readonly grpc::Method<global::RPG.GameServer.Protos.CharacterIdRequest, global::RPG.GameServer.Protos.CharacterIdReply> __Method_DeleteCharacter = new grpc::Method<global::RPG.GameServer.Protos.CharacterIdRequest, global::RPG.GameServer.Protos.CharacterIdReply>(
         grpc::MethodType.Unary,
         __ServiceName,
         "DeleteCharacter",
         __Marshaller_rpg_CharacterIdRequest,
-        __Marshaller_rpg_DeleteReply);
+        __Marshaller_rpg_CharacterIdReply);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -129,7 +97,7 @@ namespace RPG.GameServer.Protos {
     public abstract partial class CharacterServiceBase
     {
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::System.Threading.Tasks.Task<global::RPG.GameServer.Protos.CharacterReply> CreateCharacter(global::RPG.GameServer.Protos.CreateCharacterRequest request, grpc::ServerCallContext context)
+      public virtual global::System.Threading.Tasks.Task<global::RPG.GameServer.Protos.CharacterIdReply> CreateCharacter(global::RPG.GameServer.Protos.CharacterRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -141,31 +109,13 @@ namespace RPG.GameServer.Protos {
       }
 
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::System.Threading.Tasks.Task<global::RPG.GameServer.Protos.CharacterReply> UpdateCharacter(global::RPG.GameServer.Protos.UpdateCharacterRequest request, grpc::ServerCallContext context)
+      public virtual global::System.Threading.Tasks.Task<global::RPG.GameServer.Protos.CharacterIdReply> UpdateCharacter(global::RPG.GameServer.Protos.CharacterRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
 
       [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::System.Threading.Tasks.Task<global::RPG.GameServer.Protos.CharacterReply> MoveCharacter(global::RPG.GameServer.Protos.MoveCharacterRequest request, grpc::ServerCallContext context)
-      {
-        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
-      }
-
-      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::System.Threading.Tasks.Task<global::RPG.GameServer.Protos.CharacterReply> EquipItem(global::RPG.GameServer.Protos.EquipItemRequest request, grpc::ServerCallContext context)
-      {
-        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
-      }
-
-      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::System.Threading.Tasks.Task<global::RPG.GameServer.Protos.CharacterReply> UnequipItem(global::RPG.GameServer.Protos.UnequipItemRequest request, grpc::ServerCallContext context)
-      {
-        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
-      }
-
-      [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
-      public virtual global::System.Threading.Tasks.Task<global::RPG.GameServer.Protos.DeleteReply> DeleteCharacter(global::RPG.GameServer.Protos.CharacterIdRequest request, grpc::ServerCallContext context)
+      public virtual global::System.Threading.Tasks.Task<global::RPG.GameServer.Protos.CharacterIdReply> DeleteCharacter(global::RPG.GameServer.Protos.CharacterIdRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -181,9 +131,6 @@ namespace RPG.GameServer.Protos {
           .AddMethod(__Method_CreateCharacter, serviceImpl.CreateCharacter)
           .AddMethod(__Method_GetCharacter, serviceImpl.GetCharacter)
           .AddMethod(__Method_UpdateCharacter, serviceImpl.UpdateCharacter)
-          .AddMethod(__Method_MoveCharacter, serviceImpl.MoveCharacter)
-          .AddMethod(__Method_EquipItem, serviceImpl.EquipItem)
-          .AddMethod(__Method_UnequipItem, serviceImpl.UnequipItem)
           .AddMethod(__Method_DeleteCharacter, serviceImpl.DeleteCharacter).Build();
     }
 
@@ -194,13 +141,10 @@ namespace RPG.GameServer.Protos {
     [global::System.CodeDom.Compiler.GeneratedCode("grpc_csharp_plugin", null)]
     public static void BindService(grpc::ServiceBinderBase serviceBinder, CharacterServiceBase serviceImpl)
     {
-      serviceBinder.AddMethod(__Method_CreateCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::RPG.GameServer.Protos.CreateCharacterRequest, global::RPG.GameServer.Protos.CharacterReply>(serviceImpl.CreateCharacter));
+      serviceBinder.AddMethod(__Method_CreateCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::RPG.GameServer.Protos.CharacterRequest, global::RPG.GameServer.Protos.CharacterIdReply>(serviceImpl.CreateCharacter));
       serviceBinder.AddMethod(__Method_GetCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::RPG.GameServer.Protos.CharacterIdRequest, global::RPG.GameServer.Protos.CharacterReply>(serviceImpl.GetCharacter));
-      serviceBinder.AddMethod(__Method_UpdateCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::RPG.GameServer.Protos.UpdateCharacterRequest, global::RPG.GameServer.Protos.CharacterReply>(serviceImpl.UpdateCharacter));
-      serviceBinder.AddMethod(__Method_MoveCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::RPG.GameServer.Protos.MoveCharacterRequest, global::RPG.GameServer.Protos.CharacterReply>(serviceImpl.MoveCharacter));
-      serviceBinder.AddMethod(__Method_EquipItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::RPG.GameServer.Protos.EquipItemRequest, global::RPG.GameServer.Protos.CharacterReply>(serviceImpl.EquipItem));
-      serviceBinder.AddMethod(__Method_UnequipItem, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::RPG.GameServer.Protos.UnequipItemRequest, global::RPG.GameServer.Protos.CharacterReply>(serviceImpl.UnequipItem));
-      serviceBinder.AddMethod(__Method_DeleteCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::RPG.GameServer.Protos.CharacterIdRequest, global::RPG.GameServer.Protos.DeleteReply>(serviceImpl.DeleteCharacter));
+      serviceBinder.AddMethod(__Method_UpdateCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::RPG.GameServer.Protos.CharacterRequest, global::RPG.GameServer.Protos.CharacterIdReply>(serviceImpl.UpdateCharacter));
+      serviceBinder.AddMethod(__Method_DeleteCharacter, serviceImpl == null ? null : new grpc::UnaryServerMethod<global::RPG.GameServer.Protos.CharacterIdRequest, global::RPG.GameServer.Protos.CharacterIdReply>(serviceImpl.DeleteCharacter));
     }
 
   }

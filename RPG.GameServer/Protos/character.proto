@@ -2,10 +2,29 @@ syntax = "proto3";
 option csharp_namespace = "RPG.GameServer.Protos";
 package rpg;
 
-enum CharacterType {
-  PLAYER = 0;
-  FRIENDLY_NPC = 1;
-  HOSTILE_NPC = 2;
+message Stats {
+  int32 strength = 1;
+  int32 agility = 2;
+  int32 intelligence = 3;
+  int32 wisdom = 4;
+  int32 dexterity = 5;
+  int32 vitality = 6;
+  int32 magicResist = 7;
+  int32 natureResist = 8;
+  int32 misticResist = 9;
+  int32 armor = 10;
+  int32 critChance = 11;
+  int32 hitChance = 12;
+  int32 attackSpeed = 13;
+  int32 moveSpeed = 14;
+}
+
+message Item {
+  string id = 1;
+  string name = 2;
+  ItemType type = 3;
+  map<string, int32> modifiers = 4;
+  int32 requiredLevel = 5;
 }
 
 enum ItemType {
@@ -13,97 +32,161 @@ enum ItemType {
   ARMOR = 1;
   CONSUMABLE = 2;
   QUEST_ITEM = 3;
+  MISCELLANEOUS = 4;
 }
 
-message Stats {
-  int32 strength = 1;
-  int32 dexterity = 2;
-  int32 intelligence = 3;
-  int32 vitality = 4;
-  int32 wisdom = 5;
-  int32 charisma = 6;
+message EquipmentSlots {
+  Item head = 1;
+  Item chest = 2;
+  Item weapon = 3;
+  Item shield = 4;
+  Item boots = 5;
+  Item gloves = 6;
+  repeated Item rings = 7;
+  Item amulet = 8;
+}
+
+enum CharacterClass {
+  WARRIOR = 0;
+  MAGE = 1;
+  WARLOCK = 2;
+  PALADIN = 3;
+  SHAMAN = 4;
+  MONK = 5;
+  ASSASSIN = 6;
+  DRUID = 7;
+}
+
+message BaseCharacter {
+  string id = 1;
+  string name = 2;
+  int32 level = 3;
+  int32 maxHealth = 4;
+  int32 currentHealth = 5;
+  int32 maxMana = 6;
+  int32 currentMana = 7;
+  Stats stats = 8;
+  repeated Skill skills = 9;
+  map<int32, string> skillCooldowns = 10; // Using string for DateTime representation
+  Location position = 11;
+  repeated Effect activeEffects = 12;
+}
+
+message Skill {
+  int32 id = 1;
+  string name = 2;
+  SkillType type = 3;
+  int32 manaCost = 4;
+  float cooldownSeconds = 5;
+  int32 requiredLevel = 6;
+  int32 power = 7;
+  float range = 8;
+  float durationSeconds = 9;
+  string effectDescription = 10;
+  repeated Effect appliedEffects = 11;
+  bool canCastWhileMoving = 12;
+}
+
+enum SkillType {
+  MELEE_ATTACK = 0;
+  RANGED_ATTACK = 1;
+  MAGIC_DAMAGE = 2;
+  AREA_OF_EFFECT = 3;
+  DAMAGE_OVER_TIME = 4;
+  SHIELD = 5;
+  DODGE = 6;
+  ARMOR_BOOST = 7;
+  RESISTANCE_BOOST = 8;
+  HEAL = 9;
+  MANA_RESTORE = 10;
+  BUFF = 11;
+  DEBUFF = 12;
+  SUMMON = 13;
+  STUN = 14;
+  FREEZE = 15;
+  SLOW = 16;
+  KNOCKBACK = 17;
+  PASSIVE = 18;
+  AURA = 19;
+  TELEPORT = 20;
+  TRAP = 21;
+  CURSE = 22;
+  CHARM = 23;
+  REVEAL = 24;
+  DETECT = 25;
 }
 
 message Location {
-  float x = 1;
-  float y = 2;
-  float z = 3;
+  double x = 1;
+  double y = 2;
+  double z = 3;
 }
 
-message Item {
-  string id = 1;
-  string name = 2;
-  ItemType type = 3;
-  int32 value = 4;
-  Stats stats = 5;
-  bool IsEquipped = 6;
+enum Effect {
+  POISONED = 0;
+  FROZEN = 1;
+  BURNING = 2;
+  SILENCED = 3;
+  STUNNED = 4;
+  CURSED = 5;
 }
 
-message Character {
-  string id = 1;
-  string name = 2;
-  string class = 3;
-  int32 level = 4;
-  int32 health = 5;
-  int32 mana = 6;
-  CharacterType type = 7;
-  Stats stats = 8;
-  Location location = 9;
-  repeated Item inventory = 10;
-  map<string, Item> equipment = 11;
+message PlayerCharacter {
+  BaseCharacter baseCharacter = 1;
+  EquipmentSlots equipment = 2;
+  repeated Item inventory = 3;
+  map<int32, int32> skillLevels = 4;
+  string sessionId = 5;
+  CharacterClass characterClass = 6;
 }
 
-message CreateCharacterRequest {
-  string name = 1;
-  string class = 2;
-  CharacterType type = 3;
-  Stats stats = 4;
+message CharacterRequest {
+  PlayerCharacter character = 1;
 }
 
 message CharacterIdRequest {
-  string id = 1;
-}
-
-message UpdateCharacterRequest {
-  string id = 1;
-  int32 level = 2;
-  int32 health = 3;
-  int32 mana = 4;
-  Stats stats = 5;
-}
-
-message MoveCharacterRequest {
-  string id = 1;
-  float deltaX = 2;
-  float deltaY = 3;
-  float deltaZ = 4;
-}
-
-message EquipItemRequest {
   string characterId = 1;
-  string itemId = 2;
-  string slot = 3;
-}
-
-message UnequipItemRequest {
-  string characterId = 1;
-  string slot = 2;
 }
 
 message CharacterReply {
-  Character character = 1;
+  PlayerCharacter character = 1;
 }
 
-message DeleteReply {
-  bool success = 1;
+message CharacterIdReply {
+  bool characterId = 1;
+}
+
+message ProtobufSkill {
+  int32 id = 1;
+  string name = 2;
+  SkillType type = 3;
+  int32 manaCost = 4;
+  float cooldownSeconds = 5;
+}
+
+message ProtobufEquipmentSlots {
+  Item head = 1;
+  Item chest = 2;
+  Item weapon = 3;
+  Item shield = 4;
+  Item boots = 5;
+  Item gloves = 6;
+  repeated Item rings = 7;
+  Item amulet = 8;
+}
+
+message ProtobufItem {
+  string id = 1;
+  string name = 2;
+  ItemType type = 3;
+  map<string, int32> modifiers = 4;
+  int32 requiredLevel = 5;
 }
 
 service CharacterService {
-  rpc CreateCharacter (CreateCharacterRequest) returns (CharacterReply);
+  rpc CreateCharacter (CharacterRequest) returns (CharacterIdReply);
   rpc GetCharacter (CharacterIdRequest) returns (CharacterReply);
-  rpc UpdateCharacter (UpdateCharacterRequest) returns (CharacterReply);
-  rpc MoveCharacter (MoveCharacterRequest) returns (CharacterReply);
-  rpc EquipItem (EquipItemRequest) returns (CharacterReply);
-  rpc UnequipItem (UnequipItemRequest) returns (CharacterReply);
-  rpc DeleteCharacter (CharacterIdRequest) returns (DeleteReply);
+  rpc UpdateCharacter (CharacterRequest) returns (CharacterIdReply);
+  rpc DeleteCharacter (CharacterIdRequest) returns (CharacterIdReply);
 }
+

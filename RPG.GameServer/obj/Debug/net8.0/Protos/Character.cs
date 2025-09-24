@@ -24,79 +24,162 @@ namespace RPG.GameServer.Protos {
     static CharacterReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChZQcm90b3MvY2hhcmFjdGVyLnByb3RvEgNycGcidgoFU3RhdHMSEAoIc3Ry",
-            "ZW5ndGgYASABKAUSEQoJZGV4dGVyaXR5GAIgASgFEhQKDGludGVsbGlnZW5j",
-            "ZRgDIAEoBRIQCgh2aXRhbGl0eRgEIAEoBRIOCgZ3aXNkb20YBSABKAUSEAoI",
-            "Y2hhcmlzbWEYBiABKAUiKwoITG9jYXRpb24SCQoBeBgBIAEoAhIJCgF5GAIg",
-            "ASgCEgkKAXoYAyABKAIiewoESXRlbRIKCgJpZBgBIAEoCRIMCgRuYW1lGAIg",
-            "ASgJEhsKBHR5cGUYAyABKA4yDS5ycGcuSXRlbVR5cGUSDQoFdmFsdWUYBCAB",
-            "KAUSGQoFc3RhdHMYBSABKAsyCi5ycGcuU3RhdHMSEgoKSXNFcXVpcHBlZBgG",
-            "IAEoCCLMAgoJQ2hhcmFjdGVyEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkS",
-            "DQoFY2xhc3MYAyABKAkSDQoFbGV2ZWwYBCABKAUSDgoGaGVhbHRoGAUgASgF",
-            "EgwKBG1hbmEYBiABKAUSIAoEdHlwZRgHIAEoDjISLnJwZy5DaGFyYWN0ZXJU",
-            "eXBlEhkKBXN0YXRzGAggASgLMgoucnBnLlN0YXRzEh8KCGxvY2F0aW9uGAkg",
-            "ASgLMg0ucnBnLkxvY2F0aW9uEhwKCWludmVudG9yeRgKIAMoCzIJLnJwZy5J",
-            "dGVtEjAKCWVxdWlwbWVudBgLIAMoCzIdLnJwZy5DaGFyYWN0ZXIuRXF1aXBt",
-            "ZW50RW50cnkaOwoORXF1aXBtZW50RW50cnkSCwoDa2V5GAEgASgJEhgKBXZh",
-            "bHVlGAIgASgLMgkucnBnLkl0ZW06AjgBInIKFkNyZWF0ZUNoYXJhY3RlclJl",
-            "cXVlc3QSDAoEbmFtZRgBIAEoCRINCgVjbGFzcxgCIAEoCRIgCgR0eXBlGAMg",
-            "ASgOMhIucnBnLkNoYXJhY3RlclR5cGUSGQoFc3RhdHMYBCABKAsyCi5ycGcu",
-            "U3RhdHMiIAoSQ2hhcmFjdGVySWRSZXF1ZXN0EgoKAmlkGAEgASgJImwKFlVw",
-            "ZGF0ZUNoYXJhY3RlclJlcXVlc3QSCgoCaWQYASABKAkSDQoFbGV2ZWwYAiAB",
-            "KAUSDgoGaGVhbHRoGAMgASgFEgwKBG1hbmEYBCABKAUSGQoFc3RhdHMYBSAB",
-            "KAsyCi5ycGcuU3RhdHMiUgoUTW92ZUNoYXJhY3RlclJlcXVlc3QSCgoCaWQY",
-            "ASABKAkSDgoGZGVsdGFYGAIgASgCEg4KBmRlbHRhWRgDIAEoAhIOCgZkZWx0",
-            "YVoYBCABKAIiRQoQRXF1aXBJdGVtUmVxdWVzdBITCgtjaGFyYWN0ZXJJZBgB",
-            "IAEoCRIOCgZpdGVtSWQYAiABKAkSDAoEc2xvdBgDIAEoCSI3ChJVbmVxdWlw",
-            "SXRlbVJlcXVlc3QSEwoLY2hhcmFjdGVySWQYASABKAkSDAoEc2xvdBgCIAEo",
-            "CSIzCg5DaGFyYWN0ZXJSZXBseRIhCgljaGFyYWN0ZXIYASABKAsyDi5ycGcu",
-            "Q2hhcmFjdGVyIh4KC0RlbGV0ZVJlcGx5Eg8KB3N1Y2Nlc3MYASABKAgqPgoN",
-            "Q2hhcmFjdGVyVHlwZRIKCgZQTEFZRVIQABIQCgxGUklFTkRMWV9OUEMQARIP",
-            "CgtIT1NUSUxFX05QQxACKkEKCEl0ZW1UeXBlEgoKBldFQVBPThAAEgkKBUFS",
-            "TU9SEAESDgoKQ09OU1VNQUJMRRACEg4KClFVRVNUX0lURU0QAzLPAwoQQ2hh",
-            "cmFjdGVyU2VydmljZRJDCg9DcmVhdGVDaGFyYWN0ZXISGy5ycGcuQ3JlYXRl",
-            "Q2hhcmFjdGVyUmVxdWVzdBoTLnJwZy5DaGFyYWN0ZXJSZXBseRI8CgxHZXRD",
-            "aGFyYWN0ZXISFy5ycGcuQ2hhcmFjdGVySWRSZXF1ZXN0GhMucnBnLkNoYXJh",
-            "Y3RlclJlcGx5EkMKD1VwZGF0ZUNoYXJhY3RlchIbLnJwZy5VcGRhdGVDaGFy",
-            "YWN0ZXJSZXF1ZXN0GhMucnBnLkNoYXJhY3RlclJlcGx5Ej8KDU1vdmVDaGFy",
-            "YWN0ZXISGS5ycGcuTW92ZUNoYXJhY3RlclJlcXVlc3QaEy5ycGcuQ2hhcmFj",
-            "dGVyUmVwbHkSNwoJRXF1aXBJdGVtEhUucnBnLkVxdWlwSXRlbVJlcXVlc3Qa",
-            "Ey5ycGcuQ2hhcmFjdGVyUmVwbHkSOwoLVW5lcXVpcEl0ZW0SFy5ycGcuVW5l",
-            "cXVpcEl0ZW1SZXF1ZXN0GhMucnBnLkNoYXJhY3RlclJlcGx5EjwKD0RlbGV0",
-            "ZUNoYXJhY3RlchIXLnJwZy5DaGFyYWN0ZXJJZFJlcXVlc3QaEC5ycGcuRGVs",
-            "ZXRlUmVwbHlCGKoCFVJQRy5HYW1lU2VydmVyLlByb3Rvc2IGcHJvdG8z"));
+            "ChZQcm90b3MvY2hhcmFjdGVyLnByb3RvEgNycGcilAIKBVN0YXRzEhAKCHN0",
+            "cmVuZ3RoGAEgASgFEg8KB2FnaWxpdHkYAiABKAUSFAoMaW50ZWxsaWdlbmNl",
+            "GAMgASgFEg4KBndpc2RvbRgEIAEoBRIRCglkZXh0ZXJpdHkYBSABKAUSEAoI",
+            "dml0YWxpdHkYBiABKAUSEwoLbWFnaWNSZXNpc3QYByABKAUSFAoMbmF0dXJl",
+            "UmVzaXN0GAggASgFEhQKDG1pc3RpY1Jlc2lzdBgJIAEoBRINCgVhcm1vchgK",
+            "IAEoBRISCgpjcml0Q2hhbmNlGAsgASgFEhEKCWhpdENoYW5jZRgMIAEoBRIT",
+            "CgthdHRhY2tTcGVlZBgNIAEoBRIRCgltb3ZlU3BlZWQYDiABKAUiswEKBEl0",
+            "ZW0SCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIbCgR0eXBlGAMgASgOMg0u",
+            "cnBnLkl0ZW1UeXBlEisKCW1vZGlmaWVycxgEIAMoCzIYLnJwZy5JdGVtLk1v",
+            "ZGlmaWVyc0VudHJ5EhUKDXJlcXVpcmVkTGV2ZWwYBSABKAUaMAoOTW9kaWZp",
+            "ZXJzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgFOgI4ASLjAQoO",
+            "RXF1aXBtZW50U2xvdHMSFwoEaGVhZBgBIAEoCzIJLnJwZy5JdGVtEhgKBWNo",
+            "ZXN0GAIgASgLMgkucnBnLkl0ZW0SGQoGd2VhcG9uGAMgASgLMgkucnBnLkl0",
+            "ZW0SGQoGc2hpZWxkGAQgASgLMgkucnBnLkl0ZW0SGAoFYm9vdHMYBSABKAsy",
+            "CS5ycGcuSXRlbRIZCgZnbG92ZXMYBiABKAsyCS5ycGcuSXRlbRIYCgVyaW5n",
+            "cxgHIAMoCzIJLnJwZy5JdGVtEhkKBmFtdWxldBgIIAEoCzIJLnJwZy5JdGVt",
+            "IvsCCg1CYXNlQ2hhcmFjdGVyEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkS",
+            "DQoFbGV2ZWwYAyABKAUSEQoJbWF4SGVhbHRoGAQgASgFEhUKDWN1cnJlbnRI",
+            "ZWFsdGgYBSABKAUSDwoHbWF4TWFuYRgGIAEoBRITCgtjdXJyZW50TWFuYRgH",
+            "IAEoBRIZCgVzdGF0cxgIIAEoCzIKLnJwZy5TdGF0cxIaCgZza2lsbHMYCSAD",
+            "KAsyCi5ycGcuU2tpbGwSPgoOc2tpbGxDb29sZG93bnMYCiADKAsyJi5ycGcu",
+            "QmFzZUNoYXJhY3Rlci5Ta2lsbENvb2xkb3duc0VudHJ5Eh8KCHBvc2l0aW9u",
+            "GAsgASgLMg0ucnBnLkxvY2F0aW9uEiIKDWFjdGl2ZUVmZmVjdHMYDCADKA4y",
+            "Cy5ycGcuRWZmZWN0GjUKE1NraWxsQ29vbGRvd25zRW50cnkSCwoDa2V5GAEg",
+            "ASgFEg0KBXZhbHVlGAIgASgJOgI4ASKUAgoFU2tpbGwSCgoCaWQYASABKAUS",
+            "DAoEbmFtZRgCIAEoCRIcCgR0eXBlGAMgASgOMg4ucnBnLlNraWxsVHlwZRIQ",
+            "CghtYW5hQ29zdBgEIAEoBRIXCg9jb29sZG93blNlY29uZHMYBSABKAISFQoN",
+            "cmVxdWlyZWRMZXZlbBgGIAEoBRINCgVwb3dlchgHIAEoBRINCgVyYW5nZRgI",
+            "IAEoAhIXCg9kdXJhdGlvblNlY29uZHMYCSABKAISGQoRZWZmZWN0RGVzY3Jp",
+            "cHRpb24YCiABKAkSIwoOYXBwbGllZEVmZmVjdHMYCyADKA4yCy5ycGcuRWZm",
+            "ZWN0EhoKEmNhbkNhc3RXaGlsZU1vdmluZxgMIAEoCCIrCghMb2NhdGlvbhIJ",
+            "CgF4GAEgASgBEgkKAXkYAiABKAESCQoBehgDIAEoASKyAgoPUGxheWVyQ2hh",
+            "cmFjdGVyEikKDWJhc2VDaGFyYWN0ZXIYASABKAsyEi5ycGcuQmFzZUNoYXJh",
+            "Y3RlchImCgllcXVpcG1lbnQYAiABKAsyEy5ycGcuRXF1aXBtZW50U2xvdHMS",
+            "HAoJaW52ZW50b3J5GAMgAygLMgkucnBnLkl0ZW0SOgoLc2tpbGxMZXZlbHMY",
+            "BCADKAsyJS5ycGcuUGxheWVyQ2hhcmFjdGVyLlNraWxsTGV2ZWxzRW50cnkS",
+            "EQoJc2Vzc2lvbklkGAUgASgJEisKDmNoYXJhY3RlckNsYXNzGAYgASgOMhMu",
+            "cnBnLkNoYXJhY3RlckNsYXNzGjIKEFNraWxsTGV2ZWxzRW50cnkSCwoDa2V5",
+            "GAEgASgFEg0KBXZhbHVlGAIgASgFOgI4ASI7ChBDaGFyYWN0ZXJSZXF1ZXN0",
+            "EicKCWNoYXJhY3RlchgBIAEoCzIULnJwZy5QbGF5ZXJDaGFyYWN0ZXIiKQoS",
+            "Q2hhcmFjdGVySWRSZXF1ZXN0EhMKC2NoYXJhY3RlcklkGAEgASgJIjkKDkNo",
+            "YXJhY3RlclJlcGx5EicKCWNoYXJhY3RlchgBIAEoCzIULnJwZy5QbGF5ZXJD",
+            "aGFyYWN0ZXIiJwoQQ2hhcmFjdGVySWRSZXBseRITCgtjaGFyYWN0ZXJJZBgB",
+            "IAEoCCJyCg1Qcm90b2J1ZlNraWxsEgoKAmlkGAEgASgFEgwKBG5hbWUYAiAB",
+            "KAkSHAoEdHlwZRgDIAEoDjIOLnJwZy5Ta2lsbFR5cGUSEAoIbWFuYUNvc3QY",
+            "BCABKAUSFwoPY29vbGRvd25TZWNvbmRzGAUgASgCIusBChZQcm90b2J1ZkVx",
+            "dWlwbWVudFNsb3RzEhcKBGhlYWQYASABKAsyCS5ycGcuSXRlbRIYCgVjaGVz",
+            "dBgCIAEoCzIJLnJwZy5JdGVtEhkKBndlYXBvbhgDIAEoCzIJLnJwZy5JdGVt",
+            "EhkKBnNoaWVsZBgEIAEoCzIJLnJwZy5JdGVtEhgKBWJvb3RzGAUgASgLMgku",
+            "cnBnLkl0ZW0SGQoGZ2xvdmVzGAYgASgLMgkucnBnLkl0ZW0SGAoFcmluZ3MY",
+            "ByADKAsyCS5ycGcuSXRlbRIZCgZhbXVsZXQYCCABKAsyCS5ycGcuSXRlbSLD",
+            "AQoMUHJvdG9idWZJdGVtEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSGwoE",
+            "dHlwZRgDIAEoDjINLnJwZy5JdGVtVHlwZRIzCgltb2RpZmllcnMYBCADKAsy",
+            "IC5ycGcuUHJvdG9idWZJdGVtLk1vZGlmaWVyc0VudHJ5EhUKDXJlcXVpcmVk",
+            "TGV2ZWwYBSABKAUaMAoOTW9kaWZpZXJzRW50cnkSCwoDa2V5GAEgASgJEg0K",
+            "BXZhbHVlGAIgASgFOgI4ASpUCghJdGVtVHlwZRIKCgZXRUFQT04QABIJCgVB",
+            "Uk1PUhABEg4KCkNPTlNVTUFCTEUQAhIOCgpRVUVTVF9JVEVNEAMSEQoNTUlT",
+            "Q0VMTEFORU9VUxAEKnAKDkNoYXJhY3RlckNsYXNzEgsKB1dBUlJJT1IQABII",
+            "CgRNQUdFEAESCwoHV0FSTE9DSxACEgsKB1BBTEFESU4QAxIKCgZTSEFNQU4Q",
+            "BBIICgRNT05LEAUSDAoIQVNTQVNTSU4QBhIJCgVEUlVJRBAHKvQCCglTa2ls",
+            "bFR5cGUSEAoMTUVMRUVfQVRUQUNLEAASEQoNUkFOR0VEX0FUVEFDSxABEhAK",
+            "DE1BR0lDX0RBTUFHRRACEhIKDkFSRUFfT0ZfRUZGRUNUEAMSFAoQREFNQUdF",
+            "X09WRVJfVElNRRAEEgoKBlNISUVMRBAFEgkKBURPREdFEAYSDwoLQVJNT1Jf",
+            "Qk9PU1QQBxIUChBSRVNJU1RBTkNFX0JPT1NUEAgSCAoESEVBTBAJEhAKDE1B",
+            "TkFfUkVTVE9SRRAKEggKBEJVRkYQCxIKCgZERUJVRkYQDBIKCgZTVU1NT04Q",
+            "DRIICgRTVFVOEA4SCgoGRlJFRVpFEA8SCAoEU0xPVxAQEg0KCUtOT0NLQkFD",
+            "SxAREgsKB1BBU1NJVkUQEhIICgRBVVJBEBMSDAoIVEVMRVBPUlQQFBIICgRU",
+            "UkFQEBUSCQoFQ1VSU0UQFhIJCgVDSEFSTRAXEgoKBlJFVkVBTBAYEgoKBkRF",
+            "VEVDVBAZKlYKBkVmZmVjdBIMCghQT0lTT05FRBAAEgoKBkZST1pFThABEgsK",
+            "B0JVUk5JTkcQAhIMCghTSUxFTkNFRBADEgsKB1NUVU5ORUQQBBIKCgZDVVJT",
+            "RUQQBTKVAgoQQ2hhcmFjdGVyU2VydmljZRI/Cg9DcmVhdGVDaGFyYWN0ZXIS",
+            "FS5ycGcuQ2hhcmFjdGVyUmVxdWVzdBoVLnJwZy5DaGFyYWN0ZXJJZFJlcGx5",
+            "EjwKDEdldENoYXJhY3RlchIXLnJwZy5DaGFyYWN0ZXJJZFJlcXVlc3QaEy5y",
+            "cGcuQ2hhcmFjdGVyUmVwbHkSPwoPVXBkYXRlQ2hhcmFjdGVyEhUucnBnLkNo",
+            "YXJhY3RlclJlcXVlc3QaFS5ycGcuQ2hhcmFjdGVySWRSZXBseRJBCg9EZWxl",
+            "dGVDaGFyYWN0ZXISFy5ycGcuQ2hhcmFjdGVySWRSZXF1ZXN0GhUucnBnLkNo",
+            "YXJhY3RlcklkUmVwbHlCGKoCFVJQRy5HYW1lU2VydmVyLlByb3Rvc2IGcHJv",
+            "dG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::RPG.GameServer.Protos.CharacterType), typeof(global::RPG.GameServer.Protos.ItemType), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.Stats), global::RPG.GameServer.Protos.Stats.Parser, new[]{ "Strength", "Dexterity", "Intelligence", "Vitality", "Wisdom", "Charisma" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::RPG.GameServer.Protos.ItemType), typeof(global::RPG.GameServer.Protos.CharacterClass), typeof(global::RPG.GameServer.Protos.SkillType), typeof(global::RPG.GameServer.Protos.Effect), }, null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.Stats), global::RPG.GameServer.Protos.Stats.Parser, new[]{ "Strength", "Agility", "Intelligence", "Wisdom", "Dexterity", "Vitality", "MagicResist", "NatureResist", "MisticResist", "Armor", "CritChance", "HitChance", "AttackSpeed", "MoveSpeed" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.Item), global::RPG.GameServer.Protos.Item.Parser, new[]{ "Id", "Name", "Type", "Modifiers", "RequiredLevel" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.EquipmentSlots), global::RPG.GameServer.Protos.EquipmentSlots.Parser, new[]{ "Head", "Chest", "Weapon", "Shield", "Boots", "Gloves", "Rings", "Amulet" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.BaseCharacter), global::RPG.GameServer.Protos.BaseCharacter.Parser, new[]{ "Id", "Name", "Level", "MaxHealth", "CurrentHealth", "MaxMana", "CurrentMana", "Stats", "Skills", "SkillCooldowns", "Position", "ActiveEffects" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.Skill), global::RPG.GameServer.Protos.Skill.Parser, new[]{ "Id", "Name", "Type", "ManaCost", "CooldownSeconds", "RequiredLevel", "Power", "Range", "DurationSeconds", "EffectDescription", "AppliedEffects", "CanCastWhileMoving" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.Location), global::RPG.GameServer.Protos.Location.Parser, new[]{ "X", "Y", "Z" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.Item), global::RPG.GameServer.Protos.Item.Parser, new[]{ "Id", "Name", "Type", "Value", "Stats", "IsEquipped" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.Character), global::RPG.GameServer.Protos.Character.Parser, new[]{ "Id", "Name", "Class", "Level", "Health", "Mana", "Type", "Stats", "Location", "Inventory", "Equipment" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
-            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.CreateCharacterRequest), global::RPG.GameServer.Protos.CreateCharacterRequest.Parser, new[]{ "Name", "Class", "Type", "Stats" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.CharacterIdRequest), global::RPG.GameServer.Protos.CharacterIdRequest.Parser, new[]{ "Id" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.UpdateCharacterRequest), global::RPG.GameServer.Protos.UpdateCharacterRequest.Parser, new[]{ "Id", "Level", "Health", "Mana", "Stats" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.MoveCharacterRequest), global::RPG.GameServer.Protos.MoveCharacterRequest.Parser, new[]{ "Id", "DeltaX", "DeltaY", "DeltaZ" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.EquipItemRequest), global::RPG.GameServer.Protos.EquipItemRequest.Parser, new[]{ "CharacterId", "ItemId", "Slot" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.UnequipItemRequest), global::RPG.GameServer.Protos.UnequipItemRequest.Parser, new[]{ "CharacterId", "Slot" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.PlayerCharacter), global::RPG.GameServer.Protos.PlayerCharacter.Parser, new[]{ "BaseCharacter", "Equipment", "Inventory", "SkillLevels", "SessionId", "CharacterClass" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, }),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.CharacterRequest), global::RPG.GameServer.Protos.CharacterRequest.Parser, new[]{ "Character" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.CharacterIdRequest), global::RPG.GameServer.Protos.CharacterIdRequest.Parser, new[]{ "CharacterId" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.CharacterReply), global::RPG.GameServer.Protos.CharacterReply.Parser, new[]{ "Character" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.DeleteReply), global::RPG.GameServer.Protos.DeleteReply.Parser, new[]{ "Success" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.CharacterIdReply), global::RPG.GameServer.Protos.CharacterIdReply.Parser, new[]{ "CharacterId" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.ProtobufSkill), global::RPG.GameServer.Protos.ProtobufSkill.Parser, new[]{ "Id", "Name", "Type", "ManaCost", "CooldownSeconds" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.ProtobufEquipmentSlots), global::RPG.GameServer.Protos.ProtobufEquipmentSlots.Parser, new[]{ "Head", "Chest", "Weapon", "Shield", "Boots", "Gloves", "Rings", "Amulet" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::RPG.GameServer.Protos.ProtobufItem), global::RPG.GameServer.Protos.ProtobufItem.Parser, new[]{ "Id", "Name", "Type", "Modifiers", "RequiredLevel" }, null, null, null, new pbr::GeneratedClrTypeInfo[] { null, })
           }));
     }
     #endregion
 
   }
   #region Enums
-  public enum CharacterType {
-    [pbr::OriginalName("PLAYER")] Player = 0,
-    [pbr::OriginalName("FRIENDLY_NPC")] FriendlyNpc = 1,
-    [pbr::OriginalName("HOSTILE_NPC")] HostileNpc = 2,
-  }
-
   public enum ItemType {
     [pbr::OriginalName("WEAPON")] Weapon = 0,
     [pbr::OriginalName("ARMOR")] Armor = 1,
     [pbr::OriginalName("CONSUMABLE")] Consumable = 2,
     [pbr::OriginalName("QUEST_ITEM")] QuestItem = 3,
+    [pbr::OriginalName("MISCELLANEOUS")] Miscellaneous = 4,
+  }
+
+  public enum CharacterClass {
+    [pbr::OriginalName("WARRIOR")] Warrior = 0,
+    [pbr::OriginalName("MAGE")] Mage = 1,
+    [pbr::OriginalName("WARLOCK")] Warlock = 2,
+    [pbr::OriginalName("PALADIN")] Paladin = 3,
+    [pbr::OriginalName("SHAMAN")] Shaman = 4,
+    [pbr::OriginalName("MONK")] Monk = 5,
+    [pbr::OriginalName("ASSASSIN")] Assassin = 6,
+    [pbr::OriginalName("DRUID")] Druid = 7,
+  }
+
+  public enum SkillType {
+    [pbr::OriginalName("MELEE_ATTACK")] MeleeAttack = 0,
+    [pbr::OriginalName("RANGED_ATTACK")] RangedAttack = 1,
+    [pbr::OriginalName("MAGIC_DAMAGE")] MagicDamage = 2,
+    [pbr::OriginalName("AREA_OF_EFFECT")] AreaOfEffect = 3,
+    [pbr::OriginalName("DAMAGE_OVER_TIME")] DamageOverTime = 4,
+    [pbr::OriginalName("SHIELD")] Shield = 5,
+    [pbr::OriginalName("DODGE")] Dodge = 6,
+    [pbr::OriginalName("ARMOR_BOOST")] ArmorBoost = 7,
+    [pbr::OriginalName("RESISTANCE_BOOST")] ResistanceBoost = 8,
+    [pbr::OriginalName("HEAL")] Heal = 9,
+    [pbr::OriginalName("MANA_RESTORE")] ManaRestore = 10,
+    [pbr::OriginalName("BUFF")] Buff = 11,
+    [pbr::OriginalName("DEBUFF")] Debuff = 12,
+    [pbr::OriginalName("SUMMON")] Summon = 13,
+    [pbr::OriginalName("STUN")] Stun = 14,
+    [pbr::OriginalName("FREEZE")] Freeze = 15,
+    [pbr::OriginalName("SLOW")] Slow = 16,
+    [pbr::OriginalName("KNOCKBACK")] Knockback = 17,
+    [pbr::OriginalName("PASSIVE")] Passive = 18,
+    [pbr::OriginalName("AURA")] Aura = 19,
+    [pbr::OriginalName("TELEPORT")] Teleport = 20,
+    [pbr::OriginalName("TRAP")] Trap = 21,
+    [pbr::OriginalName("CURSE")] Curse = 22,
+    [pbr::OriginalName("CHARM")] Charm = 23,
+    [pbr::OriginalName("REVEAL")] Reveal = 24,
+    [pbr::OriginalName("DETECT")] Detect = 25,
+  }
+
+  public enum Effect {
+    [pbr::OriginalName("POISONED")] Poisoned = 0,
+    [pbr::OriginalName("FROZEN")] Frozen = 1,
+    [pbr::OriginalName("BURNING")] Burning = 2,
+    [pbr::OriginalName("SILENCED")] Silenced = 3,
+    [pbr::OriginalName("STUNNED")] Stunned = 4,
+    [pbr::OriginalName("CURSED")] Cursed = 5,
   }
 
   #endregion
@@ -137,11 +220,19 @@ namespace RPG.GameServer.Protos {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Stats(Stats other) : this() {
       strength_ = other.strength_;
-      dexterity_ = other.dexterity_;
+      agility_ = other.agility_;
       intelligence_ = other.intelligence_;
-      vitality_ = other.vitality_;
       wisdom_ = other.wisdom_;
-      charisma_ = other.charisma_;
+      dexterity_ = other.dexterity_;
+      vitality_ = other.vitality_;
+      magicResist_ = other.magicResist_;
+      natureResist_ = other.natureResist_;
+      misticResist_ = other.misticResist_;
+      armor_ = other.armor_;
+      critChance_ = other.critChance_;
+      hitChance_ = other.hitChance_;
+      attackSpeed_ = other.attackSpeed_;
+      moveSpeed_ = other.moveSpeed_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -163,15 +254,15 @@ namespace RPG.GameServer.Protos {
       }
     }
 
-    /// <summary>Field number for the "dexterity" field.</summary>
-    public const int DexterityFieldNumber = 2;
-    private int dexterity_;
+    /// <summary>Field number for the "agility" field.</summary>
+    public const int AgilityFieldNumber = 2;
+    private int agility_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int Dexterity {
-      get { return dexterity_; }
+    public int Agility {
+      get { return agility_; }
       set {
-        dexterity_ = value;
+        agility_ = value;
       }
     }
 
@@ -187,20 +278,8 @@ namespace RPG.GameServer.Protos {
       }
     }
 
-    /// <summary>Field number for the "vitality" field.</summary>
-    public const int VitalityFieldNumber = 4;
-    private int vitality_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int Vitality {
-      get { return vitality_; }
-      set {
-        vitality_ = value;
-      }
-    }
-
     /// <summary>Field number for the "wisdom" field.</summary>
-    public const int WisdomFieldNumber = 5;
+    public const int WisdomFieldNumber = 4;
     private int wisdom_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -211,15 +290,123 @@ namespace RPG.GameServer.Protos {
       }
     }
 
-    /// <summary>Field number for the "charisma" field.</summary>
-    public const int CharismaFieldNumber = 6;
-    private int charisma_;
+    /// <summary>Field number for the "dexterity" field.</summary>
+    public const int DexterityFieldNumber = 5;
+    private int dexterity_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int Charisma {
-      get { return charisma_; }
+    public int Dexterity {
+      get { return dexterity_; }
       set {
-        charisma_ = value;
+        dexterity_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "vitality" field.</summary>
+    public const int VitalityFieldNumber = 6;
+    private int vitality_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int Vitality {
+      get { return vitality_; }
+      set {
+        vitality_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "magicResist" field.</summary>
+    public const int MagicResistFieldNumber = 7;
+    private int magicResist_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int MagicResist {
+      get { return magicResist_; }
+      set {
+        magicResist_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "natureResist" field.</summary>
+    public const int NatureResistFieldNumber = 8;
+    private int natureResist_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int NatureResist {
+      get { return natureResist_; }
+      set {
+        natureResist_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "misticResist" field.</summary>
+    public const int MisticResistFieldNumber = 9;
+    private int misticResist_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int MisticResist {
+      get { return misticResist_; }
+      set {
+        misticResist_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "armor" field.</summary>
+    public const int ArmorFieldNumber = 10;
+    private int armor_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int Armor {
+      get { return armor_; }
+      set {
+        armor_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "critChance" field.</summary>
+    public const int CritChanceFieldNumber = 11;
+    private int critChance_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CritChance {
+      get { return critChance_; }
+      set {
+        critChance_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "hitChance" field.</summary>
+    public const int HitChanceFieldNumber = 12;
+    private int hitChance_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int HitChance {
+      get { return hitChance_; }
+      set {
+        hitChance_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "attackSpeed" field.</summary>
+    public const int AttackSpeedFieldNumber = 13;
+    private int attackSpeed_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int AttackSpeed {
+      get { return attackSpeed_; }
+      set {
+        attackSpeed_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "moveSpeed" field.</summary>
+    public const int MoveSpeedFieldNumber = 14;
+    private int moveSpeed_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int MoveSpeed {
+      get { return moveSpeed_; }
+      set {
+        moveSpeed_ = value;
       }
     }
 
@@ -239,11 +426,19 @@ namespace RPG.GameServer.Protos {
         return true;
       }
       if (Strength != other.Strength) return false;
-      if (Dexterity != other.Dexterity) return false;
+      if (Agility != other.Agility) return false;
       if (Intelligence != other.Intelligence) return false;
-      if (Vitality != other.Vitality) return false;
       if (Wisdom != other.Wisdom) return false;
-      if (Charisma != other.Charisma) return false;
+      if (Dexterity != other.Dexterity) return false;
+      if (Vitality != other.Vitality) return false;
+      if (MagicResist != other.MagicResist) return false;
+      if (NatureResist != other.NatureResist) return false;
+      if (MisticResist != other.MisticResist) return false;
+      if (Armor != other.Armor) return false;
+      if (CritChance != other.CritChance) return false;
+      if (HitChance != other.HitChance) return false;
+      if (AttackSpeed != other.AttackSpeed) return false;
+      if (MoveSpeed != other.MoveSpeed) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -252,11 +447,19 @@ namespace RPG.GameServer.Protos {
     public override int GetHashCode() {
       int hash = 1;
       if (Strength != 0) hash ^= Strength.GetHashCode();
-      if (Dexterity != 0) hash ^= Dexterity.GetHashCode();
+      if (Agility != 0) hash ^= Agility.GetHashCode();
       if (Intelligence != 0) hash ^= Intelligence.GetHashCode();
-      if (Vitality != 0) hash ^= Vitality.GetHashCode();
       if (Wisdom != 0) hash ^= Wisdom.GetHashCode();
-      if (Charisma != 0) hash ^= Charisma.GetHashCode();
+      if (Dexterity != 0) hash ^= Dexterity.GetHashCode();
+      if (Vitality != 0) hash ^= Vitality.GetHashCode();
+      if (MagicResist != 0) hash ^= MagicResist.GetHashCode();
+      if (NatureResist != 0) hash ^= NatureResist.GetHashCode();
+      if (MisticResist != 0) hash ^= MisticResist.GetHashCode();
+      if (Armor != 0) hash ^= Armor.GetHashCode();
+      if (CritChance != 0) hash ^= CritChance.GetHashCode();
+      if (HitChance != 0) hash ^= HitChance.GetHashCode();
+      if (AttackSpeed != 0) hash ^= AttackSpeed.GetHashCode();
+      if (MoveSpeed != 0) hash ^= MoveSpeed.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -279,25 +482,57 @@ namespace RPG.GameServer.Protos {
         output.WriteRawTag(8);
         output.WriteInt32(Strength);
       }
-      if (Dexterity != 0) {
+      if (Agility != 0) {
         output.WriteRawTag(16);
-        output.WriteInt32(Dexterity);
+        output.WriteInt32(Agility);
       }
       if (Intelligence != 0) {
         output.WriteRawTag(24);
         output.WriteInt32(Intelligence);
       }
-      if (Vitality != 0) {
-        output.WriteRawTag(32);
-        output.WriteInt32(Vitality);
-      }
       if (Wisdom != 0) {
-        output.WriteRawTag(40);
+        output.WriteRawTag(32);
         output.WriteInt32(Wisdom);
       }
-      if (Charisma != 0) {
+      if (Dexterity != 0) {
+        output.WriteRawTag(40);
+        output.WriteInt32(Dexterity);
+      }
+      if (Vitality != 0) {
         output.WriteRawTag(48);
-        output.WriteInt32(Charisma);
+        output.WriteInt32(Vitality);
+      }
+      if (MagicResist != 0) {
+        output.WriteRawTag(56);
+        output.WriteInt32(MagicResist);
+      }
+      if (NatureResist != 0) {
+        output.WriteRawTag(64);
+        output.WriteInt32(NatureResist);
+      }
+      if (MisticResist != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(MisticResist);
+      }
+      if (Armor != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(Armor);
+      }
+      if (CritChance != 0) {
+        output.WriteRawTag(88);
+        output.WriteInt32(CritChance);
+      }
+      if (HitChance != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(HitChance);
+      }
+      if (AttackSpeed != 0) {
+        output.WriteRawTag(104);
+        output.WriteInt32(AttackSpeed);
+      }
+      if (MoveSpeed != 0) {
+        output.WriteRawTag(112);
+        output.WriteInt32(MoveSpeed);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -313,25 +548,57 @@ namespace RPG.GameServer.Protos {
         output.WriteRawTag(8);
         output.WriteInt32(Strength);
       }
-      if (Dexterity != 0) {
+      if (Agility != 0) {
         output.WriteRawTag(16);
-        output.WriteInt32(Dexterity);
+        output.WriteInt32(Agility);
       }
       if (Intelligence != 0) {
         output.WriteRawTag(24);
         output.WriteInt32(Intelligence);
       }
-      if (Vitality != 0) {
-        output.WriteRawTag(32);
-        output.WriteInt32(Vitality);
-      }
       if (Wisdom != 0) {
-        output.WriteRawTag(40);
+        output.WriteRawTag(32);
         output.WriteInt32(Wisdom);
       }
-      if (Charisma != 0) {
+      if (Dexterity != 0) {
+        output.WriteRawTag(40);
+        output.WriteInt32(Dexterity);
+      }
+      if (Vitality != 0) {
         output.WriteRawTag(48);
-        output.WriteInt32(Charisma);
+        output.WriteInt32(Vitality);
+      }
+      if (MagicResist != 0) {
+        output.WriteRawTag(56);
+        output.WriteInt32(MagicResist);
+      }
+      if (NatureResist != 0) {
+        output.WriteRawTag(64);
+        output.WriteInt32(NatureResist);
+      }
+      if (MisticResist != 0) {
+        output.WriteRawTag(72);
+        output.WriteInt32(MisticResist);
+      }
+      if (Armor != 0) {
+        output.WriteRawTag(80);
+        output.WriteInt32(Armor);
+      }
+      if (CritChance != 0) {
+        output.WriteRawTag(88);
+        output.WriteInt32(CritChance);
+      }
+      if (HitChance != 0) {
+        output.WriteRawTag(96);
+        output.WriteInt32(HitChance);
+      }
+      if (AttackSpeed != 0) {
+        output.WriteRawTag(104);
+        output.WriteInt32(AttackSpeed);
+      }
+      if (MoveSpeed != 0) {
+        output.WriteRawTag(112);
+        output.WriteInt32(MoveSpeed);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -346,20 +613,44 @@ namespace RPG.GameServer.Protos {
       if (Strength != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Strength);
       }
-      if (Dexterity != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Dexterity);
+      if (Agility != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Agility);
       }
       if (Intelligence != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Intelligence);
       }
-      if (Vitality != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Vitality);
-      }
       if (Wisdom != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Wisdom);
       }
-      if (Charisma != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Charisma);
+      if (Dexterity != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Dexterity);
+      }
+      if (Vitality != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Vitality);
+      }
+      if (MagicResist != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(MagicResist);
+      }
+      if (NatureResist != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(NatureResist);
+      }
+      if (MisticResist != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(MisticResist);
+      }
+      if (Armor != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Armor);
+      }
+      if (CritChance != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(CritChance);
+      }
+      if (HitChance != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(HitChance);
+      }
+      if (AttackSpeed != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(AttackSpeed);
+      }
+      if (MoveSpeed != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(MoveSpeed);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -376,20 +667,44 @@ namespace RPG.GameServer.Protos {
       if (other.Strength != 0) {
         Strength = other.Strength;
       }
-      if (other.Dexterity != 0) {
-        Dexterity = other.Dexterity;
+      if (other.Agility != 0) {
+        Agility = other.Agility;
       }
       if (other.Intelligence != 0) {
         Intelligence = other.Intelligence;
       }
-      if (other.Vitality != 0) {
-        Vitality = other.Vitality;
-      }
       if (other.Wisdom != 0) {
         Wisdom = other.Wisdom;
       }
-      if (other.Charisma != 0) {
-        Charisma = other.Charisma;
+      if (other.Dexterity != 0) {
+        Dexterity = other.Dexterity;
+      }
+      if (other.Vitality != 0) {
+        Vitality = other.Vitality;
+      }
+      if (other.MagicResist != 0) {
+        MagicResist = other.MagicResist;
+      }
+      if (other.NatureResist != 0) {
+        NatureResist = other.NatureResist;
+      }
+      if (other.MisticResist != 0) {
+        MisticResist = other.MisticResist;
+      }
+      if (other.Armor != 0) {
+        Armor = other.Armor;
+      }
+      if (other.CritChance != 0) {
+        CritChance = other.CritChance;
+      }
+      if (other.HitChance != 0) {
+        HitChance = other.HitChance;
+      }
+      if (other.AttackSpeed != 0) {
+        AttackSpeed = other.AttackSpeed;
+      }
+      if (other.MoveSpeed != 0) {
+        MoveSpeed = other.MoveSpeed;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -411,7 +726,7 @@ namespace RPG.GameServer.Protos {
             break;
           }
           case 16: {
-            Dexterity = input.ReadInt32();
+            Agility = input.ReadInt32();
             break;
           }
           case 24: {
@@ -419,15 +734,47 @@ namespace RPG.GameServer.Protos {
             break;
           }
           case 32: {
-            Vitality = input.ReadInt32();
-            break;
-          }
-          case 40: {
             Wisdom = input.ReadInt32();
             break;
           }
+          case 40: {
+            Dexterity = input.ReadInt32();
+            break;
+          }
           case 48: {
-            Charisma = input.ReadInt32();
+            Vitality = input.ReadInt32();
+            break;
+          }
+          case 56: {
+            MagicResist = input.ReadInt32();
+            break;
+          }
+          case 64: {
+            NatureResist = input.ReadInt32();
+            break;
+          }
+          case 72: {
+            MisticResist = input.ReadInt32();
+            break;
+          }
+          case 80: {
+            Armor = input.ReadInt32();
+            break;
+          }
+          case 88: {
+            CritChance = input.ReadInt32();
+            break;
+          }
+          case 96: {
+            HitChance = input.ReadInt32();
+            break;
+          }
+          case 104: {
+            AttackSpeed = input.ReadInt32();
+            break;
+          }
+          case 112: {
+            MoveSpeed = input.ReadInt32();
             break;
           }
         }
@@ -450,7 +797,7 @@ namespace RPG.GameServer.Protos {
             break;
           }
           case 16: {
-            Dexterity = input.ReadInt32();
+            Agility = input.ReadInt32();
             break;
           }
           case 24: {
@@ -458,278 +805,47 @@ namespace RPG.GameServer.Protos {
             break;
           }
           case 32: {
-            Vitality = input.ReadInt32();
-            break;
-          }
-          case 40: {
             Wisdom = input.ReadInt32();
             break;
           }
+          case 40: {
+            Dexterity = input.ReadInt32();
+            break;
+          }
           case 48: {
-            Charisma = input.ReadInt32();
+            Vitality = input.ReadInt32();
             break;
           }
-        }
-      }
-    }
-    #endif
-
-  }
-
-  public sealed partial class Location : pb::IMessage<Location>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
-    private static readonly pb::MessageParser<Location> _parser = new pb::MessageParser<Location>(() => new Location());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<Location> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[1]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public Location() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public Location(Location other) : this() {
-      x_ = other.x_;
-      y_ = other.y_;
-      z_ = other.z_;
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public Location Clone() {
-      return new Location(this);
-    }
-
-    /// <summary>Field number for the "x" field.</summary>
-    public const int XFieldNumber = 1;
-    private float x_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public float X {
-      get { return x_; }
-      set {
-        x_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "y" field.</summary>
-    public const int YFieldNumber = 2;
-    private float y_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public float Y {
-      get { return y_; }
-      set {
-        y_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "z" field.</summary>
-    public const int ZFieldNumber = 3;
-    private float z_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public float Z {
-      get { return z_; }
-      set {
-        z_ = value;
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override bool Equals(object other) {
-      return Equals(other as Location);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(Location other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(X, other.X)) return false;
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Y, other.Y)) return false;
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Z, other.Z)) return false;
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (X != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(X);
-      if (Y != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Y);
-      if (Z != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Z);
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
-      if (X != 0F) {
-        output.WriteRawTag(13);
-        output.WriteFloat(X);
-      }
-      if (Y != 0F) {
-        output.WriteRawTag(21);
-        output.WriteFloat(Y);
-      }
-      if (Z != 0F) {
-        output.WriteRawTag(29);
-        output.WriteFloat(Z);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (X != 0F) {
-        output.WriteRawTag(13);
-        output.WriteFloat(X);
-      }
-      if (Y != 0F) {
-        output.WriteRawTag(21);
-        output.WriteFloat(Y);
-      }
-      if (Z != 0F) {
-        output.WriteRawTag(29);
-        output.WriteFloat(Z);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int CalculateSize() {
-      int size = 0;
-      if (X != 0F) {
-        size += 1 + 4;
-      }
-      if (Y != 0F) {
-        size += 1 + 4;
-      }
-      if (Z != 0F) {
-        size += 1 + 4;
-      }
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(Location other) {
-      if (other == null) {
-        return;
-      }
-      if (other.X != 0F) {
-        X = other.X;
-      }
-      if (other.Y != 0F) {
-        Y = other.Y;
-      }
-      if (other.Z != 0F) {
-        Z = other.Z;
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
-          case 13: {
-            X = input.ReadFloat();
+          case 56: {
+            MagicResist = input.ReadInt32();
             break;
           }
-          case 21: {
-            Y = input.ReadFloat();
+          case 64: {
+            NatureResist = input.ReadInt32();
             break;
           }
-          case 29: {
-            Z = input.ReadFloat();
+          case 72: {
+            MisticResist = input.ReadInt32();
             break;
           }
-        }
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 13: {
-            X = input.ReadFloat();
+          case 80: {
+            Armor = input.ReadInt32();
             break;
           }
-          case 21: {
-            Y = input.ReadFloat();
+          case 88: {
+            CritChance = input.ReadInt32();
             break;
           }
-          case 29: {
-            Z = input.ReadFloat();
+          case 96: {
+            HitChance = input.ReadInt32();
+            break;
+          }
+          case 104: {
+            AttackSpeed = input.ReadInt32();
+            break;
+          }
+          case 112: {
+            MoveSpeed = input.ReadInt32();
             break;
           }
         }
@@ -753,7 +869,7 @@ namespace RPG.GameServer.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[2]; }
+      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -776,9 +892,8 @@ namespace RPG.GameServer.Protos {
       id_ = other.id_;
       name_ = other.name_;
       type_ = other.type_;
-      value_ = other.value_;
-      stats_ = other.stats_ != null ? other.stats_.Clone() : null;
-      isEquipped_ = other.isEquipped_;
+      modifiers_ = other.modifiers_.Clone();
+      requiredLevel_ = other.requiredLevel_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -824,39 +939,26 @@ namespace RPG.GameServer.Protos {
       }
     }
 
-    /// <summary>Field number for the "value" field.</summary>
-    public const int ValueFieldNumber = 4;
-    private int value_;
+    /// <summary>Field number for the "modifiers" field.</summary>
+    public const int ModifiersFieldNumber = 4;
+    private static readonly pbc::MapField<string, int>.Codec _map_modifiers_codec
+        = new pbc::MapField<string, int>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForInt32(16, 0), 34);
+    private readonly pbc::MapField<string, int> modifiers_ = new pbc::MapField<string, int>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int Value {
-      get { return value_; }
-      set {
-        value_ = value;
-      }
+    public pbc::MapField<string, int> Modifiers {
+      get { return modifiers_; }
     }
 
-    /// <summary>Field number for the "stats" field.</summary>
-    public const int StatsFieldNumber = 5;
-    private global::RPG.GameServer.Protos.Stats stats_;
+    /// <summary>Field number for the "requiredLevel" field.</summary>
+    public const int RequiredLevelFieldNumber = 5;
+    private int requiredLevel_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::RPG.GameServer.Protos.Stats Stats {
-      get { return stats_; }
+    public int RequiredLevel {
+      get { return requiredLevel_; }
       set {
-        stats_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "IsEquipped" field.</summary>
-    public const int IsEquippedFieldNumber = 6;
-    private bool isEquipped_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool IsEquipped {
-      get { return isEquipped_; }
-      set {
-        isEquipped_ = value;
+        requiredLevel_ = value;
       }
     }
 
@@ -878,9 +980,8 @@ namespace RPG.GameServer.Protos {
       if (Id != other.Id) return false;
       if (Name != other.Name) return false;
       if (Type != other.Type) return false;
-      if (Value != other.Value) return false;
-      if (!object.Equals(Stats, other.Stats)) return false;
-      if (IsEquipped != other.IsEquipped) return false;
+      if (!Modifiers.Equals(other.Modifiers)) return false;
+      if (RequiredLevel != other.RequiredLevel) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -891,9 +992,8 @@ namespace RPG.GameServer.Protos {
       if (Id.Length != 0) hash ^= Id.GetHashCode();
       if (Name.Length != 0) hash ^= Name.GetHashCode();
       if (Type != global::RPG.GameServer.Protos.ItemType.Weapon) hash ^= Type.GetHashCode();
-      if (Value != 0) hash ^= Value.GetHashCode();
-      if (stats_ != null) hash ^= Stats.GetHashCode();
-      if (IsEquipped != false) hash ^= IsEquipped.GetHashCode();
+      hash ^= Modifiers.GetHashCode();
+      if (RequiredLevel != 0) hash ^= RequiredLevel.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -924,17 +1024,10 @@ namespace RPG.GameServer.Protos {
         output.WriteRawTag(24);
         output.WriteEnum((int) Type);
       }
-      if (Value != 0) {
-        output.WriteRawTag(32);
-        output.WriteInt32(Value);
-      }
-      if (stats_ != null) {
-        output.WriteRawTag(42);
-        output.WriteMessage(Stats);
-      }
-      if (IsEquipped != false) {
-        output.WriteRawTag(48);
-        output.WriteBool(IsEquipped);
+      modifiers_.WriteTo(output, _map_modifiers_codec);
+      if (RequiredLevel != 0) {
+        output.WriteRawTag(40);
+        output.WriteInt32(RequiredLevel);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -958,17 +1051,10 @@ namespace RPG.GameServer.Protos {
         output.WriteRawTag(24);
         output.WriteEnum((int) Type);
       }
-      if (Value != 0) {
-        output.WriteRawTag(32);
-        output.WriteInt32(Value);
-      }
-      if (stats_ != null) {
-        output.WriteRawTag(42);
-        output.WriteMessage(Stats);
-      }
-      if (IsEquipped != false) {
-        output.WriteRawTag(48);
-        output.WriteBool(IsEquipped);
+      modifiers_.WriteTo(ref output, _map_modifiers_codec);
+      if (RequiredLevel != 0) {
+        output.WriteRawTag(40);
+        output.WriteInt32(RequiredLevel);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -989,14 +1075,9 @@ namespace RPG.GameServer.Protos {
       if (Type != global::RPG.GameServer.Protos.ItemType.Weapon) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
       }
-      if (Value != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Value);
-      }
-      if (stats_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Stats);
-      }
-      if (IsEquipped != false) {
-        size += 1 + 1;
+      size += modifiers_.CalculateSize(_map_modifiers_codec);
+      if (RequiredLevel != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(RequiredLevel);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1019,17 +1100,9 @@ namespace RPG.GameServer.Protos {
       if (other.Type != global::RPG.GameServer.Protos.ItemType.Weapon) {
         Type = other.Type;
       }
-      if (other.Value != 0) {
-        Value = other.Value;
-      }
-      if (other.stats_ != null) {
-        if (stats_ == null) {
-          Stats = new global::RPG.GameServer.Protos.Stats();
-        }
-        Stats.MergeFrom(other.Stats);
-      }
-      if (other.IsEquipped != false) {
-        IsEquipped = other.IsEquipped;
+      modifiers_.MergeFrom(other.modifiers_);
+      if (other.RequiredLevel != 0) {
+        RequiredLevel = other.RequiredLevel;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1058,19 +1131,12 @@ namespace RPG.GameServer.Protos {
             Type = (global::RPG.GameServer.Protos.ItemType) input.ReadEnum();
             break;
           }
-          case 32: {
-            Value = input.ReadInt32();
+          case 34: {
+            modifiers_.AddEntriesFrom(input, _map_modifiers_codec);
             break;
           }
-          case 42: {
-            if (stats_ == null) {
-              Stats = new global::RPG.GameServer.Protos.Stats();
-            }
-            input.ReadMessage(Stats);
-            break;
-          }
-          case 48: {
-            IsEquipped = input.ReadBool();
+          case 40: {
+            RequiredLevel = input.ReadInt32();
             break;
           }
         }
@@ -1100,19 +1166,12 @@ namespace RPG.GameServer.Protos {
             Type = (global::RPG.GameServer.Protos.ItemType) input.ReadEnum();
             break;
           }
-          case 32: {
-            Value = input.ReadInt32();
+          case 34: {
+            modifiers_.AddEntriesFrom(ref input, _map_modifiers_codec);
             break;
           }
-          case 42: {
-            if (stats_ == null) {
-              Stats = new global::RPG.GameServer.Protos.Stats();
-            }
-            input.ReadMessage(Stats);
-            break;
-          }
-          case 48: {
-            IsEquipped = input.ReadBool();
+          case 40: {
+            RequiredLevel = input.ReadInt32();
             break;
           }
         }
@@ -1122,16 +1181,516 @@ namespace RPG.GameServer.Protos {
 
   }
 
-  public sealed partial class Character : pb::IMessage<Character>
+  public sealed partial class EquipmentSlots : pb::IMessage<EquipmentSlots>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<Character> _parser = new pb::MessageParser<Character>(() => new Character());
+    private static readonly pb::MessageParser<EquipmentSlots> _parser = new pb::MessageParser<EquipmentSlots>(() => new EquipmentSlots());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<Character> Parser { get { return _parser; } }
+    public static pb::MessageParser<EquipmentSlots> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[2]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EquipmentSlots() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EquipmentSlots(EquipmentSlots other) : this() {
+      head_ = other.head_ != null ? other.head_.Clone() : null;
+      chest_ = other.chest_ != null ? other.chest_.Clone() : null;
+      weapon_ = other.weapon_ != null ? other.weapon_.Clone() : null;
+      shield_ = other.shield_ != null ? other.shield_.Clone() : null;
+      boots_ = other.boots_ != null ? other.boots_.Clone() : null;
+      gloves_ = other.gloves_ != null ? other.gloves_.Clone() : null;
+      rings_ = other.rings_.Clone();
+      amulet_ = other.amulet_ != null ? other.amulet_.Clone() : null;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public EquipmentSlots Clone() {
+      return new EquipmentSlots(this);
+    }
+
+    /// <summary>Field number for the "head" field.</summary>
+    public const int HeadFieldNumber = 1;
+    private global::RPG.GameServer.Protos.Item head_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Head {
+      get { return head_; }
+      set {
+        head_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "chest" field.</summary>
+    public const int ChestFieldNumber = 2;
+    private global::RPG.GameServer.Protos.Item chest_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Chest {
+      get { return chest_; }
+      set {
+        chest_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "weapon" field.</summary>
+    public const int WeaponFieldNumber = 3;
+    private global::RPG.GameServer.Protos.Item weapon_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Weapon {
+      get { return weapon_; }
+      set {
+        weapon_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "shield" field.</summary>
+    public const int ShieldFieldNumber = 4;
+    private global::RPG.GameServer.Protos.Item shield_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Shield {
+      get { return shield_; }
+      set {
+        shield_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "boots" field.</summary>
+    public const int BootsFieldNumber = 5;
+    private global::RPG.GameServer.Protos.Item boots_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Boots {
+      get { return boots_; }
+      set {
+        boots_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "gloves" field.</summary>
+    public const int GlovesFieldNumber = 6;
+    private global::RPG.GameServer.Protos.Item gloves_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Gloves {
+      get { return gloves_; }
+      set {
+        gloves_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "rings" field.</summary>
+    public const int RingsFieldNumber = 7;
+    private static readonly pb::FieldCodec<global::RPG.GameServer.Protos.Item> _repeated_rings_codec
+        = pb::FieldCodec.ForMessage(58, global::RPG.GameServer.Protos.Item.Parser);
+    private readonly pbc::RepeatedField<global::RPG.GameServer.Protos.Item> rings_ = new pbc::RepeatedField<global::RPG.GameServer.Protos.Item>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::RPG.GameServer.Protos.Item> Rings {
+      get { return rings_; }
+    }
+
+    /// <summary>Field number for the "amulet" field.</summary>
+    public const int AmuletFieldNumber = 8;
+    private global::RPG.GameServer.Protos.Item amulet_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Amulet {
+      get { return amulet_; }
+      set {
+        amulet_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as EquipmentSlots);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(EquipmentSlots other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!object.Equals(Head, other.Head)) return false;
+      if (!object.Equals(Chest, other.Chest)) return false;
+      if (!object.Equals(Weapon, other.Weapon)) return false;
+      if (!object.Equals(Shield, other.Shield)) return false;
+      if (!object.Equals(Boots, other.Boots)) return false;
+      if (!object.Equals(Gloves, other.Gloves)) return false;
+      if(!rings_.Equals(other.rings_)) return false;
+      if (!object.Equals(Amulet, other.Amulet)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (head_ != null) hash ^= Head.GetHashCode();
+      if (chest_ != null) hash ^= Chest.GetHashCode();
+      if (weapon_ != null) hash ^= Weapon.GetHashCode();
+      if (shield_ != null) hash ^= Shield.GetHashCode();
+      if (boots_ != null) hash ^= Boots.GetHashCode();
+      if (gloves_ != null) hash ^= Gloves.GetHashCode();
+      hash ^= rings_.GetHashCode();
+      if (amulet_ != null) hash ^= Amulet.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (head_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(Head);
+      }
+      if (chest_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(Chest);
+      }
+      if (weapon_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Weapon);
+      }
+      if (shield_ != null) {
+        output.WriteRawTag(34);
+        output.WriteMessage(Shield);
+      }
+      if (boots_ != null) {
+        output.WriteRawTag(42);
+        output.WriteMessage(Boots);
+      }
+      if (gloves_ != null) {
+        output.WriteRawTag(50);
+        output.WriteMessage(Gloves);
+      }
+      rings_.WriteTo(output, _repeated_rings_codec);
+      if (amulet_ != null) {
+        output.WriteRawTag(66);
+        output.WriteMessage(Amulet);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (head_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(Head);
+      }
+      if (chest_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(Chest);
+      }
+      if (weapon_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Weapon);
+      }
+      if (shield_ != null) {
+        output.WriteRawTag(34);
+        output.WriteMessage(Shield);
+      }
+      if (boots_ != null) {
+        output.WriteRawTag(42);
+        output.WriteMessage(Boots);
+      }
+      if (gloves_ != null) {
+        output.WriteRawTag(50);
+        output.WriteMessage(Gloves);
+      }
+      rings_.WriteTo(ref output, _repeated_rings_codec);
+      if (amulet_ != null) {
+        output.WriteRawTag(66);
+        output.WriteMessage(Amulet);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (head_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Head);
+      }
+      if (chest_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Chest);
+      }
+      if (weapon_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Weapon);
+      }
+      if (shield_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Shield);
+      }
+      if (boots_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Boots);
+      }
+      if (gloves_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Gloves);
+      }
+      size += rings_.CalculateSize(_repeated_rings_codec);
+      if (amulet_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Amulet);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(EquipmentSlots other) {
+      if (other == null) {
+        return;
+      }
+      if (other.head_ != null) {
+        if (head_ == null) {
+          Head = new global::RPG.GameServer.Protos.Item();
+        }
+        Head.MergeFrom(other.Head);
+      }
+      if (other.chest_ != null) {
+        if (chest_ == null) {
+          Chest = new global::RPG.GameServer.Protos.Item();
+        }
+        Chest.MergeFrom(other.Chest);
+      }
+      if (other.weapon_ != null) {
+        if (weapon_ == null) {
+          Weapon = new global::RPG.GameServer.Protos.Item();
+        }
+        Weapon.MergeFrom(other.Weapon);
+      }
+      if (other.shield_ != null) {
+        if (shield_ == null) {
+          Shield = new global::RPG.GameServer.Protos.Item();
+        }
+        Shield.MergeFrom(other.Shield);
+      }
+      if (other.boots_ != null) {
+        if (boots_ == null) {
+          Boots = new global::RPG.GameServer.Protos.Item();
+        }
+        Boots.MergeFrom(other.Boots);
+      }
+      if (other.gloves_ != null) {
+        if (gloves_ == null) {
+          Gloves = new global::RPG.GameServer.Protos.Item();
+        }
+        Gloves.MergeFrom(other.Gloves);
+      }
+      rings_.Add(other.rings_);
+      if (other.amulet_ != null) {
+        if (amulet_ == null) {
+          Amulet = new global::RPG.GameServer.Protos.Item();
+        }
+        Amulet.MergeFrom(other.Amulet);
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            if (head_ == null) {
+              Head = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Head);
+            break;
+          }
+          case 18: {
+            if (chest_ == null) {
+              Chest = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Chest);
+            break;
+          }
+          case 26: {
+            if (weapon_ == null) {
+              Weapon = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Weapon);
+            break;
+          }
+          case 34: {
+            if (shield_ == null) {
+              Shield = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Shield);
+            break;
+          }
+          case 42: {
+            if (boots_ == null) {
+              Boots = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Boots);
+            break;
+          }
+          case 50: {
+            if (gloves_ == null) {
+              Gloves = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Gloves);
+            break;
+          }
+          case 58: {
+            rings_.AddEntriesFrom(input, _repeated_rings_codec);
+            break;
+          }
+          case 66: {
+            if (amulet_ == null) {
+              Amulet = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Amulet);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            if (head_ == null) {
+              Head = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Head);
+            break;
+          }
+          case 18: {
+            if (chest_ == null) {
+              Chest = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Chest);
+            break;
+          }
+          case 26: {
+            if (weapon_ == null) {
+              Weapon = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Weapon);
+            break;
+          }
+          case 34: {
+            if (shield_ == null) {
+              Shield = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Shield);
+            break;
+          }
+          case 42: {
+            if (boots_ == null) {
+              Boots = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Boots);
+            break;
+          }
+          case 50: {
+            if (gloves_ == null) {
+              Gloves = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Gloves);
+            break;
+          }
+          case 58: {
+            rings_.AddEntriesFrom(ref input, _repeated_rings_codec);
+            break;
+          }
+          case 66: {
+            if (amulet_ == null) {
+              Amulet = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Amulet);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class BaseCharacter : pb::IMessage<BaseCharacter>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<BaseCharacter> _parser = new pb::MessageParser<BaseCharacter>(() => new BaseCharacter());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<BaseCharacter> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1147,7 +1706,7 @@ namespace RPG.GameServer.Protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public Character() {
+    public BaseCharacter() {
       OnConstruction();
     }
 
@@ -1155,25 +1714,26 @@ namespace RPG.GameServer.Protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public Character(Character other) : this() {
+    public BaseCharacter(BaseCharacter other) : this() {
       id_ = other.id_;
       name_ = other.name_;
-      class_ = other.class_;
       level_ = other.level_;
-      health_ = other.health_;
-      mana_ = other.mana_;
-      type_ = other.type_;
+      maxHealth_ = other.maxHealth_;
+      currentHealth_ = other.currentHealth_;
+      maxMana_ = other.maxMana_;
+      currentMana_ = other.currentMana_;
       stats_ = other.stats_ != null ? other.stats_.Clone() : null;
-      location_ = other.location_ != null ? other.location_.Clone() : null;
-      inventory_ = other.inventory_.Clone();
-      equipment_ = other.equipment_.Clone();
+      skills_ = other.skills_.Clone();
+      skillCooldowns_ = other.skillCooldowns_.Clone();
+      position_ = other.position_ != null ? other.position_.Clone() : null;
+      activeEffects_ = other.activeEffects_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public Character Clone() {
-      return new Character(this);
+    public BaseCharacter Clone() {
+      return new BaseCharacter(this);
     }
 
     /// <summary>Field number for the "id" field.</summary>
@@ -1200,20 +1760,8 @@ namespace RPG.GameServer.Protos {
       }
     }
 
-    /// <summary>Field number for the "class" field.</summary>
-    public const int ClassFieldNumber = 3;
-    private string class_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Class {
-      get { return class_; }
-      set {
-        class_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
     /// <summary>Field number for the "level" field.</summary>
-    public const int LevelFieldNumber = 4;
+    public const int LevelFieldNumber = 3;
     private int level_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1224,39 +1772,51 @@ namespace RPG.GameServer.Protos {
       }
     }
 
-    /// <summary>Field number for the "health" field.</summary>
-    public const int HealthFieldNumber = 5;
-    private int health_;
+    /// <summary>Field number for the "maxHealth" field.</summary>
+    public const int MaxHealthFieldNumber = 4;
+    private int maxHealth_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int Health {
-      get { return health_; }
+    public int MaxHealth {
+      get { return maxHealth_; }
       set {
-        health_ = value;
+        maxHealth_ = value;
       }
     }
 
-    /// <summary>Field number for the "mana" field.</summary>
-    public const int ManaFieldNumber = 6;
-    private int mana_;
+    /// <summary>Field number for the "currentHealth" field.</summary>
+    public const int CurrentHealthFieldNumber = 5;
+    private int currentHealth_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int Mana {
-      get { return mana_; }
+    public int CurrentHealth {
+      get { return currentHealth_; }
       set {
-        mana_ = value;
+        currentHealth_ = value;
       }
     }
 
-    /// <summary>Field number for the "type" field.</summary>
-    public const int TypeFieldNumber = 7;
-    private global::RPG.GameServer.Protos.CharacterType type_ = global::RPG.GameServer.Protos.CharacterType.Player;
+    /// <summary>Field number for the "maxMana" field.</summary>
+    public const int MaxManaFieldNumber = 6;
+    private int maxMana_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::RPG.GameServer.Protos.CharacterType Type {
-      get { return type_; }
+    public int MaxMana {
+      get { return maxMana_; }
       set {
-        type_ = value;
+        maxMana_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "currentMana" field.</summary>
+    public const int CurrentManaFieldNumber = 7;
+    private int currentMana_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CurrentMana {
+      get { return currentMana_; }
+      set {
+        currentMana_ = value;
       }
     }
 
@@ -1272,49 +1832,63 @@ namespace RPG.GameServer.Protos {
       }
     }
 
-    /// <summary>Field number for the "location" field.</summary>
-    public const int LocationFieldNumber = 9;
-    private global::RPG.GameServer.Protos.Location location_;
+    /// <summary>Field number for the "skills" field.</summary>
+    public const int SkillsFieldNumber = 9;
+    private static readonly pb::FieldCodec<global::RPG.GameServer.Protos.Skill> _repeated_skills_codec
+        = pb::FieldCodec.ForMessage(74, global::RPG.GameServer.Protos.Skill.Parser);
+    private readonly pbc::RepeatedField<global::RPG.GameServer.Protos.Skill> skills_ = new pbc::RepeatedField<global::RPG.GameServer.Protos.Skill>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::RPG.GameServer.Protos.Location Location {
-      get { return location_; }
+    public pbc::RepeatedField<global::RPG.GameServer.Protos.Skill> Skills {
+      get { return skills_; }
+    }
+
+    /// <summary>Field number for the "skillCooldowns" field.</summary>
+    public const int SkillCooldownsFieldNumber = 10;
+    private static readonly pbc::MapField<int, string>.Codec _map_skillCooldowns_codec
+        = new pbc::MapField<int, string>.Codec(pb::FieldCodec.ForInt32(8, 0), pb::FieldCodec.ForString(18, ""), 82);
+    private readonly pbc::MapField<int, string> skillCooldowns_ = new pbc::MapField<int, string>();
+    /// <summary>
+    /// Using string for DateTime representation
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::MapField<int, string> SkillCooldowns {
+      get { return skillCooldowns_; }
+    }
+
+    /// <summary>Field number for the "position" field.</summary>
+    public const int PositionFieldNumber = 11;
+    private global::RPG.GameServer.Protos.Location position_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Location Position {
+      get { return position_; }
       set {
-        location_ = value;
+        position_ = value;
       }
     }
 
-    /// <summary>Field number for the "inventory" field.</summary>
-    public const int InventoryFieldNumber = 10;
-    private static readonly pb::FieldCodec<global::RPG.GameServer.Protos.Item> _repeated_inventory_codec
-        = pb::FieldCodec.ForMessage(82, global::RPG.GameServer.Protos.Item.Parser);
-    private readonly pbc::RepeatedField<global::RPG.GameServer.Protos.Item> inventory_ = new pbc::RepeatedField<global::RPG.GameServer.Protos.Item>();
+    /// <summary>Field number for the "activeEffects" field.</summary>
+    public const int ActiveEffectsFieldNumber = 12;
+    private static readonly pb::FieldCodec<global::RPG.GameServer.Protos.Effect> _repeated_activeEffects_codec
+        = pb::FieldCodec.ForEnum(98, x => (int) x, x => (global::RPG.GameServer.Protos.Effect) x);
+    private readonly pbc::RepeatedField<global::RPG.GameServer.Protos.Effect> activeEffects_ = new pbc::RepeatedField<global::RPG.GameServer.Protos.Effect>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<global::RPG.GameServer.Protos.Item> Inventory {
-      get { return inventory_; }
-    }
-
-    /// <summary>Field number for the "equipment" field.</summary>
-    public const int EquipmentFieldNumber = 11;
-    private static readonly pbc::MapField<string, global::RPG.GameServer.Protos.Item>.Codec _map_equipment_codec
-        = new pbc::MapField<string, global::RPG.GameServer.Protos.Item>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForMessage(18, global::RPG.GameServer.Protos.Item.Parser), 90);
-    private readonly pbc::MapField<string, global::RPG.GameServer.Protos.Item> equipment_ = new pbc::MapField<string, global::RPG.GameServer.Protos.Item>();
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::MapField<string, global::RPG.GameServer.Protos.Item> Equipment {
-      get { return equipment_; }
+    public pbc::RepeatedField<global::RPG.GameServer.Protos.Effect> ActiveEffects {
+      get { return activeEffects_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
-      return Equals(other as Character);
+      return Equals(other as BaseCharacter);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(Character other) {
+    public bool Equals(BaseCharacter other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
@@ -1323,15 +1897,16 @@ namespace RPG.GameServer.Protos {
       }
       if (Id != other.Id) return false;
       if (Name != other.Name) return false;
-      if (Class != other.Class) return false;
       if (Level != other.Level) return false;
-      if (Health != other.Health) return false;
-      if (Mana != other.Mana) return false;
-      if (Type != other.Type) return false;
+      if (MaxHealth != other.MaxHealth) return false;
+      if (CurrentHealth != other.CurrentHealth) return false;
+      if (MaxMana != other.MaxMana) return false;
+      if (CurrentMana != other.CurrentMana) return false;
       if (!object.Equals(Stats, other.Stats)) return false;
-      if (!object.Equals(Location, other.Location)) return false;
-      if(!inventory_.Equals(other.inventory_)) return false;
-      if (!Equipment.Equals(other.Equipment)) return false;
+      if(!skills_.Equals(other.skills_)) return false;
+      if (!SkillCooldowns.Equals(other.SkillCooldowns)) return false;
+      if (!object.Equals(Position, other.Position)) return false;
+      if(!activeEffects_.Equals(other.activeEffects_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1341,15 +1916,16 @@ namespace RPG.GameServer.Protos {
       int hash = 1;
       if (Id.Length != 0) hash ^= Id.GetHashCode();
       if (Name.Length != 0) hash ^= Name.GetHashCode();
-      if (Class.Length != 0) hash ^= Class.GetHashCode();
       if (Level != 0) hash ^= Level.GetHashCode();
-      if (Health != 0) hash ^= Health.GetHashCode();
-      if (Mana != 0) hash ^= Mana.GetHashCode();
-      if (Type != global::RPG.GameServer.Protos.CharacterType.Player) hash ^= Type.GetHashCode();
+      if (MaxHealth != 0) hash ^= MaxHealth.GetHashCode();
+      if (CurrentHealth != 0) hash ^= CurrentHealth.GetHashCode();
+      if (MaxMana != 0) hash ^= MaxMana.GetHashCode();
+      if (CurrentMana != 0) hash ^= CurrentMana.GetHashCode();
       if (stats_ != null) hash ^= Stats.GetHashCode();
-      if (location_ != null) hash ^= Location.GetHashCode();
-      hash ^= inventory_.GetHashCode();
-      hash ^= Equipment.GetHashCode();
+      hash ^= skills_.GetHashCode();
+      hash ^= SkillCooldowns.GetHashCode();
+      if (position_ != null) hash ^= Position.GetHashCode();
+      hash ^= activeEffects_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1376,36 +1952,37 @@ namespace RPG.GameServer.Protos {
         output.WriteRawTag(18);
         output.WriteString(Name);
       }
-      if (Class.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteString(Class);
-      }
       if (Level != 0) {
-        output.WriteRawTag(32);
+        output.WriteRawTag(24);
         output.WriteInt32(Level);
       }
-      if (Health != 0) {
+      if (MaxHealth != 0) {
+        output.WriteRawTag(32);
+        output.WriteInt32(MaxHealth);
+      }
+      if (CurrentHealth != 0) {
         output.WriteRawTag(40);
-        output.WriteInt32(Health);
+        output.WriteInt32(CurrentHealth);
       }
-      if (Mana != 0) {
+      if (MaxMana != 0) {
         output.WriteRawTag(48);
-        output.WriteInt32(Mana);
+        output.WriteInt32(MaxMana);
       }
-      if (Type != global::RPG.GameServer.Protos.CharacterType.Player) {
+      if (CurrentMana != 0) {
         output.WriteRawTag(56);
-        output.WriteEnum((int) Type);
+        output.WriteInt32(CurrentMana);
       }
       if (stats_ != null) {
         output.WriteRawTag(66);
         output.WriteMessage(Stats);
       }
-      if (location_ != null) {
-        output.WriteRawTag(74);
-        output.WriteMessage(Location);
+      skills_.WriteTo(output, _repeated_skills_codec);
+      skillCooldowns_.WriteTo(output, _map_skillCooldowns_codec);
+      if (position_ != null) {
+        output.WriteRawTag(90);
+        output.WriteMessage(Position);
       }
-      inventory_.WriteTo(output, _repeated_inventory_codec);
-      equipment_.WriteTo(output, _map_equipment_codec);
+      activeEffects_.WriteTo(output, _repeated_activeEffects_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -1424,36 +2001,37 @@ namespace RPG.GameServer.Protos {
         output.WriteRawTag(18);
         output.WriteString(Name);
       }
-      if (Class.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteString(Class);
-      }
       if (Level != 0) {
-        output.WriteRawTag(32);
+        output.WriteRawTag(24);
         output.WriteInt32(Level);
       }
-      if (Health != 0) {
+      if (MaxHealth != 0) {
+        output.WriteRawTag(32);
+        output.WriteInt32(MaxHealth);
+      }
+      if (CurrentHealth != 0) {
         output.WriteRawTag(40);
-        output.WriteInt32(Health);
+        output.WriteInt32(CurrentHealth);
       }
-      if (Mana != 0) {
+      if (MaxMana != 0) {
         output.WriteRawTag(48);
-        output.WriteInt32(Mana);
+        output.WriteInt32(MaxMana);
       }
-      if (Type != global::RPG.GameServer.Protos.CharacterType.Player) {
+      if (CurrentMana != 0) {
         output.WriteRawTag(56);
-        output.WriteEnum((int) Type);
+        output.WriteInt32(CurrentMana);
       }
       if (stats_ != null) {
         output.WriteRawTag(66);
         output.WriteMessage(Stats);
       }
-      if (location_ != null) {
-        output.WriteRawTag(74);
-        output.WriteMessage(Location);
+      skills_.WriteTo(ref output, _repeated_skills_codec);
+      skillCooldowns_.WriteTo(ref output, _map_skillCooldowns_codec);
+      if (position_ != null) {
+        output.WriteRawTag(90);
+        output.WriteMessage(Position);
       }
-      inventory_.WriteTo(ref output, _repeated_inventory_codec);
-      equipment_.WriteTo(ref output, _map_equipment_codec);
+      activeEffects_.WriteTo(ref output, _repeated_activeEffects_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -1470,29 +2048,30 @@ namespace RPG.GameServer.Protos {
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
       }
-      if (Class.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Class);
-      }
       if (Level != 0) {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Level);
       }
-      if (Health != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Health);
+      if (MaxHealth != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(MaxHealth);
       }
-      if (Mana != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Mana);
+      if (CurrentHealth != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(CurrentHealth);
       }
-      if (Type != global::RPG.GameServer.Protos.CharacterType.Player) {
-        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
+      if (MaxMana != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(MaxMana);
+      }
+      if (CurrentMana != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(CurrentMana);
       }
       if (stats_ != null) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Stats);
       }
-      if (location_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Location);
+      size += skills_.CalculateSize(_repeated_skills_codec);
+      size += skillCooldowns_.CalculateSize(_map_skillCooldowns_codec);
+      if (position_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Position);
       }
-      size += inventory_.CalculateSize(_repeated_inventory_codec);
-      size += equipment_.CalculateSize(_map_equipment_codec);
+      size += activeEffects_.CalculateSize(_repeated_activeEffects_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -1501,7 +2080,7 @@ namespace RPG.GameServer.Protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(Character other) {
+    public void MergeFrom(BaseCharacter other) {
       if (other == null) {
         return;
       }
@@ -1511,20 +2090,20 @@ namespace RPG.GameServer.Protos {
       if (other.Name.Length != 0) {
         Name = other.Name;
       }
-      if (other.Class.Length != 0) {
-        Class = other.Class;
-      }
       if (other.Level != 0) {
         Level = other.Level;
       }
-      if (other.Health != 0) {
-        Health = other.Health;
+      if (other.MaxHealth != 0) {
+        MaxHealth = other.MaxHealth;
       }
-      if (other.Mana != 0) {
-        Mana = other.Mana;
+      if (other.CurrentHealth != 0) {
+        CurrentHealth = other.CurrentHealth;
       }
-      if (other.Type != global::RPG.GameServer.Protos.CharacterType.Player) {
-        Type = other.Type;
+      if (other.MaxMana != 0) {
+        MaxMana = other.MaxMana;
+      }
+      if (other.CurrentMana != 0) {
+        CurrentMana = other.CurrentMana;
       }
       if (other.stats_ != null) {
         if (stats_ == null) {
@@ -1532,14 +2111,15 @@ namespace RPG.GameServer.Protos {
         }
         Stats.MergeFrom(other.Stats);
       }
-      if (other.location_ != null) {
-        if (location_ == null) {
-          Location = new global::RPG.GameServer.Protos.Location();
+      skills_.Add(other.skills_);
+      skillCooldowns_.MergeFrom(other.skillCooldowns_);
+      if (other.position_ != null) {
+        if (position_ == null) {
+          Position = new global::RPG.GameServer.Protos.Location();
         }
-        Location.MergeFrom(other.Location);
+        Position.MergeFrom(other.Position);
       }
-      inventory_.Add(other.inventory_);
-      equipment_.MergeFrom(other.equipment_);
+      activeEffects_.Add(other.activeEffects_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -1563,24 +2143,24 @@ namespace RPG.GameServer.Protos {
             Name = input.ReadString();
             break;
           }
-          case 26: {
-            Class = input.ReadString();
-            break;
-          }
-          case 32: {
+          case 24: {
             Level = input.ReadInt32();
             break;
           }
+          case 32: {
+            MaxHealth = input.ReadInt32();
+            break;
+          }
           case 40: {
-            Health = input.ReadInt32();
+            CurrentHealth = input.ReadInt32();
             break;
           }
           case 48: {
-            Mana = input.ReadInt32();
+            MaxMana = input.ReadInt32();
             break;
           }
           case 56: {
-            Type = (global::RPG.GameServer.Protos.CharacterType) input.ReadEnum();
+            CurrentMana = input.ReadInt32();
             break;
           }
           case 66: {
@@ -1591,18 +2171,23 @@ namespace RPG.GameServer.Protos {
             break;
           }
           case 74: {
-            if (location_ == null) {
-              Location = new global::RPG.GameServer.Protos.Location();
-            }
-            input.ReadMessage(Location);
+            skills_.AddEntriesFrom(input, _repeated_skills_codec);
             break;
           }
           case 82: {
-            inventory_.AddEntriesFrom(input, _repeated_inventory_codec);
+            skillCooldowns_.AddEntriesFrom(input, _map_skillCooldowns_codec);
             break;
           }
           case 90: {
-            equipment_.AddEntriesFrom(input, _map_equipment_codec);
+            if (position_ == null) {
+              Position = new global::RPG.GameServer.Protos.Location();
+            }
+            input.ReadMessage(Position);
+            break;
+          }
+          case 98:
+          case 96: {
+            activeEffects_.AddEntriesFrom(input, _repeated_activeEffects_codec);
             break;
           }
         }
@@ -1628,24 +2213,24 @@ namespace RPG.GameServer.Protos {
             Name = input.ReadString();
             break;
           }
-          case 26: {
-            Class = input.ReadString();
-            break;
-          }
-          case 32: {
+          case 24: {
             Level = input.ReadInt32();
             break;
           }
+          case 32: {
+            MaxHealth = input.ReadInt32();
+            break;
+          }
           case 40: {
-            Health = input.ReadInt32();
+            CurrentHealth = input.ReadInt32();
             break;
           }
           case 48: {
-            Mana = input.ReadInt32();
+            MaxMana = input.ReadInt32();
             break;
           }
           case 56: {
-            Type = (global::RPG.GameServer.Protos.CharacterType) input.ReadEnum();
+            CurrentMana = input.ReadInt32();
             break;
           }
           case 66: {
@@ -1656,18 +2241,23 @@ namespace RPG.GameServer.Protos {
             break;
           }
           case 74: {
-            if (location_ == null) {
-              Location = new global::RPG.GameServer.Protos.Location();
-            }
-            input.ReadMessage(Location);
+            skills_.AddEntriesFrom(ref input, _repeated_skills_codec);
             break;
           }
           case 82: {
-            inventory_.AddEntriesFrom(ref input, _repeated_inventory_codec);
+            skillCooldowns_.AddEntriesFrom(ref input, _map_skillCooldowns_codec);
             break;
           }
           case 90: {
-            equipment_.AddEntriesFrom(ref input, _map_equipment_codec);
+            if (position_ == null) {
+              Position = new global::RPG.GameServer.Protos.Location();
+            }
+            input.ReadMessage(Position);
+            break;
+          }
+          case 98:
+          case 96: {
+            activeEffects_.AddEntriesFrom(ref input, _repeated_activeEffects_codec);
             break;
           }
         }
@@ -1677,16 +2267,16 @@ namespace RPG.GameServer.Protos {
 
   }
 
-  public sealed partial class CreateCharacterRequest : pb::IMessage<CreateCharacterRequest>
+  public sealed partial class Skill : pb::IMessage<Skill>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<CreateCharacterRequest> _parser = new pb::MessageParser<CreateCharacterRequest>(() => new CreateCharacterRequest());
+    private static readonly pb::MessageParser<Skill> _parser = new pb::MessageParser<Skill>(() => new Skill());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<CreateCharacterRequest> Parser { get { return _parser; } }
+    public static pb::MessageParser<Skill> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1702,7 +2292,7 @@ namespace RPG.GameServer.Protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public CreateCharacterRequest() {
+    public Skill() {
       OnConstruction();
     }
 
@@ -1710,22 +2300,42 @@ namespace RPG.GameServer.Protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public CreateCharacterRequest(CreateCharacterRequest other) : this() {
+    public Skill(Skill other) : this() {
+      id_ = other.id_;
       name_ = other.name_;
-      class_ = other.class_;
       type_ = other.type_;
-      stats_ = other.stats_ != null ? other.stats_.Clone() : null;
+      manaCost_ = other.manaCost_;
+      cooldownSeconds_ = other.cooldownSeconds_;
+      requiredLevel_ = other.requiredLevel_;
+      power_ = other.power_;
+      range_ = other.range_;
+      durationSeconds_ = other.durationSeconds_;
+      effectDescription_ = other.effectDescription_;
+      appliedEffects_ = other.appliedEffects_.Clone();
+      canCastWhileMoving_ = other.canCastWhileMoving_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public CreateCharacterRequest Clone() {
-      return new CreateCharacterRequest(this);
+    public Skill Clone() {
+      return new Skill(this);
+    }
+
+    /// <summary>Field number for the "id" field.</summary>
+    public const int IdFieldNumber = 1;
+    private int id_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int Id {
+      get { return id_; }
+      set {
+        id_ = value;
+      }
     }
 
     /// <summary>Field number for the "name" field.</summary>
-    public const int NameFieldNumber = 1;
+    public const int NameFieldNumber = 2;
     private string name_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -1736,61 +2346,152 @@ namespace RPG.GameServer.Protos {
       }
     }
 
-    /// <summary>Field number for the "class" field.</summary>
-    public const int ClassFieldNumber = 2;
-    private string class_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Class {
-      get { return class_; }
-      set {
-        class_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
     /// <summary>Field number for the "type" field.</summary>
     public const int TypeFieldNumber = 3;
-    private global::RPG.GameServer.Protos.CharacterType type_ = global::RPG.GameServer.Protos.CharacterType.Player;
+    private global::RPG.GameServer.Protos.SkillType type_ = global::RPG.GameServer.Protos.SkillType.MeleeAttack;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::RPG.GameServer.Protos.CharacterType Type {
+    public global::RPG.GameServer.Protos.SkillType Type {
       get { return type_; }
       set {
         type_ = value;
       }
     }
 
-    /// <summary>Field number for the "stats" field.</summary>
-    public const int StatsFieldNumber = 4;
-    private global::RPG.GameServer.Protos.Stats stats_;
+    /// <summary>Field number for the "manaCost" field.</summary>
+    public const int ManaCostFieldNumber = 4;
+    private int manaCost_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::RPG.GameServer.Protos.Stats Stats {
-      get { return stats_; }
+    public int ManaCost {
+      get { return manaCost_; }
       set {
-        stats_ = value;
+        manaCost_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "cooldownSeconds" field.</summary>
+    public const int CooldownSecondsFieldNumber = 5;
+    private float cooldownSeconds_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float CooldownSeconds {
+      get { return cooldownSeconds_; }
+      set {
+        cooldownSeconds_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "requiredLevel" field.</summary>
+    public const int RequiredLevelFieldNumber = 6;
+    private int requiredLevel_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int RequiredLevel {
+      get { return requiredLevel_; }
+      set {
+        requiredLevel_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "power" field.</summary>
+    public const int PowerFieldNumber = 7;
+    private int power_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int Power {
+      get { return power_; }
+      set {
+        power_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "range" field.</summary>
+    public const int RangeFieldNumber = 8;
+    private float range_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float Range {
+      get { return range_; }
+      set {
+        range_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "durationSeconds" field.</summary>
+    public const int DurationSecondsFieldNumber = 9;
+    private float durationSeconds_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float DurationSeconds {
+      get { return durationSeconds_; }
+      set {
+        durationSeconds_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "effectDescription" field.</summary>
+    public const int EffectDescriptionFieldNumber = 10;
+    private string effectDescription_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string EffectDescription {
+      get { return effectDescription_; }
+      set {
+        effectDescription_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "appliedEffects" field.</summary>
+    public const int AppliedEffectsFieldNumber = 11;
+    private static readonly pb::FieldCodec<global::RPG.GameServer.Protos.Effect> _repeated_appliedEffects_codec
+        = pb::FieldCodec.ForEnum(90, x => (int) x, x => (global::RPG.GameServer.Protos.Effect) x);
+    private readonly pbc::RepeatedField<global::RPG.GameServer.Protos.Effect> appliedEffects_ = new pbc::RepeatedField<global::RPG.GameServer.Protos.Effect>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::RPG.GameServer.Protos.Effect> AppliedEffects {
+      get { return appliedEffects_; }
+    }
+
+    /// <summary>Field number for the "canCastWhileMoving" field.</summary>
+    public const int CanCastWhileMovingFieldNumber = 12;
+    private bool canCastWhileMoving_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool CanCastWhileMoving {
+      get { return canCastWhileMoving_; }
+      set {
+        canCastWhileMoving_ = value;
       }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
-      return Equals(other as CreateCharacterRequest);
+      return Equals(other as Skill);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(CreateCharacterRequest other) {
+    public bool Equals(Skill other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (Id != other.Id) return false;
       if (Name != other.Name) return false;
-      if (Class != other.Class) return false;
       if (Type != other.Type) return false;
-      if (!object.Equals(Stats, other.Stats)) return false;
+      if (ManaCost != other.ManaCost) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(CooldownSeconds, other.CooldownSeconds)) return false;
+      if (RequiredLevel != other.RequiredLevel) return false;
+      if (Power != other.Power) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Range, other.Range)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DurationSeconds, other.DurationSeconds)) return false;
+      if (EffectDescription != other.EffectDescription) return false;
+      if(!appliedEffects_.Equals(other.appliedEffects_)) return false;
+      if (CanCastWhileMoving != other.CanCastWhileMoving) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1798,10 +2499,18 @@ namespace RPG.GameServer.Protos {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
+      if (Id != 0) hash ^= Id.GetHashCode();
       if (Name.Length != 0) hash ^= Name.GetHashCode();
-      if (Class.Length != 0) hash ^= Class.GetHashCode();
-      if (Type != global::RPG.GameServer.Protos.CharacterType.Player) hash ^= Type.GetHashCode();
-      if (stats_ != null) hash ^= Stats.GetHashCode();
+      if (Type != global::RPG.GameServer.Protos.SkillType.MeleeAttack) hash ^= Type.GetHashCode();
+      if (ManaCost != 0) hash ^= ManaCost.GetHashCode();
+      if (CooldownSeconds != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(CooldownSeconds);
+      if (RequiredLevel != 0) hash ^= RequiredLevel.GetHashCode();
+      if (Power != 0) hash ^= Power.GetHashCode();
+      if (Range != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Range);
+      if (DurationSeconds != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DurationSeconds);
+      if (EffectDescription.Length != 0) hash ^= EffectDescription.GetHashCode();
+      hash ^= appliedEffects_.GetHashCode();
+      if (CanCastWhileMoving != false) hash ^= CanCastWhileMoving.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1820,21 +2529,50 @@ namespace RPG.GameServer.Protos {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
+      if (Id != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(Id);
+      }
       if (Name.Length != 0) {
-        output.WriteRawTag(10);
+        output.WriteRawTag(18);
         output.WriteString(Name);
       }
-      if (Class.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Class);
-      }
-      if (Type != global::RPG.GameServer.Protos.CharacterType.Player) {
+      if (Type != global::RPG.GameServer.Protos.SkillType.MeleeAttack) {
         output.WriteRawTag(24);
         output.WriteEnum((int) Type);
       }
-      if (stats_ != null) {
-        output.WriteRawTag(34);
-        output.WriteMessage(Stats);
+      if (ManaCost != 0) {
+        output.WriteRawTag(32);
+        output.WriteInt32(ManaCost);
+      }
+      if (CooldownSeconds != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(CooldownSeconds);
+      }
+      if (RequiredLevel != 0) {
+        output.WriteRawTag(48);
+        output.WriteInt32(RequiredLevel);
+      }
+      if (Power != 0) {
+        output.WriteRawTag(56);
+        output.WriteInt32(Power);
+      }
+      if (Range != 0F) {
+        output.WriteRawTag(69);
+        output.WriteFloat(Range);
+      }
+      if (DurationSeconds != 0F) {
+        output.WriteRawTag(77);
+        output.WriteFloat(DurationSeconds);
+      }
+      if (EffectDescription.Length != 0) {
+        output.WriteRawTag(82);
+        output.WriteString(EffectDescription);
+      }
+      appliedEffects_.WriteTo(output, _repeated_appliedEffects_codec);
+      if (CanCastWhileMoving != false) {
+        output.WriteRawTag(96);
+        output.WriteBool(CanCastWhileMoving);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -1846,21 +2584,50 @@ namespace RPG.GameServer.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Id != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(Id);
+      }
       if (Name.Length != 0) {
-        output.WriteRawTag(10);
+        output.WriteRawTag(18);
         output.WriteString(Name);
       }
-      if (Class.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Class);
-      }
-      if (Type != global::RPG.GameServer.Protos.CharacterType.Player) {
+      if (Type != global::RPG.GameServer.Protos.SkillType.MeleeAttack) {
         output.WriteRawTag(24);
         output.WriteEnum((int) Type);
       }
-      if (stats_ != null) {
-        output.WriteRawTag(34);
-        output.WriteMessage(Stats);
+      if (ManaCost != 0) {
+        output.WriteRawTag(32);
+        output.WriteInt32(ManaCost);
+      }
+      if (CooldownSeconds != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(CooldownSeconds);
+      }
+      if (RequiredLevel != 0) {
+        output.WriteRawTag(48);
+        output.WriteInt32(RequiredLevel);
+      }
+      if (Power != 0) {
+        output.WriteRawTag(56);
+        output.WriteInt32(Power);
+      }
+      if (Range != 0F) {
+        output.WriteRawTag(69);
+        output.WriteFloat(Range);
+      }
+      if (DurationSeconds != 0F) {
+        output.WriteRawTag(77);
+        output.WriteFloat(DurationSeconds);
+      }
+      if (EffectDescription.Length != 0) {
+        output.WriteRawTag(82);
+        output.WriteString(EffectDescription);
+      }
+      appliedEffects_.WriteTo(ref output, _repeated_appliedEffects_codec);
+      if (CanCastWhileMoving != false) {
+        output.WriteRawTag(96);
+        output.WriteBool(CanCastWhileMoving);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -1872,17 +2639,39 @@ namespace RPG.GameServer.Protos {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
+      if (Id != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Id);
+      }
       if (Name.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
       }
-      if (Class.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Class);
-      }
-      if (Type != global::RPG.GameServer.Protos.CharacterType.Player) {
+      if (Type != global::RPG.GameServer.Protos.SkillType.MeleeAttack) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
       }
-      if (stats_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Stats);
+      if (ManaCost != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(ManaCost);
+      }
+      if (CooldownSeconds != 0F) {
+        size += 1 + 4;
+      }
+      if (RequiredLevel != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(RequiredLevel);
+      }
+      if (Power != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Power);
+      }
+      if (Range != 0F) {
+        size += 1 + 4;
+      }
+      if (DurationSeconds != 0F) {
+        size += 1 + 4;
+      }
+      if (EffectDescription.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(EffectDescription);
+      }
+      size += appliedEffects_.CalculateSize(_repeated_appliedEffects_codec);
+      if (CanCastWhileMoving != false) {
+        size += 1 + 1;
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1892,24 +2681,714 @@ namespace RPG.GameServer.Protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(CreateCharacterRequest other) {
+    public void MergeFrom(Skill other) {
       if (other == null) {
         return;
+      }
+      if (other.Id != 0) {
+        Id = other.Id;
       }
       if (other.Name.Length != 0) {
         Name = other.Name;
       }
-      if (other.Class.Length != 0) {
-        Class = other.Class;
-      }
-      if (other.Type != global::RPG.GameServer.Protos.CharacterType.Player) {
+      if (other.Type != global::RPG.GameServer.Protos.SkillType.MeleeAttack) {
         Type = other.Type;
       }
-      if (other.stats_ != null) {
-        if (stats_ == null) {
-          Stats = new global::RPG.GameServer.Protos.Stats();
+      if (other.ManaCost != 0) {
+        ManaCost = other.ManaCost;
+      }
+      if (other.CooldownSeconds != 0F) {
+        CooldownSeconds = other.CooldownSeconds;
+      }
+      if (other.RequiredLevel != 0) {
+        RequiredLevel = other.RequiredLevel;
+      }
+      if (other.Power != 0) {
+        Power = other.Power;
+      }
+      if (other.Range != 0F) {
+        Range = other.Range;
+      }
+      if (other.DurationSeconds != 0F) {
+        DurationSeconds = other.DurationSeconds;
+      }
+      if (other.EffectDescription.Length != 0) {
+        EffectDescription = other.EffectDescription;
+      }
+      appliedEffects_.Add(other.appliedEffects_);
+      if (other.CanCastWhileMoving != false) {
+        CanCastWhileMoving = other.CanCastWhileMoving;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Id = input.ReadInt32();
+            break;
+          }
+          case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 24: {
+            Type = (global::RPG.GameServer.Protos.SkillType) input.ReadEnum();
+            break;
+          }
+          case 32: {
+            ManaCost = input.ReadInt32();
+            break;
+          }
+          case 45: {
+            CooldownSeconds = input.ReadFloat();
+            break;
+          }
+          case 48: {
+            RequiredLevel = input.ReadInt32();
+            break;
+          }
+          case 56: {
+            Power = input.ReadInt32();
+            break;
+          }
+          case 69: {
+            Range = input.ReadFloat();
+            break;
+          }
+          case 77: {
+            DurationSeconds = input.ReadFloat();
+            break;
+          }
+          case 82: {
+            EffectDescription = input.ReadString();
+            break;
+          }
+          case 90:
+          case 88: {
+            appliedEffects_.AddEntriesFrom(input, _repeated_appliedEffects_codec);
+            break;
+          }
+          case 96: {
+            CanCastWhileMoving = input.ReadBool();
+            break;
+          }
         }
-        Stats.MergeFrom(other.Stats);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Id = input.ReadInt32();
+            break;
+          }
+          case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 24: {
+            Type = (global::RPG.GameServer.Protos.SkillType) input.ReadEnum();
+            break;
+          }
+          case 32: {
+            ManaCost = input.ReadInt32();
+            break;
+          }
+          case 45: {
+            CooldownSeconds = input.ReadFloat();
+            break;
+          }
+          case 48: {
+            RequiredLevel = input.ReadInt32();
+            break;
+          }
+          case 56: {
+            Power = input.ReadInt32();
+            break;
+          }
+          case 69: {
+            Range = input.ReadFloat();
+            break;
+          }
+          case 77: {
+            DurationSeconds = input.ReadFloat();
+            break;
+          }
+          case 82: {
+            EffectDescription = input.ReadString();
+            break;
+          }
+          case 90:
+          case 88: {
+            appliedEffects_.AddEntriesFrom(ref input, _repeated_appliedEffects_codec);
+            break;
+          }
+          case 96: {
+            CanCastWhileMoving = input.ReadBool();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class Location : pb::IMessage<Location>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<Location> _parser = new pb::MessageParser<Location>(() => new Location());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<Location> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[5]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Location() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Location(Location other) : this() {
+      x_ = other.x_;
+      y_ = other.y_;
+      z_ = other.z_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Location Clone() {
+      return new Location(this);
+    }
+
+    /// <summary>Field number for the "x" field.</summary>
+    public const int XFieldNumber = 1;
+    private double x_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public double X {
+      get { return x_; }
+      set {
+        x_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "y" field.</summary>
+    public const int YFieldNumber = 2;
+    private double y_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public double Y {
+      get { return y_; }
+      set {
+        y_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "z" field.</summary>
+    public const int ZFieldNumber = 3;
+    private double z_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public double Z {
+      get { return z_; }
+      set {
+        z_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as Location);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(Location other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(X, other.X)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Y, other.Y)) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(Z, other.Z)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (X != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(X);
+      if (Y != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Y);
+      if (Z != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(Z);
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (X != 0D) {
+        output.WriteRawTag(9);
+        output.WriteDouble(X);
+      }
+      if (Y != 0D) {
+        output.WriteRawTag(17);
+        output.WriteDouble(Y);
+      }
+      if (Z != 0D) {
+        output.WriteRawTag(25);
+        output.WriteDouble(Z);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (X != 0D) {
+        output.WriteRawTag(9);
+        output.WriteDouble(X);
+      }
+      if (Y != 0D) {
+        output.WriteRawTag(17);
+        output.WriteDouble(Y);
+      }
+      if (Z != 0D) {
+        output.WriteRawTag(25);
+        output.WriteDouble(Z);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (X != 0D) {
+        size += 1 + 8;
+      }
+      if (Y != 0D) {
+        size += 1 + 8;
+      }
+      if (Z != 0D) {
+        size += 1 + 8;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(Location other) {
+      if (other == null) {
+        return;
+      }
+      if (other.X != 0D) {
+        X = other.X;
+      }
+      if (other.Y != 0D) {
+        Y = other.Y;
+      }
+      if (other.Z != 0D) {
+        Z = other.Z;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 9: {
+            X = input.ReadDouble();
+            break;
+          }
+          case 17: {
+            Y = input.ReadDouble();
+            break;
+          }
+          case 25: {
+            Z = input.ReadDouble();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 9: {
+            X = input.ReadDouble();
+            break;
+          }
+          case 17: {
+            Y = input.ReadDouble();
+            break;
+          }
+          case 25: {
+            Z = input.ReadDouble();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class PlayerCharacter : pb::IMessage<PlayerCharacter>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<PlayerCharacter> _parser = new pb::MessageParser<PlayerCharacter>(() => new PlayerCharacter());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<PlayerCharacter> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[6]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PlayerCharacter() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PlayerCharacter(PlayerCharacter other) : this() {
+      baseCharacter_ = other.baseCharacter_ != null ? other.baseCharacter_.Clone() : null;
+      equipment_ = other.equipment_ != null ? other.equipment_.Clone() : null;
+      inventory_ = other.inventory_.Clone();
+      skillLevels_ = other.skillLevels_.Clone();
+      sessionId_ = other.sessionId_;
+      characterClass_ = other.characterClass_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public PlayerCharacter Clone() {
+      return new PlayerCharacter(this);
+    }
+
+    /// <summary>Field number for the "baseCharacter" field.</summary>
+    public const int BaseCharacterFieldNumber = 1;
+    private global::RPG.GameServer.Protos.BaseCharacter baseCharacter_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.BaseCharacter BaseCharacter {
+      get { return baseCharacter_; }
+      set {
+        baseCharacter_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "equipment" field.</summary>
+    public const int EquipmentFieldNumber = 2;
+    private global::RPG.GameServer.Protos.EquipmentSlots equipment_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.EquipmentSlots Equipment {
+      get { return equipment_; }
+      set {
+        equipment_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "inventory" field.</summary>
+    public const int InventoryFieldNumber = 3;
+    private static readonly pb::FieldCodec<global::RPG.GameServer.Protos.Item> _repeated_inventory_codec
+        = pb::FieldCodec.ForMessage(26, global::RPG.GameServer.Protos.Item.Parser);
+    private readonly pbc::RepeatedField<global::RPG.GameServer.Protos.Item> inventory_ = new pbc::RepeatedField<global::RPG.GameServer.Protos.Item>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::RPG.GameServer.Protos.Item> Inventory {
+      get { return inventory_; }
+    }
+
+    /// <summary>Field number for the "skillLevels" field.</summary>
+    public const int SkillLevelsFieldNumber = 4;
+    private static readonly pbc::MapField<int, int>.Codec _map_skillLevels_codec
+        = new pbc::MapField<int, int>.Codec(pb::FieldCodec.ForInt32(8, 0), pb::FieldCodec.ForInt32(16, 0), 34);
+    private readonly pbc::MapField<int, int> skillLevels_ = new pbc::MapField<int, int>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::MapField<int, int> SkillLevels {
+      get { return skillLevels_; }
+    }
+
+    /// <summary>Field number for the "sessionId" field.</summary>
+    public const int SessionIdFieldNumber = 5;
+    private string sessionId_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string SessionId {
+      get { return sessionId_; }
+      set {
+        sessionId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "characterClass" field.</summary>
+    public const int CharacterClassFieldNumber = 6;
+    private global::RPG.GameServer.Protos.CharacterClass characterClass_ = global::RPG.GameServer.Protos.CharacterClass.Warrior;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.CharacterClass CharacterClass {
+      get { return characterClass_; }
+      set {
+        characterClass_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as PlayerCharacter);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(PlayerCharacter other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!object.Equals(BaseCharacter, other.BaseCharacter)) return false;
+      if (!object.Equals(Equipment, other.Equipment)) return false;
+      if(!inventory_.Equals(other.inventory_)) return false;
+      if (!SkillLevels.Equals(other.SkillLevels)) return false;
+      if (SessionId != other.SessionId) return false;
+      if (CharacterClass != other.CharacterClass) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (baseCharacter_ != null) hash ^= BaseCharacter.GetHashCode();
+      if (equipment_ != null) hash ^= Equipment.GetHashCode();
+      hash ^= inventory_.GetHashCode();
+      hash ^= SkillLevels.GetHashCode();
+      if (SessionId.Length != 0) hash ^= SessionId.GetHashCode();
+      if (CharacterClass != global::RPG.GameServer.Protos.CharacterClass.Warrior) hash ^= CharacterClass.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (baseCharacter_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(BaseCharacter);
+      }
+      if (equipment_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(Equipment);
+      }
+      inventory_.WriteTo(output, _repeated_inventory_codec);
+      skillLevels_.WriteTo(output, _map_skillLevels_codec);
+      if (SessionId.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(SessionId);
+      }
+      if (CharacterClass != global::RPG.GameServer.Protos.CharacterClass.Warrior) {
+        output.WriteRawTag(48);
+        output.WriteEnum((int) CharacterClass);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (baseCharacter_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(BaseCharacter);
+      }
+      if (equipment_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(Equipment);
+      }
+      inventory_.WriteTo(ref output, _repeated_inventory_codec);
+      skillLevels_.WriteTo(ref output, _map_skillLevels_codec);
+      if (SessionId.Length != 0) {
+        output.WriteRawTag(42);
+        output.WriteString(SessionId);
+      }
+      if (CharacterClass != global::RPG.GameServer.Protos.CharacterClass.Warrior) {
+        output.WriteRawTag(48);
+        output.WriteEnum((int) CharacterClass);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (baseCharacter_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(BaseCharacter);
+      }
+      if (equipment_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Equipment);
+      }
+      size += inventory_.CalculateSize(_repeated_inventory_codec);
+      size += skillLevels_.CalculateSize(_map_skillLevels_codec);
+      if (SessionId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(SessionId);
+      }
+      if (CharacterClass != global::RPG.GameServer.Protos.CharacterClass.Warrior) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) CharacterClass);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(PlayerCharacter other) {
+      if (other == null) {
+        return;
+      }
+      if (other.baseCharacter_ != null) {
+        if (baseCharacter_ == null) {
+          BaseCharacter = new global::RPG.GameServer.Protos.BaseCharacter();
+        }
+        BaseCharacter.MergeFrom(other.BaseCharacter);
+      }
+      if (other.equipment_ != null) {
+        if (equipment_ == null) {
+          Equipment = new global::RPG.GameServer.Protos.EquipmentSlots();
+        }
+        Equipment.MergeFrom(other.Equipment);
+      }
+      inventory_.Add(other.inventory_);
+      skillLevels_.MergeFrom(other.skillLevels_);
+      if (other.SessionId.Length != 0) {
+        SessionId = other.SessionId;
+      }
+      if (other.CharacterClass != global::RPG.GameServer.Protos.CharacterClass.Warrior) {
+        CharacterClass = other.CharacterClass;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1927,22 +3406,33 @@ namespace RPG.GameServer.Protos {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 10: {
-            Name = input.ReadString();
+            if (baseCharacter_ == null) {
+              BaseCharacter = new global::RPG.GameServer.Protos.BaseCharacter();
+            }
+            input.ReadMessage(BaseCharacter);
             break;
           }
           case 18: {
-            Class = input.ReadString();
+            if (equipment_ == null) {
+              Equipment = new global::RPG.GameServer.Protos.EquipmentSlots();
+            }
+            input.ReadMessage(Equipment);
             break;
           }
-          case 24: {
-            Type = (global::RPG.GameServer.Protos.CharacterType) input.ReadEnum();
+          case 26: {
+            inventory_.AddEntriesFrom(input, _repeated_inventory_codec);
             break;
           }
           case 34: {
-            if (stats_ == null) {
-              Stats = new global::RPG.GameServer.Protos.Stats();
-            }
-            input.ReadMessage(Stats);
+            skillLevels_.AddEntriesFrom(input, _map_skillLevels_codec);
+            break;
+          }
+          case 42: {
+            SessionId = input.ReadString();
+            break;
+          }
+          case 48: {
+            CharacterClass = (global::RPG.GameServer.Protos.CharacterClass) input.ReadEnum();
             break;
           }
         }
@@ -1961,22 +3451,231 @@ namespace RPG.GameServer.Protos {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 10: {
-            Name = input.ReadString();
+            if (baseCharacter_ == null) {
+              BaseCharacter = new global::RPG.GameServer.Protos.BaseCharacter();
+            }
+            input.ReadMessage(BaseCharacter);
             break;
           }
           case 18: {
-            Class = input.ReadString();
+            if (equipment_ == null) {
+              Equipment = new global::RPG.GameServer.Protos.EquipmentSlots();
+            }
+            input.ReadMessage(Equipment);
             break;
           }
-          case 24: {
-            Type = (global::RPG.GameServer.Protos.CharacterType) input.ReadEnum();
+          case 26: {
+            inventory_.AddEntriesFrom(ref input, _repeated_inventory_codec);
             break;
           }
           case 34: {
-            if (stats_ == null) {
-              Stats = new global::RPG.GameServer.Protos.Stats();
+            skillLevels_.AddEntriesFrom(ref input, _map_skillLevels_codec);
+            break;
+          }
+          case 42: {
+            SessionId = input.ReadString();
+            break;
+          }
+          case 48: {
+            CharacterClass = (global::RPG.GameServer.Protos.CharacterClass) input.ReadEnum();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class CharacterRequest : pb::IMessage<CharacterRequest>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<CharacterRequest> _parser = new pb::MessageParser<CharacterRequest>(() => new CharacterRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<CharacterRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[7]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CharacterRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CharacterRequest(CharacterRequest other) : this() {
+      character_ = other.character_ != null ? other.character_.Clone() : null;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public CharacterRequest Clone() {
+      return new CharacterRequest(this);
+    }
+
+    /// <summary>Field number for the "character" field.</summary>
+    public const int CharacterFieldNumber = 1;
+    private global::RPG.GameServer.Protos.PlayerCharacter character_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.PlayerCharacter Character {
+      get { return character_; }
+      set {
+        character_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as CharacterRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(CharacterRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!object.Equals(Character, other.Character)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (character_ != null) hash ^= Character.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (character_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(Character);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (character_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(Character);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (character_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Character);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(CharacterRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.character_ != null) {
+        if (character_ == null) {
+          Character = new global::RPG.GameServer.Protos.PlayerCharacter();
+        }
+        Character.MergeFrom(other.Character);
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            if (character_ == null) {
+              Character = new global::RPG.GameServer.Protos.PlayerCharacter();
             }
-            input.ReadMessage(Stats);
+            input.ReadMessage(Character);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            if (character_ == null) {
+              Character = new global::RPG.GameServer.Protos.PlayerCharacter();
+            }
+            input.ReadMessage(Character);
             break;
           }
         }
@@ -2000,7 +3699,7 @@ namespace RPG.GameServer.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[5]; }
+      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[8]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2020,7 +3719,7 @@ namespace RPG.GameServer.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public CharacterIdRequest(CharacterIdRequest other) : this() {
-      id_ = other.id_;
+      characterId_ = other.characterId_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2030,15 +3729,15 @@ namespace RPG.GameServer.Protos {
       return new CharacterIdRequest(this);
     }
 
-    /// <summary>Field number for the "id" field.</summary>
-    public const int IdFieldNumber = 1;
-    private string id_ = "";
+    /// <summary>Field number for the "characterId" field.</summary>
+    public const int CharacterIdFieldNumber = 1;
+    private string characterId_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Id {
-      get { return id_; }
+    public string CharacterId {
+      get { return characterId_; }
       set {
-        id_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+        characterId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
       }
     }
 
@@ -2057,7 +3756,7 @@ namespace RPG.GameServer.Protos {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Id != other.Id) return false;
+      if (CharacterId != other.CharacterId) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2065,7 +3764,7 @@ namespace RPG.GameServer.Protos {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Id.Length != 0) hash ^= Id.GetHashCode();
+      if (CharacterId.Length != 0) hash ^= CharacterId.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2084,9 +3783,9 @@ namespace RPG.GameServer.Protos {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Id.Length != 0) {
+      if (CharacterId.Length != 0) {
         output.WriteRawTag(10);
-        output.WriteString(Id);
+        output.WriteString(CharacterId);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -2098,9 +3797,9 @@ namespace RPG.GameServer.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Id.Length != 0) {
+      if (CharacterId.Length != 0) {
         output.WriteRawTag(10);
-        output.WriteString(Id);
+        output.WriteString(CharacterId);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -2112,8 +3811,8 @@ namespace RPG.GameServer.Protos {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Id.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Id);
+      if (CharacterId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(CharacterId);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2127,902 +3826,9 @@ namespace RPG.GameServer.Protos {
       if (other == null) {
         return;
       }
-      if (other.Id.Length != 0) {
-        Id = other.Id;
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
-          case 10: {
-            Id = input.ReadString();
-            break;
-          }
-        }
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            Id = input.ReadString();
-            break;
-          }
-        }
-      }
-    }
-    #endif
-
-  }
-
-  public sealed partial class UpdateCharacterRequest : pb::IMessage<UpdateCharacterRequest>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
-    private static readonly pb::MessageParser<UpdateCharacterRequest> _parser = new pb::MessageParser<UpdateCharacterRequest>(() => new UpdateCharacterRequest());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<UpdateCharacterRequest> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[6]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public UpdateCharacterRequest() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public UpdateCharacterRequest(UpdateCharacterRequest other) : this() {
-      id_ = other.id_;
-      level_ = other.level_;
-      health_ = other.health_;
-      mana_ = other.mana_;
-      stats_ = other.stats_ != null ? other.stats_.Clone() : null;
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public UpdateCharacterRequest Clone() {
-      return new UpdateCharacterRequest(this);
-    }
-
-    /// <summary>Field number for the "id" field.</summary>
-    public const int IdFieldNumber = 1;
-    private string id_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Id {
-      get { return id_; }
-      set {
-        id_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    /// <summary>Field number for the "level" field.</summary>
-    public const int LevelFieldNumber = 2;
-    private int level_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int Level {
-      get { return level_; }
-      set {
-        level_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "health" field.</summary>
-    public const int HealthFieldNumber = 3;
-    private int health_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int Health {
-      get { return health_; }
-      set {
-        health_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "mana" field.</summary>
-    public const int ManaFieldNumber = 4;
-    private int mana_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int Mana {
-      get { return mana_; }
-      set {
-        mana_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "stats" field.</summary>
-    public const int StatsFieldNumber = 5;
-    private global::RPG.GameServer.Protos.Stats stats_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::RPG.GameServer.Protos.Stats Stats {
-      get { return stats_; }
-      set {
-        stats_ = value;
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override bool Equals(object other) {
-      return Equals(other as UpdateCharacterRequest);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(UpdateCharacterRequest other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (Id != other.Id) return false;
-      if (Level != other.Level) return false;
-      if (Health != other.Health) return false;
-      if (Mana != other.Mana) return false;
-      if (!object.Equals(Stats, other.Stats)) return false;
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Id.Length != 0) hash ^= Id.GetHashCode();
-      if (Level != 0) hash ^= Level.GetHashCode();
-      if (Health != 0) hash ^= Health.GetHashCode();
-      if (Mana != 0) hash ^= Mana.GetHashCode();
-      if (stats_ != null) hash ^= Stats.GetHashCode();
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
-      if (Id.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Id);
-      }
-      if (Level != 0) {
-        output.WriteRawTag(16);
-        output.WriteInt32(Level);
-      }
-      if (Health != 0) {
-        output.WriteRawTag(24);
-        output.WriteInt32(Health);
-      }
-      if (Mana != 0) {
-        output.WriteRawTag(32);
-        output.WriteInt32(Mana);
-      }
-      if (stats_ != null) {
-        output.WriteRawTag(42);
-        output.WriteMessage(Stats);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Id.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Id);
-      }
-      if (Level != 0) {
-        output.WriteRawTag(16);
-        output.WriteInt32(Level);
-      }
-      if (Health != 0) {
-        output.WriteRawTag(24);
-        output.WriteInt32(Health);
-      }
-      if (Mana != 0) {
-        output.WriteRawTag(32);
-        output.WriteInt32(Mana);
-      }
-      if (stats_ != null) {
-        output.WriteRawTag(42);
-        output.WriteMessage(Stats);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int CalculateSize() {
-      int size = 0;
-      if (Id.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Id);
-      }
-      if (Level != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Level);
-      }
-      if (Health != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Health);
-      }
-      if (Mana != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Mana);
-      }
-      if (stats_ != null) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Stats);
-      }
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(UpdateCharacterRequest other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Id.Length != 0) {
-        Id = other.Id;
-      }
-      if (other.Level != 0) {
-        Level = other.Level;
-      }
-      if (other.Health != 0) {
-        Health = other.Health;
-      }
-      if (other.Mana != 0) {
-        Mana = other.Mana;
-      }
-      if (other.stats_ != null) {
-        if (stats_ == null) {
-          Stats = new global::RPG.GameServer.Protos.Stats();
-        }
-        Stats.MergeFrom(other.Stats);
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
-          case 10: {
-            Id = input.ReadString();
-            break;
-          }
-          case 16: {
-            Level = input.ReadInt32();
-            break;
-          }
-          case 24: {
-            Health = input.ReadInt32();
-            break;
-          }
-          case 32: {
-            Mana = input.ReadInt32();
-            break;
-          }
-          case 42: {
-            if (stats_ == null) {
-              Stats = new global::RPG.GameServer.Protos.Stats();
-            }
-            input.ReadMessage(Stats);
-            break;
-          }
-        }
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            Id = input.ReadString();
-            break;
-          }
-          case 16: {
-            Level = input.ReadInt32();
-            break;
-          }
-          case 24: {
-            Health = input.ReadInt32();
-            break;
-          }
-          case 32: {
-            Mana = input.ReadInt32();
-            break;
-          }
-          case 42: {
-            if (stats_ == null) {
-              Stats = new global::RPG.GameServer.Protos.Stats();
-            }
-            input.ReadMessage(Stats);
-            break;
-          }
-        }
-      }
-    }
-    #endif
-
-  }
-
-  public sealed partial class MoveCharacterRequest : pb::IMessage<MoveCharacterRequest>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
-    private static readonly pb::MessageParser<MoveCharacterRequest> _parser = new pb::MessageParser<MoveCharacterRequest>(() => new MoveCharacterRequest());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<MoveCharacterRequest> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[7]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public MoveCharacterRequest() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public MoveCharacterRequest(MoveCharacterRequest other) : this() {
-      id_ = other.id_;
-      deltaX_ = other.deltaX_;
-      deltaY_ = other.deltaY_;
-      deltaZ_ = other.deltaZ_;
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public MoveCharacterRequest Clone() {
-      return new MoveCharacterRequest(this);
-    }
-
-    /// <summary>Field number for the "id" field.</summary>
-    public const int IdFieldNumber = 1;
-    private string id_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Id {
-      get { return id_; }
-      set {
-        id_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    /// <summary>Field number for the "deltaX" field.</summary>
-    public const int DeltaXFieldNumber = 2;
-    private float deltaX_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public float DeltaX {
-      get { return deltaX_; }
-      set {
-        deltaX_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "deltaY" field.</summary>
-    public const int DeltaYFieldNumber = 3;
-    private float deltaY_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public float DeltaY {
-      get { return deltaY_; }
-      set {
-        deltaY_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "deltaZ" field.</summary>
-    public const int DeltaZFieldNumber = 4;
-    private float deltaZ_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public float DeltaZ {
-      get { return deltaZ_; }
-      set {
-        deltaZ_ = value;
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override bool Equals(object other) {
-      return Equals(other as MoveCharacterRequest);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(MoveCharacterRequest other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (Id != other.Id) return false;
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DeltaX, other.DeltaX)) return false;
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DeltaY, other.DeltaY)) return false;
-      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DeltaZ, other.DeltaZ)) return false;
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (Id.Length != 0) hash ^= Id.GetHashCode();
-      if (DeltaX != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DeltaX);
-      if (DeltaY != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DeltaY);
-      if (DeltaZ != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DeltaZ);
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
-      if (Id.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Id);
-      }
-      if (DeltaX != 0F) {
-        output.WriteRawTag(21);
-        output.WriteFloat(DeltaX);
-      }
-      if (DeltaY != 0F) {
-        output.WriteRawTag(29);
-        output.WriteFloat(DeltaY);
-      }
-      if (DeltaZ != 0F) {
-        output.WriteRawTag(37);
-        output.WriteFloat(DeltaZ);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Id.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(Id);
-      }
-      if (DeltaX != 0F) {
-        output.WriteRawTag(21);
-        output.WriteFloat(DeltaX);
-      }
-      if (DeltaY != 0F) {
-        output.WriteRawTag(29);
-        output.WriteFloat(DeltaY);
-      }
-      if (DeltaZ != 0F) {
-        output.WriteRawTag(37);
-        output.WriteFloat(DeltaZ);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int CalculateSize() {
-      int size = 0;
-      if (Id.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Id);
-      }
-      if (DeltaX != 0F) {
-        size += 1 + 4;
-      }
-      if (DeltaY != 0F) {
-        size += 1 + 4;
-      }
-      if (DeltaZ != 0F) {
-        size += 1 + 4;
-      }
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(MoveCharacterRequest other) {
-      if (other == null) {
-        return;
-      }
-      if (other.Id.Length != 0) {
-        Id = other.Id;
-      }
-      if (other.DeltaX != 0F) {
-        DeltaX = other.DeltaX;
-      }
-      if (other.DeltaY != 0F) {
-        DeltaY = other.DeltaY;
-      }
-      if (other.DeltaZ != 0F) {
-        DeltaZ = other.DeltaZ;
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
-          case 10: {
-            Id = input.ReadString();
-            break;
-          }
-          case 21: {
-            DeltaX = input.ReadFloat();
-            break;
-          }
-          case 29: {
-            DeltaY = input.ReadFloat();
-            break;
-          }
-          case 37: {
-            DeltaZ = input.ReadFloat();
-            break;
-          }
-        }
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            Id = input.ReadString();
-            break;
-          }
-          case 21: {
-            DeltaX = input.ReadFloat();
-            break;
-          }
-          case 29: {
-            DeltaY = input.ReadFloat();
-            break;
-          }
-          case 37: {
-            DeltaZ = input.ReadFloat();
-            break;
-          }
-        }
-      }
-    }
-    #endif
-
-  }
-
-  public sealed partial class EquipItemRequest : pb::IMessage<EquipItemRequest>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
-    private static readonly pb::MessageParser<EquipItemRequest> _parser = new pb::MessageParser<EquipItemRequest>(() => new EquipItemRequest());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<EquipItemRequest> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[8]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public EquipItemRequest() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public EquipItemRequest(EquipItemRequest other) : this() {
-      characterId_ = other.characterId_;
-      itemId_ = other.itemId_;
-      slot_ = other.slot_;
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public EquipItemRequest Clone() {
-      return new EquipItemRequest(this);
-    }
-
-    /// <summary>Field number for the "characterId" field.</summary>
-    public const int CharacterIdFieldNumber = 1;
-    private string characterId_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string CharacterId {
-      get { return characterId_; }
-      set {
-        characterId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    /// <summary>Field number for the "itemId" field.</summary>
-    public const int ItemIdFieldNumber = 2;
-    private string itemId_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string ItemId {
-      get { return itemId_; }
-      set {
-        itemId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    /// <summary>Field number for the "slot" field.</summary>
-    public const int SlotFieldNumber = 3;
-    private string slot_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Slot {
-      get { return slot_; }
-      set {
-        slot_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override bool Equals(object other) {
-      return Equals(other as EquipItemRequest);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(EquipItemRequest other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (CharacterId != other.CharacterId) return false;
-      if (ItemId != other.ItemId) return false;
-      if (Slot != other.Slot) return false;
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (CharacterId.Length != 0) hash ^= CharacterId.GetHashCode();
-      if (ItemId.Length != 0) hash ^= ItemId.GetHashCode();
-      if (Slot.Length != 0) hash ^= Slot.GetHashCode();
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
-      if (CharacterId.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(CharacterId);
-      }
-      if (ItemId.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(ItemId);
-      }
-      if (Slot.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteString(Slot);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (CharacterId.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(CharacterId);
-      }
-      if (ItemId.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(ItemId);
-      }
-      if (Slot.Length != 0) {
-        output.WriteRawTag(26);
-        output.WriteString(Slot);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int CalculateSize() {
-      int size = 0;
-      if (CharacterId.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(CharacterId);
-      }
-      if (ItemId.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(ItemId);
-      }
-      if (Slot.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Slot);
-      }
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(EquipItemRequest other) {
-      if (other == null) {
-        return;
-      }
       if (other.CharacterId.Length != 0) {
         CharacterId = other.CharacterId;
       }
-      if (other.ItemId.Length != 0) {
-        ItemId = other.ItemId;
-      }
-      if (other.Slot.Length != 0) {
-        Slot = other.Slot;
-      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -3042,14 +3848,6 @@ namespace RPG.GameServer.Protos {
             CharacterId = input.ReadString();
             break;
           }
-          case 18: {
-            ItemId = input.ReadString();
-            break;
-          }
-          case 26: {
-            Slot = input.ReadString();
-            break;
-          }
         }
       }
     #endif
@@ -3067,240 +3865,6 @@ namespace RPG.GameServer.Protos {
             break;
           case 10: {
             CharacterId = input.ReadString();
-            break;
-          }
-          case 18: {
-            ItemId = input.ReadString();
-            break;
-          }
-          case 26: {
-            Slot = input.ReadString();
-            break;
-          }
-        }
-      }
-    }
-    #endif
-
-  }
-
-  public sealed partial class UnequipItemRequest : pb::IMessage<UnequipItemRequest>
-  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      , pb::IBufferMessage
-  #endif
-  {
-    private static readonly pb::MessageParser<UnequipItemRequest> _parser = new pb::MessageParser<UnequipItemRequest>(() => new UnequipItemRequest());
-    private pb::UnknownFieldSet _unknownFields;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<UnequipItemRequest> Parser { get { return _parser; } }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pbr::MessageDescriptor Descriptor {
-      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[9]; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    pbr::MessageDescriptor pb::IMessage.Descriptor {
-      get { return Descriptor; }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public UnequipItemRequest() {
-      OnConstruction();
-    }
-
-    partial void OnConstruction();
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public UnequipItemRequest(UnequipItemRequest other) : this() {
-      characterId_ = other.characterId_;
-      slot_ = other.slot_;
-      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public UnequipItemRequest Clone() {
-      return new UnequipItemRequest(this);
-    }
-
-    /// <summary>Field number for the "characterId" field.</summary>
-    public const int CharacterIdFieldNumber = 1;
-    private string characterId_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string CharacterId {
-      get { return characterId_; }
-      set {
-        characterId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    /// <summary>Field number for the "slot" field.</summary>
-    public const int SlotFieldNumber = 2;
-    private string slot_ = "";
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Slot {
-      get { return slot_; }
-      set {
-        slot_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
-      }
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override bool Equals(object other) {
-      return Equals(other as UnequipItemRequest);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(UnequipItemRequest other) {
-      if (ReferenceEquals(other, null)) {
-        return false;
-      }
-      if (ReferenceEquals(other, this)) {
-        return true;
-      }
-      if (CharacterId != other.CharacterId) return false;
-      if (Slot != other.Slot) return false;
-      return Equals(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override int GetHashCode() {
-      int hash = 1;
-      if (CharacterId.Length != 0) hash ^= CharacterId.GetHashCode();
-      if (Slot.Length != 0) hash ^= Slot.GetHashCode();
-      if (_unknownFields != null) {
-        hash ^= _unknownFields.GetHashCode();
-      }
-      return hash;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public override string ToString() {
-      return pb::JsonFormatter.ToDiagnosticString(this);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void WriteTo(pb::CodedOutputStream output) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      output.WriteRawMessage(this);
-    #else
-      if (CharacterId.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(CharacterId);
-      }
-      if (Slot.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Slot);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(output);
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (CharacterId.Length != 0) {
-        output.WriteRawTag(10);
-        output.WriteString(CharacterId);
-      }
-      if (Slot.Length != 0) {
-        output.WriteRawTag(18);
-        output.WriteString(Slot);
-      }
-      if (_unknownFields != null) {
-        _unknownFields.WriteTo(ref output);
-      }
-    }
-    #endif
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public int CalculateSize() {
-      int size = 0;
-      if (CharacterId.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(CharacterId);
-      }
-      if (Slot.Length != 0) {
-        size += 1 + pb::CodedOutputStream.ComputeStringSize(Slot);
-      }
-      if (_unknownFields != null) {
-        size += _unknownFields.CalculateSize();
-      }
-      return size;
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(UnequipItemRequest other) {
-      if (other == null) {
-        return;
-      }
-      if (other.CharacterId.Length != 0) {
-        CharacterId = other.CharacterId;
-      }
-      if (other.Slot.Length != 0) {
-        Slot = other.Slot;
-      }
-      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
-    }
-
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(pb::CodedInputStream input) {
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-      input.ReadRawMessage(this);
-    #else
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
-            break;
-          case 10: {
-            CharacterId = input.ReadString();
-            break;
-          }
-          case 18: {
-            Slot = input.ReadString();
-            break;
-          }
-        }
-      }
-    #endif
-    }
-
-    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
-      uint tag;
-      while ((tag = input.ReadTag()) != 0) {
-        switch(tag) {
-          default:
-            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
-            break;
-          case 10: {
-            CharacterId = input.ReadString();
-            break;
-          }
-          case 18: {
-            Slot = input.ReadString();
             break;
           }
         }
@@ -3324,7 +3888,7 @@ namespace RPG.GameServer.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[10]; }
+      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[9]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3356,10 +3920,10 @@ namespace RPG.GameServer.Protos {
 
     /// <summary>Field number for the "character" field.</summary>
     public const int CharacterFieldNumber = 1;
-    private global::RPG.GameServer.Protos.Character character_;
+    private global::RPG.GameServer.Protos.PlayerCharacter character_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::RPG.GameServer.Protos.Character Character {
+    public global::RPG.GameServer.Protos.PlayerCharacter Character {
       get { return character_; }
       set {
         character_ = value;
@@ -3453,7 +4017,7 @@ namespace RPG.GameServer.Protos {
       }
       if (other.character_ != null) {
         if (character_ == null) {
-          Character = new global::RPG.GameServer.Protos.Character();
+          Character = new global::RPG.GameServer.Protos.PlayerCharacter();
         }
         Character.MergeFrom(other.Character);
       }
@@ -3474,7 +4038,7 @@ namespace RPG.GameServer.Protos {
             break;
           case 10: {
             if (character_ == null) {
-              Character = new global::RPG.GameServer.Protos.Character();
+              Character = new global::RPG.GameServer.Protos.PlayerCharacter();
             }
             input.ReadMessage(Character);
             break;
@@ -3496,7 +4060,7 @@ namespace RPG.GameServer.Protos {
             break;
           case 10: {
             if (character_ == null) {
-              Character = new global::RPG.GameServer.Protos.Character();
+              Character = new global::RPG.GameServer.Protos.PlayerCharacter();
             }
             input.ReadMessage(Character);
             break;
@@ -3508,21 +4072,21 @@ namespace RPG.GameServer.Protos {
 
   }
 
-  public sealed partial class DeleteReply : pb::IMessage<DeleteReply>
+  public sealed partial class CharacterIdReply : pb::IMessage<CharacterIdReply>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
   #endif
   {
-    private static readonly pb::MessageParser<DeleteReply> _parser = new pb::MessageParser<DeleteReply>(() => new DeleteReply());
+    private static readonly pb::MessageParser<CharacterIdReply> _parser = new pb::MessageParser<CharacterIdReply>(() => new CharacterIdReply());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public static pb::MessageParser<DeleteReply> Parser { get { return _parser; } }
+    public static pb::MessageParser<CharacterIdReply> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[11]; }
+      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[10]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -3533,7 +4097,7 @@ namespace RPG.GameServer.Protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public DeleteReply() {
+    public CharacterIdReply() {
       OnConstruction();
     }
 
@@ -3541,45 +4105,45 @@ namespace RPG.GameServer.Protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public DeleteReply(DeleteReply other) : this() {
-      success_ = other.success_;
+    public CharacterIdReply(CharacterIdReply other) : this() {
+      characterId_ = other.characterId_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public DeleteReply Clone() {
-      return new DeleteReply(this);
+    public CharacterIdReply Clone() {
+      return new CharacterIdReply(this);
     }
 
-    /// <summary>Field number for the "success" field.</summary>
-    public const int SuccessFieldNumber = 1;
-    private bool success_;
+    /// <summary>Field number for the "characterId" field.</summary>
+    public const int CharacterIdFieldNumber = 1;
+    private bool characterId_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Success {
-      get { return success_; }
+    public bool CharacterId {
+      get { return characterId_; }
       set {
-        success_ = value;
+        characterId_ = value;
       }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
-      return Equals(other as DeleteReply);
+      return Equals(other as CharacterIdReply);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool Equals(DeleteReply other) {
+    public bool Equals(CharacterIdReply other) {
       if (ReferenceEquals(other, null)) {
         return false;
       }
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Success != other.Success) return false;
+      if (CharacterId != other.CharacterId) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -3587,7 +4151,7 @@ namespace RPG.GameServer.Protos {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Success != false) hash ^= Success.GetHashCode();
+      if (CharacterId != false) hash ^= CharacterId.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -3606,9 +4170,9 @@ namespace RPG.GameServer.Protos {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Success != false) {
+      if (CharacterId != false) {
         output.WriteRawTag(8);
-        output.WriteBool(Success);
+        output.WriteBool(CharacterId);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -3620,9 +4184,9 @@ namespace RPG.GameServer.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Success != false) {
+      if (CharacterId != false) {
         output.WriteRawTag(8);
-        output.WriteBool(Success);
+        output.WriteBool(CharacterId);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -3634,7 +4198,7 @@ namespace RPG.GameServer.Protos {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Success != false) {
+      if (CharacterId != false) {
         size += 1 + 1;
       }
       if (_unknownFields != null) {
@@ -3645,12 +4209,12 @@ namespace RPG.GameServer.Protos {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void MergeFrom(DeleteReply other) {
+    public void MergeFrom(CharacterIdReply other) {
       if (other == null) {
         return;
       }
-      if (other.Success != false) {
-        Success = other.Success;
+      if (other.CharacterId != false) {
+        CharacterId = other.CharacterId;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -3668,7 +4232,7 @@ namespace RPG.GameServer.Protos {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Success = input.ReadBool();
+            CharacterId = input.ReadBool();
             break;
           }
         }
@@ -3687,7 +4251,1170 @@ namespace RPG.GameServer.Protos {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            Success = input.ReadBool();
+            CharacterId = input.ReadBool();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class ProtobufSkill : pb::IMessage<ProtobufSkill>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<ProtobufSkill> _parser = new pb::MessageParser<ProtobufSkill>(() => new ProtobufSkill());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<ProtobufSkill> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[11]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ProtobufSkill() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ProtobufSkill(ProtobufSkill other) : this() {
+      id_ = other.id_;
+      name_ = other.name_;
+      type_ = other.type_;
+      manaCost_ = other.manaCost_;
+      cooldownSeconds_ = other.cooldownSeconds_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ProtobufSkill Clone() {
+      return new ProtobufSkill(this);
+    }
+
+    /// <summary>Field number for the "id" field.</summary>
+    public const int IdFieldNumber = 1;
+    private int id_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int Id {
+      get { return id_; }
+      set {
+        id_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "name" field.</summary>
+    public const int NameFieldNumber = 2;
+    private string name_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Name {
+      get { return name_; }
+      set {
+        name_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "type" field.</summary>
+    public const int TypeFieldNumber = 3;
+    private global::RPG.GameServer.Protos.SkillType type_ = global::RPG.GameServer.Protos.SkillType.MeleeAttack;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.SkillType Type {
+      get { return type_; }
+      set {
+        type_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "manaCost" field.</summary>
+    public const int ManaCostFieldNumber = 4;
+    private int manaCost_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int ManaCost {
+      get { return manaCost_; }
+      set {
+        manaCost_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "cooldownSeconds" field.</summary>
+    public const int CooldownSecondsFieldNumber = 5;
+    private float cooldownSeconds_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public float CooldownSeconds {
+      get { return cooldownSeconds_; }
+      set {
+        cooldownSeconds_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as ProtobufSkill);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(ProtobufSkill other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Id != other.Id) return false;
+      if (Name != other.Name) return false;
+      if (Type != other.Type) return false;
+      if (ManaCost != other.ManaCost) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(CooldownSeconds, other.CooldownSeconds)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Id != 0) hash ^= Id.GetHashCode();
+      if (Name.Length != 0) hash ^= Name.GetHashCode();
+      if (Type != global::RPG.GameServer.Protos.SkillType.MeleeAttack) hash ^= Type.GetHashCode();
+      if (ManaCost != 0) hash ^= ManaCost.GetHashCode();
+      if (CooldownSeconds != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(CooldownSeconds);
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Id != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(Id);
+      }
+      if (Name.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Name);
+      }
+      if (Type != global::RPG.GameServer.Protos.SkillType.MeleeAttack) {
+        output.WriteRawTag(24);
+        output.WriteEnum((int) Type);
+      }
+      if (ManaCost != 0) {
+        output.WriteRawTag(32);
+        output.WriteInt32(ManaCost);
+      }
+      if (CooldownSeconds != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(CooldownSeconds);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Id != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(Id);
+      }
+      if (Name.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Name);
+      }
+      if (Type != global::RPG.GameServer.Protos.SkillType.MeleeAttack) {
+        output.WriteRawTag(24);
+        output.WriteEnum((int) Type);
+      }
+      if (ManaCost != 0) {
+        output.WriteRawTag(32);
+        output.WriteInt32(ManaCost);
+      }
+      if (CooldownSeconds != 0F) {
+        output.WriteRawTag(45);
+        output.WriteFloat(CooldownSeconds);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Id != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Id);
+      }
+      if (Name.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+      }
+      if (Type != global::RPG.GameServer.Protos.SkillType.MeleeAttack) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
+      }
+      if (ManaCost != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(ManaCost);
+      }
+      if (CooldownSeconds != 0F) {
+        size += 1 + 4;
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(ProtobufSkill other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Id != 0) {
+        Id = other.Id;
+      }
+      if (other.Name.Length != 0) {
+        Name = other.Name;
+      }
+      if (other.Type != global::RPG.GameServer.Protos.SkillType.MeleeAttack) {
+        Type = other.Type;
+      }
+      if (other.ManaCost != 0) {
+        ManaCost = other.ManaCost;
+      }
+      if (other.CooldownSeconds != 0F) {
+        CooldownSeconds = other.CooldownSeconds;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Id = input.ReadInt32();
+            break;
+          }
+          case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 24: {
+            Type = (global::RPG.GameServer.Protos.SkillType) input.ReadEnum();
+            break;
+          }
+          case 32: {
+            ManaCost = input.ReadInt32();
+            break;
+          }
+          case 45: {
+            CooldownSeconds = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Id = input.ReadInt32();
+            break;
+          }
+          case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 24: {
+            Type = (global::RPG.GameServer.Protos.SkillType) input.ReadEnum();
+            break;
+          }
+          case 32: {
+            ManaCost = input.ReadInt32();
+            break;
+          }
+          case 45: {
+            CooldownSeconds = input.ReadFloat();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class ProtobufEquipmentSlots : pb::IMessage<ProtobufEquipmentSlots>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<ProtobufEquipmentSlots> _parser = new pb::MessageParser<ProtobufEquipmentSlots>(() => new ProtobufEquipmentSlots());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<ProtobufEquipmentSlots> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[12]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ProtobufEquipmentSlots() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ProtobufEquipmentSlots(ProtobufEquipmentSlots other) : this() {
+      head_ = other.head_ != null ? other.head_.Clone() : null;
+      chest_ = other.chest_ != null ? other.chest_.Clone() : null;
+      weapon_ = other.weapon_ != null ? other.weapon_.Clone() : null;
+      shield_ = other.shield_ != null ? other.shield_.Clone() : null;
+      boots_ = other.boots_ != null ? other.boots_.Clone() : null;
+      gloves_ = other.gloves_ != null ? other.gloves_.Clone() : null;
+      rings_ = other.rings_.Clone();
+      amulet_ = other.amulet_ != null ? other.amulet_.Clone() : null;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ProtobufEquipmentSlots Clone() {
+      return new ProtobufEquipmentSlots(this);
+    }
+
+    /// <summary>Field number for the "head" field.</summary>
+    public const int HeadFieldNumber = 1;
+    private global::RPG.GameServer.Protos.Item head_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Head {
+      get { return head_; }
+      set {
+        head_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "chest" field.</summary>
+    public const int ChestFieldNumber = 2;
+    private global::RPG.GameServer.Protos.Item chest_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Chest {
+      get { return chest_; }
+      set {
+        chest_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "weapon" field.</summary>
+    public const int WeaponFieldNumber = 3;
+    private global::RPG.GameServer.Protos.Item weapon_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Weapon {
+      get { return weapon_; }
+      set {
+        weapon_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "shield" field.</summary>
+    public const int ShieldFieldNumber = 4;
+    private global::RPG.GameServer.Protos.Item shield_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Shield {
+      get { return shield_; }
+      set {
+        shield_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "boots" field.</summary>
+    public const int BootsFieldNumber = 5;
+    private global::RPG.GameServer.Protos.Item boots_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Boots {
+      get { return boots_; }
+      set {
+        boots_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "gloves" field.</summary>
+    public const int GlovesFieldNumber = 6;
+    private global::RPG.GameServer.Protos.Item gloves_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Gloves {
+      get { return gloves_; }
+      set {
+        gloves_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "rings" field.</summary>
+    public const int RingsFieldNumber = 7;
+    private static readonly pb::FieldCodec<global::RPG.GameServer.Protos.Item> _repeated_rings_codec
+        = pb::FieldCodec.ForMessage(58, global::RPG.GameServer.Protos.Item.Parser);
+    private readonly pbc::RepeatedField<global::RPG.GameServer.Protos.Item> rings_ = new pbc::RepeatedField<global::RPG.GameServer.Protos.Item>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::RepeatedField<global::RPG.GameServer.Protos.Item> Rings {
+      get { return rings_; }
+    }
+
+    /// <summary>Field number for the "amulet" field.</summary>
+    public const int AmuletFieldNumber = 8;
+    private global::RPG.GameServer.Protos.Item amulet_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.Item Amulet {
+      get { return amulet_; }
+      set {
+        amulet_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as ProtobufEquipmentSlots);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(ProtobufEquipmentSlots other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (!object.Equals(Head, other.Head)) return false;
+      if (!object.Equals(Chest, other.Chest)) return false;
+      if (!object.Equals(Weapon, other.Weapon)) return false;
+      if (!object.Equals(Shield, other.Shield)) return false;
+      if (!object.Equals(Boots, other.Boots)) return false;
+      if (!object.Equals(Gloves, other.Gloves)) return false;
+      if(!rings_.Equals(other.rings_)) return false;
+      if (!object.Equals(Amulet, other.Amulet)) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (head_ != null) hash ^= Head.GetHashCode();
+      if (chest_ != null) hash ^= Chest.GetHashCode();
+      if (weapon_ != null) hash ^= Weapon.GetHashCode();
+      if (shield_ != null) hash ^= Shield.GetHashCode();
+      if (boots_ != null) hash ^= Boots.GetHashCode();
+      if (gloves_ != null) hash ^= Gloves.GetHashCode();
+      hash ^= rings_.GetHashCode();
+      if (amulet_ != null) hash ^= Amulet.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (head_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(Head);
+      }
+      if (chest_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(Chest);
+      }
+      if (weapon_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Weapon);
+      }
+      if (shield_ != null) {
+        output.WriteRawTag(34);
+        output.WriteMessage(Shield);
+      }
+      if (boots_ != null) {
+        output.WriteRawTag(42);
+        output.WriteMessage(Boots);
+      }
+      if (gloves_ != null) {
+        output.WriteRawTag(50);
+        output.WriteMessage(Gloves);
+      }
+      rings_.WriteTo(output, _repeated_rings_codec);
+      if (amulet_ != null) {
+        output.WriteRawTag(66);
+        output.WriteMessage(Amulet);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (head_ != null) {
+        output.WriteRawTag(10);
+        output.WriteMessage(Head);
+      }
+      if (chest_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(Chest);
+      }
+      if (weapon_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Weapon);
+      }
+      if (shield_ != null) {
+        output.WriteRawTag(34);
+        output.WriteMessage(Shield);
+      }
+      if (boots_ != null) {
+        output.WriteRawTag(42);
+        output.WriteMessage(Boots);
+      }
+      if (gloves_ != null) {
+        output.WriteRawTag(50);
+        output.WriteMessage(Gloves);
+      }
+      rings_.WriteTo(ref output, _repeated_rings_codec);
+      if (amulet_ != null) {
+        output.WriteRawTag(66);
+        output.WriteMessage(Amulet);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (head_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Head);
+      }
+      if (chest_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Chest);
+      }
+      if (weapon_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Weapon);
+      }
+      if (shield_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Shield);
+      }
+      if (boots_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Boots);
+      }
+      if (gloves_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Gloves);
+      }
+      size += rings_.CalculateSize(_repeated_rings_codec);
+      if (amulet_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Amulet);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(ProtobufEquipmentSlots other) {
+      if (other == null) {
+        return;
+      }
+      if (other.head_ != null) {
+        if (head_ == null) {
+          Head = new global::RPG.GameServer.Protos.Item();
+        }
+        Head.MergeFrom(other.Head);
+      }
+      if (other.chest_ != null) {
+        if (chest_ == null) {
+          Chest = new global::RPG.GameServer.Protos.Item();
+        }
+        Chest.MergeFrom(other.Chest);
+      }
+      if (other.weapon_ != null) {
+        if (weapon_ == null) {
+          Weapon = new global::RPG.GameServer.Protos.Item();
+        }
+        Weapon.MergeFrom(other.Weapon);
+      }
+      if (other.shield_ != null) {
+        if (shield_ == null) {
+          Shield = new global::RPG.GameServer.Protos.Item();
+        }
+        Shield.MergeFrom(other.Shield);
+      }
+      if (other.boots_ != null) {
+        if (boots_ == null) {
+          Boots = new global::RPG.GameServer.Protos.Item();
+        }
+        Boots.MergeFrom(other.Boots);
+      }
+      if (other.gloves_ != null) {
+        if (gloves_ == null) {
+          Gloves = new global::RPG.GameServer.Protos.Item();
+        }
+        Gloves.MergeFrom(other.Gloves);
+      }
+      rings_.Add(other.rings_);
+      if (other.amulet_ != null) {
+        if (amulet_ == null) {
+          Amulet = new global::RPG.GameServer.Protos.Item();
+        }
+        Amulet.MergeFrom(other.Amulet);
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            if (head_ == null) {
+              Head = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Head);
+            break;
+          }
+          case 18: {
+            if (chest_ == null) {
+              Chest = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Chest);
+            break;
+          }
+          case 26: {
+            if (weapon_ == null) {
+              Weapon = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Weapon);
+            break;
+          }
+          case 34: {
+            if (shield_ == null) {
+              Shield = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Shield);
+            break;
+          }
+          case 42: {
+            if (boots_ == null) {
+              Boots = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Boots);
+            break;
+          }
+          case 50: {
+            if (gloves_ == null) {
+              Gloves = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Gloves);
+            break;
+          }
+          case 58: {
+            rings_.AddEntriesFrom(input, _repeated_rings_codec);
+            break;
+          }
+          case 66: {
+            if (amulet_ == null) {
+              Amulet = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Amulet);
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            if (head_ == null) {
+              Head = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Head);
+            break;
+          }
+          case 18: {
+            if (chest_ == null) {
+              Chest = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Chest);
+            break;
+          }
+          case 26: {
+            if (weapon_ == null) {
+              Weapon = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Weapon);
+            break;
+          }
+          case 34: {
+            if (shield_ == null) {
+              Shield = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Shield);
+            break;
+          }
+          case 42: {
+            if (boots_ == null) {
+              Boots = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Boots);
+            break;
+          }
+          case 50: {
+            if (gloves_ == null) {
+              Gloves = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Gloves);
+            break;
+          }
+          case 58: {
+            rings_.AddEntriesFrom(ref input, _repeated_rings_codec);
+            break;
+          }
+          case 66: {
+            if (amulet_ == null) {
+              Amulet = new global::RPG.GameServer.Protos.Item();
+            }
+            input.ReadMessage(Amulet);
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  public sealed partial class ProtobufItem : pb::IMessage<ProtobufItem>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<ProtobufItem> _parser = new pb::MessageParser<ProtobufItem>(() => new ProtobufItem());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<ProtobufItem> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::RPG.GameServer.Protos.CharacterReflection.Descriptor.MessageTypes[13]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ProtobufItem() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ProtobufItem(ProtobufItem other) : this() {
+      id_ = other.id_;
+      name_ = other.name_;
+      type_ = other.type_;
+      modifiers_ = other.modifiers_.Clone();
+      requiredLevel_ = other.requiredLevel_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public ProtobufItem Clone() {
+      return new ProtobufItem(this);
+    }
+
+    /// <summary>Field number for the "id" field.</summary>
+    public const int IdFieldNumber = 1;
+    private string id_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Id {
+      get { return id_; }
+      set {
+        id_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "name" field.</summary>
+    public const int NameFieldNumber = 2;
+    private string name_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Name {
+      get { return name_; }
+      set {
+        name_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "type" field.</summary>
+    public const int TypeFieldNumber = 3;
+    private global::RPG.GameServer.Protos.ItemType type_ = global::RPG.GameServer.Protos.ItemType.Weapon;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::RPG.GameServer.Protos.ItemType Type {
+      get { return type_; }
+      set {
+        type_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "modifiers" field.</summary>
+    public const int ModifiersFieldNumber = 4;
+    private static readonly pbc::MapField<string, int>.Codec _map_modifiers_codec
+        = new pbc::MapField<string, int>.Codec(pb::FieldCodec.ForString(10, ""), pb::FieldCodec.ForInt32(16, 0), 34);
+    private readonly pbc::MapField<string, int> modifiers_ = new pbc::MapField<string, int>();
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public pbc::MapField<string, int> Modifiers {
+      get { return modifiers_; }
+    }
+
+    /// <summary>Field number for the "requiredLevel" field.</summary>
+    public const int RequiredLevelFieldNumber = 5;
+    private int requiredLevel_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int RequiredLevel {
+      get { return requiredLevel_; }
+      set {
+        requiredLevel_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as ProtobufItem);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(ProtobufItem other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Id != other.Id) return false;
+      if (Name != other.Name) return false;
+      if (Type != other.Type) return false;
+      if (!Modifiers.Equals(other.Modifiers)) return false;
+      if (RequiredLevel != other.RequiredLevel) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Id.Length != 0) hash ^= Id.GetHashCode();
+      if (Name.Length != 0) hash ^= Name.GetHashCode();
+      if (Type != global::RPG.GameServer.Protos.ItemType.Weapon) hash ^= Type.GetHashCode();
+      hash ^= Modifiers.GetHashCode();
+      if (RequiredLevel != 0) hash ^= RequiredLevel.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Id.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Id);
+      }
+      if (Name.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Name);
+      }
+      if (Type != global::RPG.GameServer.Protos.ItemType.Weapon) {
+        output.WriteRawTag(24);
+        output.WriteEnum((int) Type);
+      }
+      modifiers_.WriteTo(output, _map_modifiers_codec);
+      if (RequiredLevel != 0) {
+        output.WriteRawTag(40);
+        output.WriteInt32(RequiredLevel);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Id.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(Id);
+      }
+      if (Name.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Name);
+      }
+      if (Type != global::RPG.GameServer.Protos.ItemType.Weapon) {
+        output.WriteRawTag(24);
+        output.WriteEnum((int) Type);
+      }
+      modifiers_.WriteTo(ref output, _map_modifiers_codec);
+      if (RequiredLevel != 0) {
+        output.WriteRawTag(40);
+        output.WriteInt32(RequiredLevel);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Id.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Id);
+      }
+      if (Name.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Name);
+      }
+      if (Type != global::RPG.GameServer.Protos.ItemType.Weapon) {
+        size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Type);
+      }
+      size += modifiers_.CalculateSize(_map_modifiers_codec);
+      if (RequiredLevel != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(RequiredLevel);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(ProtobufItem other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Id.Length != 0) {
+        Id = other.Id;
+      }
+      if (other.Name.Length != 0) {
+        Name = other.Name;
+      }
+      if (other.Type != global::RPG.GameServer.Protos.ItemType.Weapon) {
+        Type = other.Type;
+      }
+      modifiers_.MergeFrom(other.modifiers_);
+      if (other.RequiredLevel != 0) {
+        RequiredLevel = other.RequiredLevel;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            Id = input.ReadString();
+            break;
+          }
+          case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 24: {
+            Type = (global::RPG.GameServer.Protos.ItemType) input.ReadEnum();
+            break;
+          }
+          case 34: {
+            modifiers_.AddEntriesFrom(input, _map_modifiers_codec);
+            break;
+          }
+          case 40: {
+            RequiredLevel = input.ReadInt32();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 10: {
+            Id = input.ReadString();
+            break;
+          }
+          case 18: {
+            Name = input.ReadString();
+            break;
+          }
+          case 24: {
+            Type = (global::RPG.GameServer.Protos.ItemType) input.ReadEnum();
+            break;
+          }
+          case 34: {
+            modifiers_.AddEntriesFrom(ref input, _map_modifiers_codec);
+            break;
+          }
+          case 40: {
+            RequiredLevel = input.ReadInt32();
             break;
           }
         }

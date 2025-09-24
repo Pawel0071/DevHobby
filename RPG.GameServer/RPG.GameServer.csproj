@@ -42,4 +42,11 @@
       <Folder Include="Services\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Include="../CharacterGrpc.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <Compile Include="../Character.cs" />
+    </ItemGroup>
+
 </Project>

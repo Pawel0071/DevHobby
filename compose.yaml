@@ -70,7 +70,7 @@ services:
       - backend
 
   rabbitmq:
-    image: rabbitmq:4-management
+    image: rabbitmq:management
     container_name: rabbitmq
     ports:
       - "5672:5672"
@@ -80,12 +80,37 @@ services:
       RABBITMQ_DEFAULT_PASS: rabbit_pass
     networks:
       - backend
+    command: >
+      sh -c "rabbitmq-plugins enable rabbitmq_management && \
+      rabbitmqctl add_vhost rpg_vhost && \
+      rabbitmqctl set_permissions -p rpg_vhost rabbit_user ".*" ".*" ".*" && \
+      rabbitmqctl add_user rpg_user rpg_pass && \
+      rabbitmqctl set_permissions -p rpg_vhost rpg_user ".*" ".*" ".*" && \
+      rabbitmqadmin declare exchange name=rpg_exchange type=topic durable=true && \
+      rabbitmqadmin declare queue name=character_queue durable=true && \
+      rabbitmqadmin declare binding source=rpg_exchange destination=character_queue routing_key=character.*"
 
   redis:
     image: redis:latest
     container_name: redis
     ports:
       - "6379:6379"
+    networks:
+      - backend
+    command: >
+      sh -c "redis-server --appendonly yes && \
+      redis-cli set character:default \"{\\\"id\\\":\\\"default\\\",\\\"name\\\":\\\"Default Character\\\"}\" && \
+      redis-cli set event:character.created \"{\\\"event\\\":\\\"character.created\\\",\\\"data\\\":\\\"default\\\"}\""
+
+  persistenceservice:
+    image: persistenceservice
+    build:
+      context: .
+      dockerfile: PersistenceService/Dockerfile
+    depends_on:
+      - mongodb
+      - redis
+      - rabbitmq
     networks:
       - backend
 
@@ -95,10 +120,4 @@ volumes:
 networks:
   backend:
     driver: bridge
-      
-        persistenceservice:
-    image: persistenceservice
-    build:
-      context: .
-      dockerfile: PersistenceService/Dockerfile
 

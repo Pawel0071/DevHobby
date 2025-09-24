@@ -1,3 +1,0 @@
-obj/Debug/net8.0/Protos/World.cs \
-obj/Debug/net8.0/Protos/WorldGrpc.cs: Protos/character.proto\
- Protos/world.proto
