@@ -8,10 +8,10 @@ using ProtobufBaseCharacter = RPG.GameServer.Protos.BaseCharacter;
 using ProtobufPlayerCharacter = RPG.GameServer.Protos.PlayerCharacter;
 using ProtobufStats = RPG.GameServer.Protos.Stats;
 using ProtobufLocation = RPG.GameServer.Protos.Location;
-using ProtobufSkill = RPG.GameServer.Protos.ProtobufSkill;
+using ProtobufSkill = RPG.GameServer.Protos.Skill;
 using ProtobufSkillType = RPG.GameServer.Protos.SkillType;
 using ProtobufEquipmentSlots = RPG.GameServer.Protos.EquipmentSlots;
-using ProtobufItem = RPG.GameServer.Protos.ProtobufItem;
+using ProtobufItem = RPG.GameServer.Protos.Item;
 
 
 using DomainStats = RPG.Core.Domain.Entities.Common.Stats;
@@ -21,6 +21,7 @@ using DomainEquipmentSlots = RPG.Core.Domain.Entities.Common.EquipmentSlots;
 using DomainEffect = RPG.Core.Domain.Entities.Common.Effect;
 using DomainItem = RPG.Core.Domain.Entities.Common.Item;
 using DomainItemType = RPG.Core.Domain.Entities.Common.ItemType;
+using DomainSkillType = RPG.Core.Domain.Entities.Enums.SkillType;
 
 namespace RPG.GameServer.Services;
 
@@ -38,7 +39,7 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
     }
 
     // Update mapping logic to align with regenerated Protobuf classes
-    private DomainPlayerCharacter MapToDomainPlayerCharacter(ProtobufPlayerCharacter character)
+    private static DomainPlayerCharacter MapToDomainPlayerCharacter(ProtobufPlayerCharacter character)
     {
         return new DomainPlayerCharacter
         {
@@ -99,64 +100,71 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
     // Update MapToProtobufPlayerCharacter to include all properties
     private ProtobufPlayerCharacter MapToProtobufPlayerCharacter(DomainPlayerCharacter character)
     {
-        return new ProtobufPlayerCharacter         
-        {
-            BaseCharacter = new ProtobufBaseCharacter
+        if (character.Equipment.Rings != null)
+            return new ProtobufPlayerCharacter
             {
-                Id = character.Id,
-                Name = character.Name,
-                Level = character.Level,
-                MaxHealth = character.MaxHealth,
-                CurrentHealth = character.CurrentHealth,
-                MaxMana = character.MaxMana,
-                CurrentMana = character.CurrentMana,
-                Stats = new ProtobufStats
+                BaseCharacter = new ProtobufBaseCharacter
                 {
-                    Strength = character.Stats.Strength,
-                    Dexterity = character.Stats.Dexterity,
-                    Intelligence = character.Stats.Intelligence,
-                    Vitality = character.Stats.Vitality,
-                    Wisdom = character.Stats.Wisdom
+                    Id = character.Id,
+                    Name = character.Name,
+                    Level = character.Level,
+                    MaxHealth = character.MaxHealth,
+                    CurrentHealth = character.CurrentHealth,
+                    MaxMana = character.MaxMana,
+                    CurrentMana = character.CurrentMana,
+                    Stats = new ProtobufStats
+                    {
+                        Strength = character.Stats.Strength,
+                        Dexterity = character.Stats.Dexterity,
+                        Intelligence = character.Stats.Intelligence,
+                        Vitality = character.Stats.Vitality,
+                        Wisdom = character.Stats.Wisdom
+                    },
+                    Position = new ProtobufLocation
+                    {
+                        X = character.Position.X,
+                        Y = character.Position.Y,
+                        Z = character.Position.Z
+                    },
+                    Skills =
+                    {
+                        character.Skills.Select(skill => new ProtobufSkill
+                        {
+                            Id = skill.Id,
+                            Name = skill.Name,
+                            Type = (SkillType)(int)skill.Type,
+                            ManaCost = skill.ManaCost,
+                            CooldownSeconds = skill.CooldownSeconds
+                        })
+                    },
+                    SkillCooldowns =
+                    {
+                        character.SkillCooldowns.ToDictionary(
+                            kvp => kvp.Key,
+                            kvp => kvp.Value.ToString("o") // Convert DateTime to ISO 8601 string
+                        )
+                    },
+                    ActiveEffects = { character.ActiveEffects.Select(effect => (Effect)(int)effect) }
                 },
-                Position = new ProtobufLocation
+                Equipment = new ProtobufEquipmentSlots
                 {
-                    X = character.Position.X,
-                    Y = character.Position.Y,
-                    Z = character.Position.Z
+                    Head = MapToProtobufItem(character.Equipment.Head),
+                    Chest = MapToProtobufItem(character.Equipment.Chest),
+                    Weapon = MapToProtobufItem(character.Equipment.Weapon),
+                    Shield = MapToProtobufItem(character.Equipment.Shield),
+                    Boots = MapToProtobufItem(character.Equipment.Boots),
+                    Gloves = MapToProtobufItem(character.Equipment.Gloves),
+                    Rings = { character.Equipment.Rings.Select(MapToProtobufItem) },
+                    Amulet = MapToProtobufItem(character.Equipment.Amulet)
                 },
-                Skills = { character.Skills.Select(skill => new ProtobufSkill
-                {
-                    Id = skill.Id,
-                    Name = skill.Name,
-                    Type = (SkillType)(int)skill.Type,
-                    ManaCost = skill.ManaCost,
-                    CooldownSeconds = skill.CooldownSeconds
-                }) },
-                SkillCooldowns = { character.SkillCooldowns.ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => kvp.Value.ToString("o") // Convert DateTime to ISO 8601 string
-                ) },
-                ActiveEffects = { character.ActiveEffects.Select(effect => (Effect)(int)effect) }
-            },
-            Equipment = new ProtobufEquipmentSlots
-            {
-                Head = MapToProtobufItem(character.Equipment.Head),
-                Chest = MapToProtobufItem(character.Equipment.Chest),
-                Weapon = MapToProtobufItem(character.Equipment.Weapon),
-                Shield = MapToProtobufItem(character.Equipment.Shield),
-                Boots = MapToProtobufItem(character.Equipment.Boots),
-                Gloves = MapToProtobufItem(character.Equipment.Gloves),
-                Rings = { character.Equipment.Rings.Select(MapToProtobufItem) },
-                Amulet = MapToProtobufItem(character.Equipment.Amulet)
-            },
-            Inventory = { character.Inventory.Select(MapToProtobufItem) },
-            SkillLevels = { character.SkillLevels },
-            SessionId = character.SessionId.ToString()
-        };
+                Inventory = { character.Inventory.Select(MapToProtobufItem) },
+                SkillLevels = { character.SkillLevels },
+                SessionId = character.SessionId.ToString()
+            };
     }
 
     // Handle nullability in MapToDomainItem
-    private DomainItem MapToDomainItem(ProtobufItem item)
+    private static DomainItem MapToDomainItem(ProtobufItem? item)
     {
         if (item == null)
         {
@@ -180,7 +188,7 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
         };
     }
 
-    private ProtobufItem MapToProtobufItem(DomainItem domainItem)
+    private static ProtobufItem MapToProtobufItem(DomainItem? domainItem)
     {
         if (domainItem == null)
         {
@@ -240,6 +248,6 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
     public override async Task<CharacterIdReply> DeleteCharacter(CharacterIdRequest request, ServerCallContext context)
     {
         var success = await _characterRepository.DeleteAsync(request.CharacterId);
-        return new CharacterIdReply { CharacterId = success ? character.Id : 0 };
+        return new CharacterIdReply { CharacterId = success ? request.CharacterId : string.Empty };
     }
 }
