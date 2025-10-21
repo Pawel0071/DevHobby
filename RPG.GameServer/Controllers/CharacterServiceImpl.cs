@@ -1,5 +1,6 @@
 using Grpc.Core;
 using RabbitMQ.Client;
+using RPG.Core.Domain.Entities.Common;
 using RPG.GameServer.Interfaces;
 using RPG.GameServer.Protos;
 using StackExchange.Redis;
@@ -16,11 +17,12 @@ using ProtobufItem = RPG.GameServer.Protos.Item;
 using DomainStats = RPG.Core.Domain.Entities.Common.Stats;
 using DomainLocation = RPG.Core.Domain.Entities.Common.Location;
 using DomainSkill = RPG.Core.Domain.Entities.Skill;
-using DomainEquipmentSlots = RPG.Core.Domain.Entities.Common.EquipmentSlots;
 using DomainEffect = RPG.Core.Domain.Entities.Common.Effect;
 using DomainItem = RPG.Core.Domain.Entities.Common.Item;
 using DomainItemType = RPG.Core.Domain.Entities.Common.ItemType;
 using DomainSkillType = RPG.Core.Domain.Entities.Enums.SkillType;
+using Effect = RPG.GameServer.Protos.Effect;
+using ItemType = RPG.GameServer.Protos.ItemType;
 
 namespace RPG.GameServer.Controllers;
 
@@ -72,12 +74,12 @@ public class CharacterServiceImpl(
                 kvp => DateTime.Parse(kvp.Value)
             ),
             ActiveEffects = character.BaseCharacter.ActiveEffects.Select(effect => (DomainEffect)(int)effect).ToList(),
-            Equipment = new DomainEquipmentSlots
+            Equipment = new Equipment
             {
                 Head = MapToDomainItem(character.Equipment.Head),
                 Chest = MapToDomainItem(character.Equipment.Chest),
                 Weapon = MapToDomainItem(character.Equipment.Weapon),
-                Shield = MapToDomainItem(character.Equipment.Shield),
+                Offhand = MapToDomainItem(character.Equipment.Shield),
                 Boots = MapToDomainItem(character.Equipment.Boots),
                 Gloves = MapToDomainItem(character.Equipment.Gloves),
                 Rings = character.Equipment.Rings?.Select(MapToDomainItem).ToList(),
@@ -168,7 +170,7 @@ public class CharacterServiceImpl(
         {
             return new DomainItem
             {
-                Id = string.Empty,
+                Id = Guid.Empty.ToString(),
                 Name = string.Empty,
                 Type = DomainItemType.Miscellaneous,
                 Modifiers = new Dictionary<string, int>(),
@@ -178,10 +180,10 @@ public class CharacterServiceImpl(
 
         return new DomainItem
         {
-            Id = item.Id,
+            Id = item.Id.ToString(),
             Name = item.Name,
             Type = (DomainItemType)item.Type,
-            Modifiers = item.Modifiers.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+            Modifiers = item.Modifiers.ToDictionary<KeyValuePair<string, int>, string, int>(kvp => kvp.Key, kvp => kvp.Value),
             RequiredLevel = item.RequiredLevel
         };
     }
@@ -192,7 +194,7 @@ public class CharacterServiceImpl(
         {
             return new ProtobufItem
             {
-                Id = string.Empty,
+                Id = new Guid(string.Empty),
                 Name = string.Empty,
                 Type = ItemType.Miscellaneous, // Corrected enum value
                 Modifiers = { },
@@ -202,7 +204,7 @@ public class CharacterServiceImpl(
 
         return new ProtobufItem 
         {
-            Id = domainItem.Id,
+            Id = new Guid(domainItem.Id),
             Name = domainItem.Name,
             Type = (ItemType)(int)domainItem.Type,
             Modifiers = { (domainItem.Modifiers ?? new Dictionary<string, int>()).ToDictionary(kvp => kvp.Key, kvp => kvp.Value) },

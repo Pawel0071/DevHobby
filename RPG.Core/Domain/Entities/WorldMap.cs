@@ -1,3 +1,4 @@
+using System.Numerics;
 using RPG.Core.Domain.Entities.Common;
 
 namespace RPG.Core.Domain.Entities;
@@ -17,7 +18,7 @@ public class MapRegion
 public class MapLocation
 {
     public string Name { get; set; } = string.Empty;
-    public Location Position { get; set; } = new();
+    public Vector3  Position { get; set; } = new();
     public List<NpcCharacter> Npcs { get; set; } = new();
     public List<MonsterCharacter<DefaultMovementPattern>> Monsters { get; set; } = new();
     public List<StaticObject> StaticObjects { get; set; } = new();

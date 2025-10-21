@@ -1,3 +1,4 @@
+using System.Numerics;
 using RPG.Core.Domain.Entities.Common;
 using RPG.Core.Domain.Entities.Enums;
 using RPG.Core.Interfaces;
@@ -26,12 +27,27 @@ public class MonsterCharacter<TMovementPattern> : BaseCharacter, ILootable where
             .ToList();
     }
 
-    public bool IsPlayerInAggroRange(Location evtNewPosition)
+    public bool IsPlayerInAggroRange(Vector3 evtNewPosition)
     {
         throw new NotImplementedException();
     }
 
     List<Item> ILootable.DropLoot()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override float GetMovementSpeed()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void Move(MoveType moveType, int angle)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void ReceiveDamage(int amount)
     {
         throw new NotImplementedException();
     }

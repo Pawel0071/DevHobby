@@ -8,7 +8,7 @@ namespace RPG.Core.Interfaces;
 
 public interface IAiBehavior
 {
-    void TriggerAggro(string evtPlayerId);
+    void TriggerAggro(Guid evtPlayerId);
     void Patrol();
     void Chase(PlayerCharacter target);
     void Flee(PlayerCharacter threat);

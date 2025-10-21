@@ -1,32 +1,33 @@
+using System.Numerics;
 using RPG.Core.Interfaces;
 using RPG.Core.Domain.Entities.Common;
+using RPG.Core.Domain.Entities.Enums;
+using RPG.Core.MovementService;
 
 namespace RPG.Core.Domain.Entities;
 
 public abstract class BaseCharacter  : IMovable, IAttackable, ISkill
 {
-    public required string Id { get; set; } = Guid.NewGuid().ToString();
+    public required Guid Id { get; set; }
     public required string Name { get; set; }
     public int Level { get; set; } = 1;
     public int MaxHealth { get; set; }
     public int CurrentHealth { get; set; }
     public int MaxMana { get; set; }
     public int CurrentMana { get; set; }
-    public Stats Stats { get; set; } = new();
+    public Stats? Stats { get; set; } 
     public List<Skill> Skills { get; set; } = [];
     public Dictionary<int, DateTime> SkillCooldowns { get; set; } = new();
-    public Location Position { get; set; } = new();
+    public Vector3 Position { get; set; } = new();
+    
+    public bool CanMove { get; set; }
     public List<Effect> ActiveEffects { get; set; } = [];
 
-    public void Move(double dx, double dy, double dz)
-    {
-        Position.MoveBy(dx,dy,dz);
-    }
+    public abstract float GetMovementSpeed();
+    
+    public abstract void Move(MoveType moveType, int angle);
 
-    public void ReceiveDamage(int amount)
-    {
-        CurrentHealth = Math.Max(0, CurrentHealth - amount);
-    }
+    public abstract void ReceiveDamage(int amount);
 
     public bool IsAlive => CurrentHealth > 0;
     

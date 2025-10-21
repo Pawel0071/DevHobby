@@ -19,4 +19,19 @@ public class NpcCharacter : BaseCharacter, IInteractive
     {
         throw new NotImplementedException();
     }
+
+    public override float GetMovementSpeed()
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void Move(MoveType moveType, int angle)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void ReceiveDamage(int amount)
+    {
+        throw new NotImplementedException();
+    }
 }

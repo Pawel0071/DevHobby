@@ -892,7 +892,7 @@ namespace RPG.GameServer.Protos {
     private string id_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public string Id {
+    public Guid Id {
       get { return id_; }
       set {
         id_ = pb::ProtoPreconditions.CheckNotNull(value, "value");

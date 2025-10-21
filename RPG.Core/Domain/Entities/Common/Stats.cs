@@ -1,28 +1,45 @@
+using RPG.Core.Domain.Entities.Enums;
+using RPG.Core.Interfaces;
+
 namespace RPG.Core.Domain.Entities.Common;
 
-public class Stats
+public class Stats : IStats
 {
-    // melle atack powers
-    public int Strength { get; set; }
-    // range atack powers
-    public int Agility { get; set; }
-    // magic atack powers
-    public int Intelligence { get; set; }
-    // health and mana regeneration
-    public int Wisdom { get; set; }
-    // critical chance, miss chance, bartering
-    public int Dexterity{ get; set; }
-    // health points, life steal, health regeneration
-    public int Vitality { get; set; }
+    private readonly Dictionary<StatsProperty, int> _statsDictionary;
 
-    public int MagicResist { get; set; }
-    public int NatureResist { get; set; }
-    public int MisticResist { get; set; }
+    public Stats(Dictionary<StatsProperty, int> allStats)
+    {
+        _statsDictionary = Enum.GetValues(typeof(StatsProperty))
+            .Cast<StatsProperty>()
+            .ToDictionary(stat => stat, stat => 0);
+    }
 
-    public int Armor { get; set; }
+ 
 
-    public int CritChance { get; set; }
-    public int HitChance { get; set; }
-    public int AttackSpeed { get; set; }
-    public int MoveSpeed { get; set; }    
+    public int GetStat(StatsProperty property)
+    {
+        return _statsDictionary.TryGetValue(property, out var value) ? value : 0;
+    }
+
+    public void SetStat(StatsProperty property, int value)
+    {
+        if (_statsDictionary.ContainsKey(property))
+        {
+            _statsDictionary[property] = value;
+        }
+    }
+
+    public void ModifyStat(StatsProperty property, int delta)
+    {
+        if (_statsDictionary.ContainsKey(property))
+        {
+            _statsDictionary[property] += delta;
+        }
+    }
+    
+    public Dictionary<StatsProperty, int>  GetAllStats()
+    {
+        return new Dictionary<StatsProperty, int>(_statsDictionary);
+    }   
 }
+
