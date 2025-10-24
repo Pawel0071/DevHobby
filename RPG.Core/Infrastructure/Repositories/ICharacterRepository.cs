@@ -4,5 +4,5 @@ namespace RPG.Core.Infrastructure.Repositories;
 
 public interface ICharacterRepository
 {
-    PlayerCharacter GetById(Guid characterId);
+    Character GetById(Guid characterId);
 }

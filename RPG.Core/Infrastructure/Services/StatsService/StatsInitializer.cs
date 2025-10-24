@@ -1,6 +1,6 @@
 using RPG.Core.Domain.Entities.Enums;
 
-namespace RPG.Core.StatsService;
+namespace RPG.Core.Infrastructure.Services.StatsService;
 
 public static class StatsInitializer
 {

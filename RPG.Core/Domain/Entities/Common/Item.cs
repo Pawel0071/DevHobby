@@ -1,4 +1,6 @@
+using RPG.Core.Domain.Entities.Containers;
 using RPG.Core.Domain.Entities.Enums;
+using RPG.Core.Domain.Interfaces;
 
 namespace RPG.Core.Domain.Entities.Common;
 
@@ -6,14 +8,15 @@ public class Item
 {
     public Item()
     {
-        Modifiers = new Stats();
+        Modifiers = new StatsContainer();
     }
 
     public required Guid Id { get; set; }
     public required string Name { get; set; }
     public ItemType Type { get; set; }
-    public Stats Modifiers { get; set; }
+    public IStatsContainer Modifiers { get; set; }
     public int RequiredLevel { get; set; }
+    public int StackSize { get; set; }
     
     public bool CanEquip(bool dualWield, EquipmentSlot slot)
     {    

@@ -6,9 +6,9 @@ namespace RPG.Core.Infrastructure.Services.InventoryService;
 
 public interface IInventoryService
 {
-    bool AddItem(IInventory inventory, Item item);
-    bool RemoveItem(IInventory inventory, Item item);
-    bool Contains(IInventory inventory, Item item);
-    int FreeSpace(IInventory inventory);
-    bool IsFull(IInventory inventory);
+    InventoryResult AddItem(IInventoryContainer inventoryContainer, Item item);
+    InventoryResult RemoveItem(IInventoryContainer inventoryContainer, Item item);
+    bool Contains(IInventoryContainer inventoryContainer, Item item);
+    int FreeSpace(IInventoryContainer inventoryContainer);
+    bool IsFull(IInventoryContainer inventoryContainer);
 }

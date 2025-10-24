@@ -22,7 +22,7 @@ public class CharacterRepository : ICharacterRepository
         _rabbitChannel.ExchangeDeclare(ExchangeName, ExchangeType.Topic, durable: true);
     }
 
-    public async Task<PlayerCharacter> CreateAsync(PlayerCharacter character)
+    public async Task<Character> CreateAsync(Character character)
     {
         var json = JsonSerializer.Serialize(character);
         await _redis.StringSetAsync($"{RedisPrefix}{character.Id}", json);
@@ -30,16 +30,16 @@ public class CharacterRepository : ICharacterRepository
         return character;
     }
 
-    public async Task<PlayerCharacter?> GetAsync(string id)
+    public async Task<Character?> GetAsync(string id)
     {
         var json = await _redis.StringGetAsync($"{RedisPrefix}{id}");
         if (json.IsNullOrEmpty)
             return null;
 
-        return JsonSerializer.Deserialize<PlayerCharacter>(json!);
+        return JsonSerializer.Deserialize<Character>(json!);
     }
 
-    public async Task<PlayerCharacter> UpdateAsync(PlayerCharacter character)
+    public async Task<Character> UpdateAsync(Character character)
     {
         var json = JsonSerializer.Serialize(character);
         await _redis.StringSetAsync($"{RedisPrefix}{character.Id}", json);
@@ -47,7 +47,7 @@ public class CharacterRepository : ICharacterRepository
         return character;
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public async Task<bool> DeleteAsync(Guid id)
     {
         var success = await _redis.KeyDeleteAsync($"{RedisPrefix}{id}");
         if (success)
@@ -58,7 +58,7 @@ public class CharacterRepository : ICharacterRepository
         return success;
     }
 
-    private void PublishEvent(string routingKey, string payload, string characterId)
+    private void PublishEvent(string routingKey, string payload, Guid characterId)
     {
         // Use the character ID as the Redis key
         var redisKey = $"event:{routingKey}:{characterId}";

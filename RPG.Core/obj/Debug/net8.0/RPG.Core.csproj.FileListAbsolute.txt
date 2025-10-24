@@ -21,3 +21,4 @@
 /Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/refint/RPG.Core.dll
 /Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/RPG.Core.pdb
 /Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/ref/RPG.Core.dll
+/Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/RPG.Core.csproj.AssemblyReference.cache

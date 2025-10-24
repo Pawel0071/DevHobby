@@ -1,59 +1,78 @@
+using RPG.Core.Domain.Entities;
 using RPG.Core.Domain.Entities.Common;
 using RPG.Core.Domain.Entities.Enums;
 using RPG.Core.Domain.Interfaces;
+using RPG.Core.Infrastructure.Services.InventoryService;
+using RPG.Core.Interfaces;
 
 namespace RPG.Core.Infrastructure.Services.EquipmentService;
 
 public class EquipmentService : IEquipmentService
 {
-    public bool Equip(IEquipment equipment, IInventory inventory, EquipmentSlot slot, Item item)
+    private readonly IInventoryService _inventoryService;
+    private readonly ISkillService _skillService;
+
+    public EquipmentService(IInventoryService inventoryService, 
+        ISkillService skillService)
     {
-        if (!inventory.InventoryItems.Contains(item)) return false;
-
-        if (equipment.IsSlotFilled(slot))
-            Unequip(equipment, inventory, slot);
-
-        inventory.InventoryItems.Remove(item);
-        equipment.EquipItem(slot, item);
-        return true;
+        _inventoryService = inventoryService;
+        _skillService = skillService;
     }
 
-    public bool Unequip(IEquipment equipment, IInventory inventory, EquipmentSlot slot)
+    public EquipmentResult Equip(Character character, EquipmentSlot slot, Item item)
     {
-        if (inventory.InventoryItems.Count >= inventory.Capacity) return false;
+        if (!_inventoryService.Contains(character.BackpackInventory, item))
+            return EquipmentResult.Fail(EquipmentError.ItemCannotBeEquip, "Przedmiot nie znajduje się w ekwipunku.");
 
-        var item = equipment.GetEquippedItem(slot);
-        if (item == null) return false;
-
-        equipment.UnEquipItem(slot);
-        inventory.InventoryItems.Add(item);
-        return true;
-    }
-
-    public bool Swap(IEquipment equipment, IInventory inventory, EquipmentSlot slot, Item item)
-    {
-        if (!inventory.InventoryItems.Contains(item))
-            return false;
-        
-        if (equipment.IsSlotFilled(slot))
+        var currentlyEquipped = character.Equipments[slot];
+        if (currentlyEquipped != null)
         {
-            var equippedItem = equipment.GetEquippedItem(slot);
-            equipment.UnEquipItem(slot);
-            inventory.InventoryItems.Remove(item);
-            inventory.InventoryItems.Add(equippedItem);
-            equipment.EquipItem(slot, item);
-            return true;
+            var unequipResult = Unequip(character, slot);
+            if (!unequipResult.Success)
+                return unequipResult;
         }
-        else return Equip( equipment, inventory, slot, item);
+
+        var removeResult = _inventoryService.RemoveItem(character.BackpackInventory, item);
+        if (!removeResult.Success)
+            return EquipmentResult.Fail(EquipmentError.InvalidOperation, $"Nie udało się usunąć przedmiotu z ekwipunku: {removeResult.Message}");
+
+        character.Equipments[slot] = item;
+        return EquipmentResult.Ok();
     }
 
-    public bool IsEquipped(IEquipment equipment, EquipmentSlot slot)
+    public EquipmentResult Unequip(Character character, EquipmentSlot slot)
     {
-        return equipment.IsSlotFilled(slot);
+        var item = character.Equipments[slot];
+        if (item == null)
+            return EquipmentResult.Fail(EquipmentError.InvalidOperation, "Slot jest pusty.");
+
+        var addResult = _inventoryService.AddItem(character.BackpackInventory, item);
+        if (!addResult.Success)
+            return EquipmentResult.Fail(EquipmentError.InvalidOperation, $"Nie udało się dodać przedmiotu do ekwipunku: {addResult.Message}");
+
+        character.Equipments[slot] = null!;
+        return EquipmentResult.Ok();
     }
 
-    public IEnumerable<Item> GetAllEquippedItems(IEquipment equipment)
+    public EquipmentResult Swap(Character character, EquipmentSlot slot, Item item)
     {
-        return equipment.GetAllEquippedItems();
+        if (!_inventoryService.Contains(character.BackpackInventory, item))
+            return EquipmentResult.Fail(EquipmentError.ItemCannotBeEquip, "Przedmiot nie znajduje się w ekwipunku.");
+
+        var equippedItem = character.Equipments[slot];
+        if (equippedItem != null)
+        {
+            var unequipResult = Unequip(character, slot);
+            if (!unequipResult.Success)
+                return unequipResult;
+        }
+
+        return Equip(character, slot, item);
     }
+
+    public bool IsEquipped(Character character, EquipmentSlot slot) =>
+        character.Equipments[slot] != null;
+
+    public IEnumerable<Item> GetAllEquippedItems(Character character) =>
+        character.Equipments.Equipments.Values.Where(item => item != null)!;
 }

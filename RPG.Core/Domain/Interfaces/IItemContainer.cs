@@ -2,7 +2,7 @@ namespace RPG.Core.Domain.Interfaces;
 
 public interface IItemContainer
 {
-    public IInventory BankStorage { get; } 
-    public IInventory BackpackInventory { get; } 
-    public IEquipment Equipment { get; } 
+    public IInventoryContainer BankStorage { get; set; }
+    public IInventoryContainer BackpackInventory { get; set; }
+    public IEquipmentContainer Equipments { get; set; }
 }

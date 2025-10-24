@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "AjKDbb2w0eE=",
+  "dgSpecHash": "j5z+YT4DB8A=",
   "success": true,
   "projectFilePath": "/Volumes/Data/Repositories/DevHobby/RPG.UI/RPG.UI.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/pawel/.nuget/packages/newtonsoft.json/12.0.3/newtonsoft.json.12.0.3.nupkg.sha512"
+  ],
   "logs": []
 }

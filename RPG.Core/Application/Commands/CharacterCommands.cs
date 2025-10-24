@@ -12,6 +12,8 @@ public record GetItemFromBankCommand(Guid CharacterId, Item Item) : ICommand;
 public record UseItemCommand(Guid CharacterId, Item Item) : ICommand;
 public record DropItemCommand(Guid CharacterId, Item Item) : ICommand;
 public record PickUpItemCommand(Guid CharacterId, Item Item) : ICommand;
+public record GainExperienceCommand(Guid CharacterId, int Amount) : ICommand;
+public record LevelUpCommand(Guid CharacterId) : ICommand;
 
 public record StartMovementCommand(Guid CharacterId, int Direction) : ICommand;
 public record StopMovementCommand(Guid CharacterId) : ICommand;
@@ -26,15 +28,14 @@ public record StopBasicAttackCommand(Guid CharacterId) : ICommand;
 public record CastSkillCommand(Guid CharacterId, Guid SkillId, Vector3 TargetPosition) : ICommand;
 public record InterruptCastCommand(Guid CharacterId) : ICommand;
 
-public record GainExperienceCommand(Guid CharacterId, int Amount) : ICommand;
-public record LevelUpCommand(Guid CharacterId) : ICommand;
+
 public record LearnSkillCommand(Guid CharacterId, Guid SkillId) : ICommand;
 public record RespecSkillsCommand(Guid CharacterId) : ICommand;
 
 
-public record ApplyBuffCommand(Guid CharacterId, IBuff Buff);
-public record RemoveBuffCommand(Guid CharacterId, IBuff Buff);
-public record ApplyDebuffCommand(Guid CharacterId, IDebuff Debuff);
+public record ApplyBuffCommand(Guid CharacterId, Skill Buff);
+public record RemoveBuffCommand(Guid CharacterId, Skill Buff);
+public record ApplyDebuffCommand(Guid CharacterId, Skill Debuff);
 public record DieCommand(Guid CharacterId);
 
 public record LoginCharacterCommand(Guid CharacterId);

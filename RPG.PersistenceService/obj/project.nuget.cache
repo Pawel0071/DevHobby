@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "c5UNnyMTwnk=",
+  "dgSpecHash": "ODUqVxE4CHA=",
   "success": true,
   "projectFilePath": "/Volumes/Data/Repositories/DevHobby/RPG.PersistenceService/RPG.PersistenceService.csproj",
   "expectedPackageFiles": [
@@ -40,6 +40,7 @@
     "/Users/pawel/.nuget/packages/mongodb.driver/2.19.0/mongodb.driver.2.19.0.nupkg.sha512",
     "/Users/pawel/.nuget/packages/mongodb.driver.core/2.19.0/mongodb.driver.core.2.19.0.nupkg.sha512",
     "/Users/pawel/.nuget/packages/mongodb.libmongocrypt/1.7.0/mongodb.libmongocrypt.1.7.0.nupkg.sha512",
+    "/Users/pawel/.nuget/packages/newtonsoft.json/12.0.3/newtonsoft.json.12.0.3.nupkg.sha512",
     "/Users/pawel/.nuget/packages/rabbitmq.client/6.5.0/rabbitmq.client.6.5.0.nupkg.sha512",
     "/Users/pawel/.nuget/packages/sharpcompress/0.30.1/sharpcompress.0.30.1.nupkg.sha512",
     "/Users/pawel/.nuget/packages/snappier/1.0.0/snappier.1.0.0.nupkg.sha512",

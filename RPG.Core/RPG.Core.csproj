@@ -10,4 +10,8 @@
       <Folder Include="Domain\ValueObjects\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    </ItemGroup>
+
 </Project>

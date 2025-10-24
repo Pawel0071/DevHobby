@@ -10,14 +10,14 @@ namespace RPG.PersistanceService.Infrastructure;
 
 public class RabbitMqToMongoService : IRabbitMqToMongoService
 {
-    private readonly IMongoCollection<PlayerCharacter> _mongoCollection;
+    private readonly IMongoCollection<Character> _mongoCollection;
     private readonly IModel _rabbitChannel;
     private const string ExchangeName = "rpg_exchange";
     private const string QueueName = "rpg_queue";
 
     public RabbitMqToMongoService(IMongoDatabase mongoDatabase, IConnection rabbitConnection)
     {
-        _mongoCollection = mongoDatabase.GetCollection<PlayerCharacter>("Characters");
+        _mongoCollection = mongoDatabase.GetCollection<Character>("Characters");
         _rabbitChannel = rabbitConnection.CreateModel();
 
         _rabbitChannel.ExchangeDeclare(ExchangeName, ExchangeType.Topic, durable: true);
@@ -42,7 +42,7 @@ public class RabbitMqToMongoService : IRabbitMqToMongoService
 
     private async Task HandleMessage(string routingKey, string message)
     {
-        var character = JsonSerializer.Deserialize<PlayerCharacter>(message);
+        var character = JsonSerializer.Deserialize<Character>(message);
         if (character == null) return;
 
         switch (routingKey)
@@ -52,12 +52,12 @@ public class RabbitMqToMongoService : IRabbitMqToMongoService
                 break;
 
             case "character.updated":
-                var filter = Builders<PlayerCharacter>.Filter.Eq(c => c.Id, character.Id);
+                var filter = Builders<Character>.Filter.Eq(c => c.Id, character.Id);
                 await _mongoCollection.ReplaceOneAsync(filter, character, new ReplaceOptions { IsUpsert = true });
                 break;
 
             case "character.deleted":
-                var deleteFilter = Builders<PlayerCharacter>.Filter.Eq(c => c.Id, character.Id);
+                var deleteFilter = Builders<Character>.Filter.Eq(c => c.Id, character.Id);
                 await _mongoCollection.DeleteOneAsync(deleteFilter);
                 break;
         }

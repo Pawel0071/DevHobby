@@ -1,10 +1,11 @@
 using Grpc.Core;
 using RabbitMQ.Client;
+using RPG.Core.Domain.Entities;
 using RPG.Core.Domain.Entities.Common;
+using RPG.Core.Domain.Entities.Containers;
 using RPG.GameServer.Interfaces;
 using RPG.GameServer.Protos;
 using StackExchange.Redis;
-using DomainPlayerCharacter = RPG.Core.Domain.Entities.PlayerCharacter;
 using ProtobufBaseCharacter = RPG.GameServer.Protos.BaseCharacter;
 using ProtobufPlayerCharacter = RPG.GameServer.Protos.PlayerCharacter;
 using ProtobufStats = RPG.GameServer.Protos.Stats;
@@ -12,11 +13,8 @@ using ProtobufLocation = RPG.GameServer.Protos.Location;
 using ProtobufSkill = RPG.GameServer.Protos.Skill;
 using ProtobufEquipmentSlots = RPG.GameServer.Protos.EquipmentSlots;
 using ProtobufItem = RPG.GameServer.Protos.Item;
-
-
-using DomainStats = RPG.Core.Domain.Entities.Common.Stats;
 using DomainLocation = RPG.Core.Domain.Entities.Common.Location;
-using DomainSkill = RPG.Core.Domain.Entities.Skill;
+using DomainSkill = RPG.Core.Domain.Entities.Common.Skill;
 using DomainEffect = RPG.Core.Domain.Entities.Common.Effect;
 using DomainItem = RPG.Core.Domain.Entities.Common.Item;
 using DomainItemType = RPG.Core.Domain.Entities.Common.ItemType;
@@ -36,9 +34,9 @@ public class CharacterServiceImpl(
     private readonly IModel _rabbitChannel = rabbitChannel;
 
     // Update mapping logic to align with regenerated Protobuf classes
-    private static DomainPlayerCharacter MapToDomainPlayerCharacter(ProtobufPlayerCharacter character)
+    private static Character MapToDomainPlayerCharacter(ProtobufPlayerCharacter character)
     {
-        return new DomainPlayerCharacter
+        return new Character
         {
             Id = character.BaseCharacter.Id,
             Name = character.BaseCharacter.Name,
@@ -47,7 +45,7 @@ public class CharacterServiceImpl(
             CurrentHealth = character.BaseCharacter.CurrentHealth,
             MaxMana = character.BaseCharacter.MaxMana,
             CurrentMana = character.BaseCharacter.CurrentMana,
-            Stats = new DomainStats
+            Stats = new StatsContainer
             {
                 Strength = character.BaseCharacter.Stats.Strength,
                 Dexterity = character.BaseCharacter.Stats.Dexterity,
@@ -74,7 +72,7 @@ public class CharacterServiceImpl(
                 kvp => DateTime.Parse(kvp.Value)
             ),
             ActiveEffects = character.BaseCharacter.ActiveEffects.Select(effect => (DomainEffect)(int)effect).ToList(),
-            Equipment = new Equipment
+            EquipmentContainer = new Equipment
             {
                 Head = MapToDomainItem(character.Equipment.Head),
                 Chest = MapToDomainItem(character.Equipment.Chest),
@@ -95,9 +93,9 @@ public class CharacterServiceImpl(
     }
 
     // Update MapToProtobufPlayerCharacter to include all properties
-    private static ProtobufPlayerCharacter? MapToProtobufPlayerCharacter(DomainPlayerCharacter character)
+    private static ProtobufPlayerCharacter? MapToProtobufPlayerCharacter(Character character)
     {
-        if (character.Equipment.Rings != null)
+        if (character.EquipmentContainer.Rings != null)
         {
             return new ProtobufPlayerCharacter
             {
@@ -146,14 +144,14 @@ public class CharacterServiceImpl(
                 },
                 Equipment = new ProtobufEquipmentSlots
                 {
-                    Head = MapToProtobufItem(character.Equipment.Head),
-                    Chest = MapToProtobufItem(character.Equipment.Chest),
-                    Weapon = MapToProtobufItem(character.Equipment.Weapon),
-                    Shield = MapToProtobufItem(character.Equipment.Shield),
-                    Boots = MapToProtobufItem(character.Equipment.Boots),
-                    Gloves = MapToProtobufItem(character.Equipment.Gloves),
-                    Rings = { character.Equipment.Rings.Select(MapToProtobufItem) },
-                    Amulet = MapToProtobufItem(character.Equipment.Amulet)
+                    Head = MapToProtobufItem(character.EquipmentContainer.Head),
+                    Chest = MapToProtobufItem(character.EquipmentContainer.Chest),
+                    Weapon = MapToProtobufItem(character.EquipmentContainer.Weapon),
+                    Shield = MapToProtobufItem(character.EquipmentContainer.Shield),
+                    Boots = MapToProtobufItem(character.EquipmentContainer.Boots),
+                    Gloves = MapToProtobufItem(character.EquipmentContainer.Gloves),
+                    Rings = { character.EquipmentContainer.Rings.Select(MapToProtobufItem) },
+                    Amulet = MapToProtobufItem(character.EquipmentContainer.Amulet)
                 },
                 Inventory = { character.Inventory.Select(MapToProtobufItem) },
                 SkillLevels = { character.SkillLevels },

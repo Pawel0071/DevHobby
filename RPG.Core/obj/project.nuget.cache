@@ -1,8 +1,23 @@
 {
   "version": 2,
-  "dgSpecHash": "NiSFBgKHPcA=",
+  "dgSpecHash": "O8KDPt1Y2A8=",
   "success": true,
   "projectFilePath": "/Volumes/Data/Repositories/DevHobby/RPG.Core/RPG.Core.csproj",
-  "expectedPackageFiles": [],
-  "logs": []
+  "expectedPackageFiles": [
+    "/Users/pawel/.nuget/packages/newtonsoft.json/12.0.3/newtonsoft.json.12.0.3.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'Newtonsoft.Json' 12.0.3 has a known high severity vulnerability, https://github.com/advisories/GHSA-5crp-9r3c-p9vr",
+      "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.Core/RPG.Core.csproj",
+      "warningLevel": 1,
+      "filePath": "/Volumes/Data/Repositories/DevHobby/RPG.Core/RPG.Core.csproj",
+      "libraryId": "Newtonsoft.Json",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

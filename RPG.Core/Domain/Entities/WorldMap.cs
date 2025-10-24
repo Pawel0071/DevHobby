@@ -19,11 +19,4 @@ public class MapLocation
 {
     public string Name { get; set; } = string.Empty;
     public Vector3  Position { get; set; } = new();
-    public List<NpcCharacter> Npcs { get; set; } = new();
-    public List<MonsterCharacter<DefaultMovementPattern>> Monsters { get; set; } = new();
-    public List<StaticObject> StaticObjects { get; set; } = new();
-    public List<Chest> Chests { get; set; } = new();
-    public List<Waypoint> Waypoints { get; set; } = new();
-    public List<Portal> Portals { get; set; } = new();
-    public List<Trap> Traps { get; set; } = new();
 }
