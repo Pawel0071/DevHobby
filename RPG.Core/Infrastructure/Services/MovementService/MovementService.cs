@@ -1,5 +1,6 @@
 using System.Numerics;
 using RPG.Core.Domain.Entities.Enums;
+using RPG.Core.Infrastructure.Services.MovementService;
 
 namespace RPG.Core.MovementService;
 
