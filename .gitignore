@@ -1,0 +1,11 @@
+*.dll
+*.pdb
+*.cache
+*.dylib
+*.so
+*.user
+/RPG.Application/bin
+/RPG.Application/obj
+/RPG.UnitTest/bin
+/RPG.Core/obj
+/RPG.UnitTest/obj
