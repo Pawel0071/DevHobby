@@ -1,7 +1,4 @@
-using MongoDB.Driver;
-using RabbitMQ.Client;
-
-namespace RPG.PersistanceService.Infrastructure;
+namespace RPG.PersistenceService.Service;
 
 public interface IRabbitMqToMongoService
 {

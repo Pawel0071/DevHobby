@@ -280,7 +280,7 @@
             },
             "RabbitMQ.Client": {
               "target": "Package",
-              "version": "[6.5.0, )"
+              "version": "[7.1.2, )"
             }
           },
           "imports": [

@@ -1,7 +1,7 @@
 using MongoDB.Driver;
 using PersistenceService;
 using RabbitMQ.Client;
-using RPG.PersistanceService.Infrastructure;
+using RPG.PersistenceService.Service;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddHostedService<Worker>();
@@ -12,11 +12,10 @@ builder.Services.AddSingleton<IMongoDatabase>(sp =>
     return client.GetDatabase("RPGDatabase");
 });
 
-builder.Services.AddSingleton<IConnection>(sp =>
-{
-    var factory = new ConnectionFactory { HostName = "localhost" };
-    return factory.CreateConnection();
-});
+var factory = new ConnectionFactory { HostName = "localhost" };
+var connection = await factory.CreateConnectionAsync();
+
+builder.Services.AddSingleton<IConnection>(connection);
 
 builder.Services.AddSingleton<IRabbitMqToMongoService, RabbitMqToMongoService>();
 

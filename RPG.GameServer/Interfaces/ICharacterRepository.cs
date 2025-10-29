@@ -1,4 +1,5 @@
-using RPG.Core.Domain.Entities;
+
+using RPG.Domain.Entities;
 
 namespace RPG.GameServer.Interfaces;
 

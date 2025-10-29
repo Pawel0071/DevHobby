@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CricuitBraker")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c092a2eff5236d6bad2e6ef9940862f30a62a711")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8d5a8214c0caee2edb872193ac88bb396623273d")]
 [assembly: System.Reflection.AssemblyProductAttribute("CricuitBraker")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CricuitBraker")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

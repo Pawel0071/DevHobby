@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using RabbitMQ.Client;
-using RPG.Core.Infrastructure.Services.Logger;
 using RPG.Core.Interfaces;
 using RPG.Core.Services.EquipmentService;
 using RPG.Core.Services.InventoryService;
@@ -9,8 +8,7 @@ using RPG.Core.Services.SkillService;
 using RPG.Core.Services.StatsService;
 using RPG.GameServer.Controlers;
 using RPG.GameServer.Controllers;
-using RPG.GameServer.Infrastructure;
-using RPG.GameServer.Interfaces;
+using RPG.Infrastructure.Logger;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,31 +23,12 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 builder.Services.AddSingleton<IDatabase>(sp =>
     sp.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
 
-// RabbitMQ
-builder.Services.AddSingleton<IConnection>(sp =>
-{
-    var factory = new ConnectionFactory { HostName = "localhost" };
-    return factory.CreateConnection();
-});
-
-builder.Services.AddSingleton(typeof(RPG.Core.Infrastructure.Services.Logger.ILogger<>), typeof(SerilogWrapper<>));
+builder.Services.AddSingleton(typeof(RPG.Infrastructure.Logger.ILogger<>), typeof(SerilogWrapper<>));
 builder.Services.AddSingleton<IEquipmentService, EquipmentService>();
 builder.Services.AddSingleton<IInventoryService, InventoryService>();
-builder.Services.AddSingleton<ISkillService, SkillService>()();
+builder.Services.AddSingleton<ISkillService, SkillService>();
 builder.Services.AddSingleton<IStatsService, StatsService>();
 builder.Services.AddSingleton<ILevelingService, LevelingService>();
-
-
-builder.Services.AddSingleton<IModel>(sp =>
-{
-    var connection = sp.GetRequiredService<IConnection>();
-    var channel = connection.CreateModel();
-    channel.ExchangeDeclare("rpg_exchange", ExchangeType.Topic, durable: true);
-    return channel;
-});
-
-// Repozytoria
-builder.Services.AddScoped<ICharacterRepository, CharacterRepository>();
 
 // Serwisy gRPC
 builder.Services.AddScoped<CharacterServiceImpl>();

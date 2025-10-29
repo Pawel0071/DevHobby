@@ -170,7 +170,10 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     public CommandResult Handle(UseItemCommand command)
     {
         var character = _characterRepo.GetById(command.CharacterId);
-        if (command.Item.Type == ItemType.Consumable);
+        if (command.Item.Type != ItemType.Consumable)
+        {
+            return CommandResult.Fail(CommandError.InvalidOperation, "");
+        }
         var result = _inventoryService.RemoveItem(character.BackpackInventory, command.Item);
 
         if (result.Success)

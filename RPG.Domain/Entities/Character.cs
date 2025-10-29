@@ -10,7 +10,7 @@ public sealed class Character : IItemContainer, IStats, ILevel, ISkillsContainer
 {
     public Character(
         Guid sessionId,
-        CharacterClass characterClass, ISession session, IWorld world)
+        CharacterClass characterClass, ISession? session, IWorld? world)
     {
         Id = Guid.NewGuid();
         Class = characterClass;

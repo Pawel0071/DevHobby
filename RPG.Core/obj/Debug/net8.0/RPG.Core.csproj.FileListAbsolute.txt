@@ -22,3 +22,8 @@
 /Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/RPG.Core.pdb
 /Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/ref/RPG.Core.dll
 /Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/RPG.Core.csproj.AssemblyReference.cache
+/Volumes/Data/Repositories/DevHobby/RPG.Core/bin/Debug/net8.0/RPG.Domain.dll
+/Volumes/Data/Repositories/DevHobby/RPG.Core/bin/Debug/net8.0/RPG.Infrastructure.dll
+/Volumes/Data/Repositories/DevHobby/RPG.Core/bin/Debug/net8.0/RPG.Domain.pdb
+/Volumes/Data/Repositories/DevHobby/RPG.Core/bin/Debug/net8.0/RPG.Infrastructure.pdb
+/Volumes/Data/Repositories/DevHobby/RPG.Core/obj/Debug/net8.0/RPG.Core.csproj.Up2Date
