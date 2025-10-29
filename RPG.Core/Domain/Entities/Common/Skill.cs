@@ -21,5 +21,4 @@ public class Skill
     public bool RequiresTarget => Type != SkillType.Passive && Type != SkillType.Aura;
     public bool IsPassive => Type == SkillType.Passive;
     public bool IsAreaEffect => Type is SkillType.AreaOfEffect or SkillType.Aura;
-    
 }

@@ -1,10 +1,17 @@
 using RPG.Core.Domain.Entities.Common;
 using RPG.Core.Domain.Interfaces;
+using RPG.Core.Infrastructure.Services.Logger;
 
 namespace RPG.Core.Infrastructure.Services.InventoryService;
 
 public class InventoryService : IInventoryService
 {
+    private readonly ILogger<InventoryService> _logger;
+
+    public InventoryService(ILogger<InventoryService> logger)
+    {
+        _logger = logger;
+    }
     public InventoryResult AddItem(IInventoryContainer container, Item item)
     {
         var stackableSlot = container.Inventory.FirstOrDefault(slot =>

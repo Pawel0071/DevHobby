@@ -1,4 +1,5 @@
 using RabbitMQ.Client;
+using RPG.Core.Infrastructure.Services.Logger;
 using RPG.GameServer.Controlers;
 using RPG.GameServer.Controllers;
 using RPG.GameServer.Infrastructure;
@@ -23,6 +24,8 @@ builder.Services.AddSingleton<IConnection>(sp =>
     var factory = new ConnectionFactory { HostName = "localhost" };
     return factory.CreateConnection();
 });
+
+builder.Services.AddSingleton(typeof(ILogger<>), typeof(SerilogWrapper<>));
 
 builder.Services.AddSingleton<IModel>(sp =>
 {

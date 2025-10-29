@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RedisWormUp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d94a3d99f6fd183c7fa2aaa750992dea79239893")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eb26edb955fa40cee2db45c93b00959cdd6733f3")]
 [assembly: System.Reflection.AssemblyProductAttribute("RedisWormUp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RedisWormUp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

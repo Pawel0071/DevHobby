@@ -6,15 +6,10 @@ namespace RPG.Core.Domain.Entities.Common;
 
 public class Item
 {
-    public Item()
-    {
-        Modifiers = new StatsContainer();
-    }
-
     public required Guid Id { get; set; }
     public required string Name { get; set; }
     public ItemType Type { get; set; }
-    public IStatsContainer Modifiers { get; set; }
+    public IStatsContainer Modifiers { get; set; } = new StatsContainer();
     public int RequiredLevel { get; set; }
     public int StackSize { get; set; }
     

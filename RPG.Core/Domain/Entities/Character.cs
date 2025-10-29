@@ -16,6 +16,8 @@ public sealed class Character : IItemContainer, IStats, ILevel, ISkillsContainer
     {
         Id = Guid.NewGuid();
         Class = characterClass;
+        Skills = new Dictionary<Skill, SkillAvailability>();
+        ActiveSkills = new Dictionary<Skill, DateTime>();
         BaseStats = new StatsContainer();
         ModifiedStats = new StatsContainer();
         Equipments = new EquipmentContainer();
@@ -50,4 +52,13 @@ public sealed class Character : IItemContainer, IStats, ILevel, ISkillsContainer
     public bool IsOnline => World.Id != Guid.Empty;
 
 
+}
+
+public interface IWorld
+{
+    Guid Id { get; set; }
+}
+
+public interface ISession
+{
 }

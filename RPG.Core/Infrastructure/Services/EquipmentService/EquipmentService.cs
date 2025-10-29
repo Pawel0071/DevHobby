@@ -2,7 +2,9 @@ using RPG.Core.Domain.Entities;
 using RPG.Core.Domain.Entities.Common;
 using RPG.Core.Domain.Entities.Enums;
 using RPG.Core.Domain.Interfaces;
+using RPG.Core.Infrastructure.Interfaces;
 using RPG.Core.Infrastructure.Services.InventoryService;
+using RPG.Core.Infrastructure.Services.Logger;
 using RPG.Core.Interfaces;
 
 namespace RPG.Core.Infrastructure.Services.EquipmentService;
@@ -11,12 +13,15 @@ public class EquipmentService : IEquipmentService
 {
     private readonly IInventoryService _inventoryService;
     private readonly ISkillService _skillService;
+    private readonly ILogger<EquipmentService> _logger;
 
     public EquipmentService(IInventoryService inventoryService, 
-        ISkillService skillService)
+        ISkillService skillService,
+        ILogger<EquipmentService> logger)
     {
         _inventoryService = inventoryService;
         _skillService = skillService;
+        _logger = logger;
     }
 
     public EquipmentResult Equip(Character character, EquipmentSlot slot, Item item)

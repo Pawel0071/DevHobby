@@ -4,6 +4,7 @@ using RPG.Core.Application.Commands;
 using RPG.Core.Application.Events;
 using RPG.Core.Application.Interfaces;
 using RPG.Core.Domain.Entities.Common;
+using RPG.Core.Infrastructure.Interfaces;
 using RPG.Core.Infrastructure.Repositories;
 using RPG.Core.Infrastructure.Services.EquipmentService;
 using RPG.Core.Infrastructure.Services.InventoryService;
@@ -23,14 +24,14 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         ICommandHandler<LevelUpCommand>
 
 {
-    private readonly ICharacterRepository _characterRepo;
+    private readonly ICharacterProvider _characterRepo;
     private readonly IInventoryService _inventoryService;
     private readonly IEquipmentService _equipmentService;
     private readonly IStatsService _statsService;
     private readonly IGameEventDispatcher _eventDispatcher;
 
     public CharacterCommandHandler(
-        ICharacterRepository characterRepo,
+        ICharacterProvider characterRepo,
         IInventoryService inventoryService,
         IEquipmentService equipmentService,
         IStatsService statsService,
@@ -55,7 +56,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
         var previouslyEquipped = character.Equipments[command.Slot];
 
-        var equipResult = previouslyEquipped is null
+        var equipResult = previouslyEquipped is not null
             ? _equipmentService.Swap(character, command.Slot, command.Item)
             : _equipmentService.Equip(character, command.Slot, command.Item);
 
@@ -64,7 +65,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
         _eventDispatcher.Dispatch(new ItemEquippedEvent(command.CharacterId, command.Slot, command.Item));
 
-        if (previouslyEquipped is null)
+        if (previouslyEquipped is not null)
         {
             var unmodify = _statsService.UnModifyStats(character, command.Item.Modifiers);
             if (unmodify.Success && unmodify.Stats is not null)

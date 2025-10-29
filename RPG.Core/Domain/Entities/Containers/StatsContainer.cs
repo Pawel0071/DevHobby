@@ -5,7 +5,7 @@ namespace RPG.Core.Domain.Entities.Containers;
 
 public class StatsContainer : IStatsContainer
 {
-    public IDictionary<StatsProperty, int> Stats { get; }
+    public IDictionary<StatsProperty, int> Stats { get; set; }
 
     public StatsContainer()
     {

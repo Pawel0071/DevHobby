@@ -63,3 +63,4 @@
 /Volumes/Data/Repositories/DevHobby/RPG.PersistenceService/obj/Debug/net8.0/RPG.PersistenceService.pdb
 /Volumes/Data/Repositories/DevHobby/RPG.PersistenceService/obj/Debug/net8.0/RPG.PersistenceService.genruntimeconfig.cache
 /Volumes/Data/Repositories/DevHobby/RPG.PersistenceService/obj/Debug/net8.0/ref/RPG.PersistenceService.dll
+/Volumes/Data/Repositories/DevHobby/RPG.PersistenceService/bin/Debug/net8.0/Newtonsoft.Json.dll

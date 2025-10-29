@@ -35,3 +35,4 @@
 /Volumes/Data/Repositories/DevHobby/RPG.UI/obj/Debug/net8.0/RPG.UI.pdb
 /Volumes/Data/Repositories/DevHobby/RPG.UI/obj/Debug/net8.0/RPG.UI.genruntimeconfig.cache
 /Volumes/Data/Repositories/DevHobby/RPG.UI/obj/Debug/net8.0/ref/RPG.UI.dll
+/Volumes/Data/Repositories/DevHobby/RPG.UI/bin/Debug/net8.0/Newtonsoft.Json.dll

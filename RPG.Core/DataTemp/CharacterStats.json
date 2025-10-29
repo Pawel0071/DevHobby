@@ -13,7 +13,8 @@
     "CritChance": 0,
     "HitChance": 100,
     "AttackSpeed": 100,
-    "MoveSpeed": 100
+    "MoveSpeed": 100,
+    "baseStat": "Strength"
   },
   "Mage": {
     "Strength": 2,
@@ -29,7 +30,8 @@
     "CritChance": 0,
     "HitChance": 100,
     "AttackSpeed": 100,
-    "MoveSpeed": 100
+    "MoveSpeed": 100,
+    "baseStat": "Intelligence"
   },
   "Warlock": {
     "Strength": 3,
@@ -45,7 +47,8 @@
     "CritChance": 0,
     "HitChance": 100,
     "AttackSpeed": 100,
-    "MoveSpeed": 100
+    "MoveSpeed": 100,
+    "baseStat": "Intelligence"
   },
   "Paladin": {
     "Strength": 8,
@@ -61,7 +64,8 @@
     "CritChance": 0,
     "HitChance": 100,
     "AttackSpeed": 100,
-    "MoveSpeed": 100
+    "MoveSpeed": 100,
+    "baseStat": "Wisdom"
   },
   "Shaman": {
     "Strength": 4,
@@ -77,7 +81,8 @@
     "CritChance": 0,
     "HitChance": 100,
     "AttackSpeed": 100,
-    "MoveSpeed": 100
+    "MoveSpeed": 100,
+    "baseStat": "Wisdom"
   },
   "Monk": {
     "Strength": 6,
@@ -93,7 +98,8 @@
     "CritChance": 0,
     "HitChance": 100,
     "AttackSpeed": 100,
-    "MoveSpeed": 100
+    "MoveSpeed": 100,
+    "baseStat": "Agility"
   },
   "Assassin": {
     "Strength": 5,
@@ -109,7 +115,8 @@
     "CritChance": 0,
     "HitChance": 100,
     "AttackSpeed": 100,
-    "MoveSpeed": 100
+    "MoveSpeed": 100,
+    "baseStat": "Agility"
   },
   "Druid": {
     "Strength": 4,
@@ -125,6 +132,7 @@
     "CritChance": 0,
     "HitChance": 100,
     "AttackSpeed": 100,
-    "MoveSpeed": 100
+    "MoveSpeed": 100,
+    "baseStat": "Wisdom"
   }
 }

@@ -1,0 +1,32 @@
+# Parametry
+$mongoHost = "localhost"
+$mongoPort = 27017
+$database = "game_config"
+$collection = "tables"
+$tempFile = "$env:TEMP\class_stat_profiles.json"
+
+# Dane JSON
+$json = @'
+{
+  "_id": "class_stat_profiles",
+  "Warrior": { "Strength": 10, "Agility": 5, "Intelligence": 2, "Wisdom": 3, "Dexterity": 4, "Vitality": 9, "MagicResist": 0, "NatureResist": 0, "MisticResist": 0, "Armor": 0, "CritChance": 0, "HitChance": 100, "AttackSpeed": 100, "MoveSpeed": 100, "baseStat": "Strength" },
+  "Mage": { "Strength": 2, "Agility": 3, "Intelligence": 10, "Wisdom": 9, "Dexterity": 4, "Vitality": 4, "MagicResist": 0, "NatureResist": 0, "MisticResist": 0, "Armor": 0, "CritChance": 0, "HitChance": 100, "AttackSpeed": 100, "MoveSpeed": 100, "baseStat": "Intelligence" },
+  "Warlock": { "Strength": 3, "Agility": 4, "Intelligence": 9, "Wisdom": 8, "Dexterity": 5, "Vitality": 5, "MagicResist": 0, "NatureResist": 0, "MisticResist": 0, "Armor": 0, "CritChance": 0, "HitChance": 100, "AttackSpeed": 100, "MoveSpeed": 100, "baseStat": "Intelligence" },
+  "Paladin": { "Strength": 8, "Agility": 4, "Intelligence": 6, "Wisdom": 7, "Dexterity": 5, "Vitality": 8, "MagicResist": 0, "NatureResist": 0, "MisticResist": 0, "Armor": 0, "CritChance": 0, "HitChance": 100, "AttackSpeed": 100, "MoveSpeed": 100, "baseStat": "Wisdom" },
+  "Shaman": { "Strength": 4, "Agility": 5, "Intelligence": 7, "Wisdom": 9, "Dexterity": 5, "Vitality": 6, "MagicResist": 0, "NatureResist": 0, "MisticResist": 0, "Armor": 0, "CritChance": 0, "HitChance": 100, "AttackSpeed": 100, "MoveSpeed": 100, "baseStat": "Wisdom" },
+  "Monk": { "Strength": 6, "Agility": 8, "Intelligence": 5, "Wisdom": 6, "Dexterity": 7, "Vitality": 7, "MagicResist": 0, "NatureResist": 0, "MisticResist": 0, "Armor": 0, "CritChance": 0, "HitChance": 100, "AttackSpeed": 100, "MoveSpeed": 100, "baseStat": "Agility" },
+  "Assassin": { "Strength": 5, "Agility": 10, "Intelligence": 4, "Wisdom": 3, "Dexterity": 9, "Vitality": 4, "MagicResist": 0, "NatureResist": 0, "MisticResist": 0, "Armor": 0, "CritChance": 0, "HitChance": 100, "AttackSpeed": 100, "MoveSpeed": 100, "baseStat": "Agility" },
+  "Druid": { "Strength": 4, "Agility": 5, "Intelligence": 8, "Wisdom": 9, "Dexterity": 6, "Vitality": 6, "MagicResist": 0, "NatureResist": 0, "MisticResist": 0, "Armor": 0, "CritChance": 0, "HitChance": 100, "AttackSpeed": 100, "MoveSpeed": 100, "baseStat": "Wisdom" }
+}
+'@
+
+# Zapis do pliku
+$json | Out-File -Encoding UTF8 -FilePath $tempFile
+
+# Import do MongoDB
+mongoimport --host $mongoHost --port $mongoPort --db $database --collection $collection --drop --file "$tempFile"
+
+# Czyszczenie
+Remove-Item $tempFile
+
+Write-Host "✅ Dane klas postaci zostały załadowane do MongoDB."

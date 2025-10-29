@@ -1,4 +1,7 @@
+using Microsoft.Extensions.Logging;
 using RPG.Core.Domain.Entities;
+using RPG.Core.Domain.Entities.Common;
+using RPG.Core.Domain.Entities.Containers;
 using RPG.Core.Domain.Entities.Enums;
 using RPG.Core.Domain.Interfaces;
 
@@ -6,6 +9,12 @@ namespace RPG.Core.Infrastructure.Services.StatsService;
 
 public class StatsService :IStatsService
 {
+    private readonly ILogger<StatsService> _logger;
+
+    public StatsService (ILogger<StatsService> logger)
+    {
+        _logger = logger;
+    }
     public StatsResult ModifyStats(Character character, IStatsContainer modifier)
     {
         if (character == null)
@@ -13,10 +22,10 @@ public class StatsService :IStatsService
         if (modifier == null)
             return StatsResult.Fail(StatsError.InvalidOperation, "");
         
-        var modifiedStats = AddStats(character.ModifiedStats.Stats, modifier.Stats);
+        character.ModifiedStats.Stats.AddStats(modifier.Stats);
         
-        character.MaxHealth = character.ModifiedStats[StatsProperty.Vitality] * 15;
-        character.MaxResource = character.ModifiedStats[StatsProperty.Intelligence] * 10;
+        var strategy = GetStrategyFor(character);
+        strategy.Apply(character);
         
         return StatsResult.Ok(character.ModifiedStats);
     }
@@ -28,10 +37,10 @@ public class StatsService :IStatsService
         if (modifier == null)
             return StatsResult.Fail(StatsError.InvalidOperation, "");
         
-        var modifiedStats = SubtractStats(character.ModifiedStats.Stats, modifier.Stats);
+        character.ModifiedStats.Stats.SubtractStats(modifier.Stats);
         
-        character.MaxHealth = character.ModifiedStats[StatsProperty.Vitality] * 15;
-        character.MaxResource = character.ModifiedStats[StatsProperty.Intelligence] * 10;
+        var strategy = GetStrategyFor(character);
+        strategy.Apply(character);
         
         return StatsResult.Ok(character.ModifiedStats);
     }
@@ -43,38 +52,139 @@ public class StatsService :IStatsService
 
     StatsResult IStatsService.InitStats(Character character)
     {
+        character.BaseStats.Stats.CreateEmptyStats();
+        var strategy = GetStrategyFor(character);
+        strategy.Initialize(character);
+        character.ModifiedStats.Stats.CopyStatsFrom(character.BaseStats.Stats);
+        
         return StatsResult.Ok(character.BaseStats);
     }
     
-    private static IDictionary<StatsProperty, int> AddStats(
-        IDictionary<StatsProperty, int> a,
-        IDictionary<StatsProperty, int> b)
+    private static IStatModifierStrategy GetStrategyFor(Character character)
     {
-        var result = new Dictionary<StatsProperty, int>();
-
-        foreach (var stat in Enum.GetValues<StatsProperty>())
+        return character.Class switch
         {
-            var valueA = a.TryGetValue(stat, out var va) ? va : 0;
-            var valueB = b.TryGetValue(stat, out var vb) ? vb : 0;
-            result[stat] = valueA + valueB;
-        }
-
-        return result;
-    }
-    
-    private static IDictionary<StatsProperty, int> SubtractStats(
-        IDictionary<StatsProperty, int> a,
-        IDictionary<StatsProperty, int> b)
-    {
-        var result = new Dictionary<StatsProperty, int>();
-
-        foreach (var stat in Enum.GetValues<StatsProperty>())
-        {
-            var valueA = a.TryGetValue(stat, out var va) ? va : 0;
-            var valueB = b.TryGetValue(stat, out var vb) ? vb : 0;
-            result[stat] = valueA - valueB;
-        }
-
-        return result;
+            CharacterClass.Warrior => new WarriorStatModifierStrategy(),
+            CharacterClass.Mage => new MageStatModifierStrategy(),
+            CharacterClass.Assassin => new AssassinStatModifierStrategy(),
+            CharacterClass.Druid => new DruidStatModifierStrategy(),
+            CharacterClass.Monk => new MonkStatModifierStrategy(),
+            CharacterClass.Paladin => new PaladinStatModifierStrategy(),
+            CharacterClass.Shaman => new ShamanStatModifierStrategy(),
+            CharacterClass.Warlock => new WarlockStatModifierStrategy(),
+            _ => throw new InvalidOperationException("Unknown character class")
+        };
     }
 }  
+
+public class WarriorStatModifierStrategy : IStatModifierStrategy
+{
+    public void Apply(Character character)
+    {
+        character.MaxHealth = character.ModifiedStats[StatsProperty.Vitality] * 25;
+        character.MaxResource = character.ModifiedStats[StatsProperty.Strength] * 5;
+    }
+
+    public void Initialize(Character character)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class MageStatModifierStrategy : IStatModifierStrategy
+{
+    public void Apply(Character character)
+    {
+        character.MaxHealth = character.ModifiedStats[StatsProperty.Vitality] * 15;
+        character.MaxResource = character.ModifiedStats[StatsProperty.Intelligence] * 15;
+    }
+    
+    public void Initialize(Character character)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class WarlockStatModifierStrategy : IStatModifierStrategy
+{
+    public void Apply(Character character)
+    {
+        character.MaxHealth = character.ModifiedStats[StatsProperty.Vitality] * 20;
+        character.MaxResource = character.ModifiedStats[StatsProperty.Intelligence] * 10;
+    }
+    
+    public void Initialize(Character character)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class DruidStatModifierStrategy : IStatModifierStrategy
+{
+    public void Apply(Character character)
+    {
+        character.MaxHealth = character.ModifiedStats[StatsProperty.Vitality] * 15;
+        character.MaxResource = character.ModifiedStats[StatsProperty.Wisdom] * 15;
+    }
+    
+    public void Initialize(Character character)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class MonkStatModifierStrategy : IStatModifierStrategy
+{
+    public void Apply(Character character)
+    {
+        character.MaxHealth = character.ModifiedStats[StatsProperty.Vitality] * 10;
+        character.MaxResource = character.ModifiedStats[StatsProperty.Wisdom] * 20;
+    }
+    
+    public void Initialize(Character character)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class PaladinStatModifierStrategy : IStatModifierStrategy
+{
+    public void Apply(Character character)
+    {
+        character.MaxHealth = character.ModifiedStats[StatsProperty.Vitality] * 20;
+        character.MaxResource = character.ModifiedStats[StatsProperty.Wisdom] * 10;
+    }
+    
+    public void Initialize(Character character)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class ShamanStatModifierStrategy : IStatModifierStrategy
+{
+    public void Apply(Character character)
+    {
+        character.MaxHealth = character.ModifiedStats[StatsProperty.Vitality] * 15;
+        character.MaxResource = character.ModifiedStats[StatsProperty.Wisdom] * 15;
+    }
+
+    public void Initialize(Character character)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class AssassinStatModifierStrategy : IStatModifierStrategy
+{
+    public void Apply(Character character)
+    {
+        character.MaxHealth = character.ModifiedStats[StatsProperty.Vitality] * 15;
+        character.MaxResource = character.ModifiedStats[StatsProperty.Agility] * 15;
+    }
+    
+    public void Initialize(Character character)
+    {
+        throw new NotImplementedException();
+    }
+}
