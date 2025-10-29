@@ -1,5 +1,12 @@
+using Microsoft.AspNetCore.Builder;
 using RabbitMQ.Client;
 using RPG.Core.Infrastructure.Services.Logger;
+using RPG.Core.Interfaces;
+using RPG.Core.Services.EquipmentService;
+using RPG.Core.Services.InventoryService;
+using RPG.Core.Services.LevelService;
+using RPG.Core.Services.SkillService;
+using RPG.Core.Services.StatsService;
 using RPG.GameServer.Controlers;
 using RPG.GameServer.Controllers;
 using RPG.GameServer.Infrastructure;
@@ -25,7 +32,13 @@ builder.Services.AddSingleton<IConnection>(sp =>
     return factory.CreateConnection();
 });
 
-builder.Services.AddSingleton(typeof(ILogger<>), typeof(SerilogWrapper<>));
+builder.Services.AddSingleton(typeof(RPG.Core.Infrastructure.Services.Logger.ILogger<>), typeof(SerilogWrapper<>));
+builder.Services.AddSingleton<IEquipmentService, EquipmentService>();
+builder.Services.AddSingleton<IInventoryService, InventoryService>();
+builder.Services.AddSingleton<ISkillService, SkillService>()();
+builder.Services.AddSingleton<IStatsService, StatsService>();
+builder.Services.AddSingleton<ILevelingService, LevelingService>();
+
 
 builder.Services.AddSingleton<IModel>(sp =>
 {

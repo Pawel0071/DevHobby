@@ -4,6 +4,73 @@
     "/Volumes/Data/Repositories/DevHobby/RPG.GameServer/RPG.GameServer.csproj": {}
   },
   "projects": {
+    "/Volumes/Data/Repositories/DevHobby/RPG.Application/RPG.Application.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Volumes/Data/Repositories/DevHobby/RPG.Application/RPG.Application.csproj",
+        "projectName": "RPG.Application",
+        "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.Application/RPG.Application.csproj",
+        "packagesPath": "/Users/pawel/.nuget/packages/",
+        "outputPath": "/Volumes/Data/Repositories/DevHobby/RPG.Application/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/pawel/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Volumes/Data/Repositories/DevHobby/RPG.Core/RPG.Core.csproj": {
+                "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.Core/RPG.Core.csproj"
+              },
+              "/Volumes/Data/Repositories/DevHobby/RPG.Domain/RPG.Domain.csproj": {
+                "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.Domain/RPG.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.200"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
     "/Volumes/Data/Repositories/DevHobby/RPG.Core/RPG.Core.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -12,6 +79,73 @@
         "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.Core/RPG.Core.csproj",
         "packagesPath": "/Users/pawel/.nuget/packages/",
         "outputPath": "/Volumes/Data/Repositories/DevHobby/RPG.Core/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/pawel/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Volumes/Data/Repositories/DevHobby/RPG.Domain/RPG.Domain.csproj": {
+                "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.Domain/RPG.Domain.csproj"
+              },
+              "/Volumes/Data/Repositories/DevHobby/RPG.Infrastructure/RPG.Infrastructure.csproj": {
+                "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.Infrastructure/RPG.Infrastructure.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.200"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Volumes/Data/Repositories/DevHobby/RPG.Domain/RPG.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Volumes/Data/Repositories/DevHobby/RPG.Domain/RPG.Domain.csproj",
+        "projectName": "RPG.Domain",
+        "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.Domain/RPG.Domain.csproj",
+        "packagesPath": "/Users/pawel/.nuget/packages/",
+        "outputPath": "/Volumes/Data/Repositories/DevHobby/RPG.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/pawel/.nuget/NuGet/NuGet.Config"
@@ -44,36 +178,6 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "dependencies": {
-            "MongoDB.Driver": {
-              "target": "Package",
-              "version": "[2.19.0, )"
-            },
-            "MongoDB.Driver.Core": {
-              "target": "Package",
-              "version": "[2.30.0, )"
-            },
-            "Newtonsoft.Json": {
-              "target": "Package",
-              "version": "[12.0.3, )"
-            },
-            "Serilog": {
-              "target": "Package",
-              "version": "[4.3.1-dev-02387, )"
-            },
-            "Serilog.AspNetCore": {
-              "target": "Package",
-              "version": "[9.0.0, )"
-            },
-            "Serilog.Extensions.Hosting": {
-              "target": "Package",
-              "version": "[9.0.1-dev-02307, )"
-            },
-            "Serilog.Sinks.Console": {
-              "target": "Package",
-              "version": "[6.0.1-dev-00953, )"
-            }
-          },
           "imports": [
             "net461",
             "net462",
@@ -117,6 +221,9 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
+              "/Volumes/Data/Repositories/DevHobby/RPG.Application/RPG.Application.csproj": {
+                "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.Application/RPG.Application.csproj"
+              },
               "/Volumes/Data/Repositories/DevHobby/RPG.Core/RPG.Core.csproj": {
                 "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.Core/RPG.Core.csproj"
               }
@@ -141,23 +248,23 @@
           "dependencies": {
             "Grpc.AspNetCore": {
               "target": "Package",
-              "version": "[2.57.0, )"
+              "version": "[2.71.0, )"
             },
             "Microsoft.Extensions.DependencyInjection": {
               "target": "Package",
-              "version": "[10.0.0-rc.1.25451.107, )"
+              "version": "[10.0.0-rc.2.25502.107, )"
             },
             "OpenTelemetry": {
               "target": "Package",
-              "version": "[1.12.0, )"
+              "version": "[1.14.0-rc.1, )"
             },
             "Polly": {
               "target": "Package",
-              "version": "[8.6.3, )"
+              "version": "[8.6.4, )"
             },
             "StackExchange.Redis": {
               "target": "Package",
-              "version": "[2.9.17, )"
+              "version": "[2.9.32, )"
             },
             "Vishwam.RabbitMqLibrary.Queuing": {
               "target": "Package",
@@ -179,6 +286,100 @@
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
             },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Volumes/Data/Repositories/DevHobby/RPG.Infrastructure/RPG.Infrastructure.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Volumes/Data/Repositories/DevHobby/RPG.Infrastructure/RPG.Infrastructure.csproj",
+        "projectName": "RPG.Infrastructure",
+        "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.Infrastructure/RPG.Infrastructure.csproj",
+        "packagesPath": "/Users/pawel/.nuget/packages/",
+        "outputPath": "/Volumes/Data/Repositories/DevHobby/RPG.Infrastructure/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/pawel/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "/Volumes/Data/Repositories/DevHobby/RPG.Domain/RPG.Domain.csproj": {
+                "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.Domain/RPG.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.200"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[2.19.0, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.4, )"
+            },
+            "RabbitMQ.Client": {
+              "target": "Package",
+              "version": "[7.1.2, )"
+            },
+            "Serilog": {
+              "target": "Package",
+              "version": "[4.3.1-dev-02387, )"
+            },
+            "Serilog.AspNetCore": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Serilog.Sinks.Console": {
+              "target": "Package",
+              "version": "[6.0.1-dev-00953, )"
+            },
+            "Serilog.Sinks.Debug": {
+              "target": "Package",
+              "version": "[3.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }

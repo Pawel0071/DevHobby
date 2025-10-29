@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "dgSpecHash": "aTZUxNt4Et8=",
-  "success": true,
+  "dgSpecHash": "3nVgAKDEI4s=",
+  "success": false,
   "projectFilePath": "/Volumes/Data/Repositories/DevHobby/RPG.PersistenceService/RPG.PersistenceService.csproj",
   "expectedPackageFiles": [
     "/Users/pawel/.nuget/packages/awssdk.core/3.7.100.14/awssdk.core.3.7.100.14.nupkg.sha512",
@@ -37,15 +37,15 @@
     "/Users/pawel/.nuget/packages/microsoft.extensions.primitives/9.0.0/microsoft.extensions.primitives.9.0.0.nupkg.sha512",
     "/Users/pawel/.nuget/packages/microsoft.netcore.platforms/5.0.0/microsoft.netcore.platforms.5.0.0.nupkg.sha512",
     "/Users/pawel/.nuget/packages/microsoft.win32.registry/5.0.0/microsoft.win32.registry.5.0.0.nupkg.sha512",
-    "/Users/pawel/.nuget/packages/mongodb.bson/2.30.0/mongodb.bson.2.30.0.nupkg.sha512",
+    "/Users/pawel/.nuget/packages/mongodb.bson/2.19.0/mongodb.bson.2.19.0.nupkg.sha512",
     "/Users/pawel/.nuget/packages/mongodb.driver/2.19.0/mongodb.driver.2.19.0.nupkg.sha512",
-    "/Users/pawel/.nuget/packages/mongodb.driver.core/2.30.0/mongodb.driver.core.2.30.0.nupkg.sha512",
-    "/Users/pawel/.nuget/packages/mongodb.libmongocrypt/1.12.0/mongodb.libmongocrypt.1.12.0.nupkg.sha512",
-    "/Users/pawel/.nuget/packages/newtonsoft.json/12.0.3/newtonsoft.json.12.0.3.nupkg.sha512",
+    "/Users/pawel/.nuget/packages/mongodb.driver.core/2.19.0/mongodb.driver.core.2.19.0.nupkg.sha512",
+    "/Users/pawel/.nuget/packages/mongodb.libmongocrypt/1.7.0/mongodb.libmongocrypt.1.7.0.nupkg.sha512",
+    "/Users/pawel/.nuget/packages/newtonsoft.json/13.0.4/newtonsoft.json.13.0.4.nupkg.sha512",
     "/Users/pawel/.nuget/packages/rabbitmq.client/6.5.0/rabbitmq.client.6.5.0.nupkg.sha512",
     "/Users/pawel/.nuget/packages/serilog/4.3.1-dev-02387/serilog.4.3.1-dev-02387.nupkg.sha512",
     "/Users/pawel/.nuget/packages/serilog.aspnetcore/9.0.0/serilog.aspnetcore.9.0.0.nupkg.sha512",
-    "/Users/pawel/.nuget/packages/serilog.extensions.hosting/9.0.1-dev-02307/serilog.extensions.hosting.9.0.1-dev-02307.nupkg.sha512",
+    "/Users/pawel/.nuget/packages/serilog.extensions.hosting/9.0.0/serilog.extensions.hosting.9.0.0.nupkg.sha512",
     "/Users/pawel/.nuget/packages/serilog.extensions.logging/9.0.0/serilog.extensions.logging.9.0.0.nupkg.sha512",
     "/Users/pawel/.nuget/packages/serilog.formatting.compact/3.0.0/serilog.formatting.compact.3.0.0.nupkg.sha512",
     "/Users/pawel/.nuget/packages/serilog.settings.configuration/9.0.0/serilog.settings.configuration.9.0.0.nupkg.sha512",
@@ -65,7 +65,19 @@
     "/Users/pawel/.nuget/packages/system.text.encodings.web/9.0.0/system.text.encodings.web.9.0.0.nupkg.sha512",
     "/Users/pawel/.nuget/packages/system.text.json/9.0.0/system.text.json.9.0.0.nupkg.sha512",
     "/Users/pawel/.nuget/packages/system.threading.channels/7.0.0/system.threading.channels.7.0.0.nupkg.sha512",
-    "/Users/pawel/.nuget/packages/zstdsharp.port/0.7.3/zstdsharp.port.0.7.3.nupkg.sha512"
+    "/Users/pawel/.nuget/packages/zstdsharp.port/0.6.2/zstdsharp.port.0.6.2.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1605",
+      "level": "Error",
+      "message": "Warning As Error: Detected package downgrade: RabbitMQ.Client from 7.1.2 to 6.5.0. Reference the package directly from the project to select a different version. \n RPG.PersistenceService -> RPG.Core -> RPG.Infrastructure -> RabbitMQ.Client (>= 7.1.2) \n RPG.PersistenceService -> RabbitMQ.Client (>= 6.5.0)",
+      "projectPath": "/Volumes/Data/Repositories/DevHobby/RPG.PersistenceService/RPG.PersistenceService.csproj",
+      "filePath": "/Volumes/Data/Repositories/DevHobby/RPG.PersistenceService/RPG.PersistenceService.csproj",
+      "libraryId": "RabbitMQ.Client",
+      "targetGraphs": [
+        "net8.0"
+      ]
+    }
+  ]
 }

@@ -1,0 +1,12 @@
+/Volumes/Data/Repositories/DevHobby/RPG.Domain/bin/Debug/net8.0/RPG.Domain.deps.json
+/Volumes/Data/Repositories/DevHobby/RPG.Domain/bin/Debug/net8.0/RPG.Domain.dll
+/Volumes/Data/Repositories/DevHobby/RPG.Domain/bin/Debug/net8.0/RPG.Domain.pdb
+/Volumes/Data/Repositories/DevHobby/RPG.Domain/obj/Debug/net8.0/RPG.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Volumes/Data/Repositories/DevHobby/RPG.Domain/obj/Debug/net8.0/RPG.Domain.AssemblyInfoInputs.cache
+/Volumes/Data/Repositories/DevHobby/RPG.Domain/obj/Debug/net8.0/RPG.Domain.AssemblyInfo.cs
+/Volumes/Data/Repositories/DevHobby/RPG.Domain/obj/Debug/net8.0/RPG.Domain.csproj.CoreCompileInputs.cache
+/Volumes/Data/Repositories/DevHobby/RPG.Domain/obj/Debug/net8.0/RPG.Domain.sourcelink.json
+/Volumes/Data/Repositories/DevHobby/RPG.Domain/obj/Debug/net8.0/RPG.Domain.dll
+/Volumes/Data/Repositories/DevHobby/RPG.Domain/obj/Debug/net8.0/refint/RPG.Domain.dll
+/Volumes/Data/Repositories/DevHobby/RPG.Domain/obj/Debug/net8.0/RPG.Domain.pdb
+/Volumes/Data/Repositories/DevHobby/RPG.Domain/obj/Debug/net8.0/ref/RPG.Domain.dll
