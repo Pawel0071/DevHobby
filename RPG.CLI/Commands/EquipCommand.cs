@@ -1,12 +1,9 @@
-
 using System.CommandLine;
-using System.CommandLine.Invocation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using RPG.Domain.Enums;
-using RPG.Domain.Entities;
 using RPG.Application.Commands;
 using RPG.Domain.Common;
+using RPG.Domain.Enums;
 
 namespace RPG.CLI.Commands;
 

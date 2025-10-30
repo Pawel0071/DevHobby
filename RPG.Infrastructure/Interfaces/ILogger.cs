@@ -1,4 +1,4 @@
-namespace RPG.Infrastructure.Logger;
+namespace RPG.Infrastructure.Interfaces;
 
 public interface ILogger<T>
 {

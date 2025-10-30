@@ -5,6 +5,7 @@ using RabbitMQ.Client;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Logger;
+using RPG.Infrastructure.Outbox;
 using RPG.Infrastructure.Rabbit;
 using RPG.Infrastructure.Redis;
 using StackExchange.Redis;
@@ -20,7 +21,7 @@ public static class InfrastructureRegistration
         var mongoConn = config.GetConnectionString("Mongo");
         
         // Logger
-        services.AddSingleton(typeof(RPG.Infrastructure.Logger.ILogger<>), typeof(SerilogWrapper<>));
+        services.AddSingleton(typeof(ILogger<>), typeof(SerilogWrapper<>));
         
         // Redis
         services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -55,7 +56,8 @@ public static class InfrastructureRegistration
         {
             var channelTask = sp.GetRequiredService<Task<IChannel>>();
             var channel = channelTask.GetAwaiter().GetResult(); // wymuszenie synchronizacji
-            return new RabbitPublisher(channel);
+            var logger = sp.GetRequiredService<ILogger<RabbitPublisher>>();
+            return new RabbitPublisher(channel, logger);
         });
 
         // MongoDB
@@ -66,6 +68,8 @@ public static class InfrastructureRegistration
             return db.GetCollection<ItemDocument>(ItemDocument.ItemCollection);
         });
 
+        services.AddHostedService<OutboxDispatcher>();
+        
         return services;
     }
 }

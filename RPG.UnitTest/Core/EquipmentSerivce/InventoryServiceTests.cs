@@ -4,6 +4,7 @@ using RPG.Core.Services.InventoryService;
 using RPG.Domain.Common;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
+using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Logger;
 
 namespace RPG.UnitTest.Core.EquipmentSerivce;

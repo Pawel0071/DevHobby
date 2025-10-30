@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Infrastructure.OpenTelemetry;
 

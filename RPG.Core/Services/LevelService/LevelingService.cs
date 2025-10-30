@@ -1,6 +1,7 @@
 using RPG.Core.Interfaces;
 using RPG.Domain.Entities;
 using RPG.Domain.Interfaces;
+using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Logger;
 
 namespace RPG.Core.Services.LevelService;

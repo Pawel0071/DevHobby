@@ -1,3 +1,4 @@
+using RPG.Infrastructure.Interfaces;
 using Serilog;
 
 namespace RPG.Infrastructure.Logger;

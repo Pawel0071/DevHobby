@@ -5,6 +5,7 @@ using RPG.Core.Services.LevelService;
 using RPG.Domain.Entities;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
+using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Logger;
 
 namespace RPG.UnitTest.Core.EquipmentSerivce;

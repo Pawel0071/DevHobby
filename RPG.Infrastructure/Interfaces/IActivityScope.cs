@@ -1,4 +1,4 @@
-namespace RPG.Infrastructure.OpenTelemetry;
+namespace RPG.Infrastructure.Interfaces;
 
 public interface IActivityScope
 {
