@@ -19,14 +19,14 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         ICommandHandler<LevelUpCommand>
 
 {
-    private readonly ICharacterProvider _characterRepo;
+    private readonly ICharacterRepository _characterRepo;
     private readonly IInventoryService _inventoryService;
     private readonly IEquipmentService _equipmentService;
     private readonly IStatsService _statsService;
     private readonly IGameEventDispatcher _eventDispatcher;
 
     public CharacterCommandHandler(
-        ICharacterProvider characterRepo,
+        ICharacterRepository characterRepo,
         IInventoryService inventoryService,
         IEquipmentService equipmentService,
         IStatsService statsService,
@@ -39,9 +39,9 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         _eventDispatcher = eventDispatcher;
     }
 
-    public CommandResult Handle(EquipItemCommand command)
+    public async Task<CommandResult> HandleAsync(EquipItemCommand command)
     {
-        var character = _characterRepo.GetById(command.CharacterId);
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
 
         if (!_inventoryService.Contains(character.BackpackInventory, command.Item))
             return CommandResult.Fail(CommandError.ItemNotFound, "Przedmiot nie znajduje się w ekwipunku.");
@@ -74,9 +74,9 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         return CommandResult.Ok();
     }
 
-    public CommandResult Handle(UnequipItemCommand command)
+    public async Task<CommandResult> HandleAsync(UnequipItemCommand command)
     {
-        var character = _characterRepo.GetById(command.CharacterId);
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
         var item = character.Equipments[command.Slot];
         
         if (_inventoryService.IsFull(character.BankStorage))
@@ -100,9 +100,9 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         return CommandResult.Ok() ;
     }
 
-    public CommandResult Handle(PutItemToBankCommand command)
+    public async Task<CommandResult> HandleAsync(PutItemToBankCommand command)
     {
-        var character = _characterRepo.GetById(command.CharacterId);
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
         if (!_inventoryService.Contains(character.BackpackInventory, command.Item))
             return CommandResult.Fail(CommandError.ItemNotFound, "");
         
@@ -121,9 +121,9 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         return CommandResult.Ok() ;
     }
 
-    public CommandResult Handle(GetItemFromBankCommand command)
+    public async Task<CommandResult> HandleAsync(GetItemFromBankCommand command)
     {
-        var character = _characterRepo.GetById(command.CharacterId);
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
         if (!_inventoryService.Contains(character.BackpackInventory, command.Item))
             return CommandResult.Fail(CommandError.ItemNotFound, "");
         if (_inventoryService.IsFull(character.BankStorage))
@@ -141,9 +141,9 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         return CommandResult.Ok() ;
     }
 
-    public CommandResult Handle(DropItemCommand command)
+    public async Task<CommandResult> HandleAsync(DropItemCommand command)
     {
-        var character = _characterRepo.GetById(command.CharacterId);
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
         if (!_inventoryService.Contains(character.BackpackInventory, command.Item))
             return CommandResult.Fail(CommandError.ItemNotFound, "");
 
@@ -155,9 +155,9 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         return CommandResult.Ok() ;
     }
 
-    public CommandResult Handle(PickUpItemCommand command)
+    public async Task<CommandResult> HandleAsync(PickUpItemCommand command)
     {
-        var character = _characterRepo.GetById(command.CharacterId);
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
         
         var result = _inventoryService.AddItem(character.BackpackInventory, command.Item);
 
@@ -167,9 +167,9 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         return CommandResult.Ok() ;
     }
     
-    public CommandResult Handle(UseItemCommand command)
+    public async Task<CommandResult> HandleAsync(UseItemCommand command)
     {
-        var character = _characterRepo.GetById(command.CharacterId);
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
         if (command.Item.Type != ItemType.Consumable)
         {
             return CommandResult.Fail(CommandError.InvalidOperation, "");
@@ -182,13 +182,13 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         return CommandResult.Ok() ;
     }
 
-    public CommandResult Handle(GainExperienceCommand command)
+    public async Task<CommandResult> HandleAsync(GainExperienceCommand command)
     {
-        var character = _characterRepo.GetById(command.CharacterId);
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
         character.ExperienceToNextLevel -= command.Amount;
         if (character.ExperienceToNextLevel <= 0)
         {
-            var levelUpResult = Handle(new LevelUpCommand(command.CharacterId));
+            var levelUpResult = await HandleAsync(new LevelUpCommand(command.CharacterId));
             var newAmount = -character.ExperienceToNextLevel;
             character.Experience = newAmount;
             return !levelUpResult.Success 
@@ -200,9 +200,9 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         return CommandResult.Ok() ;
     }
 
-    public CommandResult Handle(LevelUpCommand command)
+    public async Task<CommandResult> HandleAsync(LevelUpCommand command)
     {
-        var character = _characterRepo.GetById(command.CharacterId);
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
         character.Level++;
         // get data from static table
         return CommandResult.Ok() ;

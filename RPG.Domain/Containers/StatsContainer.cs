@@ -13,6 +13,11 @@ public class StatsContainer : IStatsContainer
             .Cast<StatsProperty>()
             .ToDictionary(stat => stat, stat => 0);
     }
+
+    public StatsContainer(IDictionary<StatsProperty, int> stats)
+    {
+        Stats = stats;
+    }
     
     public int this[StatsProperty property]
     {

@@ -12,6 +12,6 @@ public class CommandBus(IServiceProvider serviceProvider) : ICommandBus
         if (handler is null)
             throw new InvalidOperationException($"No handler registered for command type {typeof(TCommand).Name}");
 
-        ((ICommandHandler<TCommand>)handler).Handle(command);
+        ((ICommandHandler<TCommand>)handler).HandleAsync(command);
     }
 }
