@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
 using RPG.Infrastructure.Documents;
-using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Interfaces;    
 
 namespace RPG.Infrastructure.Outbox;
 

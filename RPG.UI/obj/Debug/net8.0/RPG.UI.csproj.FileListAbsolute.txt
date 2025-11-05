@@ -80,3 +80,5 @@
 /Volumes/Data/Repositories/DevHobby/RPG.UI/bin/Debug/net8.0/RPG.Infrastructure.dll
 /Volumes/Data/Repositories/DevHobby/RPG.UI/bin/Debug/net8.0/RPG.Domain.pdb
 /Volumes/Data/Repositories/DevHobby/RPG.UI/bin/Debug/net8.0/RPG.Infrastructure.pdb
+/Volumes/Data/Repositories/DevHobby/RPG.UI/bin/Debug/net8.0/Pipelines.Sockets.Unofficial.dll
+/Volumes/Data/Repositories/DevHobby/RPG.UI/bin/Debug/net8.0/StackExchange.Redis.dll

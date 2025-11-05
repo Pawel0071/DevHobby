@@ -21,4 +21,8 @@
       <PackageReference Include="StackExchange.Redis" Version="2.9.32" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Mapper\" />
+    </ItemGroup>
+
 </Project>

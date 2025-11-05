@@ -1,15 +1,17 @@
+using RPG.Core.Common;
 using RPG.Core.Services.EquipmentService;
 using RPG.Domain.Common;
 using RPG.Domain.Entities;
+using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
 
 namespace RPG.Core.Interfaces;
 
 public interface IEquipmentService
 {
-    EquipmentResult Equip(Character character, EquipmentSlot slot, Item item);
-    EquipmentResult Swap(Character character, EquipmentSlot slot, Item item);
-    EquipmentResult Unequip(Character character, EquipmentSlot slot);
-    bool IsEquipped(Character character, EquipmentSlot slot);
-    IEnumerable<Item> GetAllEquippedItems(Character character);
+    ServiceResult<bool> Equip(Character character, EquipmentSlot slot, Item item);
+    ServiceResult<bool> Swap(Character character, EquipmentSlot slot, Item item);
+    ServiceResult<bool> Unequip(Character character, EquipmentSlot slot);
+    ServiceResult<bool> IsEquipped(Character character, EquipmentSlot slot);
+    ServiceResult<Item[]> GetAllEquippedItems(Character character);
 }

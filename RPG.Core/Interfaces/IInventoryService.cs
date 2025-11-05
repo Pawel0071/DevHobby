@@ -1,14 +1,16 @@
+using RPG.Core.Common;
 using RPG.Core.Services.InventoryService;
 using RPG.Domain.Common;
+using RPG.Domain.Entities.Items;
 using RPG.Domain.Interfaces;
 
 namespace RPG.Core.Interfaces;
 
 public interface IInventoryService
 {
-    InventoryResult AddItem(IInventoryContainer inventoryContainer, Item item);
-    InventoryResult RemoveItem(IInventoryContainer inventoryContainer, Item item);
-    bool Contains(IInventoryContainer inventoryContainer, Item item);
-    int FreeSpace(IInventoryContainer inventoryContainer);
-    bool IsFull(IInventoryContainer inventoryContainer);
+    ServiceResult<bool> AddItem(IInventoryContainer inventoryContainer, Item item);
+    ServiceResult<bool> RemoveItem(IInventoryContainer inventoryContainer, Item item);
+    ServiceResult<bool> Contains(IInventoryContainer inventoryContainer, Item item);
+    ServiceResult<int> FreeSpace(IInventoryContainer inventoryContainer);
+    ServiceResult<bool> IsFull(IInventoryContainer inventoryContainer);
 }

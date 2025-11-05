@@ -2,6 +2,7 @@ using FluentAssertions;
 using Moq;
 using RPG.Core.Services.InventoryService;
 using RPG.Domain.Common;
+using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
 using RPG.Infrastructure.Interfaces;
@@ -159,11 +160,11 @@ public class InventoryServiceTests
 
     // Helpers
 
-    private Item CreateItem(string name, int stackSize = 1) => new()
+    private Item CreateItem(string name, int stackSize = 1) => new(Guid.NewGuid(),"Miscellaneous")
     {
         Id = Guid.NewGuid(),
         Name = name,
-        Type = ItemType.Miscellaneous,
+        TypeCode = "Miscellaneous",
         StackSize = stackSize
     };
 

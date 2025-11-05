@@ -720,6 +720,9 @@
         }
       },
       "RPG.Domain/1.0.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.4"
+        },
         "runtime": {
           "RPG.Domain.dll": {
             "assemblyVersion": "1.0.0.0",
@@ -736,7 +739,8 @@
           "Serilog": "4.3.1-dev-02387",
           "Serilog.AspNetCore": "9.0.0",
           "Serilog.Sinks.Console": "6.0.1-dev-00953",
-          "Serilog.Sinks.Debug": "3.0.0"
+          "Serilog.Sinks.Debug": "3.0.0",
+          "StackExchange.Redis": "2.9.32"
         },
         "runtime": {
           "RPG.Infrastructure.dll": {

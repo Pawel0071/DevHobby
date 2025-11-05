@@ -1,3 +1,5 @@
+using RPG.Domain.Entities.Items;
+
 namespace RPG.Domain.Common;
 
 public class InventorySlot

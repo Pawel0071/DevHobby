@@ -1,0 +1,26 @@
+[
+  {
+    "Id": "consumable",
+    "DisplayName": "Consumable",
+    "Category": "Usage",
+    "Description": "Item that can be used and consumed by the character."
+  },
+  {
+    "Id": "equippable",
+    "DisplayName": "Equippable",
+    "Category": "Combat",
+    "Description": "Item that can be equipped to provide stats or abilities."
+  },
+  {
+    "Id": "socketable",
+    "DisplayName": "Socketable",
+    "Category": "Upgrade",
+    "Description": "Item that can hold socketed components."
+  },
+  {
+    "Id": "quest",
+    "DisplayName": "Quest Item",
+    "Category": "Story",
+    "Description": "Item required to complete a quest objective."
+  }
+]

@@ -1,5 +1,5 @@
 using MongoDB.Driver;
-using RPG.Domain.Common;
+using RPG.Domain.Entities.Items;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 
@@ -23,7 +23,7 @@ public class ItemSaveMangoConsumer : IMangoConsumer<Item>
         try
         {
             _logger.Debug($"Saving item {item.Id} ({item.Name}) to MongoDB.");
-            var doc = ItemDocument.FromDomain(item);
+            var doc = item.ToDocument();
             await _mongo.ReplaceOneAsync(x => x.Id == item.Id, doc, new ReplaceOptions { IsUpsert = true });
             _logger.Info($"Item {item.Id} saved successfully.");
         }

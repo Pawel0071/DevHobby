@@ -1,13 +1,19 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
 using RabbitMQ.Client;
+using RPG.Domain.Common;
+using RPG.Domain.Entities.Items;
+using RPG.Infrastructure.Common;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Logger;
 using RPG.Infrastructure.Outbox;
 using RPG.Infrastructure.Rabbit;
 using RPG.Infrastructure.Redis;
+using RPG.Infrastructure.Repositories;
+using Serilog;
 using StackExchange.Redis;
 
 namespace RPG.Infrastructure;
@@ -20,7 +26,12 @@ public static class InfrastructureRegistration
         var redisConn = config.GetConnectionString("Redis");
         var mongoConn = config.GetConnectionString("Mongo");
         
-        // Logger
+        // Logger - Konfiguracja Seriloga
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(config)
+            .Enrich.FromLogContext()
+            .CreateLogger();
+        
         services.AddSingleton(typeof(ILogger<>), typeof(SerilogWrapper<>));
         
         // Redis
@@ -59,7 +70,15 @@ public static class InfrastructureRegistration
             var logger = sp.GetRequiredService<ILogger<RabbitPublisher>>();
             return new RabbitPublisher(channel, logger);
         });
+        
+        services.AddScoped<IDictionaryRepository<ItemTagDefinition>, MongoDictionaryRepository<ItemTagDefinition>>();
+        services.AddScoped<IDictionaryRepository<ErrorCodeDefinition>, MongoDictionaryRepository<ErrorCodeDefinition>>();
+        services.AddScoped<IDictionaryRepository<ItemTypeDefinition>, MongoDictionaryRepository<ItemTypeDefinition>>();
 
+        services.AddSingleton<IDictionaryRegistry<ItemTagDefinition>, DictionaryRegistry<ItemTagDefinition>>(); 
+        services.AddSingleton<IDictionaryRegistry<ErrorCodeDefinition>, DictionaryRegistry<ErrorCodeDefinition>>(); 
+        services.AddSingleton<IDictionaryRegistry<ItemTypeDefinition>, DictionaryRegistry<ItemTypeDefinition>>();
+        
         // MongoDB
         services.AddSingleton<IMongoCollection<ItemDocument>>(sp =>
         {
@@ -68,6 +87,7 @@ public static class InfrastructureRegistration
             return db.GetCollection<ItemDocument>(ItemDocument.ItemCollection);
         });
 
+        services.AddSingleton<IHostedService, DictionaryWarmupService>();
         services.AddHostedService<OutboxDispatcher>();
         
         return services;

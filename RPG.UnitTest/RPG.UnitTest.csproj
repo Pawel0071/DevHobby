@@ -34,4 +34,8 @@
       <ProjectReference Include="..\RPG.UI\RPG.UI.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Helper\" />
+    </ItemGroup>
+
 </Project>

@@ -265,6 +265,17 @@
           }
         }
       },
+      "Pipelines.Sockets.Unofficial/2.2.8": {
+        "dependencies": {
+          "System.IO.Pipelines": "9.0.0"
+        },
+        "runtime": {
+          "lib/net5.0/Pipelines.Sockets.Unofficial.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "2.2.8.1080"
+          }
+        }
+      },
       "RabbitMQ.Client/7.1.2": {
         "dependencies": {
           "System.IO.Pipelines": "9.0.0",
@@ -402,6 +413,18 @@
           }
         }
       },
+      "StackExchange.Redis/2.9.32": {
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "9.0.0",
+          "Pipelines.Sockets.Unofficial": "2.2.8"
+        },
+        "runtime": {
+          "lib/net8.0/StackExchange.Redis.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.9.32.54708"
+          }
+        }
+      },
       "System.Buffers/4.5.1": {},
       "System.Diagnostics.DiagnosticSource/9.0.0": {
         "runtime": {
@@ -477,6 +500,9 @@
         }
       },
       "RPG.Domain/1.0.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.4"
+        },
         "runtime": {
           "RPG.Domain.dll": {
             "assemblyVersion": "1.0.0.0",
@@ -493,7 +519,8 @@
           "Serilog": "4.3.1-dev-02387",
           "Serilog.AspNetCore": "9.0.0",
           "Serilog.Sinks.Console": "6.0.1-dev-00953",
-          "Serilog.Sinks.Debug": "3.0.0"
+          "Serilog.Sinks.Debug": "3.0.0",
+          "StackExchange.Redis": "2.9.32"
         },
         "runtime": {
           "RPG.Infrastructure.dll": {
@@ -664,6 +691,13 @@
       "path": "newtonsoft.json/13.0.4",
       "hashPath": "newtonsoft.json.13.0.4.nupkg.sha512"
     },
+    "Pipelines.Sockets.Unofficial/2.2.8": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zG2FApP5zxSx6OcdJQLbZDk2AVlN2BNQD6MorwIfV6gVj0RRxWPEp2LXAxqDGZqeNV1Zp0BNPcNaey/GXmTdvQ==",
+      "path": "pipelines.sockets.unofficial/2.2.8",
+      "hashPath": "pipelines.sockets.unofficial.2.2.8.nupkg.sha512"
+    },
     "RabbitMQ.Client/7.1.2": {
       "type": "package",
       "serviceable": true,
@@ -747,6 +781,13 @@
       "sha512": "sha512-rFtK2KEI9hIe8gtx3a0YDXdHOpedIf9wYCEYtBEmtlyiWVX3XlCNV03JrmmAi/Cdfn7dxK+k0sjjcLv4fpHnqA==",
       "path": "snappier/1.0.0",
       "hashPath": "snappier.1.0.0.nupkg.sha512"
+    },
+    "StackExchange.Redis/2.9.32": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-j5Rjbf7gWz5izrn0UWQy9RlQY4cQDPkwJfVqATnVsOa/+zzJrps12LOgacMsDl/Vit2f01cDiDkG/Rst8v2iGw==",
+      "path": "stackexchange.redis/2.9.32",
+      "hashPath": "stackexchange.redis.2.9.32.nupkg.sha512"
     },
     "System.Buffers/4.5.1": {
       "type": "package",

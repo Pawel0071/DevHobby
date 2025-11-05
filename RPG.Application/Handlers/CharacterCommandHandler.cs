@@ -3,8 +3,12 @@ using RPG.Application.Events;
 using RPG.Application.Interfaces;
 using RPG.Core.Application.Handlers;
 using RPG.Core.Interfaces;
+using RPG.Domain.Common;
+using RPG.Domain.Entities.Items;
+using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
+using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Application.Handlers;
 
@@ -24,26 +28,30 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     private readonly IEquipmentService _equipmentService;
     private readonly IStatsService _statsService;
     private readonly IGameEventDispatcher _eventDispatcher;
+    private readonly IDictionaryRegistry<ItemTagDefinition> _tagRegistry;
 
     public CharacterCommandHandler(
         ICharacterRepository characterRepo,
         IInventoryService inventoryService,
         IEquipmentService equipmentService,
         IStatsService statsService,
-        IGameEventDispatcher eventDispatcher)
+        IGameEventDispatcher eventDispatcher,
+        IDictionaryRegistry<ItemTagDefinition> tagRegistry
+        )
     {
         _characterRepo = characterRepo;
         _inventoryService = inventoryService;
         _equipmentService = equipmentService;
         _statsService = statsService;
         _eventDispatcher = eventDispatcher;
+        _tagRegistry = tagRegistry;
     }
 
     public async Task<CommandResult> HandleAsync(EquipItemCommand command)
     {
         var character = await _characterRepo.GetByIdAsync(command.CharacterId);
 
-        if (!_inventoryService.Contains(character.BackpackInventory, command.Item))
+        if (!_inventoryService.Contains(character.BackpackInventory, command.Item).Result)
             return CommandResult.Fail(CommandError.ItemNotFound, "Przedmiot nie znajduje się w ekwipunku.");
 
         if (character.Level < command.Item.RequiredLevel)
@@ -59,17 +67,23 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
             return CommandResult.Fail(CommandError.InvalidOperation, equipResult.Message, equipResult);
 
         _eventDispatcher.Dispatch(new ItemEquippedEvent(command.CharacterId, command.Slot, command.Item));
-
+        var statsContainer = command.Item.GetComponent<StatsComponent>()?.Stats;
+        if (statsContainer == null)
+        {
+            return CommandResult.Fail(CommandError.ItemNotHaveStatsDef, equipResult.Message, equipResult);
+        }
         if (previouslyEquipped is not null)
         {
-            var unmodify = _statsService.UnModifyStats(character, command.Item.Modifiers);
+            var unmodify = _statsService.UnModifyStats(character, statsContainer);
             if (unmodify.Success && unmodify.Stats is not null)
                 character.ModifiedStats = unmodify.Stats;
-        }
 
-        var modify = _statsService.ModifyStats(character, command.Item.Modifiers);
+        }
+        
+        var modify = _statsService.ModifyStats(character, statsContainer);
         if (modify.Success && modify.Stats is not null)
             character.ModifiedStats = modify.Stats;
+
 
         return CommandResult.Ok();
     }
@@ -79,7 +93,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         var character = await _characterRepo.GetByIdAsync(command.CharacterId);
         var item = character.Equipments[command.Slot];
         
-        if (_inventoryService.IsFull(character.BankStorage))
+        if (_inventoryService.IsFull(character.BankStorage).Result)
         {
             _eventDispatcher.Dispatch(new InventoryFullEvent(command.CharacterId, item));
             return CommandResult.Fail(CommandError.InventoryFull, "");
@@ -90,8 +104,13 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
             _eventDispatcher.Dispatch(new ItemUnequippedEvent(command.CharacterId, command.Slot, item));
         else
             return CommandResult.Fail(CommandError.InvalidOperation, result.Message, result);
+        var statsContainer = item.GetComponent<StatsComponent>()?.Stats;
+        if (statsContainer == null)
+        {
+            return CommandResult.Fail(CommandError.ItemNotHaveStatsDef, result .Message, result );
+        }
         
-        var statsResult = _statsService.UnModifyStats(character, item.Modifiers);
+        var statsResult = _statsService.UnModifyStats(character, statsContainer);
         if (statsResult is { Success: true, Stats: not null })
         {
             character.ModifiedStats = statsResult.Stats;
@@ -103,10 +122,10 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     public async Task<CommandResult> HandleAsync(PutItemToBankCommand command)
     {
         var character = await _characterRepo.GetByIdAsync(command.CharacterId);
-        if (!_inventoryService.Contains(character.BackpackInventory, command.Item))
+        if (!_inventoryService.Contains(character.BackpackInventory, command.Item).Result)
             return CommandResult.Fail(CommandError.ItemNotFound, "");
         
-        if (_inventoryService.IsFull(character.BankStorage))
+        if (_inventoryService.IsFull(character.BankStorage).Result)
         {
             _eventDispatcher.Dispatch(new InventoryFullEvent(command.CharacterId, command.Item));
             return CommandResult.Fail(CommandError.InventoryFull, "");
@@ -124,9 +143,9 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     public async Task<CommandResult> HandleAsync(GetItemFromBankCommand command)
     {
         var character = await _characterRepo.GetByIdAsync(command.CharacterId);
-        if (!_inventoryService.Contains(character.BackpackInventory, command.Item))
+        if (!_inventoryService.Contains(character.BackpackInventory, command.Item).Result)
             return CommandResult.Fail(CommandError.ItemNotFound, "");
-        if (_inventoryService.IsFull(character.BankStorage))
+        if (_inventoryService.IsFull(character.BankStorage).Result)
         {
             _eventDispatcher.Dispatch(new InventoryFullEvent(command.CharacterId, command.Item));
             return CommandResult.Fail(CommandError.InventoryFull, "");
@@ -144,7 +163,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     public async Task<CommandResult> HandleAsync(DropItemCommand command)
     {
         var character = await _characterRepo.GetByIdAsync(command.CharacterId);
-        if (!_inventoryService.Contains(character.BackpackInventory, command.Item))
+        if (!_inventoryService.Contains(character.BackpackInventory, command.Item).Result)
             return CommandResult.Fail(CommandError.ItemNotFound, "");
 
         var result = _inventoryService.RemoveItem(character.BackpackInventory, command.Item);
@@ -170,16 +189,20 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     public async Task<CommandResult> HandleAsync(UseItemCommand command)
     {
         var character = await _characterRepo.GetByIdAsync(command.CharacterId);
-        if (command.Item.Type != ItemType.Consumable)
+
+        if (!command.Item.Tags.Contains("consumable") || !_tagRegistry.IsValid("consumable"))
         {
-            return CommandResult.Fail(CommandError.InvalidOperation, "");
+            return CommandResult.Fail(CommandError.InvalidOperation, "Przedmiot nie jest typu consumable.");
         }
+
         var result = _inventoryService.RemoveItem(character.BackpackInventory, command.Item);
 
         if (result.Success)
+        {
             _eventDispatcher.Dispatch(new ItemUsedEvent(command.CharacterId, command.Item));
+        }
 
-        return CommandResult.Ok() ;
+        return CommandResult.Ok();
     }
 
     public async Task<CommandResult> HandleAsync(GainExperienceCommand command)

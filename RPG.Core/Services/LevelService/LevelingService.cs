@@ -1,8 +1,9 @@
+using RPG.Core.Common;
 using RPG.Core.Interfaces;
+using RPG.Domain.Common;
 using RPG.Domain.Entities;
 using RPG.Domain.Interfaces;
 using RPG.Infrastructure.Interfaces;
-using RPG.Infrastructure.Logger;
 
 namespace RPG.Core.Services.LevelService;
 
@@ -13,7 +14,8 @@ public class LevelingService : ILevelingService
     private readonly IExperienceProvider _experienceProvider;
     private readonly ILogger<LevelingService> _logger;
 
-    public LevelingService(IStatsService statsService,
+    public LevelingService(
+        IStatsService statsService,
         ISkillService skillService,
         IExperienceProvider experienceProvider,
         ILogger<LevelingService> logger)
@@ -24,14 +26,14 @@ public class LevelingService : ILevelingService
         _logger = logger;
     }
 
-    public LevelingResult LevelUp(Character character, int amount = 0)
+    public ServiceResult<bool> LevelUp(Character character, int amount = 0)
     {
         _logger.Debug($"Attempting to level up character '{character.Id}' at level {character.Level}.");
 
         if (_experienceProvider.IsMaxLevel(character.Level))
         {
             _logger.Warn($"Character '{character.Id}' is already at max level ({character.Level}).");
-            return LevelingResult.Fail(LevelingError.AlreadyMaxLevel, $"{character.Level}");
+            return ErrorCodeDefinition.AlreadyMaxLevel.ToFail<bool>($"Poziom maksymalny: {character.Level}");
         }
 
         character.Level++;
@@ -46,17 +48,17 @@ public class LevelingService : ILevelingService
 
         _logger.Debug($"New experience requirement for level {character.Level}: {character.ExperienceToNextLevel}.");
 
-        return LevelingResult.Ok();
+        return true.ToResult();
     }
 
-    public LevelingResult GrantExperience(Character character, int amount)
+    public ServiceResult<bool> GrantExperience(Character character, int amount)
     {
         _logger.Debug($"Granting {amount} XP to character '{character.Id}' at level {character.Level}.");
 
         if (_experienceProvider.IsMaxLevel(character.Level))
         {
             _logger.Warn($"Character '{character.Id}' is already at max level ({character.Level}). XP grant ignored.");
-            return LevelingResult.Fail(LevelingError.AlreadyMaxLevel, $"{character.Level}");
+            return ErrorCodeDefinition.AlreadyMaxLevel.ToFail<bool>($"Poziom maksymalny: {character.Level}");
         }
 
         character.Experience += amount;
@@ -70,6 +72,6 @@ public class LevelingService : ILevelingService
             return LevelUp(character, -character.ExperienceToNextLevel);
         }
 
-        return LevelingResult.Ok();
+        return true.ToResult();
     }
 }

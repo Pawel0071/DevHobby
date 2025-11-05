@@ -1,4 +1,5 @@
 using RPG.Domain.Common;
+using RPG.Domain.Entities.Items;
 using RPG.Domain.Interfaces;
 
 namespace RPG.Domain.Containers;

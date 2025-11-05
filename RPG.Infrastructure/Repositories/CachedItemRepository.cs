@@ -1,5 +1,6 @@
 using MongoDB.Driver;
 using RPG.Domain.Common;
+using RPG.Domain.Entities.Items;
 using RPG.Domain.Interfaces;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
@@ -39,7 +40,8 @@ public class CachedItemRepository : IItemRepository
         if (doc == null)
             return null;
 
-        var item = doc.ToDomain();
+        var typeDefinition = await _redis.GetAsync<ItemTypeDefinition>($"itemTypeDefinition:{doc.TypeCode}");
+        var item = doc.ToDomain(typeDefinition);
         await CacheItemAsync(item);
         return item;
     }
@@ -59,8 +61,10 @@ public class CachedItemRepository : IItemRepository
 
     public async Task<Item?> TryGetFromDatabaseAsync(Guid id)
     {
+
         var doc = await _mongo.Find(x => x.Id == id).FirstOrDefaultAsync();
-        return doc?.ToDomain();
+        var typeDefinition = await _redis.GetAsync<ItemTypeDefinition>($"itemTypeDefinition:{doc.TypeCode}");
+        return doc?.ToDomain(typeDefinition);
     }
 
     private async Task CacheItemAsync(Item item)

@@ -5,6 +5,7 @@ using RPG.Core.Services.EquipmentService;
 using RPG.Core.Services.InventoryService;
 using RPG.Domain.Common;
 using RPG.Domain.Entities;
+using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Logger;
@@ -132,10 +133,10 @@ public class EquipmentServiceTests
         Name = "Rogue",
     };
 
-    private static Item CreateItem(string name) => new()
+    private static Item CreateItem(string name) => new(Guid.NewGuid(),"Weapon 1H")
     {
         Id = Guid.NewGuid(),
         Name = name,
-        Type = ItemType.Weapon1H
+        TypeCode = "Weapon 1H" 
     };
 }

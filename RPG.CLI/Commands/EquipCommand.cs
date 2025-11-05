@@ -2,19 +2,26 @@ using System.CommandLine;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using RPG.Application.Commands;
+using RPG.Core.Interfaces;
 using RPG.Domain.Common;
+using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
+using RPG.Infrastructure.Interfaces;
 
 namespace RPG.CLI.Commands;
 
 public class EquipCommand
 {
     private readonly IMediator _mediator;
+    private readonly IDictionaryRegistry<ItemTypeDefinition> _itemDefinitions;
 
     public EquipCommand(IServiceProvider provider)
     {
         _mediator = provider.GetRequiredService<IMediator>();
+        _itemDefinitions = provider
+            .GetRequiredService<IDictionaryRegistry<ItemTypeDefinition>>();
     }
+    
     public Command Build()
     {
         var characterOption = new Option<Guid>("--character", "ID postaci") { IsRequired = true };
@@ -30,12 +37,7 @@ public class EquipCommand
 
         cmd.SetHandler(async (Guid characterId, EquipmentSlot slot, string itemName) =>
             {
-                var item = new Item
-                {
-                    Id = Guid.NewGuid(),
-                    Name = itemName
-                };
-
+                var item = new Item(Guid.NewGuid(), _itemDefinitions.Get("test")!.Code!);
                 var command = new EquipItemCommand(characterId, slot, item);
                 await _mediator.Send(command);
             },

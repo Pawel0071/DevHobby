@@ -7,7 +7,8 @@ public enum CommandError
     InvalidOperation,
     ItemNotFound,
     InventoryFull,
-    LevelToLow
+    LevelToLow,
+    ItemNotHaveStatsDef
 }
 
 public record CommandResult(bool Success, CommandError Result, string? Message = null, object? InnerResult = null)

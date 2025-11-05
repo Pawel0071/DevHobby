@@ -15,3 +15,9 @@
 /RPG.Application/obj
 /RPG.CLI/bin
 /RPG.CLI/obj
+/RPG.Domain/obj
+/RPG.Domain/bin
+/RPG.GameServer/bin
+/CricuitBraker/obj
+/RPG.Core/bin
+/RPG.Core/bin
