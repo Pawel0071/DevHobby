@@ -1,25 +1,43 @@
+# Binaries and build artifacts
 *.dll
 *.pdb
+*.exe
 *.cache
+*.user
+*.log
+*.vspscc
+*.vssscc
+*.suo
+*.sdf
+*.dbmdl
+*.bak
 *.dylib
 *.so
-*.user
-/RPG.Application/bin
-/RPG.Application/obj
-/RPG.UnitTest/bin
-/RPG.Core/obj
-/RPG.UnitTest/obj
-/RedisWormUp/bin
-/RedisWormUp/bin
-/RedisWormUp/obj
-/RPG.Application/obj
-/RPG.CLI/bin
-/RPG.CLI/obj
-/RPG.Domain/obj
-/RPG.Domain/bin
-/RPG.GameServer/bin
-/CricuitBraker/obj
-/RPG.Core/bin
-/RPG.Core/bin
 
-.fake
+# Rider and VS Code
+.idea/
+.vscode/
+
+# Build folders
+**/bin/
+**/obj/
+
+# Test results
+TestResults/
+*.coverage
+*.coveragexml
+
+# NuGet packages
+*.nupkg
+packages/
+.nuget/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.lock
+
+# Others
+.fake/
+
