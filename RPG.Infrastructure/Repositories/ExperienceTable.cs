@@ -18,7 +18,7 @@ public static class ExperienceData
 
 public static class ExperienceTable
 {
-    public static Dictionary<int, int> LoadFromJson(string json)
+    public static Dictionary<int, int>? LoadFromJson(string json)
     {
         return JsonConvert.DeserializeObject<Dictionary<int, int>>(json);
     }

@@ -46,10 +46,10 @@ public sealed class Character : IItemContainer, IStats, ILevel, ISkillsContainer
     
     public IDictionary<Skill, DateTime> ActiveSkills { get; }
     
-    public ISession Session { get; set; }
-    public IWorld World { get; set; }
+    public ISession? Session { get; set; }
+    public IWorld? World { get; set; }
     
-    public bool IsOnline => World.Id != Guid.Empty;
+    public bool IsOnline => World?.Id != Guid.Empty;
 
 
 }
