@@ -1,14 +1,12 @@
-using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using RPG.Infrastructure;
-using RPG.Infrastructure.Redis;
-using RPG.Infrastructure.Documents;
 using RPG.Domain.Common;
+using RPG.Infrastructure;
+using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 
-namespace RPG.UnitTest.InfrastructureTests;
+namespace RPG.UnitTest.Infrastructure;
 
 public class InfrastructureRegistrationTests
 {

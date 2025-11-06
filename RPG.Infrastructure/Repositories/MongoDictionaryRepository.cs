@@ -13,6 +13,12 @@ public class MongoDictionaryRepository<T> : IDictionaryRepository<T>
         _collection = database.GetCollection<T>(collectionName);
     }
 
+    // Added for easier unit testing - allow passing a collection directly
+    public MongoDictionaryRepository(IMongoCollection<T> collection)
+    {
+        _collection = collection;
+    }
+
     public async Task<IReadOnlyCollection<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var result = await _collection.Find(_ => true).ToListAsync(cancellationToken);

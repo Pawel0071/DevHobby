@@ -1,13 +1,8 @@
-using System;
-using System.Collections.Generic;
 using FluentAssertions;
-using RPG.Domain.Common;
 using RPG.Domain.Entities.Items;
-using RPG.Domain.Enums;
 using RPG.Infrastructure.Documents;
-using Xunit;
 
-namespace RPG.UnitTest.InfrastructureTests;
+namespace RPG.UnitTest.Infrastructure;
 
 public class ItemDocumentExtensionsTests
 {
