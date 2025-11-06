@@ -1,11 +1,11 @@
 ﻿version: '3.8'
 
 services:
-  rpg.sessionkeeper:
-    image: rpg.sessionkeeper
+  rpg.persistenceservice:
+    image: rpg.persistenceservice
     build:
       context: .
-      dockerfile: RPG.SessionKeeper/Dockerfile
+      dockerfile: RPG.PersistenceService/Dockerfile
     environment:
       MONGO_URI: mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb
       REDIS_HOST: redis
@@ -21,11 +21,11 @@ services:
     networks:
       - backend
 
-  cache.wormup:
-    image: cache.wormup
+  redis.wormup:
+    image: redis.wormup
     build:
       context: .
-      dockerfile: Cache.WormUp/Dockerfile
+      dockerfile: RedisWormUp/Dockerfile
     environment:
       MONGO_URI: mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb
       REDIS_HOST: redis
@@ -101,18 +101,6 @@ services:
       sh -c "redis-server --appendonly yes && \
       redis-cli set character:default \"{\\\"id\\\":\\\"default\\\",\\\"name\\\":\\\"Default Character\\\"}\" && \
       redis-cli set event:character.created \"{\\\"event\\\":\\\"character.created\\\",\\\"data\\\":\\\"default\\\"}\""
-
-  persistenceservice:
-    image: persistenceservice
-    build:
-      context: .
-      dockerfile: PersistenceService/Dockerfile
-    depends_on:
-      - mongodb
-      - redis
-      - rabbitmq
-    networks:
-      - backend
 
 volumes:
   mongodb_data:
