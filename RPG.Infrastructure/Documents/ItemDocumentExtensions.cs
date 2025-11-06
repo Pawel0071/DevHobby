@@ -14,22 +14,22 @@ public static class ItemDocumentExtensions
         {
             Name = doc.Name,
             Rarity = doc.Rarity,
-            Tags =
-            [
-                ..doc.Tags
-            ],
+            Tags = doc.Tags != null ? new HashSet<string>(doc.Tags) : new HashSet<string>(),
             Components = new List<IItemComponent>(),
             RequiredLevel = doc.RequiredLevel,
             StackSize = doc.StackSize,
-            Id = doc.Id,
-            TypeCode = doc.TypeCode,
         };
-        
-        foreach (var type in def.RequiredComponents.Concat(def.OptionalComponents))
+
+        if (def != null)
         {
-            var component = CreateComponent(type, doc);
-            if (component != null)
-                item.Components.Add(component);
+            var required = def.RequiredComponents ?? Enumerable.Empty<Type>();
+            var optional = def.OptionalComponents ?? Enumerable.Empty<Type>();
+            foreach (var type in required.Concat(optional))
+            {
+                var component = CreateComponent(type, doc);
+                if (component != null)
+                    item.Components.Add(component);
+            }
         }
 
         return item;
@@ -77,7 +77,7 @@ public static class ItemDocumentExtensions
     {
         [typeof(StatsComponent)] = doc =>
             doc.Modifiers is { Count: > 0 }
-                ? new StatsComponent { Stats = new StatsContainer(doc.Modifiers!) }
+                ? new StatsComponent { Stats = new StatsContainer(new Dictionary<StatsProperty,int>(doc.Modifiers!)) }
                 : null,
 
         [typeof(SocketComponent)] = doc =>
@@ -87,7 +87,7 @@ public static class ItemDocumentExtensions
 
         [typeof(SkillGrantComponent)] = doc =>
             doc.SkillIds is { Count: > 0 }
-                ? new SkillGrantComponent { SkillIds = doc.SkillIds! }
+                ? new SkillGrantComponent { SkillIds = new List<Guid>(doc.SkillIds!) }
                 : null,
 
         [typeof(QuestItemComponent)] = doc =>

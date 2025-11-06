@@ -18,6 +18,12 @@ public class InventoryService : IInventoryService
 
     public ServiceResult<bool> AddItem(IInventoryContainer container, Item item)
     {
+        if (container == null)
+        {
+            _logger.Warn("AddItem called with null inventory container.");
+            return ErrorCodeDefinition.InvalidOperation.ToFail<bool>("Invalid inventory container.");
+        }
+
         _logger.Debug($"Attempting to add item '{item.Name}' to inventory.");
 
         var stackableSlot = container.Inventory.FirstOrDefault(slot =>

@@ -1,8 +1,9 @@
-using Microsoft.Extensions.Logging;
+
 using RPG.Core.Interfaces;
 using RPG.Domain.Entities;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
+using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Core.Services.StatsService;
 
@@ -86,9 +87,10 @@ public class WarriorStatModifierStrategy : IStatModifierStrategy
 
     public void Initialize(Character character)
     {
-        throw new NotImplementedException();
+        // Initialize base stats for Warrior - nothing special for now
+        // Base stats are created by caller; strategy may adjust defaults in future
     }
-}
+    }
 
 public class MageStatModifierStrategy : IStatModifierStrategy
 {
@@ -100,7 +102,7 @@ public class MageStatModifierStrategy : IStatModifierStrategy
     
     public void Initialize(Character character)
     {
-        throw new NotImplementedException();
+        // no-op initialization for Mage
     }
 }
 
@@ -114,7 +116,7 @@ public class WarlockStatModifierStrategy : IStatModifierStrategy
     
     public void Initialize(Character character)
     {
-        throw new NotImplementedException();
+        // no-op initialization for Warlock
     }
 }
 
@@ -128,7 +130,7 @@ public class DruidStatModifierStrategy : IStatModifierStrategy
     
     public void Initialize(Character character)
     {
-        throw new NotImplementedException();
+        // no-op initialization for Druid
     }
 }
 
@@ -142,7 +144,7 @@ public class MonkStatModifierStrategy : IStatModifierStrategy
     
     public void Initialize(Character character)
     {
-        throw new NotImplementedException();
+        // no-op initialization for Monk
     }
 }
 
@@ -156,7 +158,7 @@ public class PaladinStatModifierStrategy : IStatModifierStrategy
     
     public void Initialize(Character character)
     {
-        throw new NotImplementedException();
+        // no-op initialization for Paladin
     }
 }
 
@@ -170,7 +172,7 @@ public class ShamanStatModifierStrategy : IStatModifierStrategy
 
     public void Initialize(Character character)
     {
-        throw new NotImplementedException();
+        // no-op initialization for Shaman
     }
 }
 
@@ -184,6 +186,6 @@ public class AssassinStatModifierStrategy : IStatModifierStrategy
     
     public void Initialize(Character character)
     {
-        throw new NotImplementedException();
+        // no-op initialization for Assassin
     }
 }

@@ -1,3 +1,0 @@
-obj/Debug/net8.0/Protos/Session.cs \
-obj/Debug/net8.0/Protos/SessionGrpc.cs: Protos/character.proto\
- Protos/session.proto

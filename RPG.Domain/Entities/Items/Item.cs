@@ -10,8 +10,8 @@ public class Item(Guid itemId, string typeCode)
     public string TypeCode  { get; init; } = typeCode;
     public int RequiredLevel { get; set; }
     public int StackSize { get; set; }
-    public HashSet<string> Tags { get; set; } = [];
-    public IList<IItemComponent> Components { get; set; } = [];
+    public HashSet<string> Tags { get; set; } = new HashSet<string>();
+    public IList<IItemComponent> Components { get; set; } = new List<IItemComponent>();
     public T? GetComponent<T>() where T : class, IItemComponent
         => Components.OfType<T>().FirstOrDefault();
     

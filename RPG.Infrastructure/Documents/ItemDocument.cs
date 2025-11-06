@@ -16,7 +16,7 @@ public class ItemDocument
     public int RequiredLevel { get; set; }
     public int StackSize { get; set; }
 
-    public List<string> Tags { get; set; } = [];
+    public List<string> Tags { get; set; } = new List<string>();
 
     // Komponenty jako dane
     public Dictionary<StatsProperty, int>? Modifiers { get; set; }
