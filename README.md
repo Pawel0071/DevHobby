@@ -1,83 +1,128 @@
 # DevHobby
 
-A multi-project .NET solution containing an RPG server, core/domain libraries, workers and utilities.
+Wieloserwisowa aplikacja RPG w .NET 8.0 (microservices). Repozytorium zawiera serwer gry (gRPC/ASP.NET), biblioteki domenowe, warstwy aplikacyjne i infrastrukturalne, oraz usługi pomocnicze (workers).
 
-## Repository layout
+## Spis treści
+- Architektura i struktura repozytorium
+- Wymagania i środowisko
+- Budowanie i uruchamianie (lokalnie i Docker)
+- Testy (konwencje i uruchamianie)
+- gRPC / Protobuf
+- Konfiguracja, DI i logowanie
+- Integracje (MongoDB, Redis, RabbitMQ)
+- CI (GitHub Actions)
+- Dodawanie nowego serwisu i modyfikacja encji współdzielonych
+- Troubleshooting (najczęstsze problemy)
 
-- `RPG.Core/` - Core domain entities and shared types used across the solution.
-- `RPG.Domain/` - Domain-specific models and logic (domain layer).
-- `RPG.Application/` - Application services and use-cases.
-- `RPG.Infrastructure/` - Infrastructure implementations (DB, external integrations).
-- `RPG.GameServer/` - ASP.NET / gRPC game server and controllers (main server).
-- `RPG.PersistenceService/` - Background worker for persistence tasks.
-- `RPG.UI/` - UI project (client / front-end pieces).
-- `RedisWormUp/`, `CricuitBraker/` - Worker utilities used by the solution.
-- `RPG.CLI/` - Command-line utilities.
-- `RPG.UnitTest/` - Unit and integration tests.
-- `RPG.PersistenceService/` - (alternate persistence worker; check naming if duplicates exist)
+## Architektura i struktura repozytorium
 
-Files you will commonly use:
-- `DevHobby.sln` — Visual Studio / dotnet solution file.
-- `compose.yaml` — docker-compose for local multi-service runs (if present/used).
+- `RPG.Core/` — wspólne encje domenowe, interfejsy i usługi (kontrakty i logika współdzielona)
+- `RPG.Domain/` — logika domenowa (modele i reguły)
+- `RPG.Application/` — przypadki użycia i serwisy aplikacyjne
+- `RPG.Infrastructure/` — infrastruktura (MongoDB, Redis, RabbitMQ, rejestracje DI, outbox itp.)
+- `RPG.GameServer/` — serwer gry (ASP.NET/gRPC), kontrolery, Protos
+- `PersistenceService/` — serwis do zadań trwałości (worker)
+- `RedisWormUp/`, `CricuitBraker/` — usługi pomocnicze typu worker
+- `RPG.UI/` — UI (klient)
+- `RPG.CLI/` — narzędzia CLI
+- `RPG.UnitTest/` — testy jednostkowe; podkatalogi: `Core/*`, `InfrastructureTests/*` itd.
 
-## Requirements
+Pliki na poziomie repozytorium:
+- `DevHobby.sln` — plik rozwiązania .NET
+- `compose.yaml` — środowisko Docker Compose (uwaga: patrz sekcja Docker)
+- `.github/workflows/ci.yml` — pipeline CI (GitHub Actions)
 
-- .NET SDK 8.0+ (the projects target `net8.0`).
-- Optional: Docker and Docker Compose for running containers.
+## Wymagania i środowisko
+- .NET SDK 8.0+
+- Opcjonalnie: Docker oraz Docker Compose
 
-## Quick build & run
+## Budowanie i uruchamianie
 
-Build the whole solution:
-
+Pełne build rozwiązania:
 ```bash
 dotnet build DevHobby.sln
 ```
 
-Run a single service (example: GameServer):
-
+Uruchomienie pojedynczego serwisu (np. GameServer):
 ```bash
 cd RPG.GameServer
 dotnet run
 ```
 
-If you prefer to run multiple services using Docker/compose (if `compose.yaml` is configured):
+### Docker / Compose
+W repo znajduje się `compose.yaml` do lokalnego uruchamiania MongoDB, Redis, RabbitMQ i przykładowych serwisów. Uwaga: plik może zawierać nieaktualne nazwy ścieżek Dockerfile (np. `RPG.SessionKeeper/` lub `Cache.WormUp/`). Przed startem zaktualizuj ścieżki `dockerfile:` tak, aby odpowiadały faktycznym katalogom w repozytorium (np. `RedisWormUp/` zamiast `Cache.WormUp/`).
 
+Start usług w kontenerach:
 ```bash
 docker compose up --build
 ```
 
-## Protobuf / gRPC notes
+## Testy
 
-- Protobuf files are under `RPG.GameServer/Protos/` and compiled by the project when building.
-- If you update `.proto` files, rebuild the solution to regenerate the C# classes used by gRPC services.
+Konwencje:
+- Pliki testów kończą się na `*Tests.cs`
+- Preferowane katalogi testów z sufiksem `Tests` (np. `InfrastructureTests`)
 
-## MongoDB / Data seeding
-
-- For seeding sample items (example `Item` documents), use `mongoimport` with a JSON array file:
-
-```bash
-# create items.json with an array of item documents
-mongoimport --uri "mongodb+srv://<username>:<password>@<cluster>/<db>" --collection items --file items.json --jsonArray
-```
-
-## Running tests
-
+Uruchamianie testów:
 ```bash
 dotnet test RPG.UnitTest/RPG.UnitTest.csproj
 ```
 
-## Common troubleshooting
+W CI testy uruchamiane są w konfiguracji Release.
 
-- If `dotnet build` fails with missing project file errors, confirm that each `.csproj` path in `DevHobby.sln` matches the actual folder structure.
-- If you see type/namespace errors in `RPG.Core` or other projects, check `ProjectReference` entries in each `.csproj` and ensure referenced projects exist and build.
-- When adding a new project, add its `.csproj` to the solution with `dotnet sln add <path-to-csproj>` or edit `DevHobby.sln` carefully.
+## gRPC / Protobuf
+- Definicje Protobuf znajdują się w `RPG.GameServer/Protos/`
+- Zmiana `.proto` wymaga przebudowania, aby odświeżyć klasy generowane do gRPC
 
-## Suggested next steps
+## Konfiguracja, DI i logowanie
+- Każdy serwis ma własne `appsettings.json` i `appsettings.Development.json`
+- Rejestracje usług przez wbudowany DI w `Program.cs`
+- Logowanie jest konfigurowane w `appsettings.json` i używa `ILogger`
 
-- Run `dotnet build DevHobby.sln` and fix any compile errors; they will point to missing files or incorrect references.
-- If you want, I can validate all `ProjectReference` paths and list any missing .csproj files or broken references.
+## Integracje zewnętrzne
+- MongoDB — repozytoria i kolekcje rejestrowane w `RPG.Infrastructure`
+- Redis — `IRedisCache` i implementacja `RedisCache`
+- RabbitMQ — publisher i kanały konfiguracji
+- W testach jednostkowych integracje są mockowane (bez zależności od zewnętrznych serwisów)
 
-## Contact / notes
+## CI (GitHub Actions)
+Pipeline znajduje się w `.github/workflows/ci.yml` i wykonuje:
+- checkout kodu
+- setup .NET 8
+- `dotnet restore`
+- `dotnet build` w konfiguracji Release
+- `dotnet test` w konfiguracji Release (bez ponownego builda)
 
-If you want this README expanded with environment variables, per-service run instructions, or a diagram of the architecture, tell me which parts to expand and I will update it.
+Jeśli chcesz przyspieszyć CI, możesz dodać cache NuGet (przykład):
+```yaml
+- name: Cache NuGet
+	uses: actions/cache@v4
+	with:
+		path: ~/.nuget/packages
+		key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+		restore-keys: |
+			${{ runner.os }}-nuget-
+```
+
+## Dodawanie nowego serwisu
+1. Utwórz katalog serwisu i plik `.csproj`
+2. Dodaj projekt do rozwiązania: `dotnet sln add <ścieżka-do-csproj>`
+3. Skopiuj strukturę (np. `Program.cs`, `appsettings.json`)
+4. Zarejestruj zależności w `Program.cs`
+5. Dodaj testy do katalogu `Tests`
+
+## Modyfikacja encji współdzielonej (`RPG.Core`)
+1. Zaktualizuj encję/interfejs w `RPG.Core`
+2. Zbuduj całość i uruchom testy, aby upewnić się, że zmiana jest kompatybilna wstecznie
+3. Zaktualizuj serwisy zależne (jeśli to konieczne)
+
+## Troubleshooting
+- Błędy `dotnet build` dotyczące brakujących projektów — sprawdź wpisy w `DevHobby.sln`
+- Błędy przestrzeni nazw/typów — sprawdź `ProjectReference` w `.csproj`
+- Compose nie startuje — zaktualizuj ścieżki `dockerfile:` w `compose.yaml` do faktycznych katalogów
+- Testy w CI — upewnij się, że testy uruchamiane są w tej samej konfiguracji co build (`Release`)
+
+---
+
+Jeśli chcesz, mogę dodać sekcję z dokładnymi zmiennymi środowiskowymi dla każdego serwisu oraz przykładowe seedy bazy (Mongo). Napisz, które części rozwinąć.
 
