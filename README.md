@@ -21,7 +21,7 @@ Wieloserwisowa aplikacja RPG w .NET 8.0 (microservices). Repozytorium zawiera se
 - `RPG.Application/` — przypadki użycia i serwisy aplikacyjne
 - `RPG.Infrastructure/` — infrastruktura (MongoDB, Redis, RabbitMQ, rejestracje DI, outbox itp.)
 - `RPG.GameServer/` — serwer gry (ASP.NET/gRPC), kontrolery, Protos
-- `PersistenceService/` — serwis do zadań trwałości (worker)
+`RPG.PersistenceService/` — serwis do zadań trwałości (worker)
 - `RedisWormUp/`, `CricuitBraker/` — usługi pomocnicze typu worker
 - `RPG.UI/` — UI (klient)
 - `RPG.CLI/` — narzędzia CLI
@@ -50,7 +50,33 @@ dotnet run
 ```
 
 ### Docker / Compose
-W repo znajduje się `compose.yaml` do lokalnego uruchamiania MongoDB, Redis, RabbitMQ i przykładowych serwisów. Uwaga: plik może zawierać nieaktualne nazwy ścieżek Dockerfile (np. `RPG.SessionKeeper/` lub `Cache.WormUp/`). Przed startem zaktualizuj ścieżki `dockerfile:` tak, aby odpowiadały faktycznym katalogom w repozytorium (np. `RedisWormUp/` zamiast `Cache.WormUp/`).
+W repo znajduje się aktualny `compose.yaml` uruchamiający infrastrukturę oraz wybrane serwisy workers:
+
+- Usługi w compose:
+	- `rpg.persistenceservice` (Dockerfile: `RPG.PersistenceService/Dockerfile`)
+	- `redis.wormup` (Dockerfile: `RedisWormUp/Dockerfile`)
+	- `circuitbreaker` (Dockerfile: `CricuitBraker/Dockerfile`)
+	- `mongodb` (image: `mongo:latest`)
+	- `rabbitmq` (image: `rabbitmq:management`)
+	- `redis` (image: `redis:latest`)
+
+Per‑service zmienne środowiskowe (zgodnie z `compose.yaml`):
+
+- rpg.persistenceservice
+	- `MONGO_URI` (np. `mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb`)
+	- `REDIS_HOST`, `REDIS_PORT`
+	- `RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_USER`, `RABBITMQ_PASS`
+
+- redis.wormup
+	- `MONGO_URI`
+	- `REDIS_HOST`, `REDIS_PORT`
+
+- circuitbreaker
+	- `MONGO_URI`
+	- `REDIS_HOST`, `REDIS_PORT`
+	- `RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_USER`, `RABBITMQ_PASS`
+
+Uwaga: kod serwisów powinien czytać powyższe zmienne poprzez konfigurację .NET (IConfiguration/Options). Jeśli dany serwis nadal używa wartości "localhost" zakodowanych na stałe, zaktualizuj `Program.cs`, aby korzystał z konfiguracji środowiskowej.
 
 Start usług w kontenerach:
 ```bash
@@ -120,6 +146,7 @@ Jeśli chcesz przyspieszyć CI, możesz dodać cache NuGet (przykład):
 - Błędy `dotnet build` dotyczące brakujących projektów — sprawdź wpisy w `DevHobby.sln`
 - Błędy przestrzeni nazw/typów — sprawdź `ProjectReference` w `.csproj`
 - Compose nie startuje — zaktualizuj ścieżki `dockerfile:` w `compose.yaml` do faktycznych katalogów
+- Compose nie startuje — sprawdź, czy porty 27017/6379/5672/15672 nie są zajęte, oraz czy ścieżki Dockerfile wskazują na istniejące pliki (w tym repo są już poprawne)
 - Testy w CI — upewnij się, że testy uruchamiane są w tej samej konfiguracji co build (`Release`)
 
 ---
