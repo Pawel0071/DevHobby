@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Outbox;
 
 namespace RPG.Infrastructure.Repositories.MongoDB;
 

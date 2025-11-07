@@ -1,9 +1,10 @@
 using RPG.Domain.Common;
 using RPG.Domain.Containers;
 using RPG.Domain.Entities.Items;
+using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Mappers;
 
-namespace RPG.Infrastructure.Documents;
+namespace RPG.Infrastructure.Extensions;
 
 /// <summary>
 /// Extension methods for ItemDocument - delegates to ItemDocumentMapper

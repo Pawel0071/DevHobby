@@ -1,4 +1,4 @@
-namespace RPG.Infrastructure.Documents;
+namespace RPG.Infrastructure.Outbox;
 
 public class OutboxMessage
 {

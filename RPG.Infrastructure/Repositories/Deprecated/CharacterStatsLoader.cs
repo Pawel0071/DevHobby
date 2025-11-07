@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using RPG.Domain.Enums;
 
-namespace RPG.Core;
+namespace RPG.Infrastructure.Repositories.Deprecated;
 
 public static class CharacterStatsLoader
 {

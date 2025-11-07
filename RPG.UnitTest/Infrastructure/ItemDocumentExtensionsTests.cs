@@ -1,6 +1,7 @@
 using FluentAssertions;
 using RPG.Domain.Entities.Items;
 using RPG.Infrastructure.Documents;
+using RPG.Infrastructure.Extensions;
 
 namespace RPG.UnitTest.Infrastructure;
 

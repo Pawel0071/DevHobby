@@ -89,7 +89,17 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
         return item;
     }
 
-    private static IItemComponent? CreateComponent(Type type, ItemDocument doc)
+    /// <summary>
+    /// Creates a component from ItemDocument based on component type.
+    /// Returns null if the document doesn't have required data for that component.
+    /// 
+    /// Example usage:
+    /// var component = ItemDocumentMapper.CreateComponent(typeof(StatsComponent), doc);
+    /// if (component != null) item.Components.Add(component);
+    /// 
+    /// Note: Not all tags require components - this method returns null if data is missing.
+    /// </summary>
+    public static IItemComponent? CreateComponent(Type type, ItemDocument doc)
     {
         if (type == typeof(StatsComponent) && doc.Modifiers is { Count: > 0 })
             return new StatsComponent { Stats = new StatsContainer(new Dictionary<StatsProperty, int>(doc.Modifiers!)) };

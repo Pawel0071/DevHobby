@@ -3,7 +3,7 @@ using MongoDB.Bson;
 using RPG.Domain.Interfaces;
 using RPG.Infrastructure.Interfaces;
 
-namespace RPG.Infrastructure.Repositories.MongoDB;
+namespace RPG.Infrastructure.Repositories.Deprecated;
 
 public class ExperienceProvider : IExperienceProvider
 {
