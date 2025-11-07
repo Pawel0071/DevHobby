@@ -60,6 +60,73 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
+  # Observability Stack (Grafana + Prometheus + Tempo + Loki)
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - backend
+    restart: unless-stopped
+
+  tempo:
+    image: grafana/tempo:2.3.0
+    container_name: tempo
+    ports:
+      - "3200:3200"   # Tempo HTTP
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+    volumes:
+      - ./observability/tempo.yml:/etc/tempo/tempo.yml
+      - tempo_data:/var/tempo
+    command: 
+      - '-config.file=/etc/tempo/tempo.yml'
+    networks:
+      - backend
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./observability/loki.yml:/etc/loki/loki.yml
+      - loki_data:/loki
+    command: -config.file=/etc/loki/loki.yml
+    networks:
+      - backend
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - tempo
+      - loki
+    networks:
+      - backend
+    restart: unless-stopped
+
   # Application Services
   redis.warmup:
     image: redis.warmup
@@ -142,6 +209,14 @@ volumes:
   redis_data:
     driver: local
   rabbitmq_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  tempo_data:
+    driver: local
+  loki_data:
+    driver: local
+  grafana_data:
     driver: local
 
 networks:

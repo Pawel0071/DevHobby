@@ -1,0 +1,6 @@
+# Ignore Grafana data (będzie w Docker volume)
+grafana/provisioning/dashboards/*.json
+!grafana/provisioning/dashboards/dashboards.yml
+
+# Ignore generated configs
+*.generated.yml
