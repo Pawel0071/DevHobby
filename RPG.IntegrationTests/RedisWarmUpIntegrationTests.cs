@@ -38,7 +38,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         
         // Register repositories and services
         services.AddSingleton<IMongoDocumentReader, MongoDocumentReader>();
-        services.AddSingleton<IRedisDocumentWriter, RedisDocumentWriter>();
+        services.AddSingleton<IRedisDocumentRepository, RedisDocumentRepository>();
         
         _serviceProvider = services.BuildServiceProvider();
     }
@@ -134,7 +134,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task RedisDocumentWriter_ShouldWriteSingleDocument()
     {
         // Arrange
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentWriter>();
+        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
         var documentId = Guid.NewGuid();
         var document = new Dictionary<string, JsonElement>
         {
@@ -164,7 +164,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task RedisDocumentWriter_ShouldWriteBatchDocuments()
     {
         // Arrange
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentWriter>();
+        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
         var keyValuePairs = new Dictionary<string, string>();
         
         for (int i = 0; i < 5; i++)
@@ -195,7 +195,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task RedisDocumentWriter_ShouldSetExpiryCorrectly()
     {
         // Arrange
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentWriter>();
+        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
         var documentId = Guid.NewGuid();
         var document = new Dictionary<string, JsonElement>
         {
@@ -219,7 +219,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task RedisDocumentWriter_ShouldCheckExistence()
     {
         // Arrange
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentWriter>();
+        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
         var existingId = Guid.NewGuid();
         var nonExistingId = Guid.NewGuid();
         
@@ -245,7 +245,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task RedisDocumentWriter_ShouldDeleteDocument()
     {
         // Arrange
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentWriter>();
+        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
         var documentId = Guid.NewGuid();
         var document = new Dictionary<string, JsonElement>
         {
@@ -283,7 +283,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         await collection.InsertManyAsync(testDocuments);
 
         var reader = _serviceProvider.GetRequiredService<IMongoDocumentReader>();
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentWriter>();
+        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
 
         // Act - Simulate what RedisWarmUpService does
         var documents = await reader.ReadAllAsync(collectionName);
@@ -357,7 +357,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         }
 
         var reader = _serviceProvider.GetRequiredService<IMongoDocumentReader>();
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentWriter>();
+        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
         var logger = _serviceProvider.GetRequiredService<RPG.Infrastructure.Interfaces.ILogger<RedisWarmUpService>>();
         var warmUpService = new RedisWarmUpService(reader, writer, logger, settings);
 

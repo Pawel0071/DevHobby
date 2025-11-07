@@ -1,10 +1,21 @@
 namespace RPG.Infrastructure.Interfaces;
 
 /// <summary>
-/// Repository for writing documents to Redis cache
+/// Generic repository for reading and writing JSON documents to Redis cache.
+/// Works with raw strings/JSON - does not depend on Domain entities.
 /// </summary>
-public interface IRedisDocumentWriter
+public interface IRedisDocumentRepository
 {
+    /// <summary>
+    /// Reads a document from Redis by key
+    /// </summary>
+    Task<string?> ReadAsync(string key, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Reads multiple documents from Redis by keys
+    /// </summary>
+    Task<Dictionary<string, string>> ReadBatchAsync(string[] keys, CancellationToken cancellationToken = default);
+    
     /// <summary>
     /// Writes a document to Redis with a key pattern
     /// </summary>

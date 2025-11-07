@@ -7,13 +7,13 @@ namespace RPG.Infrastructure.Services;
 public class RedisWarmUpService : IRedisWarmUpService
 {
     private readonly IMongoDocumentReader _mongoReader;
-    private readonly IRedisDocumentWriter _redisWriter;
+    private readonly IRedisDocumentRepository _redisWriter;
     private readonly Interfaces.ILogger<RedisWarmUpService> _logger;
     private readonly RedisWarmUpSettings _settings;
 
     public RedisWarmUpService(
         IMongoDocumentReader mongoReader,
-        IRedisDocumentWriter redisWriter,
+        IRedisDocumentRepository redisWriter,
         Interfaces.ILogger<RedisWarmUpService> logger,
         RedisWarmUpSettings settings)
     {

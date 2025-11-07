@@ -66,7 +66,7 @@ try
 
     // Infrastructure services
     builder.Services.AddSingleton<IMongoDocumentReader, MongoDocumentReader>();
-    builder.Services.AddSingleton<IRedisDocumentWriter, RedisDocumentWriter>();
+    builder.Services.AddSingleton<IRedisDocumentRepository, RedisDocumentRepository>();
     builder.Services.AddSingleton<IRedisWarmUpService, RedisWarmUpService>();
 
     // Application service

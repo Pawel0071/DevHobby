@@ -17,7 +17,7 @@ public class RabbitMqIntegrationTests : IClassFixture<TestContainersFixture>
     }
 
     [Fact]
-    public async Task ShouldConnectToRabbitMq()
+    public void ShouldConnectToRabbitMq()
     {
         // Assert
         _fixture.RabbitConnection.IsOpen.Should().BeTrue();
