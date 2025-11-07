@@ -1,0 +1,113 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore
+        run: dotnet restore DevHobby.sln
+
+      - name: Build
+        run: dotnet build DevHobby.sln --no-restore --configuration Release
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for MongoDB..."
+          for i in {1..30}; do
+            if docker exec $(docker ps -q -f ancestor=mongo:latest) mongosh --eval "db.runCommand({ ping: 1 })" > /dev/null 2>&1; then
+              echo "MongoDB is ready!"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 2
+          done
+          
+          echo "Waiting for Redis..."
+          for i in {1..30}; do
+            if redis-cli -h localhost ping > /dev/null 2>&1; then
+              echo "Redis is ready!"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 2
+          done
+          
+          echo "Waiting for RabbitMQ..."
+          for i in {1..30}; do
+            if curl -s http://localhost:15672 > /dev/null 2>&1; then
+              echo "RabbitMQ is ready!"
+              break
+            fi
+            echo "Waiting... ($i/30)"
+            sleep 2
+          done
+
+      - name: Run Integration Tests
+        run: dotnet test RPG.IntegrationTests --no-build --configuration Release --verbosity normal
+        env:
+          # Override connection strings if needed
+          MONGODB_CONNECTION: mongodb://localhost:27017
+          REDIS_CONNECTION: localhost:6379
+          RABBITMQ_CONNECTION: amqp://guest:guest@localhost:5672
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: '**/TestResults/**/*'

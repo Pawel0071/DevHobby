@@ -100,6 +100,9 @@ public class GenericRabbitMqConsumer : IRabbitMqConsumer
                 cancellationToken: cancellationToken);
 
             _logger.Info($"Started consuming messages from queue: {_queueName}, ConsumerTag={_consumerTag}");
+            
+            // Log that consumer is fully ready
+            _logger.Info($"Consumer READY: Exchange={_exchangeName}, Queue={_queueName}, RoutingKey={_routingKey}, Tag={_consumerTag}");
         }
         catch (Exception ex)
         {
@@ -147,7 +150,23 @@ public class GenericRabbitMqConsumer : IRabbitMqConsumer
             {
                 if (document.TryGetValue("Id", out var idElement) || document.TryGetValue("id", out idElement))
                 {
-                    var id = idElement.GetGuid();
+                    // Handle MongoDB ObjectId format { "$oid": "..." }
+                    Guid id;
+                    if (idElement.ValueKind == JsonValueKind.Object && idElement.TryGetProperty("$oid", out var oidProperty))
+                    {
+                        // MongoDB ObjectId - use string value as GUID
+                        var oidString = oidProperty.GetString();
+                        id = Guid.Parse(oidString ?? throw new InvalidOperationException("ObjectId is null"));
+                    }
+                    else if (idElement.ValueKind == JsonValueKind.String)
+                    {
+                        id = Guid.Parse(idElement.GetString() ?? throw new InvalidOperationException("Id is null"));
+                    }
+                    else
+                    {
+                        id = idElement.GetGuid();
+                    }
+                    
                     await _documentRepository.DeleteAsync(collectionName, id, cancellationToken);
                 }
                 else

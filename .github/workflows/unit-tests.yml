@@ -23,6 +23,6 @@ jobs:
       - name: Build
         run: dotnet build DevHobby.sln --no-restore --configuration Release
 
-      - name: Run tests
-        # ensure test runner uses the same configuration/output as the build step
-        run: dotnet test DevHobby.sln --no-build --configuration Release --no-restore --verbosity normal
+      - name: Run Unit Tests Only
+        # Run only unit tests, skip integration tests that require Docker
+        run: dotnet test RPG.UnitTest --no-build --configuration Release --no-restore --verbosity normal

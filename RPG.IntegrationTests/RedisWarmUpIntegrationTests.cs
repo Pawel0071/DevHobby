@@ -95,9 +95,9 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         var reader = _serviceProvider.GetRequiredService<IMongoDocumentReader>();
 
         // Act
-        var batch1 = await reader.ReadBatchAsync("Items", 10, 0);
-        var batch2 = await reader.ReadBatchAsync("Items", 10, 10);
-        var batch3 = await reader.ReadBatchAsync("Items", 10, 20);
+        var batch1 = await reader.ReadBatchAsync("Items", 0, 10);   // skip=0, limit=10
+        var batch2 = await reader.ReadBatchAsync("Items", 10, 10);  // skip=10, limit=10
+        var batch3 = await reader.ReadBatchAsync("Items", 20, 10);  // skip=20, limit=10
 
         // Assert
         batch1.Should().HaveCount(10);
@@ -291,8 +291,24 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         
         foreach (var doc in documents)
         {
-            var id = Guid.Parse(doc["Id"].GetString()!);
-            var key = $"{collectionName}:{id}";
+            // MongoDB ObjectId is returned as { "$oid": "..." }, need to extract the string value
+            var idElement = doc["Id"];
+            string idString;
+            
+            if (idElement.ValueKind == JsonValueKind.Object && idElement.TryGetProperty("$oid", out var oidElement))
+            {
+                idString = oidElement.GetString()!;
+            }
+            else if (idElement.ValueKind == JsonValueKind.String)
+            {
+                idString = idElement.GetString()!;
+            }
+            else
+            {
+                throw new InvalidOperationException($"Unexpected Id format: {idElement.ValueKind}");
+            }
+            
+            var key = $"{collectionName}:{idString}";
             keyValuePairs[key] = JsonSerializer.Serialize(doc);
         }
         
@@ -356,8 +372,24 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
 
             foreach (var doc in documents)
             {
-                var id = Guid.Parse(doc["Id"].GetString()!);
-                var key = $"{collectionName}:{id}";
+                // MongoDB ObjectId is returned as { "$oid": "..." }, need to extract the string value
+                var idElement = doc["Id"];
+                string idString;
+                
+                if (idElement.ValueKind == JsonValueKind.Object && idElement.TryGetProperty("$oid", out var oidElement))
+                {
+                    idString = oidElement.GetString()!;
+                }
+                else if (idElement.ValueKind == JsonValueKind.String)
+                {
+                    idString = idElement.GetString()!;
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Unexpected Id format: {idElement.ValueKind}");
+                }
+                
+                var key = $"{collectionName}:{idString}";
                 var exists = await writer.ExistsAsync(key);
                 exists.Should().BeTrue($"Document from {collectionName} should be cached at key {key}");
             }

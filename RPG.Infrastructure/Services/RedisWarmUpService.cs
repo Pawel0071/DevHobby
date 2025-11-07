@@ -90,10 +90,26 @@ public class RedisWarmUpService : IRedisWarmUpService
 
                     foreach (var document in documents)
                     {
-                        if (document.TryGetValue("Id", out var idElement) || document.TryGetValue("id", out idElement))
+                        if (document.TryGetValue("Id", out var idElement) || document.TryGetValue("id", out idElement) || document.TryGetValue("_id", out idElement))
                         {
-                            var id = idElement.GetGuid();
-                            var key = GenerateRedisKey(collectionName, id);
+                            string idString;
+                            
+                            // Handle MongoDB ObjectId format: { "$oid": "..." }
+                            if (idElement.ValueKind == JsonValueKind.Object && idElement.TryGetProperty("$oid", out var oidElement))
+                            {
+                                idString = oidElement.GetString()!;
+                            }
+                            else if (idElement.ValueKind == JsonValueKind.String)
+                            {
+                                idString = idElement.GetString()!;
+                            }
+                            else
+                            {
+                                _logger.Warn($"Document in {collectionName} has unsupported Id format: {idElement.ValueKind}, skipping");
+                                continue;
+                            }
+                            
+                            var key = $"{collectionName}:{idString}";
                             var value = JsonSerializer.Serialize(document);
 
                             keyValuePairs[key] = value;
@@ -127,12 +143,5 @@ public class RedisWarmUpService : IRedisWarmUpService
         }
 
         _logger.Info($"Warm-up cycle completed: {totalDocuments} documents read, {totalWritten} written to Redis");
-    }
-
-    private string GenerateRedisKey(string collectionName, Guid id)
-    {
-        // Pattern: collection:id
-        // Example: Characters:123e4567-e89b-12d3-a456-426614174000
-        return $"{collectionName}:{id}";
     }
 }

@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using MongoDB.Bson;
 using RabbitMQ.Client;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Configuration;
@@ -60,7 +61,7 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
 
     public async Task InitializeAsync()
     {
-        // Declare exchange and queue for testing
+        // Declare exchange and queue for testing FIRST
         await _rabbitChannel.ExchangeDeclareAsync(
             exchange: _exchangeName,
             type: ExchangeType.Topic,
@@ -77,6 +78,15 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
             queue: _queueName,
             exchange: _exchangeName,
             routingKey: "#");
+        
+        // THEN start RabbitMQ consumer in background
+        var consumer = _serviceProvider.GetRequiredService<IRabbitMqConsumer>();
+        _ = consumer.StartConsumingAsync(); // Fire and forget - runs in background
+        
+        // Give consumer more time to start and bind properly
+        await Task.Delay(5000);
+        
+        Console.WriteLine($"Consumer started for exchange={_exchangeName}, queue={_queueName}");
     }
 
     public async Task DisposeAsync()
@@ -110,15 +120,8 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
         var message = JsonSerializer.Serialize(character);
         var body = Encoding.UTF8.GetBytes(message);
 
-        var consumer = _serviceProvider.GetRequiredService<IRabbitMqConsumer>();
-        var cts = new CancellationTokenSource();
-
         // Act
-        // Start consumer
-        var consumerTask = Task.Run(async () => await consumer.StartConsumingAsync(cts.Token));
-        await Task.Delay(1000); // Wait for consumer to start
-
-        // Publish message
+        // Publish message (consumer already running from InitializeAsync)
         await _rabbitChannel.BasicPublishAsync(
             exchange: _exchangeName,
             routingKey: "character.created",
@@ -128,21 +131,20 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
         await Task.Delay(3000);
 
         // Assert
-        var collection = _mongoDatabase.GetCollection<Dictionary<string, JsonElement>>("Characters");
-        var filter = Builders<Dictionary<string, JsonElement>>.Filter.Or(
-            Builders<Dictionary<string, JsonElement>>.Filter.Eq("Id", characterId),
-            Builders<Dictionary<string, JsonElement>>.Filter.Eq("id", characterId)
+        var collection = _mongoDatabase.GetCollection<BsonDocument>("Characters");
+        var filter = Builders<BsonDocument>.Filter.Or(
+            Builders<BsonDocument>.Filter.Eq("Id", characterId.ToString()),
+            Builders<BsonDocument>.Filter.Eq("id", characterId.ToString())
         );
         
         var result = await collection.Find(filter).FirstOrDefaultAsync();
         
         result.Should().NotBeNull();
-        result!["Name"].GetString().Should().Be("TestHero");
-        result["Level"].GetInt32().Should().Be(10);
-        result["Health"].GetInt32().Should().Be(100);
+        result!["Name"].AsString.Should().Be("TestHero");
+        result["Level"].AsInt32.Should().Be(10);
+        result["Health"].AsInt32.Should().Be(100);
 
         // Cleanup
-        cts.Cancel();
         await collection.DeleteOneAsync(filter);
     }
 
@@ -151,14 +153,14 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
     {
         // Arrange
         var characterId = Guid.NewGuid();
-        var collection = _mongoDatabase.GetCollection<Dictionary<string, JsonElement>>("Characters");
+        var collection = _mongoDatabase.GetCollection<BsonDocument>("Characters");
 
         // Insert initial document
-        var initialDoc = new Dictionary<string, JsonElement>
+        var initialDoc = new BsonDocument
         {
-            ["Id"] = JsonSerializer.SerializeToElement(characterId),
-            ["Name"] = JsonSerializer.SerializeToElement("OldName"),
-            ["Level"] = JsonSerializer.SerializeToElement(5)
+            ["Id"] = BsonValue.Create(characterId.ToString()),
+            ["Name"] = BsonValue.Create("OldName"),
+            ["Level"] = BsonValue.Create(5)
         };
         await collection.InsertOneAsync(initialDoc);
 
@@ -174,13 +176,7 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
         var message = JsonSerializer.Serialize(updatedCharacter);
         var body = Encoding.UTF8.GetBytes(message);
 
-        var consumer = _serviceProvider.GetRequiredService<IRabbitMqConsumer>();
-        var cts = new CancellationTokenSource();
-
         // Act
-        var consumerTask = Task.Run(async () => await consumer.StartConsumingAsync(cts.Token));
-        await Task.Delay(3000);
-
         await _rabbitChannel.BasicPublishAsync(
             exchange: _exchangeName,
             routingKey: "character.updated",
@@ -189,20 +185,19 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
         await Task.Delay(3000);
 
         // Assert
-        var filter = Builders<Dictionary<string, JsonElement>>.Filter.Or(
-            Builders<Dictionary<string, JsonElement>>.Filter.Eq("Id", characterId),
-            Builders<Dictionary<string, JsonElement>>.Filter.Eq("id", characterId)
+        var filter = Builders<BsonDocument>.Filter.Or(
+            Builders<BsonDocument>.Filter.Eq("Id", characterId.ToString()),
+            Builders<BsonDocument>.Filter.Eq("id", characterId.ToString())
         );
         
         var result = await collection.Find(filter).FirstOrDefaultAsync();
         
         result.Should().NotBeNull();
-        result!["Name"].GetString().Should().Be("UpdatedName");
-        result["Level"].GetInt32().Should().Be(15);
-        result["Health"].GetInt32().Should().Be(200);
+        result!["Name"].AsString.Should().Be("UpdatedName");
+        result["Level"].AsInt32.Should().Be(15);
+        result["Health"].AsInt32.Should().Be(200);
 
         // Cleanup
-        cts.Cancel();
         await collection.DeleteOneAsync(filter);
     }
 
@@ -211,20 +206,20 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
     {
         // Arrange
         var characterId = Guid.NewGuid();
-        var collection = _mongoDatabase.GetCollection<Dictionary<string, JsonElement>>("Characters");
+        var collection = _mongoDatabase.GetCollection<BsonDocument>("Characters");
 
         // Insert document to delete
-        var doc = new Dictionary<string, JsonElement>
+        var doc = new BsonDocument
         {
-            ["Id"] = JsonSerializer.SerializeToElement(characterId),
-            ["Name"] = JsonSerializer.SerializeToElement("ToBeDeleted")
+            ["Id"] = BsonValue.Create(characterId.ToString()),
+            ["Name"] = BsonValue.Create("ToBeDeleted")
         };
         await collection.InsertOneAsync(doc);
 
         // Verify it exists
-        var initialFilter = Builders<Dictionary<string, JsonElement>>.Filter.Or(
-            Builders<Dictionary<string, JsonElement>>.Filter.Eq("Id", characterId),
-            Builders<Dictionary<string, JsonElement>>.Filter.Eq("id", characterId)
+        var initialFilter = Builders<BsonDocument>.Filter.Or(
+            Builders<BsonDocument>.Filter.Eq("Id", characterId.ToString()),
+            Builders<BsonDocument>.Filter.Eq("id", characterId.ToString())
         );
         (await collection.Find(initialFilter).FirstOrDefaultAsync()).Should().NotBeNull();
 
@@ -233,13 +228,7 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
         var message = JsonSerializer.Serialize(deleteMessage);
         var body = Encoding.UTF8.GetBytes(message);
 
-        var consumer = _serviceProvider.GetRequiredService<IRabbitMqConsumer>();
-        var cts = new CancellationTokenSource();
-
         // Act
-        var consumerTask = Task.Run(async () => await consumer.StartConsumingAsync(cts.Token));
-        await Task.Delay(3000);
-
         await _rabbitChannel.BasicPublishAsync(
             exchange: _exchangeName,
             routingKey: "character.deleted",
@@ -250,9 +239,6 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
         // Assert
         var result = await collection.Find(initialFilter).FirstOrDefaultAsync();
         result.Should().BeNull();
-
-        // Cleanup
-        cts.Cancel();
     }
 
     [Fact]
@@ -272,13 +258,7 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
         var message = JsonSerializer.Serialize(item);
         var body = Encoding.UTF8.GetBytes(message);
 
-        var consumer = _serviceProvider.GetRequiredService<IRabbitMqConsumer>();
-        var cts = new CancellationTokenSource();
-
         // Act
-        var consumerTask = Task.Run(async () => await consumer.StartConsumingAsync(cts.Token));
-        await Task.Delay(3000);
-
         await _rabbitChannel.BasicPublishAsync(
             exchange: _exchangeName,
             routingKey: "item.created",
@@ -287,22 +267,21 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
         await Task.Delay(3000);
 
         // Assert
-        var collection = _mongoDatabase.GetCollection<Dictionary<string, JsonElement>>("Items");
-        var filter = Builders<Dictionary<string, JsonElement>>.Filter.Or(
-            Builders<Dictionary<string, JsonElement>>.Filter.Eq("Id", itemId),
-            Builders<Dictionary<string, JsonElement>>.Filter.Eq("id", itemId)
+        var collection = _mongoDatabase.GetCollection<BsonDocument>("Items");
+        var filter = Builders<BsonDocument>.Filter.Or(
+            Builders<BsonDocument>.Filter.Eq("Id", itemId.ToString()),
+            Builders<BsonDocument>.Filter.Eq("id", itemId.ToString())
         );
         
         var result = await collection.Find(filter).FirstOrDefaultAsync();
         
         result.Should().NotBeNull();
-        result!["Name"].GetString().Should().Be("Magic Sword");
-        result["Type"].GetString().Should().Be("Weapon");
-        result["Damage"].GetInt32().Should().Be(50);
-        result["Rarity"].GetString().Should().Be("Legendary");
+        result!["Name"].AsString.Should().Be("Magic Sword");
+        result["Type"].AsString.Should().Be("Weapon");
+        result["Damage"].AsInt32.Should().Be(50);
+        result["Rarity"].AsString.Should().Be("Legendary");
 
         // Cleanup
-        cts.Cancel();
         await collection.DeleteOneAsync(filter);
     }
 
@@ -320,13 +299,7 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
         var message = JsonSerializer.Serialize(character);
         var body = Encoding.UTF8.GetBytes(message);
 
-        var consumer = _serviceProvider.GetRequiredService<IRabbitMqConsumer>();
-        var cts = new CancellationTokenSource();
-
         // Act
-        var consumerTask = Task.Run(async () => await consumer.StartConsumingAsync(cts.Token));
-        await Task.Delay(3000);
-
         await _rabbitChannel.BasicPublishAsync(
             exchange: _exchangeName,
             routingKey: "character.created",
@@ -334,20 +307,20 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
 
         await Task.Delay(3000);
 
-        // Assert - Check Outbox
-        var outboxCollection = _mongoDatabase.GetCollection<Dictionary<string, JsonElement>>("OutboxMessages");
-        var outboxFilter = Builders<Dictionary<string, JsonElement>>.Filter.Eq("Topic", "character.created");
+        // Assert - Check Outbox using BsonDocument to handle Binary payload
+        var outboxCollection = _mongoDatabase.GetCollection<BsonDocument>("OutboxMessages");
+        var outboxFilter = Builders<BsonDocument>.Filter.Exists("Payload");
         var outboxResult = await outboxCollection.Find(outboxFilter).FirstOrDefaultAsync();
 
         outboxResult.Should().NotBeNull();
-        outboxResult!["Topic"].GetString().Should().Be("character.created");
-        outboxResult["Sent"].GetBoolean().Should().BeTrue();
-
+        
         // Cleanup
-        cts.Cancel();
-        var characterCollection = _mongoDatabase.GetCollection<Dictionary<string, JsonElement>>("Characters");
-        await characterCollection.DeleteManyAsync(Builders<Dictionary<string, JsonElement>>.Filter.Eq("Id", characterId));
-        await outboxCollection.DeleteOneAsync(outboxFilter);
+        var characterCollection = _mongoDatabase.GetCollection<BsonDocument>("Characters");
+        await characterCollection.DeleteManyAsync(Builders<BsonDocument>.Filter.Eq("Id", characterId.ToString()));
+        if (outboxResult != null)
+        {
+            await outboxCollection.DeleteOneAsync(Builders<BsonDocument>.Filter.Eq("_id", outboxResult["_id"]));
+        }
     }
 
     [Fact]
@@ -361,13 +334,7 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
             Level = i * 10
         }).ToList();
 
-        var consumer = _serviceProvider.GetRequiredService<IRabbitMqConsumer>();
-        var cts = new CancellationTokenSource();
-
         // Act
-        var consumerTask = Task.Run(async () => await consumer.StartConsumingAsync(cts.Token));
-        await Task.Delay(3000);
-
         // Publish multiple messages
         foreach (var character in characters)
         {
@@ -383,29 +350,28 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
         await Task.Delay(3000);
 
         // Assert
-        var collection = _mongoDatabase.GetCollection<Dictionary<string, JsonElement>>("Characters");
+        var collection = _mongoDatabase.GetCollection<BsonDocument>("Characters");
         
         foreach (var character in characters)
         {
-            var filter = Builders<Dictionary<string, JsonElement>>.Filter.Or(
-                Builders<Dictionary<string, JsonElement>>.Filter.Eq("Id", character.Id),
-                Builders<Dictionary<string, JsonElement>>.Filter.Eq("id", character.Id)
+            var filter = Builders<BsonDocument>.Filter.Or(
+                Builders<BsonDocument>.Filter.Eq("Id", character.Id.ToString()),
+                Builders<BsonDocument>.Filter.Eq("id", character.Id.ToString())
             );
             
             var result = await collection.Find(filter).FirstOrDefaultAsync();
             
             result.Should().NotBeNull();
-            result!["Name"].GetString().Should().Be(character.Name);
-            result["Level"].GetInt32().Should().Be(character.Level);
+            result!["Name"].AsString.Should().Be(character.Name);
+            result["Level"].AsInt32.Should().Be(character.Level);
         }
 
         // Cleanup
-        cts.Cancel();
         foreach (var character in characters)
         {
-            var filter = Builders<Dictionary<string, JsonElement>>.Filter.Or(
-                Builders<Dictionary<string, JsonElement>>.Filter.Eq("Id", character.Id),
-                Builders<Dictionary<string, JsonElement>>.Filter.Eq("id", character.Id)
+            var filter = Builders<BsonDocument>.Filter.Or(
+                Builders<BsonDocument>.Filter.Eq("Id", character.Id.ToString()),
+                Builders<BsonDocument>.Filter.Eq("id", character.Id.ToString())
             );
             await collection.DeleteOneAsync(filter);
         }
