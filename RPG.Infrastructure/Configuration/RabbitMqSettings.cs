@@ -1,4 +1,4 @@
-namespace RPG.Infrastructure.Rabbit;
+namespace RPG.Infrastructure.Configuration;
 
 public class RabbitMqSettings
 {

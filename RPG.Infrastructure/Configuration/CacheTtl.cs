@@ -1,4 +1,4 @@
-namespace RPG.Infrastructure.Redis;
+namespace RPG.Infrastructure.Configuration;
 
 /// <summary>
 /// Predefiniowane strategie TTL dla różnych typów danych w Redis.

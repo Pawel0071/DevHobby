@@ -4,7 +4,8 @@ using Moq;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RPG.Infrastructure.Interfaces;
-using RPG.Infrastructure.Rabbit;
+using RPG.Infrastructure.Configuration;
+using RPG.Infrastructure.Repositories.RabbitMQ;
 
 namespace RPG.UnitTest.Infrastructure;
 

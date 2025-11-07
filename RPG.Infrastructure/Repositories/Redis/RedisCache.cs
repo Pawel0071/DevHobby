@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using RPG.Infrastructure.Interfaces;
 using StackExchange.Redis;
 
-namespace RPG.Infrastructure.Redis;
+namespace RPG.Infrastructure.Repositories.Redis;
 
 public class RedisCache : IRedisCache
 {

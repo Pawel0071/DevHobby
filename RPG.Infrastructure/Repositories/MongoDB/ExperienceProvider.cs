@@ -2,9 +2,8 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using RPG.Domain.Interfaces;
 using RPG.Infrastructure.Interfaces;
-using RPG.Infrastructure.Logger;
 
-namespace RPG.Core.Infrastructure.Repositories;
+namespace RPG.Infrastructure.Repositories.MongoDB;
 
 public class ExperienceProvider : IExperienceProvider
 {

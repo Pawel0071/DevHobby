@@ -1,0 +1,100 @@
+using RPG.Domain.Common;
+using RPG.Domain.Containers;
+using RPG.Domain.Entities.Items;
+using RPG.Domain.Entities.Items.ItemComponent;
+using RPG.Domain.Enums;
+using RPG.Infrastructure.Documents;
+using RPG.Infrastructure.Interfaces;
+
+namespace RPG.Infrastructure.Mappers;
+
+/// <summary>
+/// Mapper for converting between Item domain entity and ItemDocument
+/// </summary>
+public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
+{
+    private readonly ItemTypeDefinition? _itemTypeDefinition;
+
+    public ItemDocumentMapper(ItemTypeDefinition? itemTypeDefinition = null)
+    {
+        _itemTypeDefinition = itemTypeDefinition;
+    }
+
+    public ItemDocument ToDocument(Item entity)
+    {
+        var doc = new ItemDocument
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            TypeCode = entity.TypeCode,
+            Rarity = entity.Rarity,
+            RequiredLevel = entity.RequiredLevel,
+            StackSize = entity.StackSize,
+            Tags = entity.Tags.ToList()
+        };
+
+        // Map components to document fields
+        if (entity.GetComponent<StatsComponent>() is { } stats)
+            if (stats.Stats != null)
+                doc.Modifiers = new Dictionary<StatsProperty, int>(stats.Stats.Stats);
+
+        if (entity.GetComponent<SocketComponent>() is { } socket)
+            doc.SocketNo = socket.SocketNo;
+
+        if (entity.GetComponent<SkillGrantComponent>() is { } skills)
+            doc.SkillIds = skills.SkillIds.ToList();
+
+        if (entity.GetComponent<QuestItemComponent>() is { } quest)
+        {
+            doc.QuestId = quest.QuestId;
+            doc.StepId = quest.StepId;
+        }
+
+        return doc;
+    }
+
+    public Item ToDomain(ItemDocument document)
+    {
+        var item = new Item(document.Id, document.TypeCode)
+        {
+            Name = document.Name,
+            Rarity = document.Rarity,
+            Tags = document.Tags != null ? new HashSet<string>(document.Tags) : new HashSet<string>(),
+            Components = new List<IItemComponent>(),
+            RequiredLevel = document.RequiredLevel,
+            StackSize = document.StackSize,
+        };
+
+        if (_itemTypeDefinition != null)
+        {
+            var required = _itemTypeDefinition.RequiredComponents ?? Enumerable.Empty<Type>();
+            var optional = _itemTypeDefinition.OptionalComponents ?? Enumerable.Empty<Type>();
+            
+            foreach (var type in required.Concat(optional))
+            {
+                var component = CreateComponent(type, document);
+                if (component != null)
+                    item.Components.Add(component);
+            }
+        }
+
+        return item;
+    }
+
+    private static IItemComponent? CreateComponent(Type type, ItemDocument doc)
+    {
+        if (type == typeof(StatsComponent) && doc.Modifiers is { Count: > 0 })
+            return new StatsComponent { Stats = new StatsContainer(new Dictionary<StatsProperty, int>(doc.Modifiers!)) };
+
+        if (type == typeof(SocketComponent) && doc.SocketNo.HasValue)
+            return new SocketComponent { SocketNo = doc.SocketNo.Value };
+
+        if (type == typeof(SkillGrantComponent) && doc.SkillIds is { Count: > 0 })
+            return new SkillGrantComponent { SkillIds = new List<Guid>(doc.SkillIds!) };
+
+        if (type == typeof(QuestItemComponent) && doc.QuestId.HasValue && doc.StepId.HasValue)
+            return new QuestItemComponent { QuestId = doc.QuestId.Value, StepId = doc.StepId.Value };
+
+        return null;
+    }
+}

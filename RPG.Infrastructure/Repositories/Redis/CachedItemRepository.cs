@@ -5,7 +5,7 @@ using RPG.Domain.Interfaces;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 
-namespace RPG.Infrastructure.Repositories;
+namespace RPG.Infrastructure.Repositories.Redis;
 
 public class CachedItemRepository : IItemRepository
 {

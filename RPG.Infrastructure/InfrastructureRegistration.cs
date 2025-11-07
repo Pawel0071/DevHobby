@@ -6,13 +6,15 @@ using RabbitMQ.Client;
 using RPG.Domain.Common;
 using RPG.Domain.Entities.Items;
 using RPG.Infrastructure.Common;
+using RPG.Infrastructure.Configuration;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Logger;
 using RPG.Infrastructure.Outbox;
-using RPG.Infrastructure.Rabbit;
-using RPG.Infrastructure.Redis;
-using RPG.Infrastructure.Repositories;
+using RPG.Infrastructure.Repositories.MongoDB;
+using RPG.Infrastructure.Repositories.RabbitMQ;
+using RPG.Infrastructure.Repositories.Redis;
+using RPG.Infrastructure.Services;
 using Serilog;
 using StackExchange.Redis;
 

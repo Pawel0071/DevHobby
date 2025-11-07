@@ -1,9 +1,10 @@
 using MongoDB.Driver;
 using PersistenceService;
 using RabbitMQ.Client;
+using RPG.Infrastructure.Configuration;
 using RPG.Infrastructure.Interfaces;
-using RPG.Infrastructure.Rabbit;
-using RPG.Infrastructure.Repositories;
+using RPG.Infrastructure.Repositories.MongoDB;
+using RPG.Infrastructure.Repositories.RabbitMQ;
 using RPG.PersistenceService.Adapters;
 using RPG.PersistenceService.Service;
 using Serilog;

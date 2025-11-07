@@ -1,4 +1,4 @@
-namespace RPG.Infrastructure.Redis;
+namespace RPG.Infrastructure.Common;
 
 /// <summary>
 /// Centralna klasa do budowania kluczy Redis z prefiksami i konwencją nazewnictwa.

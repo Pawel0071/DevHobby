@@ -1,7 +1,8 @@
 using FluentAssertions;
 using MongoDB.Driver;
 using Moq;
-using RPG.Infrastructure.Repositories;
+using RPG.Infrastructure.Repositories.MongoDB;
+using RPG.Infrastructure.Repositories.Redis;
 
 namespace RPG.UnitTest.Infrastructure;
 

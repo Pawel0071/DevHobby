@@ -1,7 +1,9 @@
 using FluentAssertions;
 using Moq;
 using RPG.Infrastructure.Interfaces;
-using RPG.Infrastructure.Redis;
+using RPG.Infrastructure.Configuration;
+using RPG.Infrastructure.Repositories.Redis;
+using RPG.Infrastructure.Services;
 using StackExchange.Redis;
 
 namespace RPG.UnitTest.Infrastructure;

@@ -1,7 +1,8 @@
 using MongoDB.Driver;
+using RPG.Domain.Common;
 using RPG.Infrastructure.Interfaces;
 
-namespace RPG.Infrastructure.Repositories;
+namespace RPG.Infrastructure.Repositories.MongoDB;
 
 public class MongoDictionaryRepository<T> : IDictionaryRepository<T>
 {

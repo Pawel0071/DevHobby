@@ -1,6 +1,6 @@
 using RPG.Infrastructure.Interfaces;
 
-namespace RPG.Infrastructure.Rabbit;
+namespace RPG.Infrastructure.Repositories.RabbitMQ;
 
 /// <summary>
 /// Null Object Pattern - używany gdy RabbitMQ nie jest skonfigurowany.

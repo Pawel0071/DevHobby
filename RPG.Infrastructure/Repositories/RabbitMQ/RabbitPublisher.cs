@@ -1,9 +1,10 @@
+using RPG.Infrastructure.Configuration;
 using System.Text;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RPG.Infrastructure.Interfaces;
 
-namespace RPG.Infrastructure.Rabbit;
+namespace RPG.Infrastructure.Repositories.RabbitMQ;
 
 public class RabbitPublisher : IRabbitPublisher
 {

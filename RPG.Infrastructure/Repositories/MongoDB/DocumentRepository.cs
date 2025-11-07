@@ -3,7 +3,7 @@ using MongoDB.Driver;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 
-namespace RPG.Infrastructure.Repositories;
+namespace RPG.Infrastructure.Repositories.MongoDB;
 
 public class DocumentRepository : IDocumentRepository
 {

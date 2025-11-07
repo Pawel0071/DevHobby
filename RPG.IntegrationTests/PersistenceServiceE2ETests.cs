@@ -6,7 +6,9 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using RabbitMQ.Client;
 using RPG.Infrastructure.Interfaces;
-using RPG.Infrastructure.Rabbit;
+using RPG.Infrastructure.Configuration;
+using RPG.Infrastructure.Repositories.MongoDB;
+using RPG.Infrastructure.Repositories.RabbitMQ;
 using RPG.Infrastructure.Repositories;
 using RPG.PersistenceService.Adapters;
 

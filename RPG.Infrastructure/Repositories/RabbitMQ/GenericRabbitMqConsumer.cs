@@ -1,10 +1,11 @@
+using RPG.Infrastructure.Configuration;
 using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RPG.Infrastructure.Interfaces;
 
-namespace RPG.Infrastructure.Rabbit;
+namespace RPG.Infrastructure.Repositories.RabbitMQ;
 
 public class GenericRabbitMqConsumer : IRabbitMqConsumer
 {
