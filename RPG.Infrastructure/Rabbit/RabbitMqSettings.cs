@@ -11,4 +11,6 @@ public class RabbitMqSettings
     // Exchange and Queue configuration
     public string ExchangeName { get; set; } = "rpg_exchange";
     public string ExchangeType { get; set; } = "topic";
+    public string? QueueName { get; set; }
+    public string? RoutingKey { get; set; }
 }

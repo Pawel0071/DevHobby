@@ -12,6 +12,9 @@
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
         <PackageReference Include="MongoDB.Driver" Version="2.19.0" />
         <PackageReference Include="RabbitMQ.Client" Version="7.1.2" />
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.1-dev-00953" />
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -21,6 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\RPG.Core\RPG.Core.csproj" />
+      <ProjectReference Include="..\RPG.Infrastructure\RPG.Infrastructure.csproj" />
     </ItemGroup>
 </Project>

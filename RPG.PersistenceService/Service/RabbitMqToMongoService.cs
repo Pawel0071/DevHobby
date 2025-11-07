@@ -1,29 +1,24 @@
-using System.Text;
-using System.Text.Json;
-using MongoDB.Driver;
-using RabbitMQ.Client;
-using RPG.Domain.Entities;
+using Microsoft.Extensions.Logging;
+using RPG.Infrastructure.Interfaces;
 
 namespace RPG.PersistenceService.Service;
 
 public class RabbitMqToMongoService : IRabbitMqToMongoService
 {
-    private IMongoCollection<Character> _mongoCollection;
-    private readonly IChannel _rabbitChannel;
-    private const string ExchangeName = "rpg_exchange";
-    private const string QueueName = "rpg_queue";
-    
-    public RabbitMqToMongoService(IMongoCollection<Character> mongoCollection, IChannel rabbitChannel)
+    private readonly IRabbitMqConsumer _rabbitConsumer;
+    private readonly Microsoft.Extensions.Logging.ILogger<RabbitMqToMongoService> _logger;
+
+    public RabbitMqToMongoService(
+        IRabbitMqConsumer rabbitConsumer,
+        Microsoft.Extensions.Logging.ILogger<RabbitMqToMongoService> logger)
     {
-        _mongoCollection = mongoCollection;
-        _rabbitChannel = rabbitChannel;
+        _rabbitConsumer = rabbitConsumer;
+        _logger = logger;
     }
 
-
-    
-
-    public void StartListening()
+    public async Task StartListeningAsync()
     {
+        _logger.LogInformation("Starting RabbitMQ to MongoDB service");
+        await _rabbitConsumer.StartConsumingAsync();
     }
-
 }
