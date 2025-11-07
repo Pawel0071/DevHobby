@@ -14,14 +14,18 @@ namespace RPG.Infrastructure.Mappers;
 public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
 {
     private readonly ItemTypeDefinition? _itemTypeDefinition;
+    private readonly ILogger<ItemDocumentMapper>? _logger;
 
-    public ItemDocumentMapper(ItemTypeDefinition? itemTypeDefinition = null)
+    public ItemDocumentMapper(ItemTypeDefinition? itemTypeDefinition = null, ILogger<ItemDocumentMapper>? logger = null)
     {
         _itemTypeDefinition = itemTypeDefinition;
+        _logger = logger;
     }
 
     public ItemDocument ToDocument(Item entity)
     {
+        _logger?.Debug($"Converting Item to ItemDocument. Id={entity.Id}, Type={entity.TypeCode}");
+        
         var doc = new ItemDocument
         {
             Id = entity.Id,
@@ -50,11 +54,14 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
             doc.StepId = quest.StepId;
         }
 
+        _logger?.Debug($"ItemDocument created. Id={doc.Id}, Components mapped: Stats={doc.Modifiers?.Count > 0}, Sockets={doc.SocketNo > 0}, Skills={doc.SkillIds?.Count > 0}");
         return doc;
     }
 
     public Item ToDomain(ItemDocument document)
     {
+        _logger?.Debug($"Converting ItemDocument to Item. Id={document.Id}, Type={document.TypeCode}");
+        
         var item = new Item(document.Id, document.TypeCode)
         {
             Name = document.Name,
@@ -78,6 +85,7 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
             }
         }
 
+        _logger?.Debug($"Item domain entity created. Id={item.Id}, Components={item.Components.Count}");
         return item;
     }
 

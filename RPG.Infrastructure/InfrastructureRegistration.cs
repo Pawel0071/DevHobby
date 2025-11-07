@@ -70,7 +70,11 @@ public static class InfrastructureRegistration
         else
         {
             // Null object pattern when RabbitMQ is not configured
-            services.AddSingleton<IRabbitPublisher>(sp => new NullRabbitPublisher());
+            services.AddSingleton<IRabbitPublisher>(sp => 
+            {
+                var logger = sp.GetService<ILogger<NullRabbitPublisher>>();
+                return new NullRabbitPublisher(logger);
+            });
         }
         
         services.AddScoped<IDictionaryRepository<ItemTagDefinition>, MongoDictionaryRepository<ItemTagDefinition>>();
