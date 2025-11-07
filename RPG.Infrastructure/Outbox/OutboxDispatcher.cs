@@ -8,7 +8,7 @@ namespace RPG.Infrastructure.Outbox;
 public class OutboxDispatcher : BackgroundService
 {
     private readonly IMongoCollection<OutboxMessage> _outbox;
-    private readonly IRabbitPublisher _publisher;
+    private readonly IRabbitMqPublisher _publisher;
     private readonly ILogger<OutboxDispatcher> _logger;
     private const int BatchSize = 10;
     private const int RetryDelaySeconds = 5;
@@ -16,7 +16,7 @@ public class OutboxDispatcher : BackgroundService
 
     public OutboxDispatcher(
         IMongoCollection<OutboxMessage> outbox,
-        IRabbitPublisher publisher,
+        IRabbitMqPublisher publisher,
         ILogger<OutboxDispatcher> logger)
     {
         _outbox = outbox;

@@ -88,7 +88,7 @@ try
 
     // Infrastructure services
     builder.Services.AddSingleton<IDocumentRepository, DocumentRepository>();
-    builder.Services.AddSingleton<IRabbitMqConsumer, GenericRabbitMqConsumer>();
+    builder.Services.AddSingleton<IRabbitMqConsumer, RabbitMqConsumer>();
 
     // Application service
     builder.Services.AddSingleton<IRabbitMqToMongoService, RabbitMqToMongoService>();

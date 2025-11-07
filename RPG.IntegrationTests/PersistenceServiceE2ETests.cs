@@ -54,7 +54,7 @@ public class PersistenceServiceE2ETests : IClassFixture<TestContainersFixture>, 
         
         // Infrastructure services
         services.AddSingleton<IDocumentRepository, DocumentRepository>();
-        services.AddSingleton<IRabbitMqConsumer, GenericRabbitMqConsumer>();
+        services.AddSingleton<IRabbitMqConsumer, RabbitMqConsumer>();
         
         _serviceProvider = services.BuildServiceProvider();
     }

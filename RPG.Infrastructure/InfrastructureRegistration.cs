@@ -65,15 +65,15 @@ public static class InfrastructureRegistration
                 return connection.CreateChannelAsync().GetAwaiter().GetResult();
             });
 
-            services.AddSingleton<IRabbitPublisher, RabbitPublisher>();
+            services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
         }
         else
         {
             // Null object pattern when RabbitMQ is not configured
-            services.AddSingleton<IRabbitPublisher>(sp => 
+            services.AddSingleton<IRabbitMqPublisher>(sp => 
             {
-                var logger = sp.GetService<ILogger<NullRabbitPublisher>>();
-                return new NullRabbitPublisher(logger);
+                var logger = sp.GetService<ILogger<NullRabbitMqPublisher>>();
+                return new NullRabbitMqPublisher(logger);
             });
         }
         

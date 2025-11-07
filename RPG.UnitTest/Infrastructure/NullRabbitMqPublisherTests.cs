@@ -5,26 +5,26 @@ using RPG.Infrastructure.Repositories.RabbitMQ;
 
 namespace RPG.UnitTest.Infrastructure;
 
-public class NullRabbitPublisherTests
+public class NullRabbitMqPublisherTests
 {
     [Fact]
     public void Constructor_ShouldLogInitialization_WhenLoggerProvided()
     {
         // Arrange
-        var mockLogger = new Mock<ILogger<NullRabbitPublisher>>();
+        var mockLogger = new Mock<ILogger<NullRabbitMqPublisher>>();
 
         // Act
-        var publisher = new NullRabbitPublisher(mockLogger.Object);
+        var publisher = new NullRabbitMqPublisher(mockLogger.Object);
 
         // Assert
-        mockLogger.Verify(x => x.Info(It.Is<string>(s => s.Contains("NullRabbitPublisher initialized"))), Times.Once);
+        mockLogger.Verify(x => x.Info(It.Is<string>(s => s.Contains("NullRabbitMqPublisher initialized"))), Times.Once);
     }
 
     [Fact]
     public void Constructor_ShouldNotThrow_WhenLoggerIsNull()
     {
         // Act
-        var act = () => new NullRabbitPublisher(null);
+        var act = () => new NullRabbitMqPublisher(null);
 
         // Assert
         act.Should().NotThrow();
@@ -34,7 +34,7 @@ public class NullRabbitPublisherTests
     public async Task PublishAsync_ShouldNotThrow()
     {
         // Arrange
-        var publisher = new NullRabbitPublisher();
+        var publisher = new NullRabbitMqPublisher();
         var message = new { Id = 1, Name = "Test" };
 
         // Act
@@ -48,8 +48,8 @@ public class NullRabbitPublisherTests
     public async Task PublishAsync_ShouldLogDebugMessage_WhenLoggerProvided()
     {
         // Arrange
-        var mockLogger = new Mock<ILogger<NullRabbitPublisher>>();
-        var publisher = new NullRabbitPublisher(mockLogger.Object);
+        var mockLogger = new Mock<ILogger<NullRabbitMqPublisher>>();
+        var publisher = new NullRabbitMqPublisher(mockLogger.Object);
         var message = new { Id = 1, Name = "Test" };
 
         // Act
@@ -64,7 +64,7 @@ public class NullRabbitPublisherTests
     public async Task PublishAsync_ShouldCompleteImmediately()
     {
         // Arrange
-        var publisher = new NullRabbitPublisher();
+        var publisher = new NullRabbitMqPublisher();
 
         // Act
         var startTime = DateTime.UtcNow;
@@ -79,7 +79,7 @@ public class NullRabbitPublisherTests
     public async Task PublishAsync_ShouldHandleNullMessage()
     {
         // Arrange
-        var publisher = new NullRabbitPublisher();
+        var publisher = new NullRabbitMqPublisher();
 
         // Act
         var act = async () => await publisher.PublishAsync<object?>("topic", null);

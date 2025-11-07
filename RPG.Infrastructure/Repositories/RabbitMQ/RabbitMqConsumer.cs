@@ -7,20 +7,23 @@ using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Infrastructure.Repositories.RabbitMQ;
 
-public class GenericRabbitMqConsumer : IRabbitMqConsumer
+/// <summary>
+/// RabbitMQ consumer for processing messages and persisting to MongoDB.
+/// </summary>
+public class RabbitMqConsumer : IRabbitMqConsumer
 {
     private readonly IChannel _channel;
     private readonly IDocumentRepository _documentRepository;
-    private readonly Interfaces.ILogger<GenericRabbitMqConsumer> _logger;
+    private readonly Interfaces.ILogger<RabbitMqConsumer> _logger;
     private readonly string _exchangeName;
     private readonly string _queueName;
     private readonly string _routingKey;
     private string? _consumerTag;
 
-    public GenericRabbitMqConsumer(
+    public RabbitMqConsumer(
         IChannel channel,
         IDocumentRepository documentRepository,
-        Interfaces.ILogger<GenericRabbitMqConsumer> logger,
+        Interfaces.ILogger<RabbitMqConsumer> logger,
         RabbitMqSettings settings)
     {
         _channel = channel;
