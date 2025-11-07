@@ -39,37 +39,37 @@ public static class InfrastructureRegistration
             ConnectionMultiplexer.Connect(redisConn!));
         services.AddSingleton<IRedisCache, RedisCache>();
 
-        services.AddSingleton<Task<IConnection>>(async sp =>
+        // RabbitMQ
+        if (rabbitConfig?.Host != null)
         {
-            if (rabbitConfig?.Host != null)
+            services.AddSingleton(rabbitConfig);
+            
+            services.AddSingleton<IConnection>(sp =>
             {
                 var factory = new ConnectionFactory
                 {
-                    HostName = rabbitConfig!.Host,
-                    Port = rabbitConfig!.Port,
+                    HostName = rabbitConfig.Host,
+                    Port = rabbitConfig.Port,
                     UserName = rabbitConfig.Username,
                     Password = rabbitConfig.Password,
                     VirtualHost = rabbitConfig.VirtualHost
                 };
-                return await factory.CreateConnectionAsync();
-            }
+                return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+            });
 
-            return null!;
-        });
+            services.AddSingleton<IChannel>(sp =>
+            {
+                var connection = sp.GetRequiredService<IConnection>();
+                return connection.CreateChannelAsync().GetAwaiter().GetResult();
+            });
 
-        services.AddSingleton<Task<IChannel>>(async sp =>
+            services.AddSingleton<IRabbitPublisher, RabbitPublisher>();
+        }
+        else
         {
-            var connection = await sp.GetRequiredService<Task<IConnection>>();
-            return await connection.CreateChannelAsync();
-        });
-
-        services.AddSingleton<IRabbitPublisher>(sp =>
-        {
-            var channelTask = sp.GetRequiredService<Task<IChannel>>();
-            var channel = channelTask.GetAwaiter().GetResult(); // wymuszenie synchronizacji
-            var logger = sp.GetRequiredService<ILogger<RabbitPublisher>>();
-            return new RabbitPublisher(channel, logger);
-        });
+            // Null object pattern when RabbitMQ is not configured
+            services.AddSingleton<IRabbitPublisher>(sp => new NullRabbitPublisher());
+        }
         
         services.AddScoped<IDictionaryRepository<ItemTagDefinition>, MongoDictionaryRepository<ItemTagDefinition>>();
         services.AddScoped<IDictionaryRepository<ErrorCodeDefinition>, MongoDictionaryRepository<ErrorCodeDefinition>>();
@@ -80,15 +80,33 @@ public static class InfrastructureRegistration
         services.AddSingleton<IDictionaryRegistry<ItemTypeDefinition>, DictionaryRegistry<ItemTypeDefinition>>();
         
         // MongoDB
+        services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConn));
+        services.AddSingleton<IMongoDatabase>(sp =>
+        {
+            var client = sp.GetRequiredService<IMongoClient>();
+            return client.GetDatabase("rpg");
+        });
+        
         services.AddSingleton<IMongoCollection<ItemDocument>>(sp =>
         {
-            var client = new MongoClient(mongoConn);
-            var db = client.GetDatabase("rpg");
+            var db = sp.GetRequiredService<IMongoDatabase>();
             return db.GetCollection<ItemDocument>(ItemDocument.ItemCollection);
+        });
+        
+        services.AddSingleton<IMongoCollection<OutboxMessage>>(sp =>
+        {
+            var db = sp.GetRequiredService<IMongoDatabase>();
+            return db.GetCollection<OutboxMessage>("OutboxMessages");
         });
 
         services.AddSingleton<IHostedService, DictionaryWarmupService>();
         services.AddHostedService<OutboxDispatcher>();
+        
+        // Health Checks
+        services.AddHealthChecks()
+            .AddCheck<RPG.Infrastructure.HealthChecks.MongoHealthCheck>("mongodb")
+            .AddCheck<RPG.Infrastructure.HealthChecks.RedisHealthCheck>("redis")
+            .AddCheck<RPG.Infrastructure.HealthChecks.RabbitMqHealthCheck>("rabbitmq");
         
         return services;
     }

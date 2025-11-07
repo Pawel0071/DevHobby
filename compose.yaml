@@ -1,94 +1,26 @@
-﻿version: '3.8'
+version: '3.8'
 
 services:
-  rpg.persistenceservice:
-    image: rpg.persistenceservice
-    build:
-      context: .
-      dockerfile: RPG.PersistenceService/Dockerfile
-    environment:
-      MONGO_URI: mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_PORT: 5672
-      RABBITMQ_USER: rabbit_user
-      RABBITMQ_PASS: rabbit_pass
-    depends_on:
-      - redis
-      - mongodb
-      - rabbitmq
-    networks:
-      - backend
-
-  redis.wormup:
-    image: redis.wormup
-    build:
-      context: .
-      dockerfile: RedisWormUp/Dockerfile
-    environment:
-      MONGO_URI: mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-    depends_on:
-      - redis
-      - mongodb
-    networks:
-      - backend
-
-  circuitbreaker:
-    image: circuitbreaker
-    build:
-      context: .
-      dockerfile: CricuitBraker/Dockerfile
-    environment:
-      MONGO_URI: mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_PORT: 5672
-      RABBITMQ_USER: rabbit_user
-      RABBITMQ_PASS: rabbit_pass
-    depends_on:
-      - redis
-      - mongodb
-      - rabbitmq
-    networks:
-      - backend
-
+  # Infrastructure Services
   mongodb:
-    image: mongo:latest
+    image: mongodb/mongodb-community-server:latest
     container_name: mongodb
     ports:
       - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongo_user
       MONGO_INITDB_ROOT_PASSWORD: mongo_pass
+      MONGO_INITDB_DATABASE: rpgdb
     volumes:
       - mongodb_data:/data/db
     networks:
       - backend
-
-  rabbitmq:
-    image: rabbitmq:management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: rabbit_user
-      RABBITMQ_DEFAULT_PASS: rabbit_pass
-    networks:
-      - backend
-    command: >
-      sh -c "rabbitmq-plugins enable rabbitmq_management && \
-      rabbitmqctl add_vhost rpg_vhost && \
-      rabbitmqctl set_permissions -p rpg_vhost rabbit_user ".*" ".*" ".*" && \
-      rabbitmqctl add_user rpg_user rpg_pass && \
-      rabbitmqctl set_permissions -p rpg_vhost rpg_user ".*" ".*" ".*" && \
-      rabbitmqadmin declare exchange name=rpg_exchange type=topic durable=true && \
-      rabbitmqadmin declare queue name=character_queue durable=true && \
-      rabbitmqadmin declare binding source=rpg_exchange destination=character_queue routing_key=character.*"
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/rpgdb --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   redis:
     image: redis:latest
@@ -97,15 +29,121 @@ services:
       - "6379:6379"
     networks:
       - backend
-    command: >
-      sh -c "redis-server --appendonly yes && \
-      redis-cli set character:default \"{\\\"id\\\":\\\"default\\\",\\\"name\\\":\\\"Default Character\\\"}\" && \
-      redis-cli set event:character.created \"{\\\"event\\\":\\\"character.created\\\",\\\"data\\\":\\\"default\\\"}\""
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - redis_data:/data
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit_user
+      RABBITMQ_DEFAULT_PASS: rabbit_pass
+      RABBITMQ_DEFAULT_VHOST: rpg_vhost
+    networks:
+      - backend
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  # Application Services
+  redis.warmup:
+    image: redis.warmup
+    container_name: redis_warmup
+    build:
+      context: .
+      dockerfile: RedisWormUp/Dockerfile
+    environment:
+      ConnectionStrings__Mongo: "mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb?authSource=admin"
+      ConnectionStrings__Redis: "redis:6379"
+      ASPNETCORE_ENVIRONMENT: Production
+    depends_on:
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: on-failure
+
+  circuitbreaker:
+    image: circuitbreaker
+    container_name: circuitbreaker
+    build:
+      context: .
+      dockerfile: CricuitBraker/Dockerfile
+    environment:
+      ConnectionStrings__Mongo: "mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb?authSource=admin"
+      ConnectionStrings__Redis: "redis:6379"
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__Username: rabbit_user
+      RabbitMQ__Password: rabbit_pass
+      RabbitMQ__VirtualHost: rpg_vhost
+      RabbitMQ__ExchangeName: rpg_exchange
+      RabbitMQ__ExchangeType: topic
+      ASPNETCORE_ENVIRONMENT: Production
+    depends_on:
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: on-failure
+
+  persistence.service:
+    image: persistence.service
+    container_name: persistence_service
+    build:
+      context: .
+      dockerfile: RPG.PersistenceService/Dockerfile
+    environment:
+      ConnectionStrings__Mongo: "mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb?authSource=admin"
+      ConnectionStrings__Redis: "redis:6379"
+      RabbitMQ__Host: rabbitmq
+      RabbitMQ__Port: 5672
+      RabbitMQ__Username: rabbit_user
+      RabbitMQ__Password: rabbit_pass
+      RabbitMQ__VirtualHost: rpg_vhost
+      RabbitMQ__ExchangeName: rpg_exchange
+      RabbitMQ__ExchangeType: topic
+      ASPNETCORE_ENVIRONMENT: Production
+    depends_on:
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: on-failure
 
 volumes:
   mongodb_data:
+    driver: local
+  redis_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
 
 networks:
   backend:
     driver: bridge
-

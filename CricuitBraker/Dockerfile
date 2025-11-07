@@ -1,5 +1,4 @@
 ﻿FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
-USER $APP_UID
 WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
@@ -9,11 +8,11 @@ COPY ["CricuitBraker/CricuitBraker.csproj", "CricuitBraker/"]
 RUN dotnet restore "CricuitBraker/CricuitBraker.csproj"
 COPY . .
 WORKDIR "/src/CricuitBraker"
-RUN dotnet build "./CricuitBraker.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "CricuitBraker.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./CricuitBraker.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "CricuitBraker.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

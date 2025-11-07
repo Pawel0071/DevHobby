@@ -1,0 +1,111 @@
+﻿version: '3.8'
+
+services:
+  rpg.persistenceservice:
+    image: rpg.persistenceservice
+    build:
+      context: .
+      dockerfile: RPG.PersistenceService/Dockerfile
+    environment:
+      MONGO_URI: mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: rabbit_user
+      RABBITMQ_PASS: rabbit_pass
+    depends_on:
+      - redis
+      - mongodb
+      - rabbitmq
+    networks:
+      - backend
+
+  redis.wormup:
+    image: redis.wormup
+    build:
+      context: .
+      dockerfile: RedisWormUp/Dockerfile
+    environment:
+      MONGO_URI: mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      - redis
+      - mongodb
+    networks:
+      - backend
+
+  circuitbreaker:
+    image: circuitbreaker
+    build:
+      context: .
+      dockerfile: CricuitBraker/Dockerfile
+    environment:
+      MONGO_URI: mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: rabbit_user
+      RABBITMQ_PASS: rabbit_pass
+    depends_on:
+      - redis
+      - mongodb
+      - rabbitmq
+    networks:
+      - backend
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo_user
+      MONGO_INITDB_ROOT_PASSWORD: mongo_pass
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbit_user
+      RABBITMQ_DEFAULT_PASS: rabbit_pass
+    networks:
+      - backend
+    command: >
+      sh -c "rabbitmq-plugins enable rabbitmq_management && \
+      rabbitmqctl add_vhost rpg_vhost && \
+      rabbitmqctl set_permissions -p rpg_vhost rabbit_user ".*" ".*" ".*" && \
+      rabbitmqctl add_user rpg_user rpg_pass && \
+      rabbitmqctl set_permissions -p rpg_vhost rpg_user ".*" ".*" ".*" && \
+      rabbitmqadmin declare exchange name=rpg_exchange type=topic durable=true && \
+      rabbitmqadmin declare queue name=character_queue durable=true && \
+      rabbitmqadmin declare binding source=rpg_exchange destination=character_queue routing_key=character.*"
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+    command: >
+      sh -c "redis-server --appendonly yes && \
+      redis-cli set character:default \"{\\\"id\\\":\\\"default\\\",\\\"name\\\":\\\"Default Character\\\"}\" && \
+      redis-cli set event:character.created \"{\\\"event\\\":\\\"character.created\\\",\\\"data\\\":\\\"default\\\"}\""
+
+volumes:
+  mongodb_data:
+
+networks:
+  backend:
+    driver: bridge
+

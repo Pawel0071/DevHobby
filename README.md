@@ -108,8 +108,33 @@ W CI testy uruchamiane są w konfiguracji Release.
 ## Integracje zewnętrzne
 - MongoDB — repozytoria i kolekcje rejestrowane w `RPG.Infrastructure`
 - Redis — `IRedisCache` i implementacja `RedisCache`
+  - **CacheKeyBuilder** — centralna klasa do budowania kluczy z prefiksami (np. `char:guid`, `item:id`)
+  - **CacheTtl** — strategie TTL (Short/Medium/Long/Permanent)
 - RabbitMQ — publisher i kanały konfiguracji
+  - **NullRabbitPublisher** — Null Object Pattern gdy RabbitMQ nie jest skonfigurowany
+  - **OutboxDispatcher** — reliable messaging z retry mechanism (max 3 próby)
 - W testach jednostkowych integracje są mockowane (bez zależności od zewnętrznych serwisów)
+
+### Health Checks
+Projekt `RPG.Infrastructure` dostarcza health checks dla:
+- MongoDB (`MongoHealthCheck`)
+- Redis (`RedisHealthCheck`)
+- RabbitMQ (`RabbitMqHealthCheck`)
+
+Aby włączyć endpoint health checks w aplikacji:
+```csharp
+// Program.cs
+builder.Services.AddInfrastructure(builder.Configuration);
+var app = builder.Build();
+app.MapHealthChecks("/health");
+```
+
+Sprawdzenie stanu:
+```bash
+curl http://localhost:5000/health
+```
+
+📝 **Szczegółowa dokumentacja zmian w Infrastructure:** zobacz `INFRASTRUCTURE_CHANGES.md`
 
 ## CI (GitHub Actions)
 Pipeline znajduje się w `.github/workflows/ci.yml` i wykonuje:

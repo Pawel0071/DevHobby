@@ -12,9 +12,14 @@ public class RabbitPublisherTests
 {
     private readonly Mock<IChannel> _channelMock = new();
     private readonly Mock<ILogger<RabbitPublisher>> _loggerMock = new();
+    private readonly RabbitMqSettings _settings = new()
+    {
+        Host = "localhost",
+        ExchangeName = "rpg_exchange"
+    };
 
     private RabbitPublisher CreatePublisher() =>
-        new RabbitPublisher(_channelMock.Object, _loggerMock.Object);
+        new RabbitPublisher(_channelMock.Object, _loggerMock.Object, _settings);
 
     [Fact]
     public async Task PublishAsync_ShouldPublishMessageAndLogInfo()
@@ -33,7 +38,7 @@ public class RabbitPublisherTests
         var invocation = _channelMock.Invocations
             .Single(i => i.Method.Name == nameof(IChannel.BasicPublishAsync));
 
-        invocation.Arguments[0].Should().Be("items"); // exchange
+        invocation.Arguments[0].Should().Be("rpg_exchange"); // exchange
         invocation.Arguments[1].Should().Be(topic); // routingKey
         invocation.Arguments[2].Should().Be(false); // mandatory
         invocation.Arguments[3].Should().NotBeNull(); // zamiast BeAssignableTo<IBasicProperties>
@@ -64,7 +69,7 @@ public class RabbitPublisherTests
 
         Console.WriteLine(invocation.Arguments[3].GetType().FullName);
 
-        invocation.Arguments[0].Should().Be("items"); // exchange
+        invocation.Arguments[0].Should().Be("rpg_exchange"); // exchange
         invocation.Arguments[1].Should().Be(topic); // routingKey
         invocation.Arguments[2].Should().Be(false); // mandatory
         invocation.Arguments[3].Should().NotBeNull(); // properties

@@ -9,11 +9,11 @@ namespace RPG.PersistenceService.Service;
 public class RabbitMqToMongoService : IRabbitMqToMongoService
 {
     private IMongoCollection<Character> _mongoCollection;
-    private readonly Task<IChannel> _rabbitChannel;
+    private readonly IChannel _rabbitChannel;
     private const string ExchangeName = "rpg_exchange";
     private const string QueueName = "rpg_queue";
     
-    public RabbitMqToMongoService(IMongoCollection<Character> mongoCollection, Task<IChannel> rabbitChannel)
+    public RabbitMqToMongoService(IMongoCollection<Character> mongoCollection, IChannel rabbitChannel)
     {
         _mongoCollection = mongoCollection;
         _rabbitChannel = rabbitChannel;

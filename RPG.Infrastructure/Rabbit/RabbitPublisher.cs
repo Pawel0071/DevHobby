@@ -9,11 +9,13 @@ public class RabbitPublisher : IRabbitPublisher
 {
     private readonly IChannel _channel;
     private readonly ILogger<RabbitPublisher> _logger;
+    private readonly string _exchangeName;
 
-    public RabbitPublisher(IChannel channel, ILogger<RabbitPublisher> logger)
+    public RabbitPublisher(IChannel channel, ILogger<RabbitPublisher> logger, RabbitMqSettings settings)
     {
         _channel = channel;
         _logger = logger;
+        _exchangeName = settings.ExchangeName;
     }
 
     public async Task PublishAsync<T>(string topic, T message)
@@ -26,7 +28,7 @@ public class RabbitPublisher : IRabbitPublisher
             _logger.Debug($"Publishing message to topic '{topic}': {json}");
 
             await _channel.BasicPublishAsync(
-                exchange: "items",
+                exchange: _exchangeName,
                 routingKey: topic,
                 mandatory: false,
                 body: body
