@@ -1,3 +1,4 @@
+using RPG.Domain.Entities;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
 
@@ -19,10 +20,4 @@ public record ItemPickupEvent(Guid CharacterId, Item Item);
 
 public record ItemDroppedEvent(Guid CharacterId, Item Item);
 
-public record StartMovementCommand(Guid CharacterId, int Direction);
-
-public record StopMovementCommand(Guid CharacterId);
-
-public record StartRotationCommand(Guid CharacterId, int Direction);
-
-public record StopRotationCommand(Guid CharacterId);
+public record CharacterMovedEvent(Guid CharacterId, Location Location);

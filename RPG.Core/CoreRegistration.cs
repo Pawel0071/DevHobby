@@ -4,6 +4,7 @@ using RPG.Core.Interfaces;
 using RPG.Core.Services.EquipmentService;
 using RPG.Core.Services.InventoryService;
 using RPG.Core.Services.LevelService;
+using RPG.Core.Services.MovementService;
 using RPG.Core.Services.SkillService;
 using RPG.Core.Services.StatsService;
 
@@ -18,6 +19,7 @@ public static class CoreRegistration
         services.AddSingleton<ISkillService, SkillService>();
         services.AddSingleton<IStatsService, StatsService>();
         services.AddSingleton<ILevelingService, LevelingService>();
+        services.AddSingleton<IMovementService, MovementService>();
         return services;
     }
 }

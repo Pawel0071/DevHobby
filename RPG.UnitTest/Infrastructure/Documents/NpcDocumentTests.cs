@@ -26,6 +26,9 @@ public class NpcDocumentTests
         document.Tags.Should().NotBeNull().And.BeEmpty();
         document.Components.Should().NotBeNull().And.BeEmpty();
         document.SpawnLocation.Should().NotBeNull();
+        document.CurrentLocation.Should().NotBeNull();
+        document.BaseStats.Should().NotBeNull().And.BeEmpty();
+        document.ModifiedStats.Should().NotBeNull().And.BeEmpty();
         document.DisplayName.Should().BeEmpty();
         document.Description.Should().BeEmpty();
     }
@@ -44,6 +47,17 @@ public class NpcDocumentTests
             Rotation = 90
         };
 
+        var currentLocation = new LocationData
+        {
+            X = 11,
+            Y = 21,
+            Z = 31,
+            WorldId = "world-2",
+            MapId = "map-43",
+            ZoneName = "combat-zone",
+            Rotation = 45
+        };
+
         var document = new NpcDocument
         {
             Id = Guid.NewGuid(),
@@ -53,12 +67,15 @@ public class NpcDocumentTests
             Level = 80,
             CurrentHealth = 5000,
             MaxHealth = 5000,
+            BaseStats = new Dictionary<string, int> { { "Strength", 100 } },
+            ModifiedStats = new Dictionary<string, int> { { "Strength", 120 } },
             Tags = new List<string> { "boss", "undead" },
             Components = new List<ComponentData>
             {
                 new() { Type = "ai", Data = "smart" }
             },
             SpawnLocation = location,
+            CurrentLocation = currentLocation,
             WorldId = Guid.NewGuid()
         };
 
@@ -71,5 +88,8 @@ public class NpcDocumentTests
         document.Components.Should().ContainSingle()
             .Which.Should().BeEquivalentTo(new ComponentData { Type = "ai", Data = "smart" });
         document.SpawnLocation.Should().BeSameAs(location);
+        document.CurrentLocation.Should().BeSameAs(currentLocation);
+        document.BaseStats.Should().ContainSingle().And.ContainKey("Strength").WhoseValue.Should().Be(100);
+        document.ModifiedStats.Should().ContainSingle().And.ContainKey("Strength").WhoseValue.Should().Be(120);
     }
 }

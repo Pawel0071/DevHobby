@@ -40,6 +40,9 @@ public class CharacterDocument : IMongoDocument
     public Dictionary<string, int> BaseStats { get; set; } = new();
     public Dictionary<string, int> ModifiedStats { get; set; } = new();
 
+    // Location
+    public LocationData Location { get; set; } = new();
+
     // Equipment (EquipmentSlot enum as string -> Item ID)
     public Dictionary<string, Guid> Equipment { get; set; } = new();
 

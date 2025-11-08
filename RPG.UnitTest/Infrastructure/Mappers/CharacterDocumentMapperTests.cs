@@ -1,3 +1,4 @@
+using System.Numerics;
 using FluentAssertions;
 using RPG.Domain.Entities;
 using RPG.Domain.Enums;
@@ -143,6 +144,65 @@ public class CharacterDocumentMapperTests
         document.Equipment.Should().NotBeNull();
         document.Skills.Should().NotBeNull();
         document.ActiveSkills.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void ToDocument_MapsLocation()
+    {
+        var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
+        {
+            Id = Guid.NewGuid(),
+            Name = "LocationHero"
+        };
+
+        var worldId = Guid.NewGuid();
+        var location = Location.Create(new Vector3(5, 1, -3), worldId, "Map-1", "Zone-9");
+        location.Rotation = 180f;
+        character.SetCurrentLocation(location);
+
+        var document = _mapper.ToDocument(character);
+
+        document.Location.X.Should().Be(5f);
+        document.Location.Y.Should().Be(1f);
+        document.Location.Z.Should().Be(-3f);
+        document.Location.WorldId.Should().Be(worldId.ToString());
+        document.Location.MapId.Should().Be("Map-1");
+        document.Location.ZoneName.Should().Be("Zone-9");
+        document.Location.Rotation.Should().Be(180f);
+    }
+
+    [Fact]
+    public void ToDomain_MapsLocation()
+    {
+        var worldId = Guid.NewGuid();
+        var document = new CharacterDocument
+        {
+            Id = Guid.NewGuid(),
+            Name = "MapperHero",
+            Class = CharacterClass.Mage.ToString(),
+            SessionId = Guid.NewGuid(),
+            PlayerId = Guid.NewGuid(),
+            Location = new LocationData
+            {
+                X = -2f,
+                Y = 0.5f,
+                Z = 9f,
+                WorldId = worldId.ToString(),
+                MapId = "Map-77",
+                ZoneName = "Dungeon",
+                Rotation = 90f
+            }
+        };
+
+        var character = _mapper.ToDomain(document);
+
+        character.CurrentLocation.Position.X.Should().Be(-2f);
+        character.CurrentLocation.Position.Y.Should().Be(0.5f);
+        character.CurrentLocation.Position.Z.Should().Be(9f);
+        character.CurrentLocation.WorldId.Should().Be(worldId);
+        character.CurrentLocation.MapId.Should().Be("Map-77");
+        character.CurrentLocation.ZoneName.Should().Be("Dungeon");
+        character.CurrentLocation.Rotation.Should().Be(90f);
     }
 }
 

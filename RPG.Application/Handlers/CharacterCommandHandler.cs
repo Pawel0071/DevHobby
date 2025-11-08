@@ -1,9 +1,11 @@
+using System.Numerics;
 using RPG.Application.Commands;
 using RPG.Application.Events;
 using RPG.Application.Interfaces;
 using RPG.Core.Application.Handlers;
 using RPG.Core.Interfaces;
 using RPG.Domain.Common;
+using RPG.Domain.Enums;
 using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Interfaces;
 using RPG.Infrastructure.Interfaces;
@@ -18,13 +20,16 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     ICommandHandler<DropItemCommand>,
     ICommandHandler<PickUpItemCommand>,
     ICommandHandler<GainExperienceCommand>,
-    ICommandHandler<LevelUpCommand>
+    ICommandHandler<LevelUpCommand>,
+    ICommandHandler<StartMovementCommand>
 
 {
+    private const float DefaultMovementDeltaSeconds = 1f;
     private readonly ICharacterRepository _characterRepo;
     private readonly IEquipmentService _equipmentService;
     private readonly IGameEventDispatcher _eventDispatcher;
     private readonly IInventoryService _inventoryService;
+    private readonly IMovementService _movementService;
     private readonly IStatsService _statsService;
     private readonly IDictionaryRegistry<TagDefinition> _tagRegistry;
 
@@ -33,6 +38,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         IInventoryService inventoryService,
         IEquipmentService equipmentService,
         IStatsService statsService,
+        IMovementService movementService,
         IGameEventDispatcher eventDispatcher,
     IDictionaryRegistry<TagDefinition> tagRegistry
     )
@@ -41,8 +47,35 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         _inventoryService = inventoryService;
         _equipmentService = equipmentService;
         _statsService = statsService;
+        _movementService = movementService;
         _eventDispatcher = eventDispatcher;
         _tagRegistry = tagRegistry;
+    }
+
+    public async Task<CommandResult> HandleAsync(StartMovementCommand command)
+    {
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+
+        if (!TryGetDirectionVector(command.Direction, out var direction))
+        {
+            return CommandResult.Fail(CommandError.InvalidOperation, "Niepoprawny kierunek ruchu.");
+        }
+
+        if (character.ModifiedStats.TryGetValue(StatsProperty.MoveSpeed, out var currentMoveSpeed) && currentMoveSpeed <= 0)
+        {
+            return CommandResult.Fail(CommandError.InvalidOperation, "Postać nie posiada prędkości ruchu.");
+        }
+
+        var moveResult = _movementService.Move(character, direction, DefaultMovementDeltaSeconds);
+        if (!moveResult.Success)
+        {
+            return CommandResult.Fail(CommandError.InvalidOperation, moveResult.Message, moveResult);
+        }
+
+        await _characterRepo.SaveAsync(character);
+        _eventDispatcher.Dispatch(new CharacterMovedEvent(command.CharacterId, character.CurrentLocation));
+
+        return CommandResult.Ok();
     }
 
     public async Task<CommandResult> HandleAsync(DropItemCommand command)
@@ -208,5 +241,23 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         if (result.Success) _eventDispatcher.Dispatch(new ItemUsedEvent(command.CharacterId, command.Item));
 
         return CommandResult.Ok();
+    }
+
+    private static bool TryGetDirectionVector(int direction, out Vector3 vector)
+    {
+        vector = direction switch
+        {
+            1 => new Vector3(0f, 0f, 1f), // forward
+            2 => new Vector3(1f, 0f, 1f), // forward-right
+            3 => new Vector3(1f, 0f, 0f), // right
+            4 => new Vector3(1f, 0f, -1f), // backward-right
+            5 => new Vector3(0f, 0f, -1f), // backward
+            6 => new Vector3(-1f, 0f, -1f), // backward-left
+            7 => new Vector3(-1f, 0f, 0f), // left
+            8 => new Vector3(-1f, 0f, 1f), // forward-left
+            _ => Vector3.Zero
+        };
+
+        return vector != Vector3.Zero;
     }
 }

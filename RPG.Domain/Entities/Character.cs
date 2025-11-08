@@ -25,6 +25,7 @@ public sealed class Character : IDomainEntity, IItemContainer, IStats, ILevel, I
         EquipmentContainer = new EquipmentContainer();
         BankStorageContainer = new InventoryContainer(20);
         BackpackInventoryContainer = new InventoryContainer(20);
+        CurrentLocation = new Location();
         Level = 1;
     }
 
@@ -62,6 +63,7 @@ public sealed class Character : IDomainEntity, IItemContainer, IStats, ILevel, I
     public int MaxHealth { get; set; }
     public int CurrentResource { get; set; }
     public int MaxResource { get; set; }
+    public Location CurrentLocation { get; private set; }
 
     // Container accessors for services
     public IInventoryContainer GetBankStorageContainer()
@@ -92,5 +94,10 @@ public sealed class Character : IDomainEntity, IItemContainer, IStats, ILevel, I
     public ISkillsContainer GetSkillsContainer()
     {
         return SkillsContainer;
+    }
+
+    public void SetCurrentLocation(Location location)
+    {
+        CurrentLocation = location ?? throw new ArgumentNullException(nameof(location));
     }
 }

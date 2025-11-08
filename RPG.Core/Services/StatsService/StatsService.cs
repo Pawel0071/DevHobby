@@ -9,6 +9,7 @@ namespace RPG.Core.Services.StatsService;
 
 public class StatsService : IStatsService
 {
+    private const int DefaultMoveSpeed = 5;
     private readonly ILogger<StatsService> _logger;
 
     public StatsService(ILogger<StatsService> logger)
@@ -56,6 +57,10 @@ public class StatsService : IStatsService
         character.BaseStats.CreateEmptyStats();
         var strategy = GetStrategyFor(character);
         strategy.Initialize(character);
+        if (character.BaseStats[StatsProperty.MoveSpeed] <= 0)
+        {
+            character.BaseStats[StatsProperty.MoveSpeed] = DefaultMoveSpeed;
+        }
         character.ModifiedStats.CopyStatsFrom(character.BaseStats);
 
         return StatsResult.Ok(new StatsContainer(character.BaseStats));

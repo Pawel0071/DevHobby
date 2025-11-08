@@ -43,6 +43,21 @@ public sealed class ErrorCodeDefinition : IDictionaryEntry<ErrorCodeDefinition>
         Code = "unique_equip_violation", Message = "Przedmiot może być założony tylko raz", Category = "Equipment"
     };
 
+    public static readonly ErrorCodeDefinition MovementInvalidDirection = new()
+    {
+        Code = "movement_invalid_direction", Message = "Niepoprawny kierunek ruchu", Category = "Movement"
+    };
+
+    public static readonly ErrorCodeDefinition MovementSpeedUnavailable = new()
+    {
+        Code = "movement_speed_unavailable", Message = "Brak ustalonej prędkości ruchu", Category = "Movement"
+    };
+
+    public static readonly ErrorCodeDefinition MovementDeltaInvalid = new()
+    {
+        Code = "movement_delta_invalid", Message = "Niepoprawny czas kroku ruchu", Category = "Movement"
+    };
+
     public static readonly ErrorCodeDefinition SkillRequirementLevelNotMet = new()
     {
         Code = "skill_level_requirement", Message = "Zbyt niski poziom postaci", Category = "Skill"
@@ -112,6 +127,9 @@ public sealed class ErrorCodeDefinition : IDictionaryEntry<ErrorCodeDefinition>
         SkillPrerequisiteMissing,
         SkillAlreadyKnown,
         SkillNotKnown,
-        SkillUnavailable
+        SkillUnavailable,
+        MovementInvalidDirection,
+        MovementSpeedUnavailable,
+        MovementDeltaInvalid
     ];
 }

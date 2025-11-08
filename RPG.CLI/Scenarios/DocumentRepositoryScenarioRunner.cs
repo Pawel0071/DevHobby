@@ -386,6 +386,9 @@ internal static class DocumentRepositoryScenarioFactory
                     RequiredClasses = new List<string> { nameof(CharacterClass.Warrior) }
                 });
                 var activationTime = DateTime.UtcNow;
+                var worldId = Guid.NewGuid();
+                var location = Location.Create(new Vector3(10, 2, 0), worldId, "cli-map", "training-ground");
+                location.Rotation = 270f;
 
                 var character = new Character(sessionId, CharacterClass.Warrior)
                 {
@@ -401,6 +404,8 @@ internal static class DocumentRepositoryScenarioFactory
                     CurrentResource = 60,
                     MaxResource = 80
                 };
+
+                character.SetCurrentLocation(location);
 
                 character.BaseStats[StatsProperty.Strength] = 12;
                 character.BaseStats[StatsProperty.Intelligence] = 8;
@@ -448,6 +453,10 @@ internal static class DocumentRepositoryScenarioFactory
                     entity.Skills[skillEntry] = SkillAvailability.Learnt;
                     entity.ActiveSkills[skillEntry] = DateTime.UtcNow.AddMinutes(1);
                 }
+
+                var currentLocation = entity.CurrentLocation;
+                currentLocation.Position += new Vector3(3, 0, -2);
+                currentLocation.Rotation = 90f;
             },
             assertDocument: (entity, document) =>
             {
@@ -500,6 +509,19 @@ internal static class DocumentRepositoryScenarioFactory
                     {
                         throw new InvalidOperationException("Character active skill timestamp mismatch.");
                     }
+                }
+
+                if (Math.Abs(document.Location.X - entity.CurrentLocation.Position.X) > 0.01f ||
+                    Math.Abs(document.Location.Y - entity.CurrentLocation.Position.Y) > 0.01f ||
+                    Math.Abs(document.Location.Z - entity.CurrentLocation.Position.Z) > 0.01f)
+                {
+                    throw new InvalidOperationException("Character location position mismatch.");
+                }
+
+                if (!string.Equals(document.Location.MapId, entity.CurrentLocation.MapId, StringComparison.Ordinal) ||
+                    !string.Equals(document.Location.ZoneName, entity.CurrentLocation.ZoneName, StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException("Character location metadata mismatch.");
                 }
             });
     }

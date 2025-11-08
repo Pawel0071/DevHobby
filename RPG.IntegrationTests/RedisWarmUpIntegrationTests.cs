@@ -493,6 +493,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
                 CurrentHealth = 80,
                 MaxHealth = 80,
                 SpawnLocation = new LocationData { X = 5, Y = 1, Z = 0 },
+                CurrentLocation = new LocationData { X = 5, Y = 1, Z = 0 },
                 WorldId = Guid.NewGuid()
             };
         }

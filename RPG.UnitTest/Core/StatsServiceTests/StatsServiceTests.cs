@@ -1,3 +1,4 @@
+using System.Linq;
 using FluentAssertions;
 using Moq;
 using RPG.Core.Interfaces;
@@ -78,8 +79,18 @@ public class StatsServiceTests
         var result = ((IStatsService)_service).InitStats(character);
 
         result.Success.Should().BeTrue();
-        // BaseStats should be initialized and copied to ModifiedStats
-        character.BaseStats.Values.Should().AllBeEquivalentTo(0);
-        character.ModifiedStats.Values.Should().AllBeEquivalentTo(0);
+
+        character.BaseStats[StatsProperty.MoveSpeed].Should().Be(5);
+        character.ModifiedStats[StatsProperty.MoveSpeed].Should().Be(5);
+
+        character.BaseStats
+            .Where(kvp => kvp.Key != StatsProperty.MoveSpeed)
+            .Select(kvp => kvp.Value)
+            .Should().AllBeEquivalentTo(0);
+
+        character.ModifiedStats
+            .Where(kvp => kvp.Key != StatsProperty.MoveSpeed)
+            .Select(kvp => kvp.Value)
+            .Should().AllBeEquivalentTo(0);
     }
 }

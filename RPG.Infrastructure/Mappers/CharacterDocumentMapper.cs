@@ -13,13 +13,16 @@ public class CharacterDocumentMapper : IDocumentMapper<Character, CharacterDocum
 {
     private readonly IDocumentMapper<Item, ItemDocument>? _itemMapper;
     private readonly ILogger<CharacterDocumentMapper>? _logger;
+    private readonly LocationMapper _locationMapper;
 
     public CharacterDocumentMapper(
         ILogger<CharacterDocumentMapper>? logger = null,
-        IDocumentMapper<Item, ItemDocument>? itemMapper = null)
+        IDocumentMapper<Item, ItemDocument>? itemMapper = null,
+        LocationMapper? locationMapper = null)
     {
         _logger = logger;
         _itemMapper = itemMapper;
+        _locationMapper = locationMapper ?? new LocationMapper(new NoopLogger<LocationMapper>());
     }
 
     public CharacterDocument ToDocument(Character entity)
@@ -54,6 +57,8 @@ public class CharacterDocumentMapper : IDocumentMapper<Character, CharacterDocum
             kvp => kvp.Key.ToString(),
             kvp => kvp.Value
         );
+
+    doc.Location = _locationMapper.ToDocument(entity.CurrentLocation);
 
         // Map Equipment
         doc.Equipment = entity.Equipments
@@ -113,6 +118,12 @@ public class CharacterDocumentMapper : IDocumentMapper<Character, CharacterDocum
             MaxResource = document.MaxResource
         };
 
+        if (document.Location is not null)
+        {
+            var location = _locationMapper.ToEntity(document.Location);
+            character.SetCurrentLocation(location);
+        }
+
         // Map BaseStats
         foreach (var stat in document.BaseStats)
             if (Enum.TryParse<StatsProperty>(stat.Key, out var statProperty))
@@ -162,5 +173,24 @@ public class CharacterDocumentMapper : IDocumentMapper<Character, CharacterDocum
         _logger?.Debug(
             $"Character domain entity created. Id={character.Id}, Document has {document.Skills.Count} skills, {document.ActiveSkills.Count} active skills");
         return character;
+    }
+
+    private sealed class NoopLogger<T> : ILogger<T>
+    {
+        public void Info(string message)
+        {
+        }
+
+        public void Warn(string message)
+        {
+        }
+
+        public void Error(string message, Exception? ex = null)
+        {
+        }
+
+        public void Debug(string message)
+        {
+        }
     }
 }

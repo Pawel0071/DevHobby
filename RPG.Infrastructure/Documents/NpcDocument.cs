@@ -23,9 +23,12 @@ public class NpcDocument : IMongoDocument
     public int Level { get; set; }
     public int CurrentHealth { get; set; }
     public int MaxHealth { get; set; }
+    public Dictionary<string, int> BaseStats { get; set; } = new();
+    public Dictionary<string, int> ModifiedStats { get; set; } = new();
 
     // Spawn Location
     public LocationData SpawnLocation { get; set; } = new();
+    public LocationData CurrentLocation { get; set; } = new();
 
     [BsonRepresentation(BsonType.String)] public Guid WorldId { get; set; }
 

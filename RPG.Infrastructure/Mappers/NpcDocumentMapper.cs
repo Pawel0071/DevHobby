@@ -2,6 +2,7 @@ using System.Text.Json;
 using RPG.Domain.Entities;
 using RPG.Domain.Entities.Npcs;
 using RPG.Domain.Entities.Npcs.NpcComponents;
+using RPG.Domain.Enums;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 
@@ -33,11 +34,14 @@ public class NpcDocumentMapper : IDocumentMapper<Npc, NpcDocument>
             DisplayName = entity.DisplayName,
             Description = entity.Description,
             Level = entity.Level,
-            CurrentHealth = 0,
-            MaxHealth = 0,
+            CurrentHealth = entity.CurrentHealth,
+            MaxHealth = entity.MaxHealth,
             SpawnLocation = _locationMapper.ToDocument(entity.SpawnLocation),
+            CurrentLocation = _locationMapper.ToDocument(entity.CurrentLocation ?? entity.SpawnLocation),
             WorldId = entity.WorldId,
             Tags = entity.Tags.ToList(),
+            BaseStats = entity.BaseStats.ToDictionary(kvp => kvp.Key.ToString(), kvp => kvp.Value),
+            ModifiedStats = entity.ModifiedStats.ToDictionary(kvp => kvp.Key.ToString(), kvp => kvp.Value),
             Components = entity.Components.Select(component => new ComponentData
             {
                 Type = component.GetType().Name,
@@ -58,7 +62,40 @@ public class NpcDocumentMapper : IDocumentMapper<Npc, NpcDocument>
 
         npc.Description = document.Description;
         npc.Level = document.Level;
+        npc.CurrentHealth = document.CurrentHealth;
+        npc.MaxHealth = document.MaxHealth;
+
+        if (document.CurrentLocation is not null)
+        {
+            npc.SetCurrentLocation(_locationMapper.ToEntity(document.CurrentLocation));
+        }
+        else
+        {
+            npc.SetCurrentLocation(spawnLocation);
+        }
         npc.Components.Clear();
+
+        if (document.BaseStats is not null)
+        {
+            foreach (var stat in document.BaseStats)
+            {
+                if (Enum.TryParse<StatsProperty>(stat.Key, out var statProperty))
+                {
+                    npc.BaseStats[statProperty] = stat.Value;
+                }
+            }
+        }
+
+        if (document.ModifiedStats is not null)
+        {
+            foreach (var stat in document.ModifiedStats)
+            {
+                if (Enum.TryParse<StatsProperty>(stat.Key, out var statProperty))
+                {
+                    npc.ModifiedStats[statProperty] = stat.Value;
+                }
+            }
+        }
 
         foreach (var componentData in document.Components)
         {
