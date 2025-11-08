@@ -28,7 +28,7 @@ public class SkillDocumentMapperTests
         // Arrange
         var skill = Skill.Create("Fireball", "Launches a ball of fire");
         skill.IconId = "icon_fireball_01";
-        skill.Tags = new HashSet<string> { "fire", "damage", "ranged" };
+    skill.Tags = new HashSet<string> { "fire", "damage", "ranged", "class-mage", "weapon-staff", "resource-mana" };
 
         // Act
         var document = _mapper.ToDocument(skill);
@@ -38,8 +38,9 @@ public class SkillDocumentMapperTests
         document.Name.Should().Be("Fireball");
         document.Description.Should().Be("Launches a ball of fire");
         document.IconId.Should().Be("icon_fireball_01");
-        document.Tags.Should().Contain("fire");
-        document.Tags.Should().Contain("damage");
+    document.Tags.Should().Contain("fire");
+    document.Tags.Should().Contain("damage");
+    document.Tags.Should().Contain("class-mage");
     }
 
     [Fact]
@@ -184,7 +185,7 @@ public class SkillDocumentMapperTests
             Name = "Ice Shard",
             Description = "Launches shards of ice",
             IconId = "icon_ice_01",
-            Tags = new List<string> { "ice", "damage" },
+            Tags = new List<string> { "ice", "damage", "class-mage", "resource-mana" },
             Components = new List<ComponentData>()
         };
 
@@ -196,7 +197,8 @@ public class SkillDocumentMapperTests
         skill.Name.Should().Be("Ice Shard");
         skill.Description.Should().Be("Launches shards of ice");
         skill.IconId.Should().Be("icon_ice_01");
-        skill.Tags.Should().Contain("ice");
+    skill.Tags.Should().Contain("ice");
+    skill.Tags.Should().Contain("class-mage");
     }
 
     [Fact]

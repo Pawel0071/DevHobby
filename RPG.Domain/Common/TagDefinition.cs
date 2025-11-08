@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using RPG.Domain.Common.Interfaces;
 using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Entities.MapObjects.MapObjectComponents;
@@ -291,6 +292,35 @@ public sealed class TagDefinition : IDictionaryEntry<TagDefinition>
             "stackable",
             "dispellable",
             "cleansable"
+        ]);
+
+        var classRequirementTags = Enum.GetNames(typeof(CharacterClass))
+            .Select(name => $"class-{name.ToLowerInvariant()}")
+            .ToArray();
+
+        AddSimpleRange(TagTarget.Skill, "Skill / Class Requirement", classRequirementTags);
+
+        AddSimpleRange(TagTarget.Skill, "Skill / Weapon Requirement",
+        [
+            "weapon-sword",
+            "weapon-axe",
+            "weapon-mace",
+            "weapon-dagger",
+            "weapon-spear",
+            "weapon-staff",
+            "weapon-bow",
+            "weapon-crossbow",
+            "weapon-gun",
+            "weapon-1h",
+            "weapon-2h"
+        ]);
+
+        AddSimpleRange(TagTarget.Skill, "Skill / Resource Requirement",
+        [
+            "resource-mana",
+            "resource-energy",
+            "resource-rage",
+            "resource-focus"
         ]);
 
         return definitions;

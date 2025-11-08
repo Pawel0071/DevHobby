@@ -43,6 +43,51 @@ public sealed class ErrorCodeDefinition : IDictionaryEntry<ErrorCodeDefinition>
         Code = "unique_equip_violation", Message = "Przedmiot może być założony tylko raz", Category = "Equipment"
     };
 
+    public static readonly ErrorCodeDefinition SkillRequirementLevelNotMet = new()
+    {
+        Code = "skill_level_requirement", Message = "Zbyt niski poziom postaci", Category = "Skill"
+    };
+
+    public static readonly ErrorCodeDefinition SkillRequirementClassMismatch = new()
+    {
+        Code = "skill_class_mismatch", Message = "Niewłaściwa klasa postaci", Category = "Skill"
+    };
+
+    public static readonly ErrorCodeDefinition SkillRequirementWeaponMissing = new()
+    {
+        Code = "skill_weapon_missing", Message = "Brak wymaganego uzbrojenia", Category = "Skill"
+    };
+
+    public static readonly ErrorCodeDefinition SkillRequirementStatNotMet = new()
+    {
+        Code = "skill_stat_requirement", Message = "Niewystarczające atrybuty", Category = "Skill"
+    };
+
+    public static readonly ErrorCodeDefinition SkillRequirementResourceInsufficient = new()
+    {
+        Code = "skill_resource_requirement", Message = "Za mało zasobów", Category = "Skill"
+    };
+
+    public static readonly ErrorCodeDefinition SkillPrerequisiteMissing = new()
+    {
+        Code = "skill_prerequisite_missing", Message = "Brak wymaganych umiejętności", Category = "Skill"
+    };
+
+    public static readonly ErrorCodeDefinition SkillAlreadyKnown = new()
+    {
+        Code = "skill_already_known", Message = "Umiejętność jest już znana", Category = "Skill"
+    };
+
+    public static readonly ErrorCodeDefinition SkillNotKnown = new()
+    {
+        Code = "skill_not_known", Message = "Umiejętność nie jest znana", Category = "Skill"
+    };
+
+    public static readonly ErrorCodeDefinition SkillUnavailable = new()
+    {
+        Code = "skill_unavailable", Message = "Umiejętność jest niedostępna", Category = "Skill"
+    };
+
     public static readonly ErrorCodeDefinition AlreadyMaxLevel = new() { Code = "char_max_lecel" };
     public string? Message { get; init; } // np. "Operacja niedozwolona"
     public string? Category { get; init; } // np. "Logic", "Inventory", "Combat"
@@ -58,6 +103,15 @@ public sealed class ErrorCodeDefinition : IDictionaryEntry<ErrorCodeDefinition>
         ItemNotEquippable,
         EquipmentMetadataMissing,
         EquipmentSlotMismatch,
-        UniqueEquipViolation
+        UniqueEquipViolation,
+        SkillRequirementLevelNotMet,
+        SkillRequirementClassMismatch,
+        SkillRequirementWeaponMissing,
+        SkillRequirementStatNotMet,
+        SkillRequirementResourceInsufficient,
+        SkillPrerequisiteMissing,
+        SkillAlreadyKnown,
+        SkillNotKnown,
+        SkillUnavailable
     ];
 }

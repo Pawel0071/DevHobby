@@ -378,7 +378,13 @@ internal static class DocumentRepositoryScenarioFactory
                 var bankItem = CreateTestItem("cli.bankgem", "CLI Bank Gem", ItemRarity.Rare);
 
                 var skill = Skill.Create("CLI Battle Cry", "Boosts allies");
-                skill.Tags = new HashSet<string> { "buff", "support" };
+                skill.Tags = new HashSet<string> { "buff", "support", "class-warrior", "resource-rage" };
+
+                skill.Components.Add(new RequirementComponent
+                {
+                    RequiredLevel = 5,
+                    RequiredClasses = new List<string> { nameof(CharacterClass.Warrior) }
+                });
                 var activationTime = DateTime.UtcNow;
 
                 var character = new Character(sessionId, CharacterClass.Warrior)
@@ -734,7 +740,7 @@ internal static class DocumentRepositoryScenarioFactory
             {
                 var skill = Skill.Create("CLI Flame", "Throws a burst of flame");
                 skill.IconId = "icon_fire";
-                skill.Tags = new HashSet<string> { "fire", "aoe" };
+                skill.Tags = new HashSet<string> { "fire", "aoe", "class-mage", "weapon-staff", "resource-mana" };
 
                 var damageComponent = new DamageComponent
                 {
@@ -764,9 +770,17 @@ internal static class DocumentRepositoryScenarioFactory
                     RefundPercentage = 50f
                 };
 
+                var requirementComponent = new RequirementComponent
+                {
+                    RequiredLevel = 6,
+                    RequiredClasses = new List<string> { nameof(CharacterClass.Mage) },
+                    RequiredWeaponTypes = new List<string> { "staff" }
+                };
+
                 skill.Components.Add(damageComponent);
                 skill.Components.Add(cooldownComponent);
                 skill.Components.Add(resourceComponent);
+                skill.Components.Add(requirementComponent);
 
                 return skill;
             },
