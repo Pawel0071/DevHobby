@@ -1,186 +1,143 @@
+docker compose up --build
 # DevHobby
 
-Wieloserwisowa aplikacja RPG w .NET 8.0 (microservices). Repozytorium zawiera serwer gry (gRPC/ASP.NET), biblioteki domenowe, warstwy aplikacyjne i infrastrukturalne, oraz usługi pomocnicze (workers).
+DevHobby is a multi-service RPG platform built with .NET 8. The solution contains a gRPC game server, domain/application layers, background workers, infrastructure plumbing, a CLI toolkit, automated tests, and a lightweight semi-graphical desktop client that talks to the live server.
 
-## Spis treści
-- Architektura i struktura repozytorium
-- Wymagania i środowisko
-- Budowanie i uruchamianie (lokalnie i Docker)
-- Testy (konwencje i uruchamianie)
-- gRPC / Protobuf
-- Konfiguracja, DI i logowanie
-- Integracje (MongoDB, Redis, RabbitMQ)
-- CI (GitHub Actions)
-- Dodawanie nowego serwisu i modyfikacja encji współdzielonych
-- Troubleshooting (najczęstsze problemy)
+## Table of Contents
+- Architecture
+- Prerequisites
+- Quick Start
+- Local Development Workflows
+- Testing
+- Observability Stack
+- gRPC & Protobuf
+- Configuration & Logging
+- External Integrations
+- Continuous Integration
+- Extending the Solution
+- Troubleshooting
 
-## Architektura i struktura repozytorium
+## Architecture
 
-- `RPG.Core/` — wspólne encje domenowe, interfejsy i usługi (kontrakty i logika współdzielona)
-- `RPG.Domain/` — logika domenowa (modele i reguły)
-- `RPG.Application/` — przypadki użycia i serwisy aplikacyjne
-- `RPG.Infrastructure/` — infrastruktura (MongoDB, Redis, RabbitMQ, rejestracje DI, outbox itp.)
-- `RPG.GameServer/` — serwer gry (ASP.NET/gRPC), kontrolery, Protos
-`RPG.PersistenceService/` — serwis do zadań trwałości (worker)
-- `RedisWormUp/`, `CricuitBraker/` — usługi pomocnicze typu worker
-- `RPG.UI/` — UI (klient)
-- `RPG.CLI/` — narzędzia CLI
-- `RPG.UnitTest/` — testy jednostkowe; podkatalogi: `Core/*`, `InfrastructureTests/*` itd.
+- `RPG.Core/` – shared domain entities, interfaces, diagnostics, and cross-cutting services
+- `RPG.Domain/` – domain logic (aggregates, value objects, enums)
+- `RPG.Application/` – application services, command handlers, diagnostics
+- `RPG.Infrastructure/` – MongoDB/Redis/RabbitMQ integration, DI setup, outbox, health checks
+- `RPG.GameServer/` – ASP.NET Core gRPC host exposing the RPG services
+- `RPG.PersistenceService/` – background worker for persistence/outbox dispatching
+- `RedisWormUp/`, `CricuitBraker/` – auxiliary workers (cache warm-up, circuit breaker)
+- `RPG.CLI/` – command-line entry point (functional scenarios, gRPC helpers)
+- `RPG.IntegrationTests/`, `RPG.UnitTest/` – automated test suites
+- `RPG.DesktopClient/` – semi-graphical console client for quick gameplay smoke tests
+- `observability/` – Grafana/Tempo/Prometheus/Loki provisioning
 
-Pliki na poziomie repozytorium:
-- `DevHobby.sln` — plik rozwiązania .NET
-- `compose.yaml` — środowisko Docker Compose (uwaga: patrz sekcja Docker)
-- `.github/workflows/ci.yml` — pipeline CI (GitHub Actions)
+Root-level files of note:
+- `DevHobby.sln` – Visual Studio / dotnet solution
+- `compose.yaml` – docker-compose stack for MongoDB, Redis, RabbitMQ, observability, and workers
+- `qodana.yaml`, `coverlet.runsettings` – tooling configuration
 
-## Wymagania i środowisko
-- .NET SDK 8.0+
-- Opcjonalnie: Docker oraz Docker Compose
+## Prerequisites
+- .NET SDK 8.0 or newer
+- Docker & Docker Compose (required for the full infrastructure stack)
+- For observability dashboards: Grafana/Tempo/Prometheus/Loki (auto-provisioned by `compose.yaml`)
 
-## Budowanie i uruchamianie
+## Quick Start
 
-Pełne build rozwiązania:
 ```bash
+# Restore & build everything
 dotnet build DevHobby.sln
+
+# Start infra & background services
+docker compose up -d
+
+# In a new shell start the game server (uses Mongo/Redis from compose)
+ConnectionStrings__Mongo="mongodb://localhost:27017" \
+ConnectionStrings__Redis="localhost:6379" \
+dotnet run --project RPG.GameServer/RPG.GameServer.csproj
+
+# Run the semi-graphical desktop client (creates a character and lets you move it)
+dotnet run --project RPG.DesktopClient/RPG.DesktopClient.csproj
+
+# Run document repository end-to-end scenarios via CLI (optional)
+dotnet run --project RPG.CLI/RPG.CLI.csproj -- document-tests
+
+# When finished
+kill <gameserver-pid>
+
 ```
 
-Uruchomienie pojedynczego serwisu (np. GameServer):
-```bash
-cd RPG.GameServer
-dotnet run
-```
+**Desktop client controls**
+- Movement: `W/S/A/D` or arrow keys (hold to move; release to stop)
+- Rotation: `Q` / `E` (hold to rotate; release to stop)
+- Escape: quit the client (sends stop commands before exit)
 
-CLI – scenariusze DocumentRepository:
-```bash
-./scripts/run_document_repository_tests.sh            # wszystkie encje
-./scripts/run_document_repository_tests.sh Character  # pojedyncza encja
-```
+## Local Development Workflows
+- Build specific project: `dotnet build <path-to-csproj>`
+- Run the gRPC server: `dotnet run --project RPG.GameServer`
+- Run CLI commands:
+  - Create a character via gRPC: `dotnet run --project RPG.CLI -- character create --name Hero`
+  - Movement smoke test: `rpg.CLI -- character move-start --character <id> --direction 1`
+- Launch desktop client to exercise movement/rotation visually.
+- Observability dashboards become available once `docker compose up` completes (Grafana default credentials: `admin / 2019Venza`).
 
-### Docker / Compose
-W repo znajduje się aktualny `compose.yaml` uruchamiający infrastrukturę oraz wybrane serwisy workers:
+## Testing
+- Unit tests live in `RPG.UnitTest/` (organised by module).
+- Run all unit tests: `dotnet test RPG.UnitTest/RPG.UnitTest.csproj`
+- Integration tests (`RPG.IntegrationTests/`) use Testcontainers for Mongo, Redis, RabbitMQ.
+- CLI document scenarios (full CRUD path through Mongo/Redis): `dotnet run --project RPG.CLI -- document-tests`
 
-- Usługi w compose:
-	- `rpg.persistenceservice` (Dockerfile: `RPG.PersistenceService/Dockerfile`)
-	- `redis.wormup` (Dockerfile: `RedisWormUp/Dockerfile`)
-	- `circuitbreaker` (Dockerfile: `CricuitBraker/Dockerfile`)
-	- `mongodb` (image: `mongo:latest`)
-	- `rabbitmq` (image: `rabbitmq:management`)
-	- `redis` (image: `redis:latest`)
+## Observability Stack
+- Compose provisions Prometheus, Loki, Tempo, Grafana.
+- Dashboard provisioning file: `observability/grafana/provisioning/dashboards/devhobby-observability-overview.json`.
+- Key panels:
+  - Recent gRPC activities: `RPG.GameServer`
+  - New panels for `RPG.Application` and `RPG.Core` ActivitySource traces
+  - MongoDB, Redis, RabbitMQ health/metrics
+- Activity sources are emitted from both Application and Core layers (movement handlers, services).
 
-Per‑service zmienne środowiskowe (zgodnie z `compose.yaml`):
+## gRPC & Protobuf
+- Proto definitions: `RPG.GameServer/Protos/*.proto`
+- Client stubs generated via `Grpc.Tools` (Desktop client and CLI reference them).
+- After editing `.proto` files, rebuild to regenerate messages/services.
 
-- rpg.persistenceservice
-	- `MONGO_URI` (np. `mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb`)
-	- `REDIS_HOST`, `REDIS_PORT`
-	- `RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_USER`, `RABBITMQ_PASS`
+## Configuration & Logging
+- Each project contains `appsettings.json` + `appsettings.Development.json`.
+- DI bootstrapping is done in each `Program.cs` (see `AddInfrastructure`, `CoreRegistration`, etc.).
+- Logging uses `ILogger<T>` with structured logging (Serilog-compatible sinks can be wired through configuration).
 
-- redis.wormup
-	- `MONGO_URI`
-	- `REDIS_HOST`, `REDIS_PORT`
+## External Integrations
+- **MongoDB** – persistence repositories registered in `RPG.Infrastructure` (accessed by application/core layers).
+- **Redis** – caching abstractions, warmed through `RedisWormUp` worker.
+- **RabbitMQ** – messaging via outbox/publisher pattern (`OutboxDispatcher`, `NullRabbitPublisher`).
+- Health checks for all three are exposed by infrastructure components; map `/health` endpoint in hosting projects if needed.
 
-- circuitbreaker
-	- `MONGO_URI`
-	- `REDIS_HOST`, `REDIS_PORT`
-	- `RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_USER`, `RABBITMQ_PASS`
+## Continuous Integration
+- Workflow: `.github/workflows/ci.yml`
+- Steps: checkout → setup .NET 8 → restore → build (Release) → test (Release)
+- Add NuGet caching as needed (example snippet in workflow).
 
-Uwaga: kod serwisów powinien czytać powyższe zmienne poprzez konfigurację .NET (IConfiguration/Options). Jeśli dany serwis nadal używa wartości "localhost" zakodowanych na stałe, zaktualizuj `Program.cs`, aby korzystał z konfiguracji środowiskowej.
+## Extending the Solution
+1. Create a new project directory + `.csproj`.
+2. Add to solution: `dotnet sln DevHobby.sln add <path>`
+3. Follow existing structure (`Program.cs`, DI, appsettings, Dockerfile if needed).
+4. Register interfaces in Core/Application/Infrastructure as appropriate.
+5. Add unit/integration tests.
+6. Update compose or tooling if the service requires infrastructure.
 
-Start usług w kontenerach:
-```bash
-docker compose up --build
-```
-
-## Testy
-
-Konwencje:
-- Pliki testów kończą się na `*Tests.cs`
-- Preferowane katalogi testów z sufiksem `Tests` (np. `InfrastructureTests`)
-
-Uruchamianie testów:
-```bash
-dotnet test RPG.UnitTest/RPG.UnitTest.csproj
-```
-
-W CI testy uruchamiane są w konfiguracji Release.
-
-## gRPC / Protobuf
-- Definicje Protobuf znajdują się w `RPG.GameServer/Protos/`
-- Zmiana `.proto` wymaga przebudowania, aby odświeżyć klasy generowane do gRPC
-
-## Konfiguracja, DI i logowanie
-- Każdy serwis ma własne `appsettings.json` i `appsettings.Development.json`
-- Rejestracje usług przez wbudowany DI w `Program.cs`
-- Logowanie jest konfigurowane w `appsettings.json` i używa `ILogger`
-
-## Integracje zewnętrzne
-- MongoDB — repozytoria i kolekcje rejestrowane w `RPG.Infrastructure`
-- Redis — `IRedisCache` i implementacja `RedisCache`
-  - **CacheKeyBuilder** — centralna klasa do budowania kluczy z prefiksami (np. `char:guid`, `item:id`)
-  - **CacheTtl** — strategie TTL (Short/Medium/Long/Permanent)
-- RabbitMQ — publisher i kanały konfiguracji
-  - **NullRabbitPublisher** — Null Object Pattern gdy RabbitMQ nie jest skonfigurowany
-  - **OutboxDispatcher** — reliable messaging z retry mechanism (max 3 próby)
-- W testach jednostkowych integracje są mockowane (bez zależności od zewnętrznych serwisów)
-
-### Health Checks
-Projekt `RPG.Infrastructure` dostarcza health checks dla:
-- MongoDB (`MongoHealthCheck`)
-- Redis (`RedisHealthCheck`)
-- RabbitMQ (`RabbitMqHealthCheck`)
-
-Aby włączyć endpoint health checks w aplikacji:
-```csharp
-// Program.cs
-builder.Services.AddInfrastructure(builder.Configuration);
-var app = builder.Build();
-app.MapHealthChecks("/health");
-```
-
-Sprawdzenie stanu:
-```bash
-curl http://localhost:5000/health
-```
-
-📝 **Szczegółowa dokumentacja zmian w Infrastructure:** zobacz `INFRASTRUCTURE_CHANGES.md`
-
-## CI (GitHub Actions)
-Pipeline znajduje się w `.github/workflows/ci.yml` i wykonuje:
-- checkout kodu
-- setup .NET 8
-- `dotnet restore`
-- `dotnet build` w konfiguracji Release
-- `dotnet test` w konfiguracji Release (bez ponownego builda)
-
-Jeśli chcesz przyspieszyć CI, możesz dodać cache NuGet (przykład):
-```yaml
-- name: Cache NuGet
-	uses: actions/cache@v4
-	with:
-		path: ~/.nuget/packages
-		key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-		restore-keys: |
-			${{ runner.os }}-nuget-
-```
-
-## Dodawanie nowego serwisu
-1. Utwórz katalog serwisu i plik `.csproj`
-2. Dodaj projekt do rozwiązania: `dotnet sln add <ścieżka-do-csproj>`
-3. Skopiuj strukturę (np. `Program.cs`, `appsettings.json`)
-4. Zarejestruj zależności w `Program.cs`
-5. Dodaj testy do katalogu `Tests`
-
-## Modyfikacja encji współdzielonej (`RPG.Core`)
-1. Zaktualizuj encję/interfejs w `RPG.Core`
-2. Zbuduj całość i uruchom testy, aby upewnić się, że zmiana jest kompatybilna wstecznie
-3. Zaktualizuj serwisy zależne (jeśli to konieczne)
+When modifying shared entities in `RPG.Core`:
+1. Update the contracts/entities.
+2. Rebuild the solution; run unit + integration tests.
+3. Confirm downstream services compile (GameServer, CLI, workers).
 
 ## Troubleshooting
-- Błędy `dotnet build` dotyczące brakujących projektów — sprawdź wpisy w `DevHobby.sln`
-- Błędy przestrzeni nazw/typów — sprawdź `ProjectReference` w `.csproj`
-- Compose nie startuje — zaktualizuj ścieżki `dockerfile:` w `compose.yaml` do faktycznych katalogów
-- Compose nie startuje — sprawdź, czy porty 27017/6379/5672/15672 nie są zajęte, oraz czy ścieżki Dockerfile wskazują na istniejące pliki (w tym repo są już poprawne)
-- Testy w CI — upewnij się, że testy uruchamiane są w tej samej konfiguracji co build (`Release`)
+- Missing project references → verify `DevHobby.sln` entries and `ProjectReference` nodes.
+- Docker compose issues → ensure Dockerfile paths exist, ports 27017/6379/5672/15672 are free.
+- gRPC connection failures from clients → confirm `RPG.GameServer` is running and reachable (`http://localhost:5124`).
+- Observability dashboards empty → check Tempo service logs; ensure ActivitySources are registered via OpenTelemetry setup.
+- Unit tests failing with external dependency errors → run `docker compose up -d` or use Testcontainers fixtures (integration tests handle setup automatically).
 
 ---
 
-Jeśli chcesz, mogę dodać sekcję z dokładnymi zmiennymi środowiskowymi dla każdego serwisu oraz przykładowe seedy bazy (Mongo). Napisz, które części rozwinąć.
+Questions or ideas for additional documentation (environment variables, seed data, advanced observability) are welcome—feel free to open an issue or PR.
+📝 **Szczegółowa dokumentacja zmian w Infrastructure:** zobacz `INFRASTRUCTURE_CHANGES.md`
 
