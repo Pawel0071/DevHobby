@@ -1,7 +1,10 @@
+using System;
+using System.Diagnostics;
 using System.Numerics;
 using System.Threading.Tasks;
 using RPG.Application.Commands;
 using RPG.Application.Events;
+using RPG.Application.Diagnostics;
 using RPG.Application.Interfaces;
 using RPG.Core.Application.Handlers;
 using RPG.Core.Interfaces;
@@ -57,6 +60,9 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(StartMovementCommand command)
     {
+        using var activity = StartCommandActivity("CharacterCommandHandler.StartMovement", command.CharacterId);
+        activity?.SetTag("rpg.movement.direction", command.Direction);
+
         var character = await _characterRepo.GetByIdAsync(command.CharacterId);
 
         if (!TryGetDirectionVector(command.Direction, out var direction))
@@ -83,6 +89,8 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(StopMovementCommand command)
     {
+        using var activity = StartCommandActivity("CharacterCommandHandler.StopMovement", command.CharacterId);
+
         var character = await _characterRepo.GetByIdAsync(command.CharacterId);
 
         var stopResult = _movementService.Stop(character);
@@ -99,6 +107,9 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(StartRotationCommand command)
     {
+        using var activity = StartCommandActivity("CharacterCommandHandler.StartRotation", command.CharacterId);
+        activity?.SetTag("rpg.movement.direction", command.Direction);
+
         var character = await _characterRepo.GetByIdAsync(command.CharacterId);
 
         if (!TryGetDirectionVector(command.Direction, out var direction))
@@ -122,6 +133,8 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(StopRotationCommand command)
     {
+        using var activity = StartCommandActivity("CharacterCommandHandler.StopRotation", command.CharacterId);
+
         var character = await _characterRepo.GetByIdAsync(command.CharacterId);
 
         var stopRotationResult = _movementService.StopRotation(character);
@@ -322,4 +335,15 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         return vector != Vector3.Zero;
     }
 
+    private static Activity? StartCommandActivity(string operation, Guid characterId)
+    {
+        var activity = ApplicationDiagnostics.ActivitySource.StartActivity(operation);
+        if (activity is null)
+        {
+            return null;
+        }
+
+        activity.SetTag("rpg.character.id", characterId);
+        return activity;
+    }
 }

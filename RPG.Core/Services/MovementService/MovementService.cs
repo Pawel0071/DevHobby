@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Numerics;
 using RPG.Core.Common;
+using RPG.Core.Diagnostics;
 using RPG.Core.Interfaces;
 using RPG.Domain.Common;
 using RPG.Domain.Entities;
@@ -26,6 +28,14 @@ public class MovementService : IMovementService
             return ErrorCodeDefinition.InvalidOperation.ToFail<Location>("Character is required for movement.");
         }
 
+        using var activity = StartMovementActivity("MovementService.Move.Character", "character", character.Id);
+        activity?.SetTag("rpg.movement.direction", direction.ToString());
+        activity?.SetTag("rpg.movement.delta_time", deltaTime);
+        if (speedOverride.HasValue)
+        {
+            activity?.SetTag("rpg.movement.speed_override", speedOverride.Value);
+        }
+
         var result = MoveInternal(
             entityType: "character",
             entityId: character.Id,
@@ -48,6 +58,14 @@ public class MovementService : IMovementService
         if (npc == null)
         {
             return ErrorCodeDefinition.InvalidOperation.ToFail<Location>("NPC is required for movement.");
+        }
+
+        using var activity = StartMovementActivity("MovementService.Move.Npc", "npc", npc.Id);
+        activity?.SetTag("rpg.movement.direction", direction.ToString());
+        activity?.SetTag("rpg.movement.delta_time", deltaTime);
+        if (speedOverride.HasValue)
+        {
+            activity?.SetTag("rpg.movement.speed_override", speedOverride.Value);
         }
 
         var result = MoveInternal(
@@ -74,6 +92,8 @@ public class MovementService : IMovementService
             return ErrorCodeDefinition.InvalidOperation.ToFail<Location>("Character is required for movement stop.");
         }
 
+        using var activity = StartMovementActivity("MovementService.Stop.Character", "character", character.Id);
+
         var result = StopInternal("character", character.Id, character.CurrentLocation);
         if (result.Success)
         {
@@ -90,6 +110,8 @@ public class MovementService : IMovementService
             return ErrorCodeDefinition.InvalidOperation.ToFail<Location>("NPC is required for movement stop.");
         }
 
+        using var activity = StartMovementActivity("MovementService.Stop.Npc", "npc", npc.Id);
+
         var result = StopInternal("npc", npc.Id, npc.CurrentLocation);
         if (result.Success)
         {
@@ -105,6 +127,9 @@ public class MovementService : IMovementService
         {
             return ErrorCodeDefinition.InvalidOperation.ToFail<float>("Character is required for rotation.");
         }
+
+        using var activity = StartMovementActivity("MovementService.Rotate.Character", "character", character.Id);
+        activity?.SetTag("rpg.movement.direction", direction.ToString());
 
         var result = RotateInternal(
             entityType: "character",
@@ -127,6 +152,9 @@ public class MovementService : IMovementService
             return ErrorCodeDefinition.InvalidOperation.ToFail<float>("NPC is required for rotation.");
         }
 
+        using var activity = StartMovementActivity("MovementService.Rotate.Npc", "npc", npc.Id);
+        activity?.SetTag("rpg.movement.direction", direction.ToString());
+
         var result = RotateInternal(
             entityType: "npc",
             entityId: npc.Id,
@@ -148,6 +176,8 @@ public class MovementService : IMovementService
             return ErrorCodeDefinition.InvalidOperation.ToFail<float>("Character is required to stop rotation.");
         }
 
+        using var activity = StartMovementActivity("MovementService.StopRotation.Character", "character", character.Id);
+
         var result = StopRotationInternal("character", character.Id, character.CurrentLocation);
         if (result.Success)
         {
@@ -164,6 +194,8 @@ public class MovementService : IMovementService
             return ErrorCodeDefinition.InvalidOperation.ToFail<float>("NPC is required to stop rotation.");
         }
 
+        using var activity = StartMovementActivity("MovementService.StopRotation.Npc", "npc", npc.Id);
+
         var result = StopRotationInternal("npc", npc.Id, npc.CurrentLocation);
         if (result.Success)
         {
@@ -171,6 +203,19 @@ public class MovementService : IMovementService
         }
 
         return result;
+    }
+
+    private static Activity? StartMovementActivity(string operation, string entityType, Guid entityId)
+    {
+        var activity = CoreDiagnostics.ActivitySource.StartActivity(operation);
+        if (activity is null)
+        {
+            return null;
+        }
+
+        activity.SetTag("rpg.entity.type", entityType);
+        activity.SetTag("rpg.entity.id", entityId);
+        return activity;
     }
 
     private ServiceResult<Location> MoveInternal(
