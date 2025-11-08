@@ -1,6 +1,6 @@
 namespace RPG.Core.Interfaces;
 
-public interface IItemTagRulesService
+public interface ITagRulesService
 {
     IEnumerable<Type> GetRequiredComponents(IList<string> tags);
 }

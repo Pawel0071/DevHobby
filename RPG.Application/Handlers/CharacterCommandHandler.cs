@@ -26,7 +26,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     private readonly IGameEventDispatcher _eventDispatcher;
     private readonly IInventoryService _inventoryService;
     private readonly IStatsService _statsService;
-    private readonly IDictionaryRegistry<ItemTagDefinition> _tagRegistry;
+    private readonly IDictionaryRegistry<TagDefinition> _tagRegistry;
 
     public CharacterCommandHandler(
         ICharacterRepository characterRepo,
@@ -34,7 +34,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         IEquipmentService equipmentService,
         IStatsService statsService,
         IGameEventDispatcher eventDispatcher,
-        IDictionaryRegistry<ItemTagDefinition> tagRegistry
+    IDictionaryRegistry<TagDefinition> tagRegistry
     )
     {
         _characterRepo = characterRepo;
@@ -197,7 +197,10 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     {
         var character = await _characterRepo.GetByIdAsync(command.CharacterId);
 
-        if (!command.Item.Tags.Contains("consumable") || !_tagRegistry.IsValid("consumable"))
+        const string ConsumableTag = "item:consumable";
+        var hasConsumableTag = command.Item.Tags.Contains(ConsumableTag) || command.Item.Tags.Contains("consumable");
+
+        if (!hasConsumableTag || !_tagRegistry.IsValid(ConsumableTag))
             return CommandResult.Fail(CommandError.InvalidOperation, "Przedmiot nie jest typu consumable.");
 
         var result = _inventoryService.RemoveItem(character.GetBackpackInventoryContainer(), command.Item);

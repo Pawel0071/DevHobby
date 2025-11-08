@@ -82,14 +82,12 @@ public static class InfrastructureRegistration
         }
 
         // Dictionary Repositories - for loading definitions from MongoDB
-        services.AddSingleton<IDictionaryRepository<ItemTagDefinition>, DictionaryRepository<ItemTagDefinition>>();
+        services.AddSingleton<IDictionaryRepository<TagDefinition>, DictionaryRepository<TagDefinition>>();
         services.AddSingleton<IDictionaryRepository<ErrorCodeDefinition>, DictionaryRepository<ErrorCodeDefinition>>();
-        services.AddSingleton<IDictionaryRepository<ItemTypeDefinition>, DictionaryRepository<ItemTypeDefinition>>();
 
         // Dictionary Registries - in-memory cache for loaded dictionaries
-        services.AddSingleton<IDictionaryRegistry<ItemTagDefinition>, DictionaryRegistry<ItemTagDefinition>>();
+        services.AddSingleton<IDictionaryRegistry<TagDefinition>, DictionaryRegistry<TagDefinition>>();
         services.AddSingleton<IDictionaryRegistry<ErrorCodeDefinition>, DictionaryRegistry<ErrorCodeDefinition>>();
-        services.AddSingleton<IDictionaryRegistry<ItemTypeDefinition>, DictionaryRegistry<ItemTypeDefinition>>();
 
         // MongoDB
         services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConn));

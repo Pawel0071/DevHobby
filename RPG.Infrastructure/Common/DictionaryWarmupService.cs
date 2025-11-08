@@ -16,9 +16,8 @@ public class DictionaryWarmupService(IServiceProvider provider, ILogger<Dictiona
 
         logger.Info("Starting dictionary warmup...");
 
-        await Load<ItemTagDefinition>(sp, cancellationToken);
-        await Load<ItemTypeDefinition>(sp, cancellationToken);
-        await Load<ErrorCodeDefinition>(sp, cancellationToken);
+    await Load<TagDefinition>(sp, cancellationToken);
+    await Load<ErrorCodeDefinition>(sp, cancellationToken);
 
         logger.Info("Dictionary warmup completed.");
     }
@@ -33,6 +32,7 @@ public class DictionaryWarmupService(IServiceProvider provider, ILogger<Dictiona
     {
         var repo = sp.GetRequiredService<IDictionaryRepository<T>>();
         var registry = sp.GetRequiredService<IDictionaryRegistry<T>>();
+        await repo.UpsertManyAsync(T.Predefined, ct);
         var data = await repo.GetAllAsync(ct);
         registry.Load(data);
 

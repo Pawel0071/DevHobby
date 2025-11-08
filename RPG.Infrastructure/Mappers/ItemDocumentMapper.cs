@@ -1,8 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using RPG.Domain.Common;
 using RPG.Domain.Containers;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Enums;
+using RPG.Infrastructure.Common;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 
@@ -13,13 +17,15 @@ namespace RPG.Infrastructure.Mappers;
 /// </summary>
 public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
 {
-    private readonly ItemTypeDefinition? _itemTypeDefinition;
+    private readonly IDictionaryRegistry<TagDefinition> _tagRegistry;
     private readonly ILogger<ItemDocumentMapper> _logger;
 
-    public ItemDocumentMapper(ILogger<ItemDocumentMapper> logger, ItemTypeDefinition? itemTypeDefinition = null)
+    public ItemDocumentMapper(
+        ILogger<ItemDocumentMapper> logger,
+        IDictionaryRegistry<TagDefinition> tagRegistry)
     {
-        _itemTypeDefinition = itemTypeDefinition;
         _logger = logger;
+        _tagRegistry = tagRegistry;
     }
 
     public ItemDocument ToDocument(Item entity)
@@ -58,8 +64,21 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
             doc.StepId = quest.StepId;
         }
 
+        if (entity.GetComponent<EquippableComponent>() is { } equippable)
+        {
+            doc.EquipmentSlots = equippable.ValidSlots?.ToList();
+            doc.IsTwoHanded = equippable.IsTwoHanded;
+            doc.SupportsDualWield = equippable.SupportsDualWield;
+            doc.IsUniqueEquip = equippable.IsUniqueEquip;
+        }
+
+        if (entity.GetComponent<CraftMaterialComponent>() is { } material)
+        {
+            doc.UsedInItemIds = material.UsedInItemIds?.ToList();
+        }
+
         _logger.Debug(
-            $"ItemDocument created. Id={doc.Id}, Components mapped: Stats={doc.Modifiers?.Count > 0}, Sockets={doc.SocketNo > 0}, Skills={doc.SkillIds?.Count > 0}");
+            $"ItemDocument created. Id={doc.Id}, Components mapped: Stats={doc.Modifiers?.Count > 0}, Sockets={doc.SocketNo > 0}, Skills={doc.SkillIds?.Count > 0}, Equippable={doc.EquipmentSlots is { Count: > 0 }}, CraftMaterial={doc.UsedInItemIds is { Count: > 0 }}");
         return doc;
     }
 
@@ -77,16 +96,33 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
             StackSize = document.StackSize
         };
 
-        if (_itemTypeDefinition != null)
+        var requiredComponents = new HashSet<Type>();
+        if (item.Tags.Count > 0)
         {
-            var required = _itemTypeDefinition.RequiredComponents ?? Enumerable.Empty<Type>();
-            var optional = _itemTypeDefinition.OptionalComponents ?? Enumerable.Empty<Type>();
-
-            foreach (var type in required.Concat(optional))
+            foreach (var type in _tagRegistry.GetRequiredComponents(item.Tags, TagTarget.Item))
             {
-                var component = CreateComponent(type, document);
-                if (component != null)
-                    item.Components.Add(component);
+                requiredComponents.Add(type);
+            }
+        }
+
+        var presentComponents = new HashSet<Type>(GetTypesFromDocument(document));
+
+        foreach (var type in requiredComponents.Concat(presentComponents))
+        {
+            if (item.Components.Any(component => component.GetType() == type))
+            {
+                continue;
+            }
+
+            var component = CreateComponent(type, document);
+            if (component == null && requiredComponents.Contains(type))
+            {
+                component = CreateDefaultComponent(type);
+            }
+
+            if (component != null)
+            {
+                item.Components.Add(component);
             }
         }
 
@@ -135,6 +171,75 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
         if (type == typeof(QuestItemComponent) && doc.QuestId.HasValue && doc.StepId.HasValue)
             return new QuestItemComponent { QuestId = doc.QuestId.Value, StepId = doc.StepId.Value };
 
+        if (type == typeof(EquippableComponent))
+        {
+            if (doc.EquipmentSlots is null && doc.IsTwoHanded is null && doc.SupportsDualWield is null && doc.IsUniqueEquip is null)
+            {
+                return null;
+            }
+
+            return new EquippableComponent
+            {
+                ValidSlots = doc.EquipmentSlots?.ToList() ?? new List<EquipmentSlot>(),
+                IsTwoHanded = doc.IsTwoHanded ?? false,
+                SupportsDualWield = doc.SupportsDualWield ?? false,
+                IsUniqueEquip = doc.IsUniqueEquip ?? false
+            };
+        }
+
+        if (type == typeof(CraftMaterialComponent) && doc.UsedInItemIds is { Count: > 0 })
+            return new CraftMaterialComponent { UsedInItemIds = new List<string>(doc.UsedInItemIds) };
+
         return null;
+    }
+
+    private static IEnumerable<Type> GetTypesFromDocument(ItemDocument doc)
+    {
+        if (doc.Modifiers is { Count: > 0 }) yield return typeof(StatsComponent);
+        if (doc.SocketNo.HasValue) yield return typeof(SocketComponent);
+        if (doc.SkillIds is { Count: > 0 }) yield return typeof(SkillGrantComponent);
+        if (doc.QuestId.HasValue && doc.StepId.HasValue) yield return typeof(QuestItemComponent);
+        if ((doc.EquipmentSlots is { Count: > 0 }) || doc.IsTwoHanded.HasValue || doc.SupportsDualWield.HasValue || doc.IsUniqueEquip.HasValue)
+            yield return typeof(EquippableComponent);
+        if (doc.UsedInItemIds is { Count: > 0 }) yield return typeof(CraftMaterialComponent);
+    }
+
+    private static IItemComponent? CreateDefaultComponent(Type type)
+    {
+        if (type == typeof(StatsComponent))
+        {
+            return new StatsComponent { Stats = new StatsContainer() };
+        }
+
+        if (type == typeof(SocketComponent))
+        {
+            return new SocketComponent();
+        }
+
+        if (type == typeof(SkillGrantComponent))
+        {
+            return new SkillGrantComponent();
+        }
+
+        if (type == typeof(QuestItemComponent))
+        {
+            return new QuestItemComponent();
+        }
+
+        if (type == typeof(EquippableComponent))
+            return new EquippableComponent
+            {
+                ValidSlots = new List<EquipmentSlot>(),
+                IsTwoHanded = false,
+                SupportsDualWield = false,
+                IsUniqueEquip = false
+            };
+
+        if (type == typeof(CraftMaterialComponent))
+        {
+            return new CraftMaterialComponent();
+        }
+
+        return Activator.CreateInstance(type) as IItemComponent;
     }
 }

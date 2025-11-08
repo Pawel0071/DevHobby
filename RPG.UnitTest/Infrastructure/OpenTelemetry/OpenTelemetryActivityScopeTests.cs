@@ -37,15 +37,16 @@ public class OpenTelemetryActivityScopeTests
     }
 
     [Fact]
-    public void Start_ShouldReturnNull_WhenNoListener()
+    public void Start_ShouldReturnActivity_WhenNoExternalListener()
     {
         var logger = new Mock<ILogger<OpenTelemetryActivityScope>>();
         var scope = new OpenTelemetryActivityScope(logger.Object);
 
         var disposable = scope.Start("no-listener");
 
-        disposable.Should().BeNull();
+        disposable.Should().BeOfType<Activity>();
+        ((Activity)disposable!).Dispose();
         logger.Verify(l => l.Debug(It.Is<string>(msg => msg.Contains("Starting activity"))), Times.Once);
-        logger.Verify(l => l.Warn(It.Is<string>(msg => msg.Contains("Failed to start"))), Times.Once);
+        logger.Verify(l => l.Warn(It.IsAny<string>()), Times.Never);
     }
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using Moq;
 using RPG.Domain.Common;
@@ -5,6 +7,7 @@ using RPG.Domain.Containers;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Enums;
+using RPG.Infrastructure.Common;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Mappers;
@@ -20,11 +23,22 @@ public class ItemDocumentMapperTests
         _mockLogger = new Mock<ILogger<ItemDocumentMapper>>();
     }
 
+    private ItemDocumentMapper CreateMapper()
+    {
+        var tagRegistryLogger = new Mock<ILogger<DictionaryRegistry<TagDefinition>>>();
+        var tagRegistry = new DictionaryRegistry<TagDefinition>(tagRegistryLogger.Object);
+        tagRegistry.Load(Array.Empty<TagDefinition>());
+
+        return new ItemDocumentMapper(
+            _mockLogger.Object,
+            tagRegistry);
+    }
+
     [Fact]
     public void ToDocument_ShouldMapBasicProperties()
     {
         // Arrange
-        var mapper = new ItemDocumentMapper(_mockLogger.Object);
+        var mapper = CreateMapper();
         var item = new Item(Guid.NewGuid(), "weapon_1h")
         {
             Name = "Test Sword",
@@ -55,7 +69,7 @@ public class ItemDocumentMapperTests
     public void ToDocument_ShouldMapStatsComponent()
     {
         // Arrange
-        var mapper = new ItemDocumentMapper(_mockLogger.Object);
+        var mapper = CreateMapper();
         var item = new Item(Guid.NewGuid(), "weapon") { Name = "Stat Weapon" };
 
         var statsComponent = new StatsComponent
@@ -82,7 +96,7 @@ public class ItemDocumentMapperTests
     public void ToDocument_ShouldMapSocketComponent()
     {
         // Arrange
-        var mapper = new ItemDocumentMapper(_mockLogger.Object);
+        var mapper = CreateMapper();
         var item = new Item(Guid.NewGuid(), "weapon") { Name = "Socketed Weapon" };
 
         var socketComponent = new SocketComponent { SocketNo = 3 };
@@ -99,7 +113,7 @@ public class ItemDocumentMapperTests
     public void ToDomain_ShouldMapBasicProperties()
     {
         // Arrange
-        var mapper = new ItemDocumentMapper(logger: _mockLogger.Object);
+        var mapper = CreateMapper();
         var doc = new ItemDocument
         {
             Id = Guid.NewGuid(),
@@ -129,20 +143,16 @@ public class ItemDocumentMapperTests
     }
 
     [Fact]
-    public void ToDomain_ShouldCreateComponentsFromDefinition()
+    public void ToDomain_ShouldCreateComponentsFromTags()
     {
         // Arrange
-        var def = new ItemTypeDefinition
-        {
-            Code = "weapon", DisplayName = "Weapon", RequiredComponents = new[] { typeof(StatsComponent) }
-        };
-
-        var mapper = new ItemDocumentMapper(_mockLogger.Object, def);
+        var mapper = CreateMapper();
         var doc = new ItemDocument
         {
             Id = Guid.NewGuid(),
             Name = "Test Weapon",
             TypeCode = "weapon",
+            Tags = new List<string> { "item:stats" },
             Modifiers = new Dictionary<string, int> { { StatsProperty.Strength.ToString(), 15 } }
         };
 
@@ -160,7 +170,7 @@ public class ItemDocumentMapperTests
     public void Roundtrip_ShouldPreserveData()
     {
         // Arrange
-        var mapper = new ItemDocumentMapper(logger: _mockLogger.Object);
+        var mapper = CreateMapper();
         var originalItem = new Item(Guid.NewGuid(), "weapon")
         {
             Name = "Roundtrip Test",
@@ -186,7 +196,7 @@ public class ItemDocumentMapperTests
     public void ToDocument_ShouldMapSkillGrantComponent()
     {
         // Arrange
-        var mapper = new ItemDocumentMapper(logger: _mockLogger.Object);
+        var mapper = CreateMapper();
         var item = new Item(Guid.NewGuid(), "item_skill") { Name = "Skill Item" };
         var skill1 = Guid.NewGuid();
         var skill2 = Guid.NewGuid();
@@ -208,7 +218,7 @@ public class ItemDocumentMapperTests
     public void ToDocument_ShouldMapQuestItemComponent()
     {
         // Arrange
-        var mapper = new ItemDocumentMapper(logger: _mockLogger.Object);
+        var mapper = CreateMapper();
         var item = new Item(Guid.NewGuid(), "quest_item") { Name = "Quest Item" };
         var questId = Guid.NewGuid();
         var stepId = Guid.NewGuid();
@@ -225,10 +235,60 @@ public class ItemDocumentMapperTests
     }
 
     [Fact]
+    public void ToDocument_ShouldMapEquippableComponent()
+    {
+        // Arrange
+        var mapper = CreateMapper();
+        var item = new Item(Guid.NewGuid(), "equip_item") { Name = "Equippable Item" };
+
+        var equippable = new EquippableComponent
+        {
+            ValidSlots = new List<EquipmentSlot> { EquipmentSlot.Weapon1, EquipmentSlot.Weapon2 },
+            IsTwoHanded = true,
+            SupportsDualWield = false,
+            IsUniqueEquip = true
+        };
+
+        item.Components.Add(equippable);
+
+        // Act
+        var doc = mapper.ToDocument(item);
+
+        // Assert
+    doc.EquipmentSlots.Should().NotBeNull().And.Contain(EquipmentSlot.Weapon1);
+        doc.IsTwoHanded.Should().BeTrue();
+        doc.SupportsDualWield.Should().BeFalse();
+        doc.IsUniqueEquip.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ToDocument_ShouldMapCraftMaterialComponent()
+    {
+        // Arrange
+        var mapper = CreateMapper();
+        var item = new Item(Guid.NewGuid(), "material_item") { Name = "Material" };
+
+        var material = new CraftMaterialComponent
+        {
+            UsedInItemIds = new List<string> { "recipe-1", "recipe-2" }
+        };
+
+        item.Components.Add(material);
+
+        // Act
+        var doc = mapper.ToDocument(item);
+
+        // Assert
+        doc.UsedInItemIds.Should().NotBeNull().And.HaveCount(2);
+        doc.UsedInItemIds.Should().Contain("recipe-1");
+        doc.UsedInItemIds.Should().Contain("recipe-2");
+    }
+
+    [Fact]
     public void ToDocument_ShouldMapAllComponents()
     {
         // Arrange
-        var mapper = new ItemDocumentMapper(logger: _mockLogger.Object);
+        var mapper = CreateMapper();
         var item = new Item(Guid.NewGuid(), "legendary_weapon") { Name = "Ultimate Weapon" };
         
         // Add all component types
@@ -243,6 +303,14 @@ public class ItemDocumentMapperTests
         item.Components.Add(new SocketComponent { SocketNo = 6 });
         item.Components.Add(new SkillGrantComponent { SkillIds = new List<Guid> { Guid.NewGuid() } });
         item.Components.Add(new QuestItemComponent { QuestId = Guid.NewGuid(), StepId = Guid.NewGuid() });
+        item.Components.Add(new EquippableComponent
+        {
+            ValidSlots = new List<EquipmentSlot> { EquipmentSlot.Weapon1 },
+            IsTwoHanded = true,
+            SupportsDualWield = false,
+            IsUniqueEquip = false
+        });
+        item.Components.Add(new CraftMaterialComponent { UsedInItemIds = new List<string> { "legendary-recipe" } });
 
         // Act
         var doc = mapper.ToDocument(item);
@@ -253,13 +321,17 @@ public class ItemDocumentMapperTests
         doc.SkillIds.Should().NotBeNull().And.HaveCount(1);
         doc.QuestId.Should().NotBeNull();
         doc.StepId.Should().NotBeNull();
+    doc.EquipmentSlots.Should().NotBeNull().And.Contain(EquipmentSlot.Weapon1);
+        doc.IsTwoHanded.Should().BeTrue();
+        doc.SupportsDualWield.Should().BeFalse();
+        doc.UsedInItemIds.Should().NotBeNull().And.Contain("legendary-recipe");
     }
 
     [Fact]
     public void ToDocument_WithNoComponents_ShouldNotThrow()
     {
         // Arrange
-        var mapper = new ItemDocumentMapper(logger: _mockLogger.Object);
+        var mapper = CreateMapper();
         var item = new Item(Guid.NewGuid(), "simple_item") { Name = "Simple Item" };
 
         // Act
@@ -272,13 +344,18 @@ public class ItemDocumentMapperTests
         doc.SkillIds.Should().BeNullOrEmpty();
         doc.QuestId.Should().BeNull();
         doc.StepId.Should().BeNull();
+    doc.EquipmentSlots.Should().BeNullOrEmpty();
+    doc.IsTwoHanded.Should().BeNull();
+    doc.SupportsDualWield.Should().BeNull();
+    doc.IsUniqueEquip.Should().BeNull();
+    doc.UsedInItemIds.Should().BeNullOrEmpty();
     }
 
     [Fact]
     public void ToDomain_WithNullTags_ShouldCreateEmptyHashSet()
     {
         // Arrange
-        var mapper = new ItemDocumentMapper(logger: _mockLogger.Object);
+        var mapper = CreateMapper();
         var doc = new ItemDocument
         {
             Id = Guid.NewGuid(),
@@ -293,6 +370,57 @@ public class ItemDocumentMapperTests
         // Assert
         item.Tags.Should().NotBeNull();
         item.Tags.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void ToDomain_ShouldCreateEquippableComponentFromDocument()
+    {
+        // Arrange
+        var mapper = CreateMapper();
+        var doc = new ItemDocument
+        {
+            Id = Guid.NewGuid(),
+            Name = "Equippable Doc",
+            TypeCode = "equip",
+            EquipmentSlots = new List<EquipmentSlot> { EquipmentSlot.Weapon1 },
+            IsTwoHanded = true,
+            SupportsDualWield = true,
+            IsUniqueEquip = false
+        };
+
+        // Act
+        var item = mapper.ToDomain(doc);
+
+        // Assert
+        var equippable = item.GetComponent<EquippableComponent>();
+        equippable.Should().NotBeNull();
+        equippable!.ValidSlots.Should().Contain(EquipmentSlot.Weapon1);
+        equippable.IsTwoHanded.Should().BeTrue();
+        equippable.SupportsDualWield.Should().BeTrue();
+        equippable.IsUniqueEquip.Should().BeFalse();
+    }
+
+    [Fact]
+    public void ToDomain_ShouldCreateCraftMaterialComponentFromDocument()
+    {
+        // Arrange
+        var mapper = CreateMapper();
+        var doc = new ItemDocument
+        {
+            Id = Guid.NewGuid(),
+            Name = "Material Doc",
+            TypeCode = "material",
+            UsedInItemIds = new List<string> { "recipe-1", "recipe-2" }
+        };
+
+        // Act
+        var item = mapper.ToDomain(doc);
+
+        // Assert
+        var material = item.GetComponent<CraftMaterialComponent>();
+        material.Should().NotBeNull();
+        material!.UsedInItemIds.Should().Contain("recipe-1");
+        material.UsedInItemIds.Should().Contain("recipe-2");
     }
 
     [Fact]
@@ -355,6 +483,47 @@ public class ItemDocumentMapperTests
     }
 
     [Fact]
+    public void CreateComponent_EquippableComponent_ShouldCreateFromDocument()
+    {
+        // Arrange
+        var doc = new ItemDocument
+        {
+            EquipmentSlots = new List<EquipmentSlot> { EquipmentSlot.Weapon1 },
+            IsTwoHanded = false,
+            SupportsDualWield = true,
+            IsUniqueEquip = true
+        };
+
+        // Act
+        var component = ItemDocumentMapper.CreateComponent(typeof(EquippableComponent), doc);
+
+        // Assert
+        component.Should().NotBeNull();
+        component.Should().BeOfType<EquippableComponent>();
+        var equipComp = (EquippableComponent)component!;
+        equipComp.ValidSlots.Should().Contain(EquipmentSlot.Weapon1);
+        equipComp.IsTwoHanded.Should().BeFalse();
+        equipComp.SupportsDualWield.Should().BeTrue();
+        equipComp.IsUniqueEquip.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CreateComponent_CraftMaterialComponent_ShouldCreateFromDocument()
+    {
+        // Arrange
+        var doc = new ItemDocument { UsedInItemIds = new List<string> { "recipe-1" } };
+
+        // Act
+        var component = ItemDocumentMapper.CreateComponent(typeof(CraftMaterialComponent), doc);
+
+        // Assert
+        component.Should().NotBeNull();
+        component.Should().BeOfType<CraftMaterialComponent>();
+        var materialComp = (CraftMaterialComponent)component!;
+        materialComp.UsedInItemIds.Should().Contain("recipe-1");
+    }
+
+    [Fact]
     public void CreateComponent_QuestItemComponent_ShouldCreateFromQuestData()
     {
         // Arrange
@@ -384,36 +553,29 @@ public class ItemDocumentMapperTests
         var socketComp = ItemDocumentMapper.CreateComponent(typeof(SocketComponent), doc);
         var skillComp = ItemDocumentMapper.CreateComponent(typeof(SkillGrantComponent), doc);
         var questComp = ItemDocumentMapper.CreateComponent(typeof(QuestItemComponent), doc);
+    var equipComp = ItemDocumentMapper.CreateComponent(typeof(EquippableComponent), doc);
+    var craftComp = ItemDocumentMapper.CreateComponent(typeof(CraftMaterialComponent), doc);
 
         // Assert
         statsComp.Should().BeNull();
         socketComp.Should().BeNull();
         skillComp.Should().BeNull();
         questComp.Should().BeNull();
+    equipComp.Should().BeNull();
+    craftComp.Should().BeNull();
     }
 
     [Fact]
-    public void ToDomain_WithOptionalComponents_ShouldCreateAllAvailable()
+    public void ToDomain_WithDocumentData_ShouldCreateAllAvailable()
     {
         // Arrange
-        var def = new ItemTypeDefinition
-        {
-            Code = "epic_weapon",
-            DisplayName = "Epic Weapon",
-            OptionalComponents = new[]
-            {
-                typeof(StatsComponent),
-                typeof(SocketComponent),
-                typeof(SkillGrantComponent)
-            }
-        };
-
-        var mapper = new ItemDocumentMapper(_mockLogger.Object, def);
+        var mapper = CreateMapper();
         var doc = new ItemDocument
         {
             Id = Guid.NewGuid(),
             Name = "Epic Item",
             TypeCode = "epic_weapon",
+            Tags = new List<string> { "item:stats" },
             Modifiers = new Dictionary<string, int> { { StatsProperty.Strength.ToString(), 100 } },
             SocketNo = 2,
             SkillIds = new List<Guid> { Guid.NewGuid() }
@@ -433,20 +595,13 @@ public class ItemDocumentMapperTests
     public void ToDomain_WithMixedComponents_ShouldCreateAllAvailable()
     {
         // Arrange
-        var def = new ItemTypeDefinition
-        {
-            Code = "legendary_item",
-            DisplayName = "Legendary Item",
-            RequiredComponents = new[] { typeof(StatsComponent) },
-            OptionalComponents = new[] { typeof(SocketComponent), typeof(SkillGrantComponent) }
-        };
-
-        var mapper = new ItemDocumentMapper(_mockLogger.Object, def);
+        var mapper = CreateMapper();
         var doc = new ItemDocument
         {
             Id = Guid.NewGuid(),
             Name = "Legendary Item",
             TypeCode = "legendary_item",
+            Tags = new List<string> { "item:stats" },
             Modifiers = new Dictionary<string, int> { { StatsProperty.Strength.ToString(), 150 } },
             SocketNo = 3,
             SkillIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() }
@@ -466,7 +621,7 @@ public class ItemDocumentMapperTests
     public void ToDocument_WithDifferentRarities_ShouldMapCorrectly()
     {
         // Arrange
-        var mapper = new ItemDocumentMapper(logger: _mockLogger.Object);
+        var mapper = CreateMapper();
         
         // Act & Assert - Test all rarities
         foreach (ItemRarity rarity in Enum.GetValues(typeof(ItemRarity)))

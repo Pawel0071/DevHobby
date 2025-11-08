@@ -1,124 +1,204 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using MongoDB.Driver;
 using Moq;
 using RPG.Domain.Common;
+using RPG.Domain.Enums;
 using RPG.Infrastructure.Interfaces;
-using RPG.Infrastructure.Repositories.MongoDB;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using RPG.Infrastructure.Repositories.Orchestrators;
 using Xunit;
 
-namespace RPG.UnitTest.Infrastructure;
+namespace RPG.UnitTest.Infrastructure.Repositories.MongoDB;
 
 public class DictionaryRepositoryTests
 {
-    private readonly Mock<IMongoDatabase> _mockDatabase;
-    private readonly Mock<IMongoCollection<ItemTagDefinition>> _mockCollection;
-    private readonly Mock<ILogger<DictionaryRepository<ItemTagDefinition>>> _mockLogger;
-    private readonly DictionaryRepository<ItemTagDefinition> _repository;
-    private readonly Mock<IAsyncCursor<ItemTagDefinition>> _mockCursor;
+    private readonly Mock<IMongoDatabase> _mockDatabase = new();
+    private readonly Mock<IMongoCollection<TagDefinition>> _mockCollection = new();
+    private readonly Mock<ILogger<DictionaryRepository<TagDefinition>>> _mockLogger = new();
+    private readonly DictionaryRepository<TagDefinition> _repository;
 
     public DictionaryRepositoryTests()
     {
-        _mockDatabase = new Mock<IMongoDatabase>();
-        _mockCollection = new Mock<IMongoCollection<ItemTagDefinition>>();
-        _mockLogger = new Mock<ILogger<DictionaryRepository<ItemTagDefinition>>>();
-        _mockCursor = new Mock<IAsyncCursor<ItemTagDefinition>>();
-
         _mockDatabase
-            .Setup(db => db.GetCollection<ItemTagDefinition>(It.IsAny<string>(), null))
+            .Setup(db => db.GetCollection<TagDefinition>(It.IsAny<string>(), null))
             .Returns(_mockCollection.Object);
 
-        _repository = new DictionaryRepository<ItemTagDefinition>(_mockDatabase.Object, _mockLogger.Object);
-    }
-
-    private void SetupMockCursor(IReadOnlyList<ItemTagDefinition> items)
-    {
-        _mockCursor.SetupSequence(c => c.MoveNextAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(true)
-            .ReturnsAsync(false);
-        _mockCursor.Setup(c => c.Current).Returns(items);
-
-        _mockCollection.Setup(c => c.FindAsync(
-                It.IsAny<FilterDefinition<ItemTagDefinition>>(),
-                It.IsAny<FindOptions<ItemTagDefinition, ItemTagDefinition>>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(_mockCursor.Object);
+        _repository = new DictionaryRepository<TagDefinition>(_mockDatabase.Object, _mockLogger.Object);
     }
 
     [Fact]
     public async Task GetAllAsync_WithEmptyCollection_ShouldReturnEmptyList()
     {
-        // Arrange
-        SetupMockCursor(new List<ItemTagDefinition>());
+        SetupFindForGetAll(Array.Empty<TagDefinition>());
 
-        // Act
         var result = await _repository.GetAllAsync();
 
-        // Assert
-        result.Should().NotBeNull();
         result.Should().BeEmpty();
         _mockLogger.Verify(l => l.Info(It.Is<string>(s => s.Contains("Loaded 0"))), Times.Once);
     }
 
     [Fact]
-    public async Task GetAllAsync_WithMultipleItems_ShouldReturnAllItems()
+    public async Task GetAllAsync_WithMultipleItems_ShouldReturnResults()
     {
-        // Arrange
-        var tags = new List<ItemTagDefinition>
+        var tags = new[]
         {
-            new() { Code = "weapon", DisplayName = "Weapon", Category = "Equipment" },
-            new() { Code = "consumable", DisplayName = "Consumable", Category = "Usable" },
-            new() { Code = "quest", DisplayName = "Quest Item", Category = "Special" }
+            CreateDefinition("item:weapon"),
+            CreateDefinition("item:armor")
         };
-        SetupMockCursor(tags);
 
-        // Act
+        SetupFindForGetAll(tags);
+
         var result = await _repository.GetAllAsync();
 
-        // Assert
-        result.Should().HaveCount(3);
-        result.Should().Contain(t => t.Code == "weapon");
-        result.Should().Contain(t => t.Code == "consumable");
-        result.Should().Contain(t => t.Code == "quest");
-        _mockLogger.Verify(l => l.Info(It.Is<string>(s => s.Contains("Loaded 3"))), Times.Once);
+        result.Should().HaveCount(2);
+        result.Should().Contain(t => t.Code == "item:weapon");
+        _mockLogger.Verify(l => l.Info(It.Is<string>(s => s.Contains("Loaded 2"))), Times.Once);
     }
 
     [Fact]
-    public async Task GetByCodeAsync_WithExistingCode_ShouldReturnItem()
+    public async Task GetByCodeAsync_WithExistingCode_ShouldReturnEntry()
     {
-        // Arrange
-        var expectedTag = new ItemTagDefinition
-        {
-            Code = "armor",
-            DisplayName = "Armor",
-            Category = "Equipment",
-            Description = "Protective gear"
-        };
-        SetupMockCursor(new List<ItemTagDefinition> { expectedTag });
+        var expected = CreateDefinition("item:consumable");
 
-        // Act
-        var result = await _repository.GetByCodeAsync("armor");
+        SetupFindForGetByCode(expected);
 
-        // Assert
+        var result = await _repository.GetByCodeAsync("item:consumable");
+
         result.Should().NotBeNull();
-        result!.Code.Should().Be("armor");
-        result.DisplayName.Should().Be("Armor");
+        result!.Code.Should().Be("item:consumable");
     }
 
     [Fact]
-    public async Task GetByCodeAsync_WithNonExistingCode_ShouldReturnNull()
+    public async Task GetByCodeAsync_WithMissingCode_ShouldReturnNullAndWarn()
     {
-        // Arrange
-        SetupMockCursor(new List<ItemTagDefinition>());
+        SetupFindForGetByCode(null);
 
-        // Act
-        var result = await _repository.GetByCodeAsync("nonexistent");
+        var result = await _repository.GetByCodeAsync("missing");
 
-        // Assert
         result.Should().BeNull();
         _mockLogger.Verify(l => l.Warn(It.Is<string>(s => s.Contains("not found"))), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpsertManyAsync_ShouldBulkWriteEntries()
+    {
+        var tags = new[]
+        {
+            CreateDefinition("item:test-1"),
+            CreateDefinition("item:test-2")
+        };
+
+        _mockCollection
+            .Setup(c => c.BulkWriteAsync(
+                It.IsAny<IEnumerable<WriteModel<TagDefinition>>>(),
+                null,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync((BulkWriteResult<TagDefinition>)null!);
+
+        await _repository.UpsertManyAsync(tags, CancellationToken.None);
+
+        _mockCollection.Verify(c => c.BulkWriteAsync(
+            It.Is<IEnumerable<WriteModel<TagDefinition>>>(models => models.Count() == 2),
+            null,
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    private void SetupFindForGetAll(IEnumerable<TagDefinition> items)
+    {
+        var batches = items.Any()
+            ? new[] { items }
+            : Array.Empty<IEnumerable<TagDefinition>>();
+
+        var cursor = new TestAsyncCursor<TagDefinition>(batches);
+
+        _mockCollection
+            .Setup(c => c.FindAsync(
+                It.IsAny<FilterDefinition<TagDefinition>>(),
+                It.IsAny<FindOptions<TagDefinition, TagDefinition>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(cursor);
+    }
+
+    private void SetupFindForGetByCode(TagDefinition? result)
+    {
+        var batches = result is null
+            ? Array.Empty<IEnumerable<TagDefinition>>()
+            : new[] { new[] { result } as IEnumerable<TagDefinition> };
+
+        var cursor = new TestAsyncCursor<TagDefinition>(batches);
+
+        _mockCollection
+            .Setup(c => c.FindAsync(
+                It.IsAny<FilterDefinition<TagDefinition>>(),
+                It.IsAny<FindOptions<TagDefinition, TagDefinition>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(cursor);
+    }
+
+    private sealed class TestAsyncCursor<T> : IAsyncCursor<T>
+    {
+        private readonly IEnumerator<IEnumerable<T>> _enumerator;
+        private bool _disposed;
+
+        public TestAsyncCursor(IEnumerable<IEnumerable<T>> batches)
+        {
+            _enumerator = batches?.GetEnumerator() ?? Enumerable.Empty<IEnumerable<T>>().GetEnumerator();
+        }
+
+        public IEnumerable<T> Current { get; private set; } = Enumerable.Empty<T>();
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            _enumerator.Dispose();
+        }
+
+        public bool MoveNext(CancellationToken cancellationToken)
+        {
+            return MoveNextInternal();
+        }
+
+        public bool MoveNext()
+        {
+            return MoveNextInternal();
+        }
+
+        public Task<bool> MoveNextAsync(CancellationToken cancellationToken)
+        {
+            return Task.FromResult(MoveNextInternal());
+        }
+
+        private bool MoveNextInternal()
+        {
+            if (!_enumerator.MoveNext())
+            {
+                Current = Enumerable.Empty<T>();
+                return false;
+            }
+
+            Current = _enumerator.Current ?? Enumerable.Empty<T>();
+            return true;
+        }
+    }
+
+    private static TagDefinition CreateDefinition(string code)
+    {
+        return new TagDefinition
+        {
+            Code = code,
+            Target = TagTarget.Item,
+            DisplayName = code,
+            Category = "Test"
+        };
     }
 }

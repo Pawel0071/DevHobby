@@ -15,41 +15,42 @@ public class DictionaryWarmupServiceTests
     [Fact]
     public async Task StartAsync_ShouldLoadAllDictionaries()
     {
-        var tagRepo = new Mock<IDictionaryRepository<ItemTagDefinition>>();
-        var tagRegistry = new Mock<IDictionaryRegistry<ItemTagDefinition>>();
-        var typeRepo = new Mock<IDictionaryRepository<ItemTypeDefinition>>();
-        var typeRegistry = new Mock<IDictionaryRegistry<ItemTypeDefinition>>();
+        var tagRepo = new Mock<IDictionaryRepository<TagDefinition>>();
+        var tagRegistry = new Mock<IDictionaryRegistry<TagDefinition>>();
         var errorRepo = new Mock<IDictionaryRepository<ErrorCodeDefinition>>();
         var errorRegistry = new Mock<IDictionaryRegistry<ErrorCodeDefinition>>();
         var logger = new Mock<ILogger<DictionaryWarmupService>>();
 
-        var tagData = new List<ItemTagDefinition> { new() { Code = "tag" } };
-        var typeData = new List<ItemTypeDefinition> { new() { DisplayName = "Sword" } };
+        var tagData = new List<TagDefinition> { new() { Code = "item:test" } };
         var errorData = new List<ErrorCodeDefinition> { new() { Code = "err" } };
 
         tagRepo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(tagData);
-        typeRepo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(typeData);
+        tagRepo.Setup(r => r.UpsertManyAsync(It.IsAny<IEnumerable<TagDefinition>>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
         errorRepo.Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(errorData);
+        errorRepo.Setup(r => r.UpsertManyAsync(It.IsAny<IEnumerable<ErrorCodeDefinition>>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask)
+            .Verifiable();
 
         var services = new ServiceCollection();
         services.AddSingleton(tagRepo.Object);
         services.AddSingleton(tagRegistry.Object);
-        services.AddSingleton(typeRepo.Object);
-        services.AddSingleton(typeRegistry.Object);
         services.AddSingleton(errorRepo.Object);
         services.AddSingleton(errorRegistry.Object);
 
-    using var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
 
         var warmup = new DictionaryWarmupService(provider, logger.Object);
         await warmup.StartAsync(CancellationToken.None);
 
         tagRegistry.Verify(r => r.Load(tagData), Times.Once);
-        typeRegistry.Verify(r => r.Load(typeData), Times.Once);
         errorRegistry.Verify(r => r.Load(errorData), Times.Once);
+        tagRepo.Verify();
+        errorRepo.Verify();
         logger.Verify(l => l.Info(It.Is<string>(msg => msg.Contains("Starting dictionary warmup"))), Times.Once);
         logger.Verify(l => l.Info(It.Is<string>(msg => msg.Contains("completed"))), Times.Once);
-        logger.Verify(l => l.Debug(It.Is<string>(msg => msg.Contains("Loaded dictionary"))), Times.Exactly(3));
+        logger.Verify(l => l.Debug(It.Is<string>(msg => msg.Contains("Loaded dictionary"))), Times.Exactly(2));
     }
 
     [Fact]
@@ -58,10 +59,10 @@ public class DictionaryWarmupServiceTests
         var services = new ServiceCollection().BuildServiceProvider();
         var logger = new Mock<ILogger<DictionaryWarmupService>>();
 
-    var warmup = new DictionaryWarmupService(services, logger.Object);
-    var result = warmup.StopAsync(CancellationToken.None);
+        var warmup = new DictionaryWarmupService(services, logger.Object);
+        var result = warmup.StopAsync(CancellationToken.None);
 
-    result.Should().Be(Task.CompletedTask);
+        result.Should().Be(Task.CompletedTask);
         return Task.CompletedTask;
     }
 }

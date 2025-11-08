@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using MongoDB.Driver;
 using RPG.Domain.Common.Interfaces;
 using RPG.Infrastructure.Interfaces;
@@ -5,7 +10,7 @@ using RPG.Infrastructure.Interfaces;
 namespace RPG.Infrastructure.Repositories.Orchestrators;
 
 /// <summary>
-///     Repository for loading dictionary definitions (ErrorCodeDefinition, ItemTagDefinition, ItemTypeDefinition)
+///     Repository for loading dictionary definitions (ErrorCodeDefinition, TagDefinition)
 ///     from MongoDB into memory at application startup.
 /// </summary>
 /// <typeparam name="T">Dictionary type that implements IDictionaryEntry</typeparam>
@@ -29,9 +34,8 @@ public class DictionaryRepository<T> : IDictionaryRepository<T> where T : IDicti
         {
             _logger.Debug($"Loading all {typeof(T).Name} from MongoDB collection: {GetCollectionName()}");
 
-            var items = await _collection
-                .Find(_ => true)
-                .ToListAsync(cancellationToken);
+            using var cursor = await _collection.FindAsync(_ => true, cancellationToken: cancellationToken);
+            var items = await ReadAllAsync(cursor, cancellationToken).ConfigureAwait(false);
 
             _logger.Info($"Loaded {items.Count} {typeof(T).Name} entries from MongoDB");
 
@@ -44,6 +48,39 @@ public class DictionaryRepository<T> : IDictionaryRepository<T> where T : IDicti
         }
     }
 
+    public async Task UpsertManyAsync(IEnumerable<T> entries, CancellationToken cancellationToken = default)
+    {
+        if (entries is null)
+        {
+            return;
+        }
+
+        var models = entries
+            .Where(entry => entry is not null)
+            .Select(entry =>
+            {
+                var filter = Builders<T>.Filter.Eq(x => x.Code, entry.Code);
+                return new ReplaceOneModel<T>(filter, entry) { IsUpsert = true };
+            })
+            .ToList();
+
+        if (models.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            _logger.Debug($"Ensuring {models.Count} {typeof(T).Name} definitions exist in MongoDB collection: {GetCollectionName()}");
+            await _collection.BulkWriteAsync(models, cancellationToken: cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"Failed to upsert {typeof(T).Name} definitions", ex);
+            throw;
+        }
+    }
+
     public async Task<T?> GetByCodeAsync(string code, CancellationToken cancellationToken = default)
     {
         try
@@ -51,9 +88,8 @@ public class DictionaryRepository<T> : IDictionaryRepository<T> where T : IDicti
             _logger.Debug($"Loading {typeof(T).Name} with code: {code}");
 
             var filter = Builders<T>.Filter.Eq(x => x.Code, code);
-            var item = await _collection
-                .Find(filter)
-                .FirstOrDefaultAsync(cancellationToken);
+            using var cursor = await _collection.FindAsync(filter, cancellationToken: cancellationToken);
+            var item = await ReadFirstOrDefaultAsync(cursor, cancellationToken).ConfigureAwait(false);
 
             if (item != null)
                 _logger.Debug($"Found {typeof(T).Name} with code: {code}");
@@ -73,11 +109,38 @@ public class DictionaryRepository<T> : IDictionaryRepository<T> where T : IDicti
     {
         var typeName = typeof(T).Name;
 
-        // ErrorCodeDefinition → ErrorCodes
-        // ItemTagDefinition → ItemTags
-        // ItemTypeDefinition → ItemTypes
+    // ErrorCodeDefinition → ErrorCodes
+    // TagDefinition → Tags
         if (typeName.EndsWith("Definition")) typeName = typeName[..^"Definition".Length];
 
         return typeName + "s";
+    }
+
+    private static async Task<List<T>> ReadAllAsync(IAsyncCursor<T> cursor, CancellationToken cancellationToken)
+    {
+        var items = new List<T>();
+
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            items.AddRange(cursor.Current.Where(entry => entry is not null));
+        }
+
+        return items;
+    }
+
+    private static async Task<T?> ReadFirstOrDefaultAsync(IAsyncCursor<T> cursor, CancellationToken cancellationToken)
+    {
+        while (await cursor.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+        {
+            foreach (var entry in cursor.Current)
+            {
+                if (entry is not null)
+                {
+                    return entry;
+                }
+            }
+        }
+
+        return default;
     }
 }

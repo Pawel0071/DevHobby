@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using FluentAssertions;
 using Moq;
 using RPG.Domain.Common;
+using RPG.Domain.Enums;
 using RPG.Infrastructure.Common;
 using RPG.Infrastructure.Interfaces;
 
@@ -8,30 +10,31 @@ namespace RPG.UnitTest.Infrastructure.Common;
 
 public class DictionaryRegistryTests
 {
-    private readonly Mock<ILogger<DictionaryRegistry<ItemTagDefinition>>> _mockLogger;
-    private readonly DictionaryRegistry<ItemTagDefinition> _registry;
+    private readonly Mock<ILogger<DictionaryRegistry<TagDefinition>>> _mockLogger;
+    private readonly DictionaryRegistry<TagDefinition> _registry;
 
     public DictionaryRegistryTests()
     {
-        _mockLogger = new Mock<ILogger<DictionaryRegistry<ItemTagDefinition>>>();
-        _registry = new DictionaryRegistry<ItemTagDefinition>(_mockLogger.Object);
+        _mockLogger = new Mock<ILogger<DictionaryRegistry<TagDefinition>>>();
+        _registry = new DictionaryRegistry<TagDefinition>(_mockLogger.Object);
     }
 
     [Fact]
     public void Load_ShouldLoadEntries_AndLogInformation()
     {
         // Arrange
-        var entries = new List<ItemTagDefinition>
+        var entries = new List<TagDefinition>
         {
-            new() { Code = "weapon", DisplayName = "Weapon" }, new() { Code = "armor", DisplayName = "Armor" }
+            CreateDefinition("item:test-weapon", "Weapon"),
+            CreateDefinition("item:test-armor", "Armor")
         };
 
         // Act
         _registry.Load(entries);
 
         // Assert
-        _registry.IsValid("weapon").Should().BeTrue();
-        _registry.IsValid("armor").Should().BeTrue();
+        _registry.IsValid("item:test-weapon").Should().BeTrue();
+        _registry.IsValid("item:test-armor").Should().BeTrue();
 
         _mockLogger.Verify(x => x.Info(It.Is<string>(s => s.Contains("Loading dictionary"))), Times.Once);
         _mockLogger.Verify(x => x.Info(It.Is<string>(s => s.Contains("loaded"))), Times.Once);
@@ -41,18 +44,18 @@ public class DictionaryRegistryTests
     public void IsValid_ShouldReturnTrue_ForValidCode()
     {
         // Arrange
-        var entries = new List<ItemTagDefinition> { new() { Code = "weapon", DisplayName = "Weapon" } };
+        var entries = new List<TagDefinition> { CreateDefinition("item:test-weapon", "Weapon") };
         _registry.Load(entries);
 
         // Act & Assert
-        _registry.IsValid("weapon").Should().BeTrue();
+        _registry.IsValid("item:test-weapon").Should().BeTrue();
     }
 
     [Fact]
     public void IsValid_ShouldReturnFalse_ForInvalidCode()
     {
         // Arrange
-        var entries = new List<ItemTagDefinition>();
+        var entries = new List<TagDefinition>();
         _registry.Load(entries);
 
         // Act & Assert
@@ -63,22 +66,22 @@ public class DictionaryRegistryTests
     public void Get_ShouldReturnEntry_WhenCodeExists()
     {
         // Arrange
-        var entry = new ItemTagDefinition { Code = "weapon", DisplayName = "Weapon" };
+        var entry = CreateDefinition("item:test-weapon", "Weapon");
         _registry.Load(new[] { entry });
 
         // Act
-        var result = _registry.Get("weapon");
+        var result = _registry.Get("item:test-weapon");
 
         // Assert
         result.Should().NotBeNull();
-        result!.Code.Should().Be("weapon");
+        result!.Code.Should().Be("item:test-weapon");
     }
 
     [Fact]
     public void Get_ShouldReturnNull_WhenCodeDoesNotExist()
     {
         // Arrange
-        _registry.Load(Array.Empty<ItemTagDefinition>());
+        _registry.Load(Array.Empty<TagDefinition>());
 
         // Act
         var result = _registry.Get("nonexistent");
@@ -91,9 +94,10 @@ public class DictionaryRegistryTests
     public void All_ShouldReturnAllLoadedEntries()
     {
         // Arrange
-        var entries = new List<ItemTagDefinition>
+        var entries = new List<TagDefinition>
         {
-            new() { Code = "weapon", DisplayName = "Weapon" }, new() { Code = "armor", DisplayName = "Armor" }
+            CreateDefinition("item:test-weapon", "Weapon"),
+            CreateDefinition("item:test-armor", "Armor")
         };
         _registry.Load(entries);
 
@@ -108,19 +112,27 @@ public class DictionaryRegistryTests
     public void Load_ShouldClearPreviousEntries()
     {
         // Arrange
-        var firstLoad = new List<ItemTagDefinition> { new() { Code = "weapon", DisplayName = "Weapon" } };
-        var secondLoad = new List<ItemTagDefinition> { new() { Code = "armor", DisplayName = "Armor" } };
+        var firstLoad = new List<TagDefinition> { CreateDefinition("item:test-weapon", "Weapon") };
+        var secondLoad = new List<TagDefinition> { CreateDefinition("item:test-armor", "Armor") };
 
         // Act
         _registry.Load(firstLoad);
-        var firstCount = _registry.Codes.Count;
-
         _registry.Load(secondLoad);
-        var secondCount = _registry.Codes.Count;
 
         // Assert
-        // Predefined entries + new entries
-        _registry.IsValid("armor").Should().BeTrue();
+        _registry.IsValid("item:test-armor").Should().BeTrue();
         _mockLogger.Verify(x => x.Info(It.IsAny<string>()), Times.AtLeast(2));
+    }
+
+    private static TagDefinition CreateDefinition(string code, string name)
+    {
+        return new TagDefinition
+        {
+            Code = code,
+            DisplayName = name,
+            Category = "Test",
+            Description = string.Empty,
+            Target = TagTarget.Item
+        };
     }
 }

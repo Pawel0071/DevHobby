@@ -1,5 +1,7 @@
+using MongoDB.Bson.Serialization.Attributes;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
+using System.Text.Json.Serialization;
 
 namespace RPG.Infrastructure.Documents;
 
@@ -20,9 +22,43 @@ public class ItemDocument : IMongoDocument
     public List<string> Tags { get; set; } = new();
 
     // Komponenty jako dane
+    [BsonIgnoreIfNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public Dictionary<string, int>? Modifiers { get; set; }
+
+    [BsonIgnoreIfNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? SocketNo { get; set; }
+
+    [BsonIgnoreIfNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<Guid>? SkillIds { get; set; }
+
+    [BsonIgnoreIfNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public Guid? QuestId { get; set; }
+
+    [BsonIgnoreIfNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public Guid? StepId { get; set; }
+
+    [BsonIgnoreIfNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<EquipmentSlot>? EquipmentSlots { get; set; }
+
+    [BsonIgnoreIfNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? IsTwoHanded { get; set; }
+
+    [BsonIgnoreIfNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? SupportsDualWield { get; set; }
+
+    [BsonIgnoreIfNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? IsUniqueEquip { get; set; }
+
+    [BsonIgnoreIfNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? UsedInItemIds { get; set; }
 }
