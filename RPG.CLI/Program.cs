@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using RPG.Application;
 using RPG.Application.Handlers;
 using RPG.CLI.Commands;
@@ -38,6 +41,19 @@ var builder = Host.CreateDefaultBuilder(args)
         services.AddInfrastructure(configuration);
         services.AddCore(configuration);
         services.AddApplication(configuration);
+
+        var otlpEndpoint = configuration.GetValue<string>("OpenTelemetry:OtlpEndpoint") ?? "http://localhost:4317";
+
+        services.AddOpenTelemetry()
+            .ConfigureResource(resource => resource
+                .AddService("RPG.GameServer", serviceVersion: "1.0.0"))
+            .WithTracing(tracing => tracing
+                .AddSource("RPG.GameServer")
+                .AddOtlpExporter(options =>
+                {
+                    options.Endpoint = new Uri(otlpEndpoint);
+                    options.Protocol = OtlpExportProtocol.Grpc;
+                }));
 
         services.AddSingleton<LocationMapper>();
 
@@ -80,6 +96,8 @@ var builder = Host.CreateDefaultBuilder(args)
     });
 
 using var host = builder.Build();
+await host.StartAsync();
+
 var services = host.Services;
 
 // CLI root
@@ -94,4 +112,11 @@ rootCommand.AddCommand(functionalTestsCommand.Build());
 var documentTestsCommand = new DocumentRepositoryCommand(services);
 rootCommand.AddCommand(documentTestsCommand.Build());
 
-await rootCommand.InvokeAsync(args);
+try
+{
+    await rootCommand.InvokeAsync(args);
+}
+finally
+{
+    await host.StopAsync();
+}
