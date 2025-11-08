@@ -18,8 +18,17 @@ public class MongoDocumentRepositoryTests
 {
     private readonly Mock<IMongoDatabase> _databaseMock = new();
     private readonly Mock<ILogger<MongoDocumentRepository>> _loggerMock = new();
+    private readonly Mock<IActivityScope> _activityScopeMock = new();
+    private readonly IDisposable _activityHandle = Mock.Of<IDisposable>();
 
-    private MongoDocumentRepository CreateRepository() => new(_databaseMock.Object, _loggerMock.Object);
+    public MongoDocumentRepositoryTests()
+    {
+        _activityScopeMock
+            .Setup(scope => scope.Start(It.IsAny<string>(), It.IsAny<IDictionary<string, object>>()))
+            .Returns(_activityHandle);
+    }
+
+    private MongoDocumentRepository CreateRepository() => new(_databaseMock.Object, _loggerMock.Object, _activityScopeMock.Object);
 
     private static Mock<IMongoCollection<TestDocument>> CreateCollectionMock() => new();
 

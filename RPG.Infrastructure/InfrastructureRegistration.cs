@@ -11,6 +11,7 @@ using RPG.Infrastructure.HealthChecks;
 using RPG.Infrastructure.Helpers;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Logger;
+using RPG.Infrastructure.OpenTelemetry;
 using RPG.Infrastructure.Repositories.Orchestrators;
 using RPG.Infrastructure.Repositories.RabbitMQ;
 using RPG.Infrastructure.Repositories.Redis;
@@ -35,6 +36,7 @@ public static class InfrastructureRegistration
             .CreateLogger();
 
         services.AddSingleton(typeof(ILogger<>), typeof(SerilogWrapper<>));
+        services.AddSingleton<IActivityScope, OpenTelemetryActivityScope>();
 
         // Redis
         services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -90,7 +92,7 @@ public static class InfrastructureRegistration
         services.AddSingleton<IDictionaryRegistry<ItemTypeDefinition>, DictionaryRegistry<ItemTypeDefinition>>();
 
         // MongoDB
-        services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConn));
+        services.AddSingleton<IMongoClient>(_ => new MongoClient(mongoConn));
         services.AddSingleton<IMongoDatabase>(sp =>
         {
             var client = sp.GetRequiredService<IMongoClient>();

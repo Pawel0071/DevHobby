@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
@@ -17,19 +18,22 @@ public class RabbitMqConsumer : IRabbitMqConsumer
     private readonly ILogger<RabbitMqConsumer> _logger;
     private readonly string _queueName;
     private readonly string _routingKey;
+    private readonly IActivityScope _activityScope;
     private string? _consumerTag;
     private Func<string, string, CancellationToken, Task>? _messageHandler;
 
     public RabbitMqConsumer(
         IChannel channel,
         ILogger<RabbitMqConsumer> logger,
-        RabbitMqSettings settings)
+        RabbitMqSettings settings,
+        IActivityScope activityScope)
     {
         _channel = channel;
         _logger = logger;
         _exchangeName = settings.ExchangeName;
         _queueName = settings.QueueName ?? "rpg_persistence_queue";
         _routingKey = settings.RoutingKey ?? "#";
+        _activityScope = activityScope;
     }
 
     public void SetMessageHandler(Func<string, string, CancellationToken, Task> handler)
@@ -76,6 +80,16 @@ public class RabbitMqConsumer : IRabbitMqConsumer
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
+
+                using var activity = _activityScope.Start("rabbitmq.consume", new Dictionary<string, object>
+                {
+                    ["messaging.system"] = "rabbitmq",
+                    ["messaging.destination"] = _queueName,
+                    ["messaging.destination_kind"] = "queue",
+                    ["messaging.operation"] = "process",
+                    ["messaging.rabbitmq.routing_key"] = ea.RoutingKey,
+                    ["messaging.message.payload_size_bytes"] = body.Length
+                });
 
                 _logger.Info($"Received message. RoutingKey={ea.RoutingKey}, Size={body.Length} bytes");
 
@@ -140,6 +154,14 @@ public class RabbitMqConsumer : IRabbitMqConsumer
     {
         try
         {
+            using var activity = _activityScope.Start("rabbitmq.handle", new Dictionary<string, object>
+            {
+                ["messaging.system"] = "rabbitmq",
+                ["messaging.destination"] = _queueName,
+                ["messaging.operation"] = operationFromRoutingKey(routingKey),
+                ["messaging.rabbitmq.routing_key"] = routingKey
+            });
+
             _logger.Info($"Processing message. RoutingKey={routingKey}");
 
             if (_messageHandler != null)
@@ -156,5 +178,11 @@ public class RabbitMqConsumer : IRabbitMqConsumer
             _logger.Error("Error deserializing message", ex);
             throw;
         }
+    }
+
+    private static string operationFromRoutingKey(string routingKey)
+    {
+        var parts = routingKey.Split('.');
+        return parts.Length > 0 ? parts[^1] : "process";
     }
 }

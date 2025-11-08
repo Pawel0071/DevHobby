@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
@@ -16,17 +17,20 @@ public class RabbitMqPublisher : IRabbitMqPublisher
     private readonly ILogger<RabbitMqPublisher> _logger;
     private readonly string _queueName;
     private readonly string _routingKey;
+    private readonly IActivityScope _activityScope;
 
     public RabbitMqPublisher(
         IChannel channel,
         ILogger<RabbitMqPublisher> logger,
-        RabbitMqSettings settings)
+        RabbitMqSettings settings,
+        IActivityScope activityScope)
     {
         _channel = channel;
         _logger = logger;
         _exchangeName = settings.ExchangeName;
         _queueName = settings.QueueName ?? "rpg_persistence_queue";
         _routingKey = settings.RoutingKey ?? "#";
+        _activityScope = activityScope;
 
         _logger.Info(
             $"RabbitMqPublisher initialized: Exchange={_exchangeName}, Queue={_queueName}, RoutingKey={_routingKey}");
@@ -36,6 +40,15 @@ public class RabbitMqPublisher : IRabbitMqPublisher
     {
         try
         {
+            using var activity = _activityScope.Start("rabbitmq.publish", new Dictionary<string, object>
+            {
+                ["messaging.system"] = "rabbitmq",
+                ["messaging.destination"] = _exchangeName,
+                ["messaging.destination_kind"] = "exchange",
+                ["messaging.operation"] = "publish",
+                ["messaging.rabbitmq.routing_key"] = topic
+            });
+
             var json = JsonSerializer.Serialize(message);
             var body = Encoding.UTF8.GetBytes(json);
 

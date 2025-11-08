@@ -41,12 +41,13 @@ docker-compose logs -f grafana
 
 ## ✅ Already Integrated
 
-**RPG.GameServer** is already configured with full OpenTelemetry support:
+**RPG.GameServer** is already configured with full OpenTelemetry support and now emits spans for MongoDB, Redis, and RabbitMQ operations through the shared `IActivityScope` abstraction:
 
 - ✅ Traces exported to Tempo via OTLP (http://tempo:4317)
 - ✅ Metrics exported to Prometheus via `/metrics` endpoint
 - ✅ Custom ActivitySource `RPG.GameServer` automatically captured
 - ✅ ASP.NET Core, gRPC, and HTTP client instrumentation enabled
+- ✅ MongoDB/Redis repositories and RabbitMQ publisher/consumer create spans with database & messaging tags
 
 **Configuration:**
 - Production: `appsettings.json` → `"OtlpEndpoint": "http://tempo:4317"`
@@ -191,32 +192,10 @@ process_resident_memory_bytes / 1024 / 1024
 ## Monitoring infrastruktury
 
 ### MongoDB
-Dodaj MongoDB Exporter do `compose.yaml`:
-```yaml
-mongodb_exporter:
-  image: percona/mongodb_exporter:latest
-  container_name: mongodb_exporter
-  command:
-    - '--mongodb.uri=mongodb://mongo_user:mongo_pass@mongodb:27017'
-  ports:
-    - "9216:9216"
-  networks:
-    - backend
-```
+`compose.yaml` uruchamia teraz `percona/mongodb_exporter` (port `9216`). Prometheus zbiera metryki z endpointu `mongodb_exporter:9216`.
 
 ### Redis
-Dodaj Redis Exporter:
-```yaml
-redis_exporter:
-  image: oliver006/redis_exporter:latest
-  container_name: redis_exporter
-  command:
-    - '--redis.addr=redis:6379'
-  ports:
-    - "9121:9121"
-  networks:
-    - backend
-```
+`compose.yaml` startuje `oliver006/redis_exporter` (port `9121`). Prometheus zbiera metryki z endpointu `redis_exporter:9121`.
 
 ## Alerty
 

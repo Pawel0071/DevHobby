@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using FluentAssertions;
 using Moq;
@@ -13,12 +14,21 @@ public class RabbitMqPublisherTests
 {
     private readonly Mock<IChannel> _channelMock = new();
     private readonly Mock<ILogger<RabbitMqPublisher>> _loggerMock = new();
+    private readonly Mock<IActivityScope> _activityScopeMock = new();
+    private readonly IDisposable _activityHandle = Mock.Of<IDisposable>();
 
     private readonly RabbitMqSettings _settings = new() { Host = "localhost", ExchangeName = "rpg_exchange" };
 
+    public RabbitMqPublisherTests()
+    {
+        _activityScopeMock
+            .Setup(scope => scope.Start(It.IsAny<string>(), It.IsAny<IDictionary<string, object>>()))
+            .Returns(_activityHandle);
+    }
+
     private RabbitMqPublisher CreatePublisher()
     {
-        return new RabbitMqPublisher(_channelMock.Object, _loggerMock.Object, _settings);
+        return new RabbitMqPublisher(_channelMock.Object, _loggerMock.Object, _settings, _activityScopeMock.Object);
     }
 
     [Fact]

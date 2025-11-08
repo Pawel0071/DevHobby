@@ -45,6 +45,7 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+      - "15692:15692"
     environment:
       RABBITMQ_DEFAULT_USER: rabbit_user
       RABBITMQ_DEFAULT_PASS: rabbit_pass
@@ -59,6 +60,35 @@ services:
       start_period: 30s
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+
+  mongodb_exporter:
+    image: percona/mongodb_exporter:0.43
+    container_name: mongodb_exporter
+    command:
+      - '--mongodb.uri=mongodb://mongo_user:mongo_pass@mongodb:27017/admin'
+      - '--compatible-mode'
+    ports:
+      - "9216:9216"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+
+  redis_exporter:
+    image: oliver006/redis_exporter:v1.57.0
+    container_name: redis_exporter
+    command:
+      - '--redis.addr=redis:6379'
+    ports:
+      - "9121:9121"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
 
   # Observability Stack (Grafana + Prometheus + Tempo + Loki)
   prometheus:

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
@@ -13,13 +15,16 @@ public class RedisDocumentRepository : IRedisDocumentRepository
 {
     private readonly ILogger<RedisDocumentRepository> _logger;
     private readonly IDatabase _redisDatabase;
+    private readonly IActivityScope _activityScope;
 
     public RedisDocumentRepository(
         IDatabase redisDatabase,
-        ILogger<RedisDocumentRepository> logger)
+        ILogger<RedisDocumentRepository> logger,
+        IActivityScope activityScope)
     {
         _redisDatabase = redisDatabase;
         _logger = logger;
+        _activityScope = activityScope;
     }
 
     /// <summary>
@@ -46,6 +51,14 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     {
         try
         {
+            using var activity = _activityScope.Start("redis.upsert", new Dictionary<string, object>
+            {
+                ["db.system"] = "redis",
+                ["db.operation"] = "set",
+                ["db.redis.key"] = BuildKey<TDocument>(document.Id),
+                ["db.redis.database"] = _redisDatabase.Database
+            });
+
             var key = BuildKey<TDocument>(document.Id);
             var json = JsonSerializer.Serialize(document);
             
@@ -71,6 +84,14 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     {
         try
         {
+            using var activity = _activityScope.Start("redis.get", new Dictionary<string, object>
+            {
+                ["db.system"] = "redis",
+                ["db.operation"] = "get",
+                ["db.redis.key"] = BuildKey<TDocument>(id),
+                ["db.redis.database"] = _redisDatabase.Database
+            });
+
             var key = BuildKey<TDocument>(id);
             var json = await _redisDatabase.StringGetAsync(key);
 
@@ -100,6 +121,14 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     {
         try
         {
+            using var activity = _activityScope.Start("redis.getAll", new Dictionary<string, object>
+            {
+                ["db.system"] = "redis",
+                ["db.operation"] = "scan",
+                ["db.redis.pattern"] = BuildPattern<TDocument>(),
+                ["db.redis.database"] = _redisDatabase.Database
+            });
+
             var pattern = BuildPattern<TDocument>();
             var server = _redisDatabase.Multiplexer.GetServer(_redisDatabase.Multiplexer.GetEndPoints().First());
             var keys = server.Keys(pattern: pattern).Select(k => (RedisKey)k.ToString()).ToArray();
@@ -146,6 +175,16 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     {
         try
         {
+            using var activity = _activityScope.Start("redis.getBatch", new Dictionary<string, object>
+            {
+                ["db.system"] = "redis",
+                ["db.operation"] = "scan",
+                ["db.redis.pattern"] = BuildPattern<TDocument>(),
+                ["db.redis.database"] = _redisDatabase.Database,
+                ["db.redis.skip"] = skip,
+                ["db.redis.limit"] = limit
+            });
+
             var allDocuments = await GetAllAsync<TDocument>(cancellationToken);
             var batch = allDocuments.Skip(skip).Take(limit).ToList();
 
@@ -167,6 +206,14 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     {
         try
         {
+            using var activity = _activityScope.Start("redis.count", new Dictionary<string, object>
+            {
+                ["db.system"] = "redis",
+                ["db.operation"] = "scan",
+                ["db.redis.pattern"] = BuildPattern<TDocument>(),
+                ["db.redis.database"] = _redisDatabase.Database
+            });
+
             var pattern = BuildPattern<TDocument>();
             var server = _redisDatabase.Multiplexer.GetServer(_redisDatabase.Multiplexer.GetEndPoints().First());
             var count = server.Keys(pattern: pattern).Count();
@@ -189,6 +236,14 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     {
         try
         {
+            using var activity = _activityScope.Start("redis.delete", new Dictionary<string, object>
+            {
+                ["db.system"] = "redis",
+                ["db.operation"] = "del",
+                ["db.redis.key"] = BuildKey<TDocument>(id),
+                ["db.redis.database"] = _redisDatabase.Database
+            });
+
             var key = BuildKey<TDocument>(id);
             var deleted = await _redisDatabase.KeyDeleteAsync(key);
 

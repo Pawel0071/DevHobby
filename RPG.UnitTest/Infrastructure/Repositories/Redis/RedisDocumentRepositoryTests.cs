@@ -21,6 +21,8 @@ public class RedisDocumentRepositoryTests
     private readonly RedisDocumentRepository _repository;
     private readonly Mock<IServer> _mockServer;
     private readonly Mock<IConnectionMultiplexer> _mockConnectionMultiplexer;
+    private readonly Mock<IActivityScope> _activityScopeMock = new();
+    private readonly IDisposable _activityHandle = Mock.Of<IDisposable>();
 
     public RedisDocumentRepositoryTests()
     {
@@ -34,7 +36,11 @@ public class RedisDocumentRepositoryTests
         _mockConnectionMultiplexer.Setup(m => m.GetEndPoints(It.IsAny<bool>())).Returns(new System.Net.EndPoint[] { new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, 6379) });
         _mockDatabase.Setup(db => db.Multiplexer).Returns(_mockConnectionMultiplexer.Object);
 
-        _repository = new RedisDocumentRepository(_mockDatabase.Object, _mockLogger.Object);
+        _activityScopeMock
+            .Setup(scope => scope.Start(It.IsAny<string>(), It.IsAny<IDictionary<string, object>>()))
+            .Returns(_activityHandle);
+
+        _repository = new RedisDocumentRepository(_mockDatabase.Object, _mockLogger.Object, _activityScopeMock.Object);
     }
 
     private class TestDocument : IMongoDocument

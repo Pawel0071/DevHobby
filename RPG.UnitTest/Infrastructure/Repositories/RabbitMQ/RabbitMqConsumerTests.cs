@@ -23,6 +23,15 @@ namespace RPG.UnitTest.Infrastructure.Repositories.RabbitMQ
             QueueName = "rpg.queue",
             RoutingKey = "rpg.#"
         };
+        private readonly Mock<IActivityScope> _activityScopeMock = new();
+        private readonly IDisposable _activityHandle = Mock.Of<IDisposable>();
+
+        public RabbitMqConsumerTests()
+        {
+            _activityScopeMock
+                .Setup(scope => scope.Start(It.IsAny<string>(), It.IsAny<IDictionary<string, object>>()))
+                .Returns(_activityHandle);
+        }
 
         [Fact]
         public async Task StartConsumingAsync_ShouldConfigureTopologyAndStart()
@@ -30,7 +39,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.RabbitMQ
             AsyncEventingBasicConsumer? consumerCapture = null;
             var channel = CreateChannelMock(out var logger, consumer => consumerCapture = consumer);
 
-            var subject = new RabbitMqConsumer(channel.Object, logger.Object, _settings);
+            var subject = new RabbitMqConsumer(channel.Object, logger.Object, _settings, _activityScopeMock.Object);
 
             await subject.StartConsumingAsync();
 
@@ -79,7 +88,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.RabbitMQ
         {
             AsyncEventingBasicConsumer? consumerCapture = null;
             var channel = CreateChannelMock(out var logger, consumer => consumerCapture = consumer);
-            var subject = new RabbitMqConsumer(channel.Object, logger.Object, _settings);
+            var subject = new RabbitMqConsumer(channel.Object, logger.Object, _settings, _activityScopeMock.Object);
 
             var handledMessages = new List<(string Message, string RoutingKey)>();
             subject.SetMessageHandler((message, routingKey, _) =>
@@ -112,7 +121,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.RabbitMQ
         {
             AsyncEventingBasicConsumer? consumerCapture = null;
             var channel = CreateChannelMock(out var logger, consumer => consumerCapture = consumer);
-            var subject = new RabbitMqConsumer(channel.Object, logger.Object, _settings);
+            var subject = new RabbitMqConsumer(channel.Object, logger.Object, _settings, _activityScopeMock.Object);
 
             subject.SetMessageHandler((_, _, _) => throw new InvalidOperationException("boom"));
 
@@ -140,7 +149,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.RabbitMQ
         {
             AsyncEventingBasicConsumer? consumerCapture = null;
             var channel = CreateChannelMock(out var logger, consumer => consumerCapture = consumer);
-            var subject = new RabbitMqConsumer(channel.Object, logger.Object, _settings);
+            var subject = new RabbitMqConsumer(channel.Object, logger.Object, _settings, _activityScopeMock.Object);
 
             await subject.StartConsumingAsync();
             consumerCapture.Should().NotBeNull();
@@ -166,7 +175,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.RabbitMQ
         {
             AsyncEventingBasicConsumer? consumerCapture = null;
             var channel = CreateChannelMock(out var logger, consumer => consumerCapture = consumer);
-            var subject = new RabbitMqConsumer(channel.Object, logger.Object, _settings);
+            var subject = new RabbitMqConsumer(channel.Object, logger.Object, _settings, _activityScopeMock.Object);
 
             await subject.StartConsumingAsync();
             await subject.StopConsumingAsync();
@@ -190,7 +199,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.RabbitMQ
                     It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new InvalidOperationException("exchange error"));
 
-            var subject = new RabbitMqConsumer(channel.Object, logger.Object, _settings);
+            var subject = new RabbitMqConsumer(channel.Object, logger.Object, _settings, _activityScopeMock.Object);
 
             var act = async () => await subject.StartConsumingAsync();
 

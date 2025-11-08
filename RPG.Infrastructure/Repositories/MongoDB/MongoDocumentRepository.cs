@@ -1,6 +1,7 @@
 using MongoDB.Driver;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using System.Collections.Generic;
 
 namespace RPG.Infrastructure.Repositories.MongoDB;
 
@@ -13,13 +14,16 @@ public class MongoDocumentRepository : IMongoDocumentRepository
 {
     private readonly IMongoDatabase _database;
     private readonly ILogger<MongoDocumentRepository> _logger;
+    private readonly IActivityScope _activityScope;
 
     public MongoDocumentRepository(
         IMongoDatabase database,
-        ILogger<MongoDocumentRepository> logger)
+        ILogger<MongoDocumentRepository> logger,
+        IActivityScope activityScope)
     {
         _database = database;
         _logger = logger;
+        _activityScope = activityScope;
     }
 
     /// <summary>
@@ -30,6 +34,14 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     {
         try
         {
+            using var activity = _activityScope.Start("mongo.upsert", new Dictionary<string, object>
+            {
+                ["db.system"] = "mongodb",
+                ["db.operation"] = "replaceOne",
+                ["db.collection"] = TDocument.CollectionName,
+                ["db.namespace"] = GetDatabaseName()
+            });
+
             var collection = _database.GetCollection<TDocument>(TDocument.CollectionName);
             var id = document.Id;
             var filter = Builders<TDocument>.Filter.Eq("_id", id);
@@ -57,6 +69,15 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     {
         try
         {
+            using var activity = _activityScope.Start("mongo.getById", new Dictionary<string, object>
+            {
+                ["db.system"] = "mongodb",
+                ["db.operation"] = "findOne",
+                ["db.collection"] = TDocument.CollectionName,
+                ["db.namespace"] = GetDatabaseName(),
+                ["db.mongo.request_id"] = id
+            });
+
             var collection = _database.GetCollection<TDocument>(TDocument.CollectionName);
             var filter = Builders<TDocument>.Filter.Eq("_id", id);
             var document = await collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
@@ -83,6 +104,14 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     {
         try
         {
+            using var activity = _activityScope.Start("mongo.findAll", new Dictionary<string, object>
+            {
+                ["db.system"] = "mongodb",
+                ["db.operation"] = "find",
+                ["db.collection"] = TDocument.CollectionName,
+                ["db.namespace"] = GetDatabaseName()
+            });
+
             var collection = _database.GetCollection<TDocument>(TDocument.CollectionName);
             var documents = await collection.Find(_ => true).ToListAsync(cancellationToken);
 
@@ -105,6 +134,16 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     {
         try
         {
+            using var activity = _activityScope.Start("mongo.findBatch", new Dictionary<string, object>
+            {
+                ["db.system"] = "mongodb",
+                ["db.operation"] = "find",
+                ["db.collection"] = TDocument.CollectionName,
+                ["db.namespace"] = GetDatabaseName(),
+                ["db.mongo.skip"] = skip,
+                ["db.mongo.limit"] = limit
+            });
+
             var collection = _database.GetCollection<TDocument>(TDocument.CollectionName);
             var documents = await collection
                 .Find(_ => true)
@@ -132,6 +171,14 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     {
         try
         {
+            using var activity = _activityScope.Start("mongo.count", new Dictionary<string, object>
+            {
+                ["db.system"] = "mongodb",
+                ["db.operation"] = "count",
+                ["db.collection"] = TDocument.CollectionName,
+                ["db.namespace"] = GetDatabaseName()
+            });
+
             var collection = _database.GetCollection<TDocument>(TDocument.CollectionName);
             var count = await collection.CountDocumentsAsync(_ => true, cancellationToken: cancellationToken);
 
@@ -154,6 +201,15 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     {
         try
         {
+            using var activity = _activityScope.Start("mongo.delete", new Dictionary<string, object>
+            {
+                ["db.system"] = "mongodb",
+                ["db.operation"] = "deleteOne",
+                ["db.collection"] = TDocument.CollectionName,
+                ["db.namespace"] = GetDatabaseName(),
+                ["db.mongo.request_id"] = id
+            });
+
             var collection = _database.GetCollection<TDocument>(TDocument.CollectionName);
             var filter = Builders<TDocument>.Filter.Eq("_id", id);
             var result = await collection.DeleteOneAsync(filter, cancellationToken);
@@ -172,5 +228,11 @@ public class MongoDocumentRepository : IMongoDocumentRepository
             _logger.Error($"Failed to delete {typeof(TDocument).Name} from MongoDB. Id={id}", ex);
             throw;
         }
+
+    }
+
+    private string GetDatabaseName()
+    {
+        return _database?.DatabaseNamespace?.DatabaseName ?? "unknown";
     }
 }
