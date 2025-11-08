@@ -23,6 +23,26 @@ public sealed class ErrorCodeDefinition : IDictionaryEntry<ErrorCodeDefinition>
     public static readonly ErrorCodeDefinition NoFreeSlot =
         new() { Code = "no_free_slot", Message = "Brak wolnego slotu", Category = "Inventory" };
 
+    public static readonly ErrorCodeDefinition ItemNotEquippable = new()
+    {
+        Code = "item_not_equippable", Message = "Przedmiot nie może być wyposażony", Category = "Equipment"
+    };
+
+    public static readonly ErrorCodeDefinition EquipmentMetadataMissing = new()
+    {
+        Code = "equipment_metadata_missing", Message = "Brak danych o wyposażeniu", Category = "Equipment"
+    };
+
+    public static readonly ErrorCodeDefinition EquipmentSlotMismatch = new()
+    {
+        Code = "equipment_slot_mismatch", Message = "Nieprawidłowy slot wyposażenia", Category = "Equipment"
+    };
+
+    public static readonly ErrorCodeDefinition UniqueEquipViolation = new()
+    {
+        Code = "unique_equip_violation", Message = "Przedmiot może być założony tylko raz", Category = "Equipment"
+    };
+
     public static readonly ErrorCodeDefinition AlreadyMaxLevel = new() { Code = "char_max_lecel" };
     public string? Message { get; init; } // np. "Operacja niedozwolona"
     public string? Category { get; init; } // np. "Logic", "Inventory", "Combat"
@@ -34,6 +54,10 @@ public sealed class ErrorCodeDefinition : IDictionaryEntry<ErrorCodeDefinition>
         InvalidOperation,
         ItemNotFound,
         StackLimitReached,
-        NoFreeSlot
+        NoFreeSlot,
+        ItemNotEquippable,
+        EquipmentMetadataMissing,
+        EquipmentSlotMismatch,
+        UniqueEquipViolation
     ];
 }

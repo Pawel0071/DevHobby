@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using FluentAssertions;
 using Moq;
 using RPG.Core.Common;
@@ -6,6 +7,7 @@ using RPG.Core.Services.EquipmentService;
 using RPG.Domain.Common;
 using RPG.Domain.Entities;
 using RPG.Domain.Entities.Items;
+using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Enums;
 using RPG.Infrastructure.Interfaces;
 
@@ -135,6 +137,23 @@ public class EquipmentServiceTests
 
     private static Item CreateItem(string name)
     {
-        return new Item(Guid.NewGuid(), "Weapon 1H") { Id = Guid.NewGuid(), Name = name, TypeCode = "Weapon 1H" };
+        return new Item(Guid.NewGuid(), "Weapon 1H")
+        {
+            Id = Guid.NewGuid(),
+            Name = name,
+            TypeCode = "Weapon 1H",
+            Tags = new HashSet<string> { "item:equippable" },
+            Components = new List<IItemComponent>
+            {
+                new EquippableComponent
+                {
+                    ValidSlots = new List<EquipmentSlot>
+                    {
+                        EquipmentSlot.Weapon1,
+                        EquipmentSlot.Weapon2
+                    }
+                }
+            }
+        };
     }
 }
