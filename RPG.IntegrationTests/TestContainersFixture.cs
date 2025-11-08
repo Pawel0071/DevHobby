@@ -10,8 +10,8 @@ namespace RPG.IntegrationTests;
 public class TestContainersFixture : IAsyncLifetime
 {
     private MongoDbContainer? _mongoContainer;
-    private RedisContainer? _redisContainer;
     private RabbitMqContainer? _rabbitMqContainer;
+    private RedisContainer? _redisContainer;
 
     public IMongoClient MongoClient { get; private set; } = null!;
     public IMongoDatabase MongoDatabase { get; private set; } = null!;
@@ -48,15 +48,14 @@ public class TestContainersFixture : IAsyncLifetime
         MongoClient = new MongoClient(MongoConnectionString);
         MongoDatabase = MongoClient.GetDatabase("rpg_test");
 
-        // Initialize Redis client
-        RedisConnection = await ConnectionMultiplexer.ConnectAsync(RedisConnectionString);
+    // Initialize Redis client (allow admin commands for cleanup)
+    var redisOptions = ConfigurationOptions.Parse(RedisConnectionString);
+    redisOptions.AllowAdmin = true;
+    RedisConnection = await ConnectionMultiplexer.ConnectAsync(redisOptions);
         RedisDatabase = RedisConnection.GetDatabase();
 
         // Initialize RabbitMQ client
-        var factory = new ConnectionFactory
-        {
-            Uri = new Uri(RabbitConnectionString)
-        };
+        var factory = new ConnectionFactory { Uri = new Uri(RabbitConnectionString) };
         RabbitConnection = await factory.CreateConnectionAsync();
         RabbitChannel = await RabbitConnection.CreateChannelAsync();
     }
@@ -66,7 +65,7 @@ public class TestContainersFixture : IAsyncLifetime
         // Dispose clients
         if (RabbitChannel != null)
             await RabbitChannel.CloseAsync();
-        
+
         if (RabbitConnection != null)
             await RabbitConnection.CloseAsync();
 

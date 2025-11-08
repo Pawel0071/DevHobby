@@ -16,7 +16,7 @@ public class RabbitMqHealthCheck : IHealthCheck
     }
 
     public Task<HealthCheckResult> CheckHealthAsync(
-        HealthCheckContext context, 
+        HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
         try

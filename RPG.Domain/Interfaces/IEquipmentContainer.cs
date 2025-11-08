@@ -1,4 +1,3 @@
-using RPG.Domain.Common;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
 

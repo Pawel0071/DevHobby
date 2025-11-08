@@ -1,24 +1,32 @@
-using Microsoft.Extensions.Logging;
 using RPG.Infrastructure.Interfaces;
+using RPG.PersistenceService.Handlers;
 
 namespace RPG.PersistenceService.Service;
 
 public class RabbitMqToMongoService : IRabbitMqToMongoService
 {
+    private readonly Infrastructure.Interfaces.ILogger<RabbitMqToMongoService> _logger;
     private readonly IRabbitMqConsumer _rabbitConsumer;
-    private readonly Microsoft.Extensions.Logging.ILogger<RabbitMqToMongoService> _logger;
+    private readonly MessageHandler _messageHandler;
 
     public RabbitMqToMongoService(
         IRabbitMqConsumer rabbitConsumer,
-        Microsoft.Extensions.Logging.ILogger<RabbitMqToMongoService> logger)
+        MessageHandler messageHandler,
+        Infrastructure.Interfaces.ILogger<RabbitMqToMongoService> logger)
     {
         _rabbitConsumer = rabbitConsumer;
+        _messageHandler = messageHandler;
         _logger = logger;
     }
 
     public async Task StartListeningAsync()
     {
-        _logger.LogInformation("Starting RabbitMQ to MongoDB service");
+        _logger.Info("Starting RabbitMQ to MongoDB service");
+
+        // Set message handler
+        _rabbitConsumer.SetMessageHandler(_messageHandler.HandleMessageAsync);
+
+        // Start consuming
         await _rabbitConsumer.StartConsumingAsync();
     }
 }

@@ -16,8 +16,8 @@ public class OpenTelemetryActivityScope : IActivityScope
     public IDisposable? Start(string name, IDictionary<string, object>? tags = null)
     {
         _logger.Debug($"Starting activity: {name}");
-        
-        var activity = Source.StartActivity(name, ActivityKind.Internal);
+
+        var activity = Source.StartActivity(name);
 
         if (activity is null)
         {
@@ -27,10 +27,7 @@ public class OpenTelemetryActivityScope : IActivityScope
 
         if (tags is not null)
         {
-            foreach (var tag in tags)
-            {
-                activity.SetTag(tag.Key, tag.Value);
-            }
+            foreach (var tag in tags) activity.SetTag(tag.Key, tag.Value);
             _logger.Debug($"Activity {name} started with {tags.Count} tags");
         }
 

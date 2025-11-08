@@ -1,25 +1,22 @@
 using RPG.Infrastructure.Interfaces;
+using System.Threading.Tasks;
 
-namespace RPG.Infrastructure.Repositories.RabbitMQ;
-
-/// <summary>
-/// Null Object Pattern - używany gdy RabbitMQ nie jest skonfigurowany.
-/// Pozwala aplikacji działać bez RabbitMQ dla dev/test.
-/// </summary>
-public class NullRabbitMqPublisher : IRabbitMqPublisher
+namespace RPG.Infrastructure.Repositories.RabbitMQ
 {
-    private readonly ILogger<NullRabbitMqPublisher>? _logger;
-
-    public NullRabbitMqPublisher(ILogger<NullRabbitMqPublisher>? logger = null)
+    public class NullRabbitMqPublisher : IRabbitMqPublisher
     {
-        _logger = logger;
-        _logger?.Info("NullRabbitMqPublisher initialized - RabbitMQ messages will not be published");
-    }
+        private readonly ILogger<NullRabbitMqPublisher>? _logger;
 
-    public Task PublishAsync<T>(string topic, T message)
-    {
-        _logger?.Debug($"NullRabbitMqPublisher: Skipping message publish to topic={topic}");
-        // Do nothing - silent no-op
-        return Task.CompletedTask;
+        public NullRabbitMqPublisher(ILogger<NullRabbitMqPublisher>? logger)
+        {
+            _logger = logger;
+            _logger?.Info("NullRabbitMqPublisher initialized because RabbitMQ is not configured.");
+        }
+
+        public Task PublishAsync<T>(string topic, T message)
+        {
+            _logger?.Debug($"Skipping message publish to topic '{topic}' as RabbitMQ is not configured.");
+            return Task.CompletedTask;
+        }
     }
 }

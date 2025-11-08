@@ -1,4 +1,3 @@
-using RPG.Domain.Common;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
@@ -7,7 +6,7 @@ namespace RPG.Domain.Containers;
 
 public class EquipmentContainer : IEquipmentContainer
 {
-    public EquipmentContainer() 
+    public EquipmentContainer()
     {
         Equipments = Enum.GetValues(typeof(EquipmentSlot))
             .Cast<EquipmentSlot>()
@@ -22,7 +21,13 @@ public class EquipmentContainer : IEquipmentContainer
 
     public IDictionary<EquipmentSlot, Item> Equipments { get; }
 
-    public bool IsEmpty(EquipmentSlot slot) => Equipments[slot] == null;
-    
-    public bool Contains(EquipmentSlot slot) => Equipments.ContainsKey(slot);
+    public bool IsEmpty(EquipmentSlot slot)
+    {
+        return Equipments[slot] == null;
+    }
+
+    public bool Contains(EquipmentSlot slot)
+    {
+        return Equipments.ContainsKey(slot);
+    }
 }

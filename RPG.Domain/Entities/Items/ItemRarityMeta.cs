@@ -14,5 +14,7 @@ public static class ItemRarityMeta
     };
 
     public static string GetColor(ItemRarity rarity)
-        => RarityColors.TryGetValue(rarity, out var color) ? color : "#FFFFFF";
+    {
+        return RarityColors.TryGetValue(rarity, out var color) ? color : "#FFFFFF";
+    }
 }

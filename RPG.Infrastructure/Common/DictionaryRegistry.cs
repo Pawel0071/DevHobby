@@ -5,7 +5,7 @@ namespace RPG.Infrastructure.Common;
 
 public class DictionaryRegistry<T> : IDictionaryRegistry<T> where T : IDictionaryEntry<T>
 {
-    private readonly Dictionary<string, T> _entries = new Dictionary<string, T>();
+    private readonly Dictionary<string, T> _entries = new();
     private readonly ILogger<DictionaryRegistry<T>> _logger;
 
     public DictionaryRegistry(ILogger<DictionaryRegistry<T>> logger)
@@ -32,13 +32,19 @@ public class DictionaryRegistry<T> : IDictionaryRegistry<T> where T : IDictionar
             loadedCount++;
         }
 
-        _logger.Info($"Dictionary {typeof(T).Name} loaded: {predefinedCount} predefined, {loadedCount} from storage, {_entries.Count} total");
+        _logger.Info(
+            $"Dictionary {typeof(T).Name} loaded: {predefinedCount} predefined, {loadedCount} from storage, {_entries.Count} total");
     }
 
-    public bool IsValid(string code) => _entries.ContainsKey(code);
+    public bool IsValid(string code)
+    {
+        return _entries.ContainsKey(code);
+    }
 
-    public T? Get(string code) =>
-        _entries.TryGetValue(code, out var entry) ? entry : default;
+    public T? Get(string code)
+    {
+        return _entries.TryGetValue(code, out var entry) ? entry : default;
+    }
 
     public IReadOnlyCollection<string> Codes => _entries.Keys;
 

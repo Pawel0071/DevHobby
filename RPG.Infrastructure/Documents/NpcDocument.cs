@@ -1,0 +1,37 @@
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace RPG.Infrastructure.Documents;
+
+/// <summary>
+///     MongoDB document representing a Non-Player Character (NPC).
+///     Uses tags and components for flexible NPC behavior definition.
+/// </summary>
+public class NpcDocument : IMongoDocument
+{
+    public static string CollectionName => "Npcs";
+
+    [BsonId]
+    [BsonRepresentation(BsonType.String)]
+    public Guid Id { get; set; }
+
+    public required string Name { get; set; }
+    public string DisplayName { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+
+    // Basic attributes
+    public int Level { get; set; }
+    public int CurrentHealth { get; set; }
+    public int MaxHealth { get; set; }
+
+    // Spawn Location
+    public LocationData SpawnLocation { get; set; } = new();
+
+    [BsonRepresentation(BsonType.String)] public Guid WorldId { get; set; }
+
+    // Tags for categorization (e.g., "friendly", "hostile", "merchant", "boss")
+    public List<string> Tags { get; set; } = new();
+
+    // Components stored as JSON strings
+    public List<ComponentData> Components { get; set; } = new();
+}

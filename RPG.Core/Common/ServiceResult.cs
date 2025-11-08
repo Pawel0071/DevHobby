@@ -1,5 +1,4 @@
 using RPG.Domain.Common;
-using RPG.Infrastructure;
 
 namespace RPG.Core.Common;
 
@@ -10,11 +9,17 @@ public readonly record struct ServiceResult<TResult>(
     string? Message = null)
 {
     public static ServiceResult<TResult> Ok(TResult result)
-        => new(true, ErrorCodeDefinition.None, result);
+    {
+        return new ServiceResult<TResult>(true, ErrorCodeDefinition.None, result);
+    }
 
     public static ServiceResult<TResult> Fail(ErrorCodeDefinition error, string? message = null)
-        => new(false, error, default, message ?? error.Message);
+    {
+        return new ServiceResult<TResult>(false, error, default, message ?? error.Message);
+    }
 
     public static ServiceResult<TResult> FromException(Exception ex, ErrorCodeDefinition? fallback = null)
-        => new(false, fallback ?? ErrorCodeDefinition.Unknown, default, ex.Message);
+    {
+        return new ServiceResult<TResult>(false, fallback ?? ErrorCodeDefinition.Unknown, default, ex.Message);
+    }
 }

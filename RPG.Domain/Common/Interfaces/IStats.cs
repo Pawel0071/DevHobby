@@ -1,4 +1,4 @@
-using RPG.Domain.Interfaces;
+using RPG.Domain.Enums;
 
 namespace RPG.Domain.Common.Interfaces;
 
@@ -8,7 +8,7 @@ public interface IStats
     int MaxHealth { get; set; }
     int CurrentResource { get; set; }
     int MaxResource { get; set; }
-    
-    IStatsContainer BaseStats { get; set; }
-    IStatsContainer ModifiedStats { get; set; }
+
+    IDictionary<StatsProperty, int> BaseStats { get; }
+    IDictionary<StatsProperty, int> ModifiedStats { get; }
 }

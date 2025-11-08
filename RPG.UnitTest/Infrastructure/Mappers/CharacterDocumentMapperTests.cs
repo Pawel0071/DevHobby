@@ -1,0 +1,148 @@
+using FluentAssertions;
+using RPG.Domain.Entities;
+using RPG.Domain.Enums;
+using RPG.Infrastructure.Documents;
+using RPG.Infrastructure.Mappers;
+
+namespace RPG.UnitTest.Infrastructure.Mappers;
+
+/// <summary>
+///     Tests for CharacterDocumentMapper - mapping between Character entity and CharacterDocument
+/// </summary>
+public class CharacterDocumentMapperTests
+{
+    private readonly CharacterDocumentMapper _mapper = new(null);
+
+    [Fact]
+    public void ToDocument_MapsBasicProperties()
+    {
+        // Arrange
+        var character = new Character(
+            Guid.NewGuid(),
+            CharacterClass.Warrior
+        )
+        {
+            Id = Guid.NewGuid(),
+            Name = "Geralt"
+        };
+
+        // Act
+        var document = _mapper.ToDocument(character);
+
+        // Assert
+        document.Should().NotBeNull();
+        document.Id.Should().Be(character.Id);
+        document.Name.Should().Be("Geralt");
+        document.Class.Should().Be(CharacterClass.Warrior.ToString());
+    }
+
+    [Fact]
+    public void ToDocument_MapsSessionAndPlayerIds()
+    {
+        // Arrange
+        var sessionId = Guid.NewGuid();
+        var playerId = Guid.NewGuid();
+        
+        var character = new Character(sessionId, CharacterClass.Mage)
+        {
+            Id = Guid.NewGuid(),
+            Name = "Test",
+            PlayerId = playerId
+        };
+
+        // Act
+        var document = _mapper.ToDocument(character);
+
+        // Assert
+        document.SessionId.Should().Be(sessionId);
+        document.PlayerId.Should().Be(playerId);
+    }
+
+    [Fact]
+    public void ToDomain_MapsBasicProperties()
+    {
+        // Arrange
+        var document = new CharacterDocument
+        {
+            Id = Guid.NewGuid(),
+            Name = "Geralt",
+            Class = CharacterClass.Warrior.ToString(),
+            SessionId = Guid.NewGuid(),
+            PlayerId = Guid.NewGuid()
+        };
+
+        // Act
+        var character = _mapper.ToDomain(document);
+
+        // Assert
+        character.Should().NotBeNull();
+        character.Id.Should().Be(document.Id);
+        character.Name.Should().Be("Geralt");
+        character.Class.Should().Be(CharacterClass.Warrior);
+    }
+
+    [Fact]
+    public void RoundTrip_PreservesBasicData()
+    {
+        // Arrange
+        var originalCharacter = new Character(Guid.NewGuid(), CharacterClass.Assassin)
+        {
+            Id = Guid.NewGuid(),
+            Name = "Geralt",
+            PlayerId = Guid.NewGuid()
+        };
+
+        // Act - convert to document and back
+        var document = _mapper.ToDocument(originalCharacter);
+        var roundTrippedCharacter = _mapper.ToDomain(document);
+
+        // Assert - basic properties should match
+        roundTrippedCharacter.Id.Should().Be(originalCharacter.Id);
+        roundTrippedCharacter.Name.Should().Be(originalCharacter.Name);
+        roundTrippedCharacter.Class.Should().Be(originalCharacter.Class);
+        roundTrippedCharacter.SessionId.Should().Be(originalCharacter.SessionId);
+        roundTrippedCharacter.PlayerId.Should().Be(originalCharacter.PlayerId);
+    }
+
+    [Fact]
+    public void ToDocument_HandlesNullPlayerId()
+    {
+        // Arrange
+        var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
+        {
+            Id = Guid.NewGuid(),
+            Name = "Test"
+            // PlayerId not set (default Guid.Empty)
+        };
+
+        // Act
+        var document = _mapper.ToDocument(character);
+
+        // Assert
+        document.Should().NotBeNull();
+        // Should handle Guid.Empty gracefully
+        document.PlayerId.Should().Be(Guid.Empty);
+    }
+
+    [Fact]
+    public void ToDocument_WithEmptyInventories_ShouldMapInventorySlots()
+    {
+        // Arrange
+        var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
+        {
+            Id = Guid.NewGuid(),
+            Name = "EmptyInventoryTest"
+        };
+
+        // Act
+        var document = _mapper.ToDocument(character);
+
+        // Assert
+        document.Backpack.Should().NotBeNull();
+        document.Bank.Should().NotBeNull();
+        document.Equipment.Should().NotBeNull();
+        document.Skills.Should().NotBeNull();
+        document.ActiveSkills.Should().NotBeNull();
+    }
+}
+

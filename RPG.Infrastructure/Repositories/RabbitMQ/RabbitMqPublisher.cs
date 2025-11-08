@@ -1,25 +1,25 @@
-using RPG.Infrastructure.Configuration;
 using System.Text;
 using System.Text.Json;
 using RabbitMQ.Client;
+using RPG.Infrastructure.Configuration;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Infrastructure.Repositories.RabbitMQ;
 
 /// <summary>
-/// RabbitMQ publisher for sending messages to exchange.
+///     RabbitMQ publisher for sending messages to exchange.
 /// </summary>
 public class RabbitMqPublisher : IRabbitMqPublisher
 {
     private readonly IChannel _channel;
-    private readonly Interfaces.ILogger<RabbitMqPublisher> _logger;
     private readonly string _exchangeName;
+    private readonly ILogger<RabbitMqPublisher> _logger;
     private readonly string _queueName;
     private readonly string _routingKey;
 
     public RabbitMqPublisher(
-        IChannel channel, 
-        Interfaces.ILogger<RabbitMqPublisher> logger, 
+        IChannel channel,
+        ILogger<RabbitMqPublisher> logger,
         RabbitMqSettings settings)
     {
         _channel = channel;
@@ -27,8 +27,9 @@ public class RabbitMqPublisher : IRabbitMqPublisher
         _exchangeName = settings.ExchangeName;
         _queueName = settings.QueueName ?? "rpg_persistence_queue";
         _routingKey = settings.RoutingKey ?? "#";
-        
-        _logger.Info($"RabbitMqPublisher initialized: Exchange={_exchangeName}, Queue={_queueName}, RoutingKey={_routingKey}");
+
+        _logger.Info(
+            $"RabbitMqPublisher initialized: Exchange={_exchangeName}, Queue={_queueName}, RoutingKey={_routingKey}");
     }
 
     public async Task PublishAsync<T>(string topic, T message)
@@ -41,10 +42,10 @@ public class RabbitMqPublisher : IRabbitMqPublisher
             _logger.Debug($"Publishing message to topic '{topic}': {json}");
 
             await _channel.BasicPublishAsync(
-                exchange: _exchangeName,
-                routingKey: topic,
-                mandatory: false,
-                body: body
+                _exchangeName,
+                topic,
+                false,
+                body
             );
 
             _logger.Info($"Message published to topic '{topic}'");

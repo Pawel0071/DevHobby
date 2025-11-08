@@ -50,9 +50,9 @@ public class RedisIntegrationTests : IClassFixture<TestContainersFixture>
         // Act
         await _redisDb.StringSetAsync(key, value, ttl);
         var result1 = await _redisDb.StringGetAsync(key);
-        
+
         await Task.Delay(TimeSpan.FromSeconds(3));
-        
+
         var result2 = await _redisDb.StringGetAsync(key);
 
         // Assert
@@ -84,9 +84,7 @@ public class RedisIntegrationTests : IClassFixture<TestContainersFixture>
         var key = "test:hash:character";
         var hashEntries = new[]
         {
-            new HashEntry("name", "Hero"),
-            new HashEntry("level", 10),
-            new HashEntry("health", 100)
+            new HashEntry("name", "Hero"), new HashEntry("level", 10), new HashEntry("health", 100)
         };
 
         // Act

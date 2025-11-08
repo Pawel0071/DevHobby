@@ -4,17 +4,17 @@ using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
 using RabbitMQ.Client;
 using RPG.Domain.Common;
-using RPG.Domain.Entities.Items;
 using RPG.Infrastructure.Common;
 using RPG.Infrastructure.Configuration;
 using RPG.Infrastructure.Documents;
+using RPG.Infrastructure.HealthChecks;
+using RPG.Infrastructure.Helpers;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Logger;
-using RPG.Infrastructure.Outbox;
-using RPG.Infrastructure.Repositories.MongoDB;
+using RPG.Infrastructure.Repositories.Orchestrators;
 using RPG.Infrastructure.Repositories.RabbitMQ;
 using RPG.Infrastructure.Repositories.Redis;
-using RPG.Infrastructure.Services;
+using RPG.Infrastructure.Repositories.MongoDB;
 using Serilog;
 using StackExchange.Redis;
 
@@ -27,25 +27,26 @@ public static class InfrastructureRegistration
         var rabbitConfig = config.GetSection("RabbitMQ").Get<RabbitMqSettings>();
         var redisConn = config.GetConnectionString("Redis");
         var mongoConn = config.GetConnectionString("Mongo");
-        
+
         // Logger - Konfiguracja Seriloga
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(config)
             .Enrich.FromLogContext()
             .CreateLogger();
-        
+
         services.AddSingleton(typeof(ILogger<>), typeof(SerilogWrapper<>));
-        
+
         // Redis
         services.AddSingleton<IConnectionMultiplexer>(sp =>
             ConnectionMultiplexer.Connect(redisConn!));
-        services.AddSingleton<IRedisCache, RedisCache>();
+        services.AddSingleton<IDatabase>(sp => sp.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
+        services.AddSingleton<IRedisDocumentRepository, RedisDocumentRepository>();
 
         // RabbitMQ
         if (rabbitConfig?.Host != null)
         {
             services.AddSingleton(rabbitConfig);
-            
+
             services.AddSingleton<IConnection>(sp =>
             {
                 var factory = new ConnectionFactory
@@ -66,25 +67,28 @@ public static class InfrastructureRegistration
             });
 
             services.AddSingleton<IRabbitMqPublisher, RabbitMqPublisher>();
+            services.AddSingleton<IRabbitMqConsumer, RabbitMqConsumer>();
         }
         else
         {
             // Null object pattern when RabbitMQ is not configured
-            services.AddSingleton<IRabbitMqPublisher>(sp => 
+            services.AddSingleton<IRabbitMqPublisher>(sp =>
             {
                 var logger = sp.GetService<ILogger<NullRabbitMqPublisher>>();
-                return new NullRabbitMqPublisher(logger);
+                return new NullRabbitMqPublisher(logger!);
             });
         }
-        
-        services.AddScoped<IDictionaryRepository<ItemTagDefinition>, MongoDictionaryRepository<ItemTagDefinition>>();
-        services.AddScoped<IDictionaryRepository<ErrorCodeDefinition>, MongoDictionaryRepository<ErrorCodeDefinition>>();
-        services.AddScoped<IDictionaryRepository<ItemTypeDefinition>, MongoDictionaryRepository<ItemTypeDefinition>>();
 
-        services.AddSingleton<IDictionaryRegistry<ItemTagDefinition>, DictionaryRegistry<ItemTagDefinition>>(); 
-        services.AddSingleton<IDictionaryRegistry<ErrorCodeDefinition>, DictionaryRegistry<ErrorCodeDefinition>>(); 
+        // Dictionary Repositories - for loading definitions from MongoDB
+        services.AddSingleton<IDictionaryRepository<ItemTagDefinition>, DictionaryRepository<ItemTagDefinition>>();
+        services.AddSingleton<IDictionaryRepository<ErrorCodeDefinition>, DictionaryRepository<ErrorCodeDefinition>>();
+        services.AddSingleton<IDictionaryRepository<ItemTypeDefinition>, DictionaryRepository<ItemTypeDefinition>>();
+
+        // Dictionary Registries - in-memory cache for loaded dictionaries
+        services.AddSingleton<IDictionaryRegistry<ItemTagDefinition>, DictionaryRegistry<ItemTagDefinition>>();
+        services.AddSingleton<IDictionaryRegistry<ErrorCodeDefinition>, DictionaryRegistry<ErrorCodeDefinition>>();
         services.AddSingleton<IDictionaryRegistry<ItemTypeDefinition>, DictionaryRegistry<ItemTypeDefinition>>();
-        
+
         // MongoDB
         services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConn));
         services.AddSingleton<IMongoDatabase>(sp =>
@@ -92,28 +96,17 @@ public static class InfrastructureRegistration
             var client = sp.GetRequiredService<IMongoClient>();
             return client.GetDatabase("rpg");
         });
-        
-        services.AddSingleton<IMongoCollection<ItemDocument>>(sp =>
-        {
-            var db = sp.GetRequiredService<IMongoDatabase>();
-            return db.GetCollection<ItemDocument>(ItemDocument.ItemCollection);
-        });
-        
-        services.AddSingleton<IMongoCollection<OutboxMessage>>(sp =>
-        {
-            var db = sp.GetRequiredService<IMongoDatabase>();
-            return db.GetCollection<OutboxMessage>("OutboxMessages");
-        });
 
-        services.AddSingleton<IHostedService, DictionaryWarmupService>();
-        services.AddHostedService<OutboxDispatcher>();
-        
+        services.AddSingleton<IMongoDocumentRepository, MongoDocumentRepository>();
+        services.AddSingleton<IDocumentRepository, DocumentRepository>();
+        services.AddSingleton<IDocumentTypeResolver, DocumentTypeResolver>();
+
         // Health Checks
         services.AddHealthChecks()
-            .AddCheck<RPG.Infrastructure.HealthChecks.MongoHealthCheck>("mongodb")
-            .AddCheck<RPG.Infrastructure.HealthChecks.RedisHealthCheck>("redis")
-            .AddCheck<RPG.Infrastructure.HealthChecks.RabbitMqHealthCheck>("rabbitmq");
-        
+            .AddCheck<MongoHealthCheck>("mongo")
+            .AddCheck<RedisHealthCheck>("redis")
+            .AddCheck<RabbitMqHealthCheck>("rabbitmq");
+
         return services;
     }
 }

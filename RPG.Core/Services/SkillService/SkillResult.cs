@@ -8,6 +8,13 @@ public enum SkillError
 
 public record SkillResult(bool Success, SkillError Result, string? Message = null)
 {
-    public static SkillResult Ok() => new(true, SkillError.None);
-    public static SkillResult Fail(SkillError result, string? message = null) => new(false, result, message);
+    public static SkillResult Ok()
+    {
+        return new SkillResult(true, SkillError.None);
+    }
+
+    public static SkillResult Fail(SkillError result, string? message = null)
+    {
+        return new SkillResult(false, result, message);
+    }
 }

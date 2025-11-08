@@ -1,12 +1,13 @@
-using RPG.Domain.Common;
-using RPG.Domain.Containers;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
 
 namespace RPG.Infrastructure.Documents;
 
-public class ItemDocument
+public class ItemDocument : IMongoDocument
 {
+    public static string CollectionName => "Items";
+    
+    // Keep for backward compatibility
     public static string ItemCollection { get; } = "Items";
 
     public Guid Id { get; set; }
@@ -16,7 +17,7 @@ public class ItemDocument
     public int RequiredLevel { get; set; }
     public int StackSize { get; set; }
 
-    public List<string> Tags { get; set; } = new List<string>();
+    public List<string> Tags { get; set; } = new();
 
     // Komponenty jako dane
     public Dictionary<StatsProperty, int>? Modifiers { get; set; }
@@ -24,5 +25,4 @@ public class ItemDocument
     public List<Guid>? SkillIds { get; set; }
     public Guid? QuestId { get; set; }
     public Guid? StepId { get; set; }
-    
 }

@@ -1,6 +1,4 @@
 using RPG.Core.Common;
-using RPG.Core.Services.InventoryService;
-using RPG.Domain.Common;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Interfaces;
 

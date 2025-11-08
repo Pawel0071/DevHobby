@@ -1,7 +1,7 @@
 using RPG.Core.Common;
-using RPG.Domain.Common;
 using RPG.Domain.Entities;
 using RPG.Domain.Entities.Items;
+using RPG.Domain.Entities.Skills;
 
 namespace RPG.Core.Interfaces;
 
@@ -14,4 +14,3 @@ public interface ISkillService
     ServiceResult<bool> LearnSkill(Character character, Skill skill);
     ServiceResult<bool> UnlearnSkill(Character character, Skill skill);
 }
-

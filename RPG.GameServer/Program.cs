@@ -11,10 +11,10 @@ using RPG.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile("../RPG.Infrastructure/appsettings.infrastructure.json", optional: true, reloadOnChange: true)
-    .AddJsonFile("../RPG.Core/appsettings.core.json", optional: true, reloadOnChange: true)
-    .AddJsonFile("../RPG.Application/appsettings.application.json", optional: true, reloadOnChange: true);
+    .AddJsonFile("appsettings.json", false, true)
+    .AddJsonFile("../RPG.Infrastructure/appsettings.infrastructure.json", true, true)
+    .AddJsonFile("../RPG.Core/appsettings.core.json", true, true)
+    .AddJsonFile("../RPG.Application/appsettings.application.json", true, true);
 
 // gRPC
 builder.Services.AddGrpc();
@@ -24,7 +24,7 @@ var otlpEndpoint = builder.Configuration.GetValue<string>("OpenTelemetry:OtlpEnd
 
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(resource => resource
-        .AddService(serviceName: "RPG.GameServer", serviceVersion: "1.0.0"))
+        .AddService("RPG.GameServer", serviceVersion: "1.0.0"))
     .WithTracing(tracing => tracing
         .AddSource("RPG.GameServer") // Nasz ActivitySource z OpenTelemetryActivityScope
         .AddAspNetCoreInstrumentation(options =>

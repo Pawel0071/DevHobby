@@ -9,14 +9,14 @@ using RPG.Infrastructure.Interfaces;
 namespace RPG.Infrastructure.Mappers;
 
 /// <summary>
-/// Mapper for converting between Item domain entity and ItemDocument
+///     Mapper for converting between Item domain entity and ItemDocument
 /// </summary>
 public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
 {
     private readonly ItemTypeDefinition? _itemTypeDefinition;
-    private readonly ILogger<ItemDocumentMapper>? _logger;
+    private readonly ILogger<ItemDocumentMapper> _logger;
 
-    public ItemDocumentMapper(ItemTypeDefinition? itemTypeDefinition = null, ILogger<ItemDocumentMapper>? logger = null)
+    public ItemDocumentMapper(ILogger<ItemDocumentMapper> logger, ItemTypeDefinition? itemTypeDefinition = null)
     {
         _itemTypeDefinition = itemTypeDefinition;
         _logger = logger;
@@ -24,8 +24,8 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
 
     public ItemDocument ToDocument(Item entity)
     {
-        _logger?.Debug($"Converting Item to ItemDocument. Id={entity.Id}, Type={entity.TypeCode}");
-        
+        _logger.Debug($"Converting Item to ItemDocument. Id={entity.Id}, Type={entity.TypeCode}");
+
         var doc = new ItemDocument
         {
             Id = entity.Id,
@@ -54,14 +54,15 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
             doc.StepId = quest.StepId;
         }
 
-        _logger?.Debug($"ItemDocument created. Id={doc.Id}, Components mapped: Stats={doc.Modifiers?.Count > 0}, Sockets={doc.SocketNo > 0}, Skills={doc.SkillIds?.Count > 0}");
+        _logger.Debug(
+            $"ItemDocument created. Id={doc.Id}, Components mapped: Stats={doc.Modifiers?.Count > 0}, Sockets={doc.SocketNo > 0}, Skills={doc.SkillIds?.Count > 0}");
         return doc;
     }
 
     public Item ToDomain(ItemDocument document)
     {
-        _logger?.Debug($"Converting ItemDocument to Item. Id={document.Id}, Type={document.TypeCode}");
-        
+        _logger.Debug($"Converting ItemDocument to Item. Id={document.Id}, Type={document.TypeCode}");
+
         var item = new Item(document.Id, document.TypeCode)
         {
             Name = document.Name,
@@ -69,14 +70,14 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
             Tags = document.Tags != null ? new HashSet<string>(document.Tags) : new HashSet<string>(),
             Components = new List<IItemComponent>(),
             RequiredLevel = document.RequiredLevel,
-            StackSize = document.StackSize,
+            StackSize = document.StackSize
         };
 
         if (_itemTypeDefinition != null)
         {
             var required = _itemTypeDefinition.RequiredComponents ?? Enumerable.Empty<Type>();
             var optional = _itemTypeDefinition.OptionalComponents ?? Enumerable.Empty<Type>();
-            
+
             foreach (var type in required.Concat(optional))
             {
                 var component = CreateComponent(type, document);
@@ -85,24 +86,25 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
             }
         }
 
-        _logger?.Debug($"Item domain entity created. Id={item.Id}, Components={item.Components.Count}");
+        _logger.Debug($"Item domain entity created. Id={item.Id}, Components={item.Components.Count}");
         return item;
     }
 
     /// <summary>
-    /// Creates a component from ItemDocument based on component type.
-    /// Returns null if the document doesn't have required data for that component.
-    /// 
-    /// Example usage:
-    /// var component = ItemDocumentMapper.CreateComponent(typeof(StatsComponent), doc);
-    /// if (component != null) item.Components.Add(component);
-    /// 
-    /// Note: Not all tags require components - this method returns null if data is missing.
+    ///     Creates a component from ItemDocument based on component type.
+    ///     Returns null if the document doesn't have required data for that component.
+    ///     Example usage:
+    ///     var component = ItemDocumentMapper.CreateComponent(typeof(StatsComponent), doc);
+    ///     if (component != null) item.Components.Add(component);
+    ///     Note: Not all tags require components - this method returns null if data is missing.
     /// </summary>
     public static IItemComponent? CreateComponent(Type type, ItemDocument doc)
     {
         if (type == typeof(StatsComponent) && doc.Modifiers is { Count: > 0 })
-            return new StatsComponent { Stats = new StatsContainer(new Dictionary<StatsProperty, int>(doc.Modifiers!)) };
+            return new StatsComponent
+            {
+                Stats = new StatsContainer(new Dictionary<StatsProperty, int>(doc.Modifiers!))
+            };
 
         if (type == typeof(SocketComponent) && doc.SocketNo.HasValue)
             return new SocketComponent { SocketNo = doc.SocketNo.Value };

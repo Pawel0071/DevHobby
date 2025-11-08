@@ -1,151 +1,211 @@
+using System.Text.Json;
+using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using StackExchange.Redis;
 
 namespace RPG.Infrastructure.Repositories.Redis;
 
 /// <summary>
-/// Generic Redis repository for storing and retrieving JSON documents.
-/// Does not depend on Domain - works with raw strings/JSON.
+///     Redis document repository - identical interface to MongoDocumentRepository.
+///     Uses CollectionName from IMongoDocument to build Redis keys.
 /// </summary>
 public class RedisDocumentRepository : IRedisDocumentRepository
 {
+    private readonly ILogger<RedisDocumentRepository> _logger;
     private readonly IDatabase _redisDatabase;
-    private readonly Interfaces.ILogger<RedisDocumentRepository> _logger;
 
     public RedisDocumentRepository(
         IDatabase redisDatabase,
-        Interfaces.ILogger<RedisDocumentRepository> logger)
+        ILogger<RedisDocumentRepository> logger)
     {
         _redisDatabase = redisDatabase;
         _logger = logger;
     }
 
-    public async Task<string?> ReadAsync(string key, CancellationToken cancellationToken = default)
+    /// <summary>
+    ///     Build Redis key for a document: CollectionName:Id
+    /// </summary>
+    private string BuildKey<TDocument>(object id) where TDocument : class, IMongoDocument
+    {
+        return $"{TDocument.CollectionName}:{id}";
+    }
+
+    /// <summary>
+    ///     Build Redis pattern for a collection: CollectionName:*
+    /// </summary>
+    private string BuildPattern<TDocument>() where TDocument : class, IMongoDocument
+    {
+        return $"{TDocument.CollectionName}:*";
+    }
+
+    /// <summary>
+    ///     Insert or update a document in Redis
+    /// </summary>
+    public async Task UpsertAsync<TDocument>(TDocument document, CancellationToken cancellationToken = default) 
+        where TDocument : class, IMongoDocument
     {
         try
         {
-            var value = await _redisDatabase.StringGetAsync(key);
+            var key = BuildKey<TDocument>(document.Id);
+            var json = JsonSerializer.Serialize(document);
             
-            if (value.HasValue)
-            {
-                _logger.Debug($"Read from Redis: {key}");
-                return value.ToString();
-            }
-            
-            _logger.Debug($"Key not found in Redis: {key}");
-            return null;
+            var success = await _redisDatabase.StringSetAsync(key, json);
+
+            if (success)
+                _logger.Info($"{typeof(TDocument).Name} upserted to Redis. Id={document.Id}");
+            else
+                _logger.Warn($"Failed to upsert {typeof(TDocument).Name} to Redis. Id={document.Id}");
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error reading from Redis: {key}", ex);
+            _logger.Error($"Failed to upsert {typeof(TDocument).Name} to Redis", ex);
             throw;
         }
     }
 
-    public async Task<Dictionary<string, string>> ReadBatchAsync(string[] keys, CancellationToken cancellationToken = default)
+    /// <summary>
+    ///     Get a document by its ID from Redis
+    /// </summary>
+    public async Task<TDocument?> GetByIdAsync<TDocument>(object id, CancellationToken cancellationToken = default) 
+        where TDocument : class, IMongoDocument
     {
         try
         {
-            var redisKeys = keys.Select(k => (RedisKey)k).ToArray();
-            var values = await _redisDatabase.StringGetAsync(redisKeys);
-            
-            var result = new Dictionary<string, string>();
-            for (int i = 0; i < keys.Length; i++)
+            var key = BuildKey<TDocument>(id);
+            var json = await _redisDatabase.StringGetAsync(key);
+
+            if (!json.HasValue)
             {
-                if (values[i].HasValue)
+                _logger.Debug($"{typeof(TDocument).Name} not found in Redis. Id={id}");
+                return null;
+            }
+
+            var document = JsonSerializer.Deserialize<TDocument>(json.ToString());
+            _logger.Debug($"{typeof(TDocument).Name} found in Redis. Id={id}");
+
+            return document;
+        }
+        catch (Exception ex)
+        {
+            _logger.Error($"Failed to get {typeof(TDocument).Name} from Redis. Id={id}", ex);
+            throw;
+        }
+    }
+
+    /// <summary>
+    ///     Get all documents of a specific type from Redis
+    /// </summary>
+    public async Task<List<TDocument>> GetAllAsync<TDocument>(CancellationToken cancellationToken = default) 
+        where TDocument : class, IMongoDocument
+    {
+        try
+        {
+            var pattern = BuildPattern<TDocument>();
+            var server = _redisDatabase.Multiplexer.GetServer(_redisDatabase.Multiplexer.GetEndPoints().First());
+            var keys = server.Keys(pattern: pattern).Select(k => (RedisKey)k.ToString()).ToArray();
+
+            if (keys.Length == 0)
+            {
+                _logger.Debug($"No {typeof(TDocument).Name} documents found in Redis");
+                return new List<TDocument>();
+            }
+
+            var values = await _redisDatabase.StringGetAsync(keys);
+            var documents = new List<TDocument>();
+
+            foreach (var value in values)
+            {
+                if (!value.HasValue) continue;
+                
+                try
                 {
-                    result[keys[i]] = values[i].ToString()!;
+                    var document = JsonSerializer.Deserialize<TDocument>(value.ToString());
+                    if (document != null) documents.Add(document);
+                }
+                catch (JsonException ex)
+                {
+                    _logger.Warn($"Failed to deserialize {typeof(TDocument).Name}: {ex.Message}");
                 }
             }
-            
-            _logger.Debug($"Read batch of {result.Count}/{keys.Length} items from Redis");
-            return result;
+
+            _logger.Info($"Read {documents.Count} {typeof(TDocument).Name} documents from Redis");
+            return documents;
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error reading batch from Redis", ex);
+            _logger.Error($"Failed to get all {typeof(TDocument).Name} from Redis", ex);
             throw;
         }
     }
 
-    public async Task WriteAsync(string key, string value, TimeSpan? expiry = null, CancellationToken cancellationToken = default)
+    /// <summary>
+    ///     Get documents in batches (pagination)
+    /// </summary>
+    public async Task<List<TDocument>> GetBatchAsync<TDocument>(int skip, int limit, CancellationToken cancellationToken = default) 
+        where TDocument : class, IMongoDocument
     {
         try
         {
-            var success = await _redisDatabase.StringSetAsync(key, value, expiry);
-            
-            if (success)
-            {
-                _logger.Debug($"Written to Redis: {key} (expiry={expiry?.TotalSeconds ?? -1}s)");
-            }
-            else
-            {
-                _logger.Warn($"Failed to write to Redis: {key}");
-            }
+            var allDocuments = await GetAllAsync<TDocument>(cancellationToken);
+            var batch = allDocuments.Skip(skip).Take(limit).ToList();
+
+            _logger.Debug($"Read batch of {batch.Count} {typeof(TDocument).Name} documents from Redis (skip={skip}, limit={limit})");
+            return batch;
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error writing to Redis: {key}", ex);
+            _logger.Error($"Failed to get batch of {typeof(TDocument).Name} from Redis", ex);
             throw;
         }
     }
 
-    public async Task WriteBatchAsync(Dictionary<string, string> keyValuePairs, TimeSpan? expiry = null, CancellationToken cancellationToken = default)
+    /// <summary>
+    ///     Count total documents of a specific type in Redis
+    /// </summary>
+    public Task<long> CountAsync<TDocument>(CancellationToken cancellationToken = default) 
+        where TDocument : class, IMongoDocument
     {
         try
         {
-            var batch = _redisDatabase.CreateBatch();
-            var tasks = new List<Task>();
+            var pattern = BuildPattern<TDocument>();
+            var server = _redisDatabase.Multiplexer.GetServer(_redisDatabase.Multiplexer.GetEndPoints().First());
+            var count = server.Keys(pattern: pattern).Count();
 
-            foreach (var kvp in keyValuePairs)
-            {
-                tasks.Add(batch.StringSetAsync(kvp.Key, kvp.Value, expiry));
-            }
-
-            batch.Execute();
-            await Task.WhenAll(tasks);
-            
-            _logger.Info($"Written batch of {keyValuePairs.Count} items to Redis");
+            _logger.Debug($"Collection {typeof(TDocument).Name} has {count} documents in Redis");
+            return Task.FromResult((long)count);
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error writing batch to Redis", ex);
+            _logger.Error($"Failed to count {typeof(TDocument).Name} documents in Redis", ex);
             throw;
         }
     }
 
-    public async Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default)
+    /// <summary>
+    ///     Delete a document by its ID from Redis
+    /// </summary>
+    public async Task<bool> DeleteAsync<TDocument>(object id, CancellationToken cancellationToken = default) 
+        where TDocument : class, IMongoDocument
     {
         try
         {
-            return await _redisDatabase.KeyExistsAsync(key);
-        }
-        catch (Exception ex)
-        {
-            _logger.Error($"Error checking key existence in Redis: {key}", ex);
-            throw;
-        }
-    }
-
-    public async Task DeleteAsync(string key, CancellationToken cancellationToken = default)
-    {
-        try
-        {
+            var key = BuildKey<TDocument>(id);
             var deleted = await _redisDatabase.KeyDeleteAsync(key);
-            
+
             if (deleted)
             {
-                _logger.Debug($"Deleted from Redis: {key}");
+                _logger.Info($"{typeof(TDocument).Name} deleted from Redis. Id={id}");
+                return true;
             }
-            else
-            {
-                _logger.Debug($"Key not found in Redis: {key}");
-            }
+
+            _logger.Warn($"{typeof(TDocument).Name} not found in Redis for deletion. Id={id}");
+            return false;
         }
         catch (Exception ex)
         {
-            _logger.Error($"Error deleting from Redis: {key}", ex);
+            _logger.Error($"Failed to delete {typeof(TDocument).Name} from Redis. Id={id}", ex);
             throw;
         }
     }
 }
+

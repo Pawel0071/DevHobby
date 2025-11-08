@@ -7,9 +7,9 @@ public interface IInventoryContainer
 {
     IList<InventorySlot> Inventory { get; set; }
     Item this[int inventoryNo] { get; set; }
-    int Capacity { get; init;  }
+    int Capacity { get; init; }
     int FreeSpace { get; }
     bool IsFull { get; }
     int IndexOf(Item item);
-    bool Contains( Item item);
+    bool Contains(Item item);
 }

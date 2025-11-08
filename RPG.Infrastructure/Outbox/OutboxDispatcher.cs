@@ -1,17 +1,17 @@
 using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
-using RPG.Infrastructure.Interfaces;    
+using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Infrastructure.Outbox;
 
 public class OutboxDispatcher : BackgroundService
 {
-    private readonly IMongoCollection<OutboxMessage> _outbox;
-    private readonly IRabbitMqPublisher _publisher;
-    private readonly ILogger<OutboxDispatcher> _logger;
     private const int BatchSize = 10;
     private const int RetryDelaySeconds = 5;
     private const int MaxRetries = 3;
+    private readonly ILogger<OutboxDispatcher> _logger;
+    private readonly IMongoCollection<OutboxMessage> _outbox;
+    private readonly IRabbitMqPublisher _publisher;
 
     public OutboxDispatcher(
         IMongoCollection<OutboxMessage> outbox,
@@ -28,7 +28,6 @@ public class OutboxDispatcher : BackgroundService
         _logger.Info("OutboxDispatcher started.");
 
         while (!stoppingToken.IsCancellationRequested)
-        {
             try
             {
                 var unsent = await _outbox
@@ -36,10 +35,7 @@ public class OutboxDispatcher : BackgroundService
                     .Limit(BatchSize)
                     .ToListAsync(stoppingToken);
 
-                foreach (var msg in unsent)
-                {
-                    await ProcessMessage(msg, stoppingToken);
-                }
+                foreach (var msg in unsent) await ProcessMessage(msg, stoppingToken);
 
                 await Task.Delay(TimeSpan.FromSeconds(RetryDelaySeconds), stoppingToken);
             }
@@ -48,7 +44,6 @@ public class OutboxDispatcher : BackgroundService
                 _logger.Error("Error in OutboxDispatcher main loop", ex);
                 await Task.Delay(TimeSpan.FromSeconds(RetryDelaySeconds), stoppingToken);
             }
-        }
 
         _logger.Warn("OutboxDispatcher stopped.");
     }
@@ -68,7 +63,7 @@ public class OutboxDispatcher : BackgroundService
         catch (Exception ex)
         {
             _logger.Error($"Failed to dispatch message {msg.Id} (attempt {msg.RetryCount + 1}/{MaxRetries})", ex);
-            
+
             var update = Builders<OutboxMessage>.Update
                 .Inc(x => x.RetryCount, 1)
                 .Set(x => x.LastRetryAt, DateTime.UtcNow);

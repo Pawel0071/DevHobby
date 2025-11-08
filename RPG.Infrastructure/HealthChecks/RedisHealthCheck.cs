@@ -6,8 +6,8 @@ namespace RPG.Infrastructure.HealthChecks;
 
 public class RedisHealthCheck : IHealthCheck
 {
-    private readonly IConnectionMultiplexer _redis;
     private readonly ILogger<RedisHealthCheck> _logger;
+    private readonly IConnectionMultiplexer _redis;
 
     public RedisHealthCheck(IConnectionMultiplexer redis, ILogger<RedisHealthCheck> logger)
     {
@@ -16,14 +16,14 @@ public class RedisHealthCheck : IHealthCheck
     }
 
     public async Task<HealthCheckResult> CheckHealthAsync(
-        HealthCheckContext context, 
+        HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
         try
         {
             var db = _redis.GetDatabase();
             await db.PingAsync();
-            
+
             _logger.Debug("Redis health check: Healthy");
             return HealthCheckResult.Healthy("Redis is responsive");
         }

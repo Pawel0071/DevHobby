@@ -19,7 +19,7 @@ public static class ApplicationRegistration
         services.AddScoped<ICommandHandler<PickUpItemCommand>, CharacterCommandHandler>();
         services.AddScoped<ICommandHandler<GainExperienceCommand>, CharacterCommandHandler>();
         services.AddScoped<ICommandHandler<LevelUpCommand>, CharacterCommandHandler>();
-        
+
         return services;
     }
 }

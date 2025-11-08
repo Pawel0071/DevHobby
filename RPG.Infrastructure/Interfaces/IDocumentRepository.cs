@@ -1,24 +1,20 @@
-using System.Text.Json;
+using RPG.Domain.Common;
 
 namespace RPG.Infrastructure.Interfaces;
 
-/// <summary>
-/// Repository for saving generic documents to MongoDB
-/// </summary>
 public interface IDocumentRepository
 {
-    /// <summary>
-    /// Saves or updates a document in a specific collection
-    /// </summary>
-    Task UpsertAsync(string collectionName, Dictionary<string, JsonElement> document, CancellationToken cancellationToken = default);
-    
-    /// <summary>
-    /// Deletes a document from a specific collection by ID
-    /// </summary>
-    Task DeleteAsync(string collectionName, Guid id, CancellationToken cancellationToken = default);
-    
-    /// <summary>
-    /// Saves a document to the outbox for audit purposes
-    /// </summary>
-    Task SaveToOutboxAsync(string topic, string payload, CancellationToken cancellationToken = default);
+    Task UpsertAsync<TEntity>( TEntity entity, CancellationToken cancellationToken = default)
+        where TEntity : class, IDomainEntity;
+    Task<TEntity?> GetByIdAsync<TEntity>(object id, CancellationToken cancellationToken = default)
+        where TEntity : class, IDomainEntity;
+    Task<List<TEntity>> GetAllAsync<TEntity>(CancellationToken cancellationToken = default)
+        where TEntity : class, IDomainEntity;
+    Task<List<TEntity>> GetBatchAsync<TEntity>(int skip, int limit, CancellationToken cancellationToken = default)
+        where TEntity : class, IDomainEntity;
+    Task<long> CountAsync<TEntity>(CancellationToken cancellationToken = default)
+        where TEntity : class, IDomainEntity;
+    Task<bool> DeleteAsync<TEntity>(object id, CancellationToken cancellationToken = default)
+        where TEntity : class, IDomainEntity;
 }
+

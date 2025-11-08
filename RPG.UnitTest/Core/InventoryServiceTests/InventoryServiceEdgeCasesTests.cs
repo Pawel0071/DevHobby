@@ -20,7 +20,7 @@ public class InventoryServiceEdgeCasesTests
     [Fact]
     public void AddItem_ShouldReturnFail_WhenContainerIsNull()
     {
-        Item? item = new Item(Guid.NewGuid(), "Misc") { Id = Guid.NewGuid(), Name = "X" };
+        var item = new Item(Guid.NewGuid(), "Misc") { Id = Guid.NewGuid(), Name = "X" };
 
         var result = _service.AddItem(null!, item);
 

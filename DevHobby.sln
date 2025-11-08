@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		compose.yaml = compose.yaml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisWormUp", "RedisWormUp\RedisWormUp.csproj", "{8627D52D-F95C-489E-A99F-3E86A141EB2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedisWarmUp", "RedisWarmUp\RedisWarmUp.csproj", "{8627D52D-F95C-489E-A99F-3E86A141EB2D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CricuitBraker", "CricuitBraker\CricuitBraker.csproj", "{FF8ED257-0614-4F5C-B612-0F4D591F9864}"
 EndProject

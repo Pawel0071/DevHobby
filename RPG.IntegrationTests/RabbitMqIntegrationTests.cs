@@ -7,8 +7,8 @@ namespace RPG.IntegrationTests;
 
 public class RabbitMqIntegrationTests : IClassFixture<TestContainersFixture>
 {
-    private readonly TestContainersFixture _fixture;
     private readonly IChannel _channel;
+    private readonly TestContainersFixture _fixture;
 
     public RabbitMqIntegrationTests(TestContainersFixture fixture)
     {
@@ -32,10 +32,10 @@ public class RabbitMqIntegrationTests : IClassFixture<TestContainersFixture>
 
         // Act
         await _channel.ExchangeDeclareAsync(
-            exchange: exchangeName,
-            type: ExchangeType.Direct,
-            durable: true,
-            autoDelete: false
+            exchangeName,
+            ExchangeType.Direct,
+            true,
+            false
         );
 
         // Assert - No exception means success
@@ -50,10 +50,10 @@ public class RabbitMqIntegrationTests : IClassFixture<TestContainersFixture>
 
         // Act
         var result = await _channel.QueueDeclareAsync(
-            queue: queueName,
-            durable: true,
-            exclusive: false,
-            autoDelete: false
+            queueName,
+            true,
+            false,
+            false
         );
 
         // Assert
@@ -103,21 +103,17 @@ public class RabbitMqIntegrationTests : IClassFixture<TestContainersFixture>
             return Task.CompletedTask;
         };
 
-        await _channel.BasicConsumeAsync(queueName, autoAck: true, consumer: consumer);
+        await _channel.BasicConsumeAsync(queueName, true, consumer);
 
         // Act
-        var properties = new BasicProperties
-        {
-            Persistent = true,
-            ContentType = "text/plain"
-        };
+        var properties = new BasicProperties { Persistent = true, ContentType = "text/plain" };
 
         await _channel.BasicPublishAsync(
-            exchange: exchangeName,
-            routingKey: routingKey,
-            mandatory: false,
-            basicProperties: properties,
-            body: Encoding.UTF8.GetBytes(messageBody)
+            exchangeName,
+            routingKey,
+            false,
+            properties,
+            Encoding.UTF8.GetBytes(messageBody)
         );
 
         // Assert
@@ -148,25 +144,22 @@ public class RabbitMqIntegrationTests : IClassFixture<TestContainersFixture>
             var message = Encoding.UTF8.GetString(body);
             receivedMessages.Add(message);
 
-            if (receivedMessages.Count == messageCount)
-            {
-                tcs.TrySetResult(true);
-            }
+            if (receivedMessages.Count == messageCount) tcs.TrySetResult(true);
 
             return Task.CompletedTask;
         };
 
-        await _channel.BasicConsumeAsync(queueName, autoAck: true, consumer: consumer);
+        await _channel.BasicConsumeAsync(queueName, true, consumer);
 
         // Act
-        for (int i = 0; i < messageCount; i++)
+        for (var i = 0; i < messageCount; i++)
         {
             var message = $"Message {i + 1}";
             await _channel.BasicPublishAsync(
-                exchange: exchangeName,
-                routingKey: routingKey,
-                mandatory: false,
-                body: Encoding.UTF8.GetBytes(message)
+                exchangeName,
+                routingKey,
+                false,
+                Encoding.UTF8.GetBytes(message)
             );
         }
 
@@ -211,15 +204,15 @@ public class RabbitMqIntegrationTests : IClassFixture<TestContainersFixture>
             return Task.CompletedTask;
         };
 
-        await _channel.BasicConsumeAsync(queue1, autoAck: true, consumer: consumer1);
-        await _channel.BasicConsumeAsync(queue2, autoAck: true, consumer: consumer2);
+        await _channel.BasicConsumeAsync(queue1, true, consumer1);
+        await _channel.BasicConsumeAsync(queue2, true, consumer2);
 
         // Act
         await _channel.BasicPublishAsync(
-            exchange: exchangeName,
-            routingKey: string.Empty,
-            mandatory: false,
-            body: Encoding.UTF8.GetBytes(messageBody)
+            exchangeName,
+            string.Empty,
+            false,
+            Encoding.UTF8.GetBytes(messageBody)
         );
 
         // Assert
@@ -238,15 +231,13 @@ public class RabbitMqIntegrationTests : IClassFixture<TestContainersFixture>
         await _channel.QueueDeclareAsync(queueName, true, false, false);
 
         // Publish 3 messages
-        for (int i = 0; i < 3; i++)
-        {
+        for (var i = 0; i < 3; i++)
             await _channel.BasicPublishAsync(
-                exchange: string.Empty,
-                routingKey: queueName,
-                mandatory: false,
-                body: Encoding.UTF8.GetBytes($"Message {i}")
+                string.Empty,
+                queueName,
+                false,
+                Encoding.UTF8.GetBytes($"Message {i}")
             );
-        }
 
         // Wait a bit for messages to be queued
         await Task.Delay(100);

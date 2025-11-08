@@ -1,4 +1,5 @@
 namespace RPG.Domain.Enums;
+
 public enum SkillType
 {
     MeleeAttack,

@@ -12,11 +12,11 @@ namespace RPG.UnitTest.Core.LevelingServiceTests;
 
 public class LevelingServiceTests
 {
-    private readonly Mock<IStatsService> _statsMock = new();
-    private readonly Mock<ISkillService> _skillMock = new();
-    private readonly Mock<IExperienceProvider> _xpMock = new();
     private readonly Mock<ILogger<LevelingService>> _loggerMock = new();
     private readonly LevelingService _service;
+    private readonly Mock<ISkillService> _skillMock = new();
+    private readonly Mock<IStatsService> _statsMock = new();
+    private readonly Mock<IExperienceProvider> _xpMock = new();
 
     public LevelingServiceTests()
     {
@@ -26,13 +26,13 @@ public class LevelingServiceTests
     [Fact]
     public void LevelUp_ShouldSucceed_WhenNotAtMaxLevel()
     {
-        var character = CreateCharacter(level: 5);
+        var character = CreateCharacter(5);
         _xpMock.Setup(x => x.IsMaxLevel(5)).Returns(false);
         _xpMock.Setup(x => x.GetRequiredExperience(6)).Returns(1000);
 
-    var result = _service.LevelUp(character, amount: 123);
+        var result = _service.LevelUp(character, 123);
 
-    result.Success.Should().BeTrue();
+        result.Success.Should().BeTrue();
         character.Level.Should().Be(6);
         character.Experience.Should().Be(123);
         character.ExperienceToNextLevel.Should().Be(1000);
@@ -44,25 +44,25 @@ public class LevelingServiceTests
     [Fact]
     public void LevelUp_ShouldFail_WhenAtMaxLevel()
     {
-        var character = CreateCharacter(level: 99);
+        var character = CreateCharacter(99);
         _xpMock.Setup(x => x.IsMaxLevel(99)).Returns(true);
 
         var result = _service.LevelUp(character);
 
-    result.Success.Should().BeFalse();
-    result.Error.Should().Be(ErrorCodeDefinition.AlreadyMaxLevel);
-    result.Message.Should().Be($"Poziom maksymalny: {character.Level}");
+        result.Success.Should().BeFalse();
+        result.Error.Should().Be(ErrorCodeDefinition.AlreadyMaxLevel);
+        result.Message.Should().Be($"Poziom maksymalny: {character.Level}");
     }
 
     [Fact]
     public void GrantExperience_ShouldAddXp_WhenNotAtMaxLevel()
     {
-        var character = CreateCharacter(level: 10, xp: 100, xpToNext: 500);
+        var character = CreateCharacter(10, 100, 500);
         _xpMock.Setup(x => x.IsMaxLevel(10)).Returns(false);
 
-    var result = _service.GrantExperience(character, amount: 200);
+        var result = _service.GrantExperience(character, 200);
 
-    result.Success.Should().BeTrue();
+        result.Success.Should().BeTrue();
         character.Experience.Should().Be(300);
         character.ExperienceToNextLevel.Should().Be(300);
         character.Level.Should().Be(10);
@@ -71,27 +71,27 @@ public class LevelingServiceTests
     [Fact]
     public void GrantExperience_ShouldFail_WhenAtMaxLevel()
     {
-        var character = CreateCharacter(level: 99);
+        var character = CreateCharacter(99);
         _xpMock.Setup(x => x.IsMaxLevel(99)).Returns(true);
 
-    var result = _service.GrantExperience(character, amount: 500);
+        var result = _service.GrantExperience(character, 500);
 
-    result.Success.Should().BeFalse();
-    result.Error.Should().Be(ErrorCodeDefinition.AlreadyMaxLevel);
-    result.Message.Should().Be($"Poziom maksymalny: {character.Level}");
+        result.Success.Should().BeFalse();
+        result.Error.Should().Be(ErrorCodeDefinition.AlreadyMaxLevel);
+        result.Message.Should().Be($"Poziom maksymalny: {character.Level}");
     }
 
     [Fact]
     public void GrantExperience_ShouldTriggerLevelUp_WhenXpExceedsThreshold()
     {
-        var character = CreateCharacter(level: 10, xp: 900, xpToNext: 100);
+        var character = CreateCharacter(10, 900, 100);
         _xpMock.Setup(x => x.IsMaxLevel(10)).Returns(false);
         _xpMock.Setup(x => x.IsMaxLevel(11)).Returns(false);
         _xpMock.Setup(x => x.GetRequiredExperience(11)).Returns(1500);
 
-    var result = _service.GrantExperience(character, amount: 150);
+        var result = _service.GrantExperience(character, 150);
 
-    result.Success.Should().BeTrue();
+        result.Success.Should().BeTrue();
         character.Level.Should().Be(11);
         character.Experience.Should().Be(50);
         character.ExperienceToNextLevel.Should().Be(1500);
@@ -100,8 +100,9 @@ public class LevelingServiceTests
         _skillMock.Verify(s => s.AddSkillsAfterLevelUp(character), Times.Once);
     }
 
-    private static Character CreateCharacter(int level = 1, int xp = 100, int xpToNext = 1000) => 
-        new( Guid.NewGuid(), CharacterClass.Druid, null, null)
+    private static Character CreateCharacter(int level = 1, int xp = 100, int xpToNext = 1000)
+    {
+        return new Character(Guid.NewGuid(), CharacterClass.Druid)
         {
             Id = Guid.NewGuid(),
             Level = level,
@@ -109,4 +110,5 @@ public class LevelingServiceTests
             ExperienceToNextLevel = xpToNext,
             Name = "Name"
         };
+    }
 }

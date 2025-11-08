@@ -30,12 +30,7 @@ public class MongoDbIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task ShouldInsertDocument()
     {
         // Arrange
-        var document = new BsonDocument
-        {
-            { "name", "TestCharacter" },
-            { "level", 10 },
-            { "health", 100 }
-        };
+        var document = new BsonDocument { { "name", "TestCharacter" }, { "level", 10 }, { "health", 100 } };
 
         // Act
         await _testCollection.InsertOneAsync(document);
@@ -52,11 +47,7 @@ public class MongoDbIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task ShouldReadDocument()
     {
         // Arrange
-        var document = new BsonDocument
-        {
-            { "name", "ReadTest" },
-            { "value", 42 }
-        };
+        var document = new BsonDocument { { "name", "ReadTest" }, { "value", 42 } };
         await _testCollection.InsertOneAsync(document);
 
         // Act
@@ -71,11 +62,7 @@ public class MongoDbIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task ShouldUpdateDocument()
     {
         // Arrange
-        var document = new BsonDocument
-        {
-            { "name", "UpdateTest" },
-            { "value", 10 }
-        };
+        var document = new BsonDocument { { "name", "UpdateTest" }, { "value", 10 } };
         await _testCollection.InsertOneAsync(document);
 
         // Act
@@ -93,11 +80,7 @@ public class MongoDbIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task ShouldDeleteDocument()
     {
         // Arrange
-        var document = new BsonDocument
-        {
-            { "name", "DeleteTest" },
-            { "value", 99 }
-        };
+        var document = new BsonDocument { { "name", "DeleteTest" }, { "value", 99 } };
         await _testCollection.InsertOneAsync(document);
 
         // Act

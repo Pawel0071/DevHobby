@@ -1,0 +1,94 @@
+using System.Text.Json;
+using RPG.Domain.Entities.Skills;
+using RPG.Domain.Entities.Skills.SkillComponents;
+using RPG.Infrastructure.Documents;
+using RPG.Infrastructure.Interfaces;
+
+namespace RPG.Infrastructure.Mappers;
+
+/// <summary>
+///     Mapper for converting between Skill domain entity and SkillDocument
+///     Components are serialized to JSON for flexible storage
+/// </summary>
+public class SkillDocumentMapper
+{
+    private readonly ILogger<SkillDocumentMapper> _logger;
+
+    public SkillDocumentMapper(ILogger<SkillDocumentMapper> logger)
+    {
+        _logger = logger;
+    }
+
+    public SkillDocument ToDocument(Skill entity)
+    {
+        _logger.Debug($"Converting Skill to SkillDocument. Id={entity.Id}, Name={entity.Name}");
+        return new SkillDocument
+        {
+            Id = entity.Id,
+            Name = entity.Name,
+            Description = entity.Description,
+            IconId = entity.IconId,
+            Tags = entity.Tags.ToList(),
+            Components = entity.Components.Select(c => new ComponentData
+            {
+                Type = c.GetType().Name, Data = JsonSerializer.Serialize(c, c.GetType())
+            }).ToList()
+        };
+    }
+
+    public Skill ToEntity(SkillDocument document)
+    {
+        _logger.Debug($"Converting SkillDocument to Skill. Id={document.Id}, Name={document.Name}");
+        var skill = Skill.Create(document.Name, document.Description);
+
+        // Preserve ID from document using reflection
+        typeof(Skill).GetProperty("Id")!.SetValue(skill, document.Id);
+
+        skill.IconId = document.IconId;
+        skill.Tags = document.Tags.ToHashSet();
+
+        // Deserialize components
+        foreach (var componentData in document.Components)
+        {
+            var component = DeserializeComponent(componentData);
+            if (component != null) skill.Components.Add(component);
+        }
+
+        return skill;
+    }
+
+    private ISkillComponent? DeserializeComponent(ComponentData componentData)
+    {
+        return componentData.Type switch
+        {
+            // Damage & Healing
+            nameof(DamageComponent) => JsonSerializer.Deserialize<DamageComponent>(componentData.Data),
+            nameof(HealingComponent) => JsonSerializer.Deserialize<HealingComponent>(componentData.Data),
+            nameof(DamageOverTimeComponent) => JsonSerializer.Deserialize<DamageOverTimeComponent>(componentData.Data),
+            nameof(HealOverTimeComponent) => JsonSerializer.Deserialize<HealOverTimeComponent>(componentData.Data),
+
+            // Buffs & Debuffs
+            nameof(BuffComponent) => JsonSerializer.Deserialize<BuffComponent>(componentData.Data),
+            nameof(DebuffComponent) => JsonSerializer.Deserialize<DebuffComponent>(componentData.Data),
+
+            // Control & Movement
+            nameof(CrowdControlComponent) => JsonSerializer.Deserialize<CrowdControlComponent>(componentData.Data),
+            nameof(MovementComponent) => JsonSerializer.Deserialize<MovementComponent>(componentData.Data),
+
+            // Defense
+            nameof(ShieldComponent) => JsonSerializer.Deserialize<ShieldComponent>(componentData.Data),
+
+            // Targeting
+            nameof(AreaOfEffectComponent) => JsonSerializer.Deserialize<AreaOfEffectComponent>(componentData.Data),
+
+            // Mechanics
+            nameof(ResourceCostComponent) => JsonSerializer.Deserialize<ResourceCostComponent>(componentData.Data),
+            nameof(CastingComponent) => JsonSerializer.Deserialize<CastingComponent>(componentData.Data),
+            nameof(CooldownComponent) => JsonSerializer.Deserialize<CooldownComponent>(componentData.Data),
+            nameof(RequirementComponent) => JsonSerializer.Deserialize<RequirementComponent>(componentData.Data),
+            nameof(ComboComponent) => JsonSerializer.Deserialize<ComboComponent>(componentData.Data),
+
+            _ => null
+        };
+    }
+}

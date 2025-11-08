@@ -1,64 +1,96 @@
 using RPG.Domain.Common;
 using RPG.Domain.Common.Interfaces;
 using RPG.Domain.Containers;
+using RPG.Domain.Entities.Items;
+using RPG.Domain.Entities.Skills;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
 
 namespace RPG.Domain.Entities;
 
-public sealed class Character : IItemContainer, IStats, ILevel, ISkillsContainer
+public sealed class Character : IDomainEntity, IItemContainer, IStats, ILevel, ISkillsContainer
 {
     public Character(
         Guid sessionId,
-        CharacterClass characterClass, ISession? session, IWorld? world)
+        CharacterClass characterClass,
+        object? session = null,
+        object? world = null)
     {
         Id = Guid.NewGuid();
+        SessionId = sessionId;
         Class = characterClass;
-        Session = session;
-        World = world;
-        Skills = new Dictionary<Skill, SkillAvailability>();
-        ActiveSkills = new Dictionary<Skill, DateTime>();
-        BaseStats = new StatsContainer();
-        ModifiedStats = new StatsContainer();
-        Equipments = new EquipmentContainer();
-        BankStorage = new InventoryContainer(20);
-        BackpackInventory = new InventoryContainer(20);
+        SkillsContainer = new SkillsContainer();
+        BaseStatsContainer = new StatsContainer();
+        ModifiedStatsContainer = new StatsContainer();
+        EquipmentContainer = new EquipmentContainer();
+        BankStorageContainer = new InventoryContainer(20);
+        BackpackInventoryContainer = new InventoryContainer(20);
         Level = 1;
     }
+
     public required Guid Id { get; init; }
     public required string Name { get; init; }
+
+    // Player & Session
+    public Guid PlayerId { get; set; }
+    public Guid SessionId { get; set; }
+
     public CharacterClass Class { get; set; }
+
+    // Containers (private)
+    private InventoryContainer BankStorageContainer { get; }
+    private InventoryContainer BackpackInventoryContainer { get; }
+    private EquipmentContainer EquipmentContainer { get; }
+    private StatsContainer BaseStatsContainer { get; }
+    private StatsContainer ModifiedStatsContainer { get; }
+    private SkillsContainer SkillsContainer { get; }
+
+    // Public collections exposed from containers
+    public IList<InventorySlot> BankStorage => BankStorageContainer.Inventory;
+    public IList<InventorySlot> BackpackInventory => BackpackInventoryContainer.Inventory;
+    public IDictionary<EquipmentSlot, Item> Equipments => EquipmentContainer.Equipments;
     public int Level { get; set; }
-    public int Experience { get; set; }
-    public int ExperienceToNextLevel { get; set; }
-    public IInventoryContainer BankStorage { get; set; }
-    public IInventoryContainer BackpackInventory { get; set; }
-    public IEquipmentContainer Equipments { get; set; }
+    public long Experience { get; set; }
+    public long ExperienceToNextLevel { get; set; }
+    public IDictionary<Skill, SkillAvailability> Skills => SkillsContainer.Skills;
+    public IDictionary<Skill, DateTime> ActiveSkills => SkillsContainer.ActiveSkills;
+    public IDictionary<StatsProperty, int> BaseStats => BaseStatsContainer.Stats;
+    public IDictionary<StatsProperty, int> ModifiedStats => ModifiedStatsContainer.Stats;
+
+    // Health & Resource
     public int CurrentHealth { get; set; }
     public int MaxHealth { get; set; }
-    
     public int CurrentResource { get; set; }
     public int MaxResource { get; set; }
-    public IStatsContainer BaseStats { get; set; }
-    public IStatsContainer ModifiedStats { get; set; }
-    
-    public IDictionary<Skill, SkillAvailability> Skills { get; }
-    
-    public IDictionary<Skill, DateTime> ActiveSkills { get; }
-    
-    public ISession? Session { get; set; }
-    public IWorld? World { get; set; }
-    
-    public bool IsOnline => World?.Id != Guid.Empty;
 
+    // Container accessors for services
+    public IInventoryContainer GetBankStorageContainer()
+    {
+        return BankStorageContainer;
+    }
 
-}
+    public IInventoryContainer GetBackpackInventoryContainer()
+    {
+        return BackpackInventoryContainer;
+    }
 
-public interface IWorld
-{
-    Guid Id { get; set; }
-}
+    public IEquipmentContainer GetEquipmentContainer()
+    {
+        return EquipmentContainer;
+    }
 
-public interface ISession
-{
+    public IStatsContainer GetBaseStatsContainer()
+    {
+        return BaseStatsContainer;
+    }
+
+    public IStatsContainer GetModifiedStatsContainer()
+    {
+        return ModifiedStatsContainer;
+    }
+
+    public ISkillsContainer GetSkillsContainer()
+    {
+        return SkillsContainer;
+    }
 }

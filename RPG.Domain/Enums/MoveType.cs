@@ -1,9 +1,8 @@
-namespace RPG.Domain.Enums
+namespace RPG.Domain.Enums;
+
+public enum MoveType
 {
-    public enum MoveType
-    {
-        Walk,
-        Run,
-        Ride
-    }
+    Walk,
+    Run,
+    Ride
 }

@@ -1,38 +1,47 @@
+using RPG.Infrastructure.Documents;
+
 namespace RPG.Infrastructure.Interfaces;
 
 /// <summary>
-/// Generic repository for reading and writing JSON documents to Redis cache.
-/// Works with raw strings/JSON - does not depend on Domain entities.
+///     Repository interface for Redis CRUD operations on typed documents.
+///     Identical to IMongoDocumentRepository - methods are generic, class is not.
 /// </summary>
 public interface IRedisDocumentRepository
 {
     /// <summary>
-    /// Reads a document from Redis by key
+    ///     Insert or update a document
     /// </summary>
-    Task<string?> ReadAsync(string key, CancellationToken cancellationToken = default);
+    Task UpsertAsync<TDocument>(TDocument document, CancellationToken cancellationToken = default) 
+        where TDocument : class, IMongoDocument;
     
     /// <summary>
-    /// Reads multiple documents from Redis by keys
+    ///     Get a document by its ID
     /// </summary>
-    Task<Dictionary<string, string>> ReadBatchAsync(string[] keys, CancellationToken cancellationToken = default);
+    Task<TDocument?> GetByIdAsync<TDocument>(object id, CancellationToken cancellationToken = default) 
+        where TDocument : class, IMongoDocument;
     
     /// <summary>
-    /// Writes a document to Redis with a key pattern
+    ///     Get all documents
     /// </summary>
-    Task WriteAsync(string key, string value, TimeSpan? expiry = null, CancellationToken cancellationToken = default);
+    Task<List<TDocument>> GetAllAsync<TDocument>(CancellationToken cancellationToken = default) 
+        where TDocument : class, IMongoDocument;
     
     /// <summary>
-    /// Writes multiple documents to Redis in a batch
+    ///     Get documents in batches
     /// </summary>
-    Task WriteBatchAsync(Dictionary<string, string> keyValuePairs, TimeSpan? expiry = null, CancellationToken cancellationToken = default);
+    Task<List<TDocument>> GetBatchAsync<TDocument>(int skip, int limit, CancellationToken cancellationToken = default) 
+        where TDocument : class, IMongoDocument;
     
     /// <summary>
-    /// Checks if a key exists in Redis
+    ///     Count total documents
     /// </summary>
-    Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default);
+    Task<long> CountAsync<TDocument>(CancellationToken cancellationToken = default) 
+        where TDocument : class, IMongoDocument;
     
     /// <summary>
-    /// Deletes a key from Redis
+    ///     Delete a document by its ID
     /// </summary>
-    Task DeleteAsync(string key, CancellationToken cancellationToken = default);
+    Task<bool> DeleteAsync<TDocument>(object id, CancellationToken cancellationToken = default) 
+        where TDocument : class, IMongoDocument;
 }
+

@@ -6,7 +6,8 @@ using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Infrastructure.Common;
 
-public class DictionaryWarmupService(IServiceProvider provider, ILogger<DictionaryWarmupService> logger) : IHostedService
+public class DictionaryWarmupService(IServiceProvider provider, ILogger<DictionaryWarmupService> logger)
+    : IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -22,6 +23,11 @@ public class DictionaryWarmupService(IServiceProvider provider, ILogger<Dictiona
         logger.Info("Dictionary warmup completed.");
     }
 
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
     private async Task Load<T>(IServiceProvider sp, CancellationToken ct)
         where T : IDictionaryEntry<T>
     {
@@ -32,6 +38,4 @@ public class DictionaryWarmupService(IServiceProvider provider, ILogger<Dictiona
 
         logger.Debug($"Loaded dictionary: {typeof(T).Name} with {data.Count} entries");
     }
-
-    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }

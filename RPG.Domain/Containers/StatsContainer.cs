@@ -5,8 +5,6 @@ namespace RPG.Domain.Containers;
 
 public class StatsContainer : IStatsContainer
 {
-    public IDictionary<StatsProperty, int> Stats { get; set; }
-
     public StatsContainer()
     {
         Stats = Enum.GetValues(typeof(StatsProperty))
@@ -18,12 +16,12 @@ public class StatsContainer : IStatsContainer
     {
         Stats = stats;
     }
-    
+
+    public IDictionary<StatsProperty, int> Stats { get; set; }
+
     public int this[StatsProperty property]
     {
         get => Stats[property];
         set => Stats[property] = value;
     }
-    
 }
-

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <Exclude>
+            <!-- Exclude test projects -->
+            [*Test*]*
+            [*Tests]*
+            
+            <!-- Exclude files that don't get instrumented properly -->
+            [RPG.Infrastructure]RPG.Infrastructure.Mappers.WorldStateDocumentMapper
+            [RPG.Infrastructure]RPG.Infrastructure.Logger.SerilogWrapper`1
+            [RPG.Infrastructure]RPG.Infrastructure.Common.ItemTagRegistryExtensions
+            [RPG.Infrastructure]RPG.Infrastructure.Documents.NpcDocument
+            [RPG.Infrastructure]RPG.Infrastructure.OpenTelemetry.OpenTelemetryActivityScope
+            [RPG.Infrastructure]RPG.Infrastructure.Documents.WorldStateDocument
+            [RPG.Infrastructure]RPG.Infrastructure.Documents.SharedTypes
+            
+            <!-- Exclude auto-generated files -->
+            [*]*.Designer
+            [*]*.g.cs
+            [*]*.g.i.cs
+          </Exclude>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

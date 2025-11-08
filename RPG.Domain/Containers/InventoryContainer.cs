@@ -13,7 +13,7 @@ public class InventoryContainer(int capacity) : IInventoryContainer
     public int Capacity { get; init; } = capacity;
     public bool IsFull => Inventory.Count >= Capacity;
     public int FreeSpace => Capacity - Inventory.Count;
-    
+
     public Item this[int index]
     {
         get => Inventory[index].Item!;
@@ -22,13 +22,18 @@ public class InventoryContainer(int capacity) : IInventoryContainer
             {
                 null => (value, 1),
                 var i when i.Equals(value) => (i, Inventory[index].Quantity + 1),
-                _ => throw new InvalidOperationException($"Slot {index} already contains '{Inventory[index].Item!.Name}'.")
+                _ => throw new InvalidOperationException(
+                    $"Slot {index} already contains '{Inventory[index].Item!.Name}'.")
             };
-       
     }
-    
-    public int IndexOf(Item item) =>
-        (int)(Inventory as List<InventorySlot>)?.FindIndex(slot => slot.Item?.Equals(item) == true)!;
-    
-    public bool Contains(Item item) => Inventory.Select(x => x.Item == item).Any();
+
+    public int IndexOf(Item item)
+    {
+        return (int)(Inventory as List<InventorySlot>)?.FindIndex(slot => slot.Item?.Equals(item) == true)!;
+    }
+
+    public bool Contains(Item item)
+    {
+        return Inventory.Select(x => x.Item == item).Any();
+    }
 }

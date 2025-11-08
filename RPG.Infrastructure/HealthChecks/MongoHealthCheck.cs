@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using RPG.Infrastructure.Interfaces;
 
@@ -16,16 +17,16 @@ public class MongoHealthCheck : IHealthCheck
     }
 
     public async Task<HealthCheckResult> CheckHealthAsync(
-        HealthCheckContext context, 
+        HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {
         try
         {
             // Ping MongoDB
-            await _database.RunCommandAsync<MongoDB.Bson.BsonDocument>(
-                new MongoDB.Bson.BsonDocument("ping", 1), 
+            await _database.RunCommandAsync<BsonDocument>(
+                new BsonDocument("ping", 1),
                 cancellationToken: cancellationToken);
-            
+
             _logger.Debug("MongoDB health check: Healthy");
             return HealthCheckResult.Healthy("MongoDB is responsive");
         }

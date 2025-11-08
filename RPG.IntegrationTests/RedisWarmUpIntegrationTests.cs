@@ -1,15 +1,20 @@
+using System.Text.Json;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using RPG.Domain.Entities.Items;
+using RPG.Domain.Entities.Quests;
+using RPG.Domain.Entities.Skills;
+using RPG.Domain.Enums;
+using RPG.Infrastructure.Documents;
+using RPG.Infrastructure.Helpers;
 using RPG.Infrastructure.Interfaces;
-using RPG.Infrastructure.Configuration;
-using RPG.Infrastructure.Repositories.Redis;
 using RPG.Infrastructure.Repositories.MongoDB;
-using RPG.Infrastructure.Services;
+using RPG.Infrastructure.Repositories.Redis;
+using RedisWarmUp.Services;
 using StackExchange.Redis;
-using System.Text.Json;
 
 namespace RPG.IntegrationTests;
 
@@ -28,76 +33,72 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
 
         var services = new ServiceCollection();
         services.AddLogging(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Debug));
-        
+
         // Register Infrastructure logger adapter
-        services.AddSingleton(typeof(RPG.Infrastructure.Interfaces.ILogger<>), typeof(LoggerAdapter<>));
-        
+        services.AddSingleton(typeof(Infrastructure.Interfaces.ILogger<>), typeof(LoggerAdapter<>));
+
         // Register MongoDB and Redis
         services.AddSingleton(_mongoDatabase);
         services.AddSingleton(_redisDatabase);
-        
-        // Register repositories and services
-        services.AddSingleton<IMongoDocumentReader, MongoDocumentReader>();
+
+        // Register repositories
         services.AddSingleton<IRedisDocumentRepository, RedisDocumentRepository>();
-        
+        services.AddSingleton<IMongoDocumentRepository, MongoDocumentRepository>();
+
         _serviceProvider = services.BuildServiceProvider();
     }
 
     [Fact]
-    public async Task MongoDocumentReader_ShouldReadAllDocuments()
+    public async Task MongoDocumentRepository_ShouldReadAllDocuments()
     {
         // Arrange
-        var collection = _mongoDatabase.GetCollection<BsonDocument>("Characters");
-        await collection.DeleteManyAsync(FilterDefinition<BsonDocument>.Empty);
+        var collection = _mongoDatabase.GetCollection<CharacterDocument>(CharacterDocument.CollectionName);
+        await collection.DeleteManyAsync(FilterDefinition<CharacterDocument>.Empty);
 
         var testDocuments = new[]
         {
-            new BsonDocument { { "_id", ObjectId.GenerateNewId() }, { "Name", "Hero1" }, { "Level", 10 } },
-            new BsonDocument { { "_id", ObjectId.GenerateNewId() }, { "Name", "Hero2" }, { "Level", 20 } },
-            new BsonDocument { { "_id", ObjectId.GenerateNewId() }, { "Name", "Hero3" }, { "Level", 30 } }
+            new CharacterDocument { Id = Guid.NewGuid(), Name = "Hero1", PlayerId = Guid.NewGuid(), SessionId = Guid.NewGuid(), Class = "Warrior", Level = 10, Experience = 0, ExperienceToNextLevel = 100, CurrentHealth = 100, MaxHealth = 100, CurrentResource = 50, MaxResource = 50 },
+            new CharacterDocument { Id = Guid.NewGuid(), Name = "Hero2", PlayerId = Guid.NewGuid(), SessionId = Guid.NewGuid(), Class = "Mage", Level = 20, Experience = 0, ExperienceToNextLevel = 100, CurrentHealth = 100, MaxHealth = 100, CurrentResource = 50, MaxResource = 50 },
+            new CharacterDocument { Id = Guid.NewGuid(), Name = "Hero3", PlayerId = Guid.NewGuid(), SessionId = Guid.NewGuid(), Class = "Rogue", Level = 30, Experience = 0, ExperienceToNextLevel = 100, CurrentHealth = 100, MaxHealth = 100, CurrentResource = 50, MaxResource = 50 }
         };
         await collection.InsertManyAsync(testDocuments);
 
-        var reader = _serviceProvider.GetRequiredService<IMongoDocumentReader>();
+        var repository = _serviceProvider.GetRequiredService<IMongoDocumentRepository>();
 
         // Act
-        var documents = await reader.ReadAllAsync("Characters");
+        var documents = await repository.GetAllAsync<CharacterDocument>();
 
         // Assert
         documents.Should().HaveCount(3);
         documents.Should().AllSatisfy(doc =>
         {
-            doc.Should().ContainKey("Id");
-            doc.Should().ContainKey("Name");
-            doc.Should().ContainKey("Level");
+            doc.Id.Should().NotBeEmpty();
+            doc.Name.Should().NotBeNullOrEmpty();
+            doc.Level.Should().BePositive();
         });
     }
 
     [Fact]
-    public async Task MongoDocumentReader_ShouldReadInBatches()
+    public async Task MongoDocumentRepository_ShouldReadInBatches()
     {
         // Arrange
-        var collection = _mongoDatabase.GetCollection<BsonDocument>("Items");
-        await collection.DeleteManyAsync(FilterDefinition<BsonDocument>.Empty);
+        var collection = _mongoDatabase.GetCollection<ItemDocument>(ItemDocument.CollectionName);
+        await collection.DeleteManyAsync(FilterDefinition<ItemDocument>.Empty);
 
-        var testDocuments = new List<BsonDocument>();
-        for (int i = 0; i < 25; i++)
-        {
-            testDocuments.Add(new BsonDocument
+        var testDocuments = new List<ItemDocument>();
+        for (var i = 0; i < 25; i++)
+            testDocuments.Add(new ItemDocument
             {
-                { "_id", ObjectId.GenerateNewId() },
-                { "Name", $"Item{i}" },
-                { "Rarity", i % 5 }
+                Id = Guid.NewGuid(), Name = $"Item{i}", TypeCode = "WEAPON", Rarity = ItemRarity.Common, RequiredLevel = 1, StackSize = 1
             });
-        }
         await collection.InsertManyAsync(testDocuments);
 
-        var reader = _serviceProvider.GetRequiredService<IMongoDocumentReader>();
+        var repository = _serviceProvider.GetRequiredService<IMongoDocumentRepository>();
 
         // Act
-        var batch1 = await reader.ReadBatchAsync("Items", 0, 10);   // skip=0, limit=10
-        var batch2 = await reader.ReadBatchAsync("Items", 10, 10);  // skip=10, limit=10
-        var batch3 = await reader.ReadBatchAsync("Items", 20, 10);  // skip=20, limit=10
+        var batch1 = await repository.GetBatchAsync<ItemDocument>(0, 10); // skip=0, limit=10
+        var batch2 = await repository.GetBatchAsync<ItemDocument>(10, 10); // skip=10, limit=10
+        var batch3 = await repository.GetBatchAsync<ItemDocument>(20, 10); // skip=20, limit=10
 
         // Assert
         batch1.Should().HaveCount(10);
@@ -106,25 +107,25 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     }
 
     [Fact]
-    public async Task MongoDocumentReader_ShouldGetCorrectCount()
+    public async Task MongoDocumentRepository_ShouldGetCorrectCount()
     {
         // Arrange
-        var collection = _mongoDatabase.GetCollection<BsonDocument>("Skills");
-        await collection.DeleteManyAsync(FilterDefinition<BsonDocument>.Empty);
+        var collection = _mongoDatabase.GetCollection<SkillDocument>(SkillDocument.CollectionName);
+        await collection.DeleteManyAsync(FilterDefinition<SkillDocument>.Empty);
 
         var testDocuments = new[]
         {
-            new BsonDocument { { "_id", ObjectId.GenerateNewId() }, { "Name", "Fireball" } },
-            new BsonDocument { { "_id", ObjectId.GenerateNewId() }, { "Name", "Heal" } },
-            new BsonDocument { { "_id", ObjectId.GenerateNewId() }, { "Name", "Shield" } },
-            new BsonDocument { { "_id", ObjectId.GenerateNewId() }, { "Name", "Teleport" } }
+            new SkillDocument { Id = Guid.NewGuid(), Name = "Fireball" },
+            new SkillDocument { Id = Guid.NewGuid(), Name = "Heal" },
+            new SkillDocument { Id = Guid.NewGuid(), Name = "Shield" },
+            new SkillDocument { Id = Guid.NewGuid(), Name = "Teleport" }
         };
         await collection.InsertManyAsync(testDocuments);
 
-        var reader = _serviceProvider.GetRequiredService<IMongoDocumentReader>();
+        var repository = _serviceProvider.GetRequiredService<IMongoDocumentRepository>();
 
         // Act
-        var count = await reader.GetCountAsync("Skills");
+        var count = await repository.CountAsync<SkillDocument>();
 
         // Assert
         count.Should().Be(4);
@@ -135,29 +136,22 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     {
         // Arrange
         var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
-        var documentId = Guid.NewGuid();
-        var document = new Dictionary<string, JsonElement>
-        {
-            { "Id", JsonSerializer.SerializeToElement(documentId.ToString()) },
-            { "Name", JsonSerializer.SerializeToElement("TestCharacter") },
-            { "Level", JsonSerializer.SerializeToElement(42) }
-        };
-        var redisKey = $"Characters:{documentId}";
-        var documentJson = JsonSerializer.Serialize(document);
+        var document = new CharacterDocument { Id = Guid.NewGuid(), Name = "TestCharacter", PlayerId = Guid.NewGuid(), SessionId = Guid.NewGuid(), Class = "Warrior", Level = 42, Experience = 0, ExperienceToNextLevel = 100, CurrentHealth = 100, MaxHealth = 100, CurrentResource = 50, MaxResource = 50 };
 
         // Act
-        await writer.WriteAsync(redisKey, documentJson, TimeSpan.FromMinutes(5));
+        await writer.UpsertAsync(document);
 
         // Assert
+        var redisKey = $"{CharacterDocument.CollectionName}:{document.Id}";
         var exists = await _redisDatabase.KeyExistsAsync(redisKey);
         exists.Should().BeTrue();
 
         var value = await _redisDatabase.StringGetAsync(redisKey);
         value.HasValue.Should().BeTrue();
-        
-        var stored = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(value!);
-        stored.Should().ContainKey("Name");
-        stored!["Name"].GetString().Should().Be("TestCharacter");
+
+        var stored = JsonSerializer.Deserialize<CharacterDocument>(value!);
+        stored.Should().NotBeNull();
+        stored!.Name.Should().Be("TestCharacter");
     }
 
     [Fact]
@@ -165,29 +159,33 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     {
         // Arrange
         var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
-        var keyValuePairs = new Dictionary<string, string>();
-        
-        for (int i = 0; i < 5; i++)
+        var documents = new List<ItemDocument>();
+
+        for (var i = 0; i < 5; i++)
         {
-            var id = Guid.NewGuid();
-            var document = new Dictionary<string, JsonElement>
+            documents.Add(new ItemDocument
             {
-                { "Id", JsonSerializer.SerializeToElement(id.ToString()) },
-                { "Name", JsonSerializer.SerializeToElement($"Item{i}") },
-                { "Price", JsonSerializer.SerializeToElement(100 * i) }
-            };
-            var key = $"Items:{id}";
-            keyValuePairs[key] = JsonSerializer.Serialize(document);
+                Id = Guid.NewGuid(),
+                Name = $"Item{i}",
+                TypeCode = "POTION",
+                Rarity = ItemRarity.Rare,
+                RequiredLevel = 1,
+                StackSize = 10
+            });
         }
 
         // Act
-        await writer.WriteBatchAsync(keyValuePairs, TimeSpan.FromMinutes(10));
+        foreach(var doc in documents)
+        {
+            await writer.UpsertAsync(doc);
+        }
 
         // Assert
-        foreach (var kvp in keyValuePairs)
+        foreach (var doc in documents)
         {
-            var exists = await _redisDatabase.KeyExistsAsync(kvp.Key);
-            exists.Should().BeTrue($"Key {kvp.Key} should exist in Redis");
+            var key = $"{ItemDocument.CollectionName}:{doc.Id}";
+            var exists = await _redisDatabase.KeyExistsAsync(key);
+            exists.Should().BeTrue($"Key {key} should exist in Redis");
         }
     }
 
@@ -196,18 +194,12 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     {
         // Arrange
         var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
-        var documentId = Guid.NewGuid();
-        var document = new Dictionary<string, JsonElement>
-        {
-            { "Id", JsonSerializer.SerializeToElement(documentId.ToString()) },
-            { "Name", JsonSerializer.SerializeToElement("TempData") }
-        };
-        var redisKey = $"TempCollection:{documentId}";
-        var documentJson = JsonSerializer.Serialize(document);
-        var expiry = TimeSpan.FromSeconds(5);
-
+        var document = new SkillDocument { Id = Guid.NewGuid(), Name = "TempData" };
+        
         // Act
-        await writer.WriteAsync(redisKey, documentJson, expiry);
+        await writer.UpsertAsync(document);
+        var redisKey = $"{SkillDocument.CollectionName}:{document.Id}";
+        await _redisDatabase.KeyExpireAsync(redisKey, TimeSpan.FromSeconds(5));
 
         // Assert
         var ttl = await _redisDatabase.KeyTimeToLiveAsync(redisKey);
@@ -222,23 +214,18 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
         var existingId = Guid.NewGuid();
         var nonExistingId = Guid.NewGuid();
-        
-        var document = new Dictionary<string, JsonElement>
-        {
-            { "Id", JsonSerializer.SerializeToElement(existingId.ToString()) }
-        };
-        var redisKey = $"Quests:{existingId}";
-        var documentJson = JsonSerializer.Serialize(document);
-        
-        await writer.WriteAsync(redisKey, documentJson, TimeSpan.FromMinutes(1));
+
+        var document = new QuestDocument { Id = existingId, Title = "Test Quest" };
+
+        await writer.UpsertAsync(document);
 
         // Act
-        var exists = await writer.ExistsAsync(redisKey);
-        var notExists = await writer.ExistsAsync($"Quests:{nonExistingId}");
+        var exists = await writer.GetByIdAsync<QuestDocument>(existingId);
+        var notExists = await writer.GetByIdAsync<QuestDocument>(nonExistingId);
 
         // Assert
-        exists.Should().BeTrue();
-        notExists.Should().BeFalse();
+        exists.Should().NotBeNull();
+        notExists.Should().BeNull();
     }
 
     [Fact]
@@ -247,23 +234,18 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         // Arrange
         var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
         var documentId = Guid.NewGuid();
-        var document = new Dictionary<string, JsonElement>
-        {
-            { "Id", JsonSerializer.SerializeToElement(documentId.ToString()) }
-        };
-        var redisKey = $"Worlds:{documentId}";
-        var documentJson = JsonSerializer.Serialize(document);
-        
-        await writer.WriteAsync(redisKey, documentJson, TimeSpan.FromMinutes(1));
-        var existsBefore = await writer.ExistsAsync(redisKey);
+        var document = new CharacterDocument { Id = documentId, Name = "ToDelete", PlayerId = Guid.NewGuid(), SessionId = Guid.NewGuid(), Class = "Warrior", Level = 1, Experience = 0, ExperienceToNextLevel = 100, CurrentHealth = 100, MaxHealth = 100, CurrentResource = 50, MaxResource = 50 };
+
+        await writer.UpsertAsync(document);
+        var existsBefore = await writer.GetByIdAsync<CharacterDocument>(documentId);
 
         // Act
-        await writer.DeleteAsync(redisKey);
+        await writer.DeleteAsync<CharacterDocument>(documentId);
 
         // Assert
-        existsBefore.Should().BeTrue();
-        var existsAfter = await writer.ExistsAsync(redisKey);
-        existsAfter.Should().BeFalse();
+        existsBefore.Should().NotBeNull();
+        var existsAfter = await writer.GetByIdAsync<CharacterDocument>(documentId);
+        existsAfter.Should().BeNull();
     }
 
     [Fact]
@@ -271,133 +253,85 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     {
         // Arrange
         var collectionName = "Characters";
-        var collection = _mongoDatabase.GetCollection<BsonDocument>(collectionName);
-        await collection.DeleteManyAsync(FilterDefinition<BsonDocument>.Empty);
+        var collection = _mongoDatabase.GetCollection<CharacterDocument>(collectionName);
+        await collection.DeleteManyAsync(FilterDefinition<CharacterDocument>.Empty);
 
         var testDocuments = new[]
         {
-            new BsonDocument { { "_id", ObjectId.GenerateNewId() }, { "Name", "Warrior" }, { "Level", 50 } },
-            new BsonDocument { { "_id", ObjectId.GenerateNewId() }, { "Name", "Mage" }, { "Level", 45 } },
-            new BsonDocument { { "_id", ObjectId.GenerateNewId() }, { "Name", "Rogue" }, { "Level", 48 } }
+            new CharacterDocument { Id = Guid.NewGuid(), Name = "Warrior", PlayerId = Guid.NewGuid(), SessionId = Guid.NewGuid(), Class = "Warrior", Level = 50, Experience = 0, ExperienceToNextLevel = 100, CurrentHealth = 100, MaxHealth = 100, CurrentResource = 50, MaxResource = 50 },
+            new CharacterDocument { Id = Guid.NewGuid(), Name = "Mage", PlayerId = Guid.NewGuid(), SessionId = Guid.NewGuid(), Class = "Mage", Level = 45, Experience = 0, ExperienceToNextLevel = 100, CurrentHealth = 100, MaxHealth = 100, CurrentResource = 50, MaxResource = 50 },
+            new CharacterDocument { Id = Guid.NewGuid(), Name = "Rogue", PlayerId = Guid.NewGuid(), SessionId = Guid.NewGuid(), Class = "Rogue", Level = 48, Experience = 0, ExperienceToNextLevel = 100, CurrentHealth = 100, MaxHealth = 100, CurrentResource = 50, MaxResource = 50 }
         };
         await collection.InsertManyAsync(testDocuments);
 
-        var reader = _serviceProvider.GetRequiredService<IMongoDocumentReader>();
+        var repository = _serviceProvider.GetRequiredService<IMongoDocumentRepository>();
         var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
 
-        // Act - Simulate what RedisWarmUpService does
-        var documents = await reader.ReadAllAsync(collectionName);
-        var keyValuePairs = new Dictionary<string, string>();
-        
-        foreach (var doc in documents)
+        // Act - Simulate what RedisWarmUpOrchestrator does
+        var documents = await repository.GetAllAsync<CharacterDocument>();
+        foreach(var doc in documents)
         {
-            // MongoDB ObjectId is returned as { "$oid": "..." }, need to extract the string value
-            var idElement = doc["Id"];
-            string idString;
-            
-            if (idElement.ValueKind == JsonValueKind.Object && idElement.TryGetProperty("$oid", out var oidElement))
-            {
-                idString = oidElement.GetString()!;
-            }
-            else if (idElement.ValueKind == JsonValueKind.String)
-            {
-                idString = idElement.GetString()!;
-            }
-            else
-            {
-                throw new InvalidOperationException($"Unexpected Id format: {idElement.ValueKind}");
-            }
-            
-            var key = $"{collectionName}:{idString}";
-            keyValuePairs[key] = JsonSerializer.Serialize(doc);
+            await writer.UpsertAsync(doc);
         }
-        
-        await writer.WriteBatchAsync(keyValuePairs, TimeSpan.FromMinutes(30));
 
         // Assert
-        foreach (var kvp in keyValuePairs)
+        foreach (var doc in documents)
         {
-            var exists = await writer.ExistsAsync(kvp.Key);
-            exists.Should().BeTrue($"Key {kvp.Key} should be cached in Redis");
+            var key = $"{collectionName}:{doc.Id}";
+            var exists = await _redisDatabase.KeyExistsAsync(key);
+            exists.Should().BeTrue($"Key {key} should be cached in Redis");
 
-            var value = await _redisDatabase.StringGetAsync(kvp.Key);
+            var value = await _redisDatabase.StringGetAsync(key);
             value.HasValue.Should().BeTrue();
-            
-            var stored = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(value!);
-            stored.Should().ContainKey("Name");
-            stored.Should().ContainKey("Level");
+
+            var stored = JsonSerializer.Deserialize<CharacterDocument>(value!);
+            stored.Should().NotBeNull();
+            stored!.Name.Should().Be(doc.Name);
+            stored.Level.Should().Be(doc.Level);
         }
     }
 
     [Fact]
-    public async Task RedisWarmUpService_ShouldWarmUpMultipleCollections()
+    public async Task RedisWarmUpService_ShouldWarmUpAllMappedDocuments()
     {
         // Arrange
-        var settings = new RedisWarmUpSettings
-        {
-            CollectionsToCache = new List<string> { "Characters", "Items", "Skills" },
-            BatchSize = 10,
-            IntervalSeconds = 1,
-            CacheExpirySeconds = 300
-        };
+        await FlushRedisAsync();
+        await ClearMongoCollectionsAsync();
 
-        // Seed MongoDB with test data
-        foreach (var collectionName in settings.CollectionsToCache)
-        {
-            var collection = _mongoDatabase.GetCollection<BsonDocument>(collectionName);
-            await collection.DeleteManyAsync(FilterDefinition<BsonDocument>.Empty);
+        var redisRepo = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
+        var mongoRepo = _serviceProvider.GetRequiredService<IMongoDocumentRepository>();
+        var logger = _serviceProvider.GetRequiredService<Infrastructure.Interfaces.ILogger<RedisWarmUpService>>();
 
-            var testDoc = new BsonDocument
-            {
-                { "_id", ObjectId.GenerateNewId() },
-                { "Name", $"Test{collectionName}" },
-                { "Value", 123 }
-            };
-            await collection.InsertOneAsync(testDoc);
+    var seededDocuments = new List<object>();
+        foreach (var mapping in DocumentMappingRegistry.All)
+        {
+            var document = CreateDocumentInstance(mapping.DocumentType);
+            await InsertDocumentAsync(document);
+            seededDocuments.Add(document);
         }
 
-        var reader = _serviceProvider.GetRequiredService<IMongoDocumentReader>();
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
-        var logger = _serviceProvider.GetRequiredService<RPG.Infrastructure.Interfaces.ILogger<RedisWarmUpService>>();
-        var warmUpService = new RedisWarmUpService(reader, writer, logger, settings);
+        var strategies = DocumentMappingRegistry.All
+            .Select(mapping =>
+            {
+                var strategyType = typeof(DocumentWarmUpStrategy<>).MakeGenericType(mapping.DocumentType);
+                return (RedisWarmUp.Services.IDocumentWarmUpStrategy)Activator.CreateInstance(strategyType, mongoRepo, mapping.CollectionName)!;
+            })
+            .ToList();
+
+        var warmUpService = new RedisWarmUp.Services.RedisWarmUpService(redisRepo, strategies, logger);
 
         // Act
-        await warmUpService.WarmUpCycleAsync(CancellationToken.None);
+        await warmUpService.ExecuteAsync(CancellationToken.None);
 
         // Assert
-        foreach (var collectionName in settings.CollectionsToCache)
+        foreach (var document in seededDocuments)
         {
-            var documents = await reader.ReadAllAsync(collectionName);
-            documents.Should().NotBeEmpty($"{collectionName} should have documents");
-
-            foreach (var doc in documents)
-            {
-                // MongoDB ObjectId is returned as { "$oid": "..." }, need to extract the string value
-                var idElement = doc["Id"];
-                string idString;
-                
-                if (idElement.ValueKind == JsonValueKind.Object && idElement.TryGetProperty("$oid", out var oidElement))
-                {
-                    idString = oidElement.GetString()!;
-                }
-                else if (idElement.ValueKind == JsonValueKind.String)
-                {
-                    idString = idElement.GetString()!;
-                }
-                else
-                {
-                    throw new InvalidOperationException($"Unexpected Id format: {idElement.ValueKind}");
-                }
-                
-                var key = $"{collectionName}:{idString}";
-                var exists = await writer.ExistsAsync(key);
-                exists.Should().BeTrue($"Document from {collectionName} should be cached at key {key}");
-            }
+            await AssertRedisContainsDocumentAsync(redisRepo, document);
         }
     }
 
     // Helper class for logger adapter
-    public class LoggerAdapter<T> : RPG.Infrastructure.Interfaces.ILogger<T>
+    public class LoggerAdapter<T> : Infrastructure.Interfaces.ILogger<T>
     {
         private readonly Microsoft.Extensions.Logging.ILogger<T> _logger;
 
@@ -406,10 +340,195 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
             _logger = logger;
         }
 
-        public void Info(string message) => _logger.LogInformation(message);
-        public void Warn(string message) => _logger.LogWarning(message);
-        public void Error(string message, Exception? exception = null) => 
+        public void Info(string message)
+        {
+            _logger.LogInformation(message);
+        }
+
+        public void Warn(string message)
+        {
+            _logger.LogWarning(message);
+        }
+
+        public void Error(string message, Exception? exception = null)
+        {
             _logger.LogError(exception, message);
-        public void Debug(string message) => _logger.LogDebug(message);
+        }
+
+        public void Debug(string message)
+        {
+            _logger.LogDebug(message);
+        }
+    }
+
+    private async Task FlushRedisAsync()
+    {
+        var endpoints = _fixture.RedisConnection.GetEndPoints();
+        foreach (var endpoint in endpoints)
+        {
+            var server = _fixture.RedisConnection.GetServer(endpoint);
+            await server.FlushDatabaseAsync();
+        }
+    }
+
+    private async Task ClearMongoCollectionsAsync()
+    {
+        foreach (var mapping in DocumentMappingRegistry.All)
+        {
+            var generic = typeof(RedisWarmUpIntegrationTests)
+                .GetMethod(nameof(DeleteAllDocumentsAsync), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+                .MakeGenericMethod(mapping.DocumentType);
+            await (Task)generic.Invoke(this, null)!;
+        }
+    }
+
+    private async Task DeleteAllDocumentsAsync<TDocument>() where TDocument : class, IMongoDocument
+    {
+        var collection = _mongoDatabase.GetCollection<TDocument>(TDocument.CollectionName);
+        await collection.DeleteManyAsync(FilterDefinition<TDocument>.Empty);
+    }
+
+    private async Task InsertDocumentAsync(object document)
+    {
+        var genericMethod = typeof(RedisWarmUpIntegrationTests)
+            .GetMethod(nameof(InsertTypedDocumentAsync), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+
+        var constructed = genericMethod.MakeGenericMethod(document.GetType());
+        await (Task)constructed.Invoke(this, new object[] { document })!;
+    }
+
+    private async Task InsertTypedDocumentAsync<TDocument>(TDocument document) where TDocument : class, IMongoDocument
+    {
+        var collection = _mongoDatabase.GetCollection<TDocument>(TDocument.CollectionName);
+        await collection.InsertOneAsync(document);
+    }
+
+    private async Task AssertRedisContainsDocumentAsync(IRedisDocumentRepository redisRepository, object document)
+    {
+        var genericMethod = typeof(RedisWarmUpIntegrationTests)
+            .GetMethod(nameof(AssertRedisContainsTypedDocumentAsync), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+
+        var constructed = genericMethod.MakeGenericMethod(document.GetType());
+        await (Task)constructed.Invoke(this, new object[] { redisRepository, document })!;
+    }
+
+    private async Task AssertRedisContainsTypedDocumentAsync<TDocument>(IRedisDocumentRepository redisRepository, TDocument document)
+        where TDocument : class, IMongoDocument
+    {
+        var cached = await redisRepository.GetByIdAsync<TDocument>(document.Id);
+        cached.Should().NotBeNull($"Document {typeof(TDocument).Name} with Id {document.Id} should be cached in Redis");
+    }
+
+    private static object CreateDocumentInstance(Type documentType)
+    {
+        if (documentType == typeof(CharacterDocument))
+        {
+            return new CharacterDocument
+            {
+                Id = Guid.NewGuid(),
+                Name = "WarmUpCharacter",
+                PlayerId = Guid.NewGuid(),
+                SessionId = Guid.NewGuid(),
+                Class = "Warrior",
+                Level = 5,
+                Experience = 100,
+                ExperienceToNextLevel = 200,
+                CurrentHealth = 100,
+                MaxHealth = 120,
+                CurrentResource = 40,
+                MaxResource = 80,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+        }
+
+        if (documentType == typeof(ItemDocument))
+        {
+            return new ItemDocument
+            {
+                Id = Guid.NewGuid(),
+                Name = "WarmUpItem",
+                TypeCode = "TEST",
+                Rarity = ItemRarity.Common,
+                RequiredLevel = 1,
+                StackSize = 1
+            };
+        }
+
+        if (documentType == typeof(SkillDocument))
+        {
+            return new SkillDocument
+            {
+                Id = Guid.NewGuid(),
+                Name = "WarmUpSkill",
+                Description = "Test skill"
+            };
+        }
+
+        if (documentType == typeof(QuestDocument))
+        {
+            return new QuestDocument
+            {
+                Id = Guid.NewGuid(),
+                Title = "WarmUpQuest",
+                Description = "Test quest",
+                StartLocation = new LocationData { X = 1, Y = 2, Z = 3 }
+            };
+        }
+
+        if (documentType == typeof(NpcDocument))
+        {
+            return new NpcDocument
+            {
+                Id = Guid.NewGuid(),
+                Name = "WarmUpNpc",
+                Level = 3,
+                CurrentHealth = 80,
+                MaxHealth = 80,
+                SpawnLocation = new LocationData { X = 5, Y = 1, Z = 0 },
+                WorldId = Guid.NewGuid()
+            };
+        }
+
+        if (documentType == typeof(PlayerDocument))
+        {
+            return new PlayerDocument
+            {
+                Id = Guid.NewGuid(),
+                Username = "warmup-player",
+                Email = "warmup@test.dev",
+                CreatedAt = DateTime.UtcNow,
+                LastLoginAt = DateTime.UtcNow,
+                IsOnline = true
+            };
+        }
+
+        if (documentType == typeof(MapObjectDocument))
+        {
+            return new MapObjectDocument
+            {
+                Id = Guid.NewGuid(),
+                Name = "WarmUpObject",
+                DisplayName = "Object",
+                Description = "Test object",
+                Location = new LocationData { X = 10, Y = 0, Z = -5 },
+                RotationYaw = 45,
+                WorldId = Guid.NewGuid(),
+                ZoneId = "test-zone"
+            };
+        }
+
+        if (documentType == typeof(WorldStateDocument))
+        {
+            return new WorldStateDocument
+            {
+                Id = Guid.NewGuid(),
+                WorldId = Guid.NewGuid(),
+                WorldName = "WarmUpWorld",
+                LastUpdated = DateTime.UtcNow
+            };
+        }
+
+        throw new InvalidOperationException($"Unknown document type {documentType.Name}");
     }
 }

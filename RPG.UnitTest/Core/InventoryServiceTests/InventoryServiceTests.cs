@@ -21,28 +21,24 @@ public class InventoryServiceTests
     [Fact]
     public void AddItem_ShouldStack_WhenSameItemExistsAndHasSpace()
     {
-        var item = CreateItem("Potion", stackSize: 10);
-        var container = CreateContainer(new InventorySlot
-        {
-            Item = item,
-            Quantity = 5
-        });
+        var item = CreateItem("Potion", 10);
+        var container = CreateContainer(new InventorySlot { Item = item, Quantity = 5 });
 
-    var result = _service.AddItem(container, item);
+        var result = _service.AddItem(container, item);
 
-    result.Success.Should().BeTrue();
+        result.Success.Should().BeTrue();
         container.Inventory[0].Quantity.Should().Be(6);
     }
 
     [Fact]
     public void AddItem_ShouldUseEmptySlot_WhenNoStackableSlotExists()
     {
-        var item = CreateItem("Scroll", stackSize: 5);
+        var item = CreateItem("Scroll", 5);
         var container = CreateContainer(new InventorySlot());
 
-    var result = _service.AddItem(container, item);
+        var result = _service.AddItem(container, item);
 
-    result.Success.Should().BeTrue();
+        result.Success.Should().BeTrue();
         container.Inventory[0].Item.Should().Be(item);
         container.Inventory[0].Quantity.Should().Be(1);
     }
@@ -50,33 +46,25 @@ public class InventoryServiceTests
     [Fact]
     public void AddItem_ShouldFail_WhenNoFreeSlotAvailable()
     {
-        var item = CreateItem("Gem", stackSize: 1);
-        var container = CreateContainer(new InventorySlot
-        {
-            Item = item,
-            Quantity = 1,
-        });
+        var item = CreateItem("Gem", 1);
+        var container = CreateContainer(new InventorySlot { Item = item, Quantity = 1 });
 
-    var result = _service.AddItem(container, item);
+        var result = _service.AddItem(container, item);
 
-    result.Success.Should().BeFalse();
-    result.Error.Should().Be(ErrorCodeDefinition.NoFreeSlot);
-    result.Message.Should().Be("Brak wolnych slotów w ekwipunku.");
+        result.Success.Should().BeFalse();
+        result.Error.Should().Be(ErrorCodeDefinition.NoFreeSlot);
+        result.Message.Should().Be("Brak wolnych slotów w ekwipunku.");
     }
 
     [Fact]
     public void RemoveItem_ShouldDecreaseQuantity_WhenItemExists()
     {
-        var item = CreateItem("Arrow", stackSize: 20);
-        var container = CreateContainer(new InventorySlot
-        {
-            Item = item,
-            Quantity = 5
-        });
+        var item = CreateItem("Arrow", 20);
+        var container = CreateContainer(new InventorySlot { Item = item, Quantity = 5 });
 
-    var result = _service.RemoveItem(container, item);
+        var result = _service.RemoveItem(container, item);
 
-    result.Success.Should().BeTrue();
+        result.Success.Should().BeTrue();
         container.Inventory[0].Quantity.Should().Be(4);
         container.Inventory[0].Item.Should().Be(item);
     }
@@ -84,16 +72,12 @@ public class InventoryServiceTests
     [Fact]
     public void RemoveItem_ShouldClearSlot_WhenQuantityBecomesZero()
     {
-        var item = CreateItem("Key", stackSize: 1);
-        var container = CreateContainer(new InventorySlot
-        {
-            Item = item,
-            Quantity = 1
-        });
+        var item = CreateItem("Key", 1);
+        var container = CreateContainer(new InventorySlot { Item = item, Quantity = 1 });
 
-    var result = _service.RemoveItem(container, item);
+        var result = _service.RemoveItem(container, item);
 
-    result.Success.Should().BeTrue();
+        result.Success.Should().BeTrue();
         container.Inventory[0].Quantity.Should().Be(0);
         container.Inventory[0].Item.Should().BeNull();
     }
@@ -104,67 +88,59 @@ public class InventoryServiceTests
         var item = CreateItem("Map");
         var container = CreateContainer(new InventorySlot());
 
-    var result = _service.RemoveItem(container, item);
+        var result = _service.RemoveItem(container, item);
 
-    result.Success.Should().BeFalse();
-    result.Error.Should().Be(ErrorCodeDefinition.ItemNotFound);
-    result.Message.Should().Be("Nie znaleziono przedmiotu w ekwipunku.");
+        result.Success.Should().BeFalse();
+        result.Error.Should().Be(ErrorCodeDefinition.ItemNotFound);
+        result.Message.Should().Be("Nie znaleziono przedmiotu w ekwipunku.");
     }
 
     [Fact]
     public void Contains_ShouldReturnTrue_WhenItemExists()
     {
         var item = CreateItem("Torch");
-        var container = CreateContainer(new InventorySlot
-        {
-            Item = item,
-            Quantity = 1
-        });
+        var container = CreateContainer(new InventorySlot { Item = item, Quantity = 1 });
 
-    var result = _service.Contains(container, item);
+        var result = _service.Contains(container, item);
 
-    result.Success.Should().BeTrue();
+        result.Success.Should().BeTrue();
     }
 
     [Fact]
     public void IsFull_ShouldReturnTrue_WhenAllSlotsAreFull()
     {
-        var item = CreateItem("Coin", stackSize: 5);
-        var container = CreateContainer(new InventorySlot
-        {
-            Item = item,
-            Quantity = 5
-        });
+        var item = CreateItem("Coin", 5);
+        var container = CreateContainer(new InventorySlot { Item = item, Quantity = 5 });
 
-    var result = _service.IsFull(container);
+        var result = _service.IsFull(container);
 
-    result.Success.Should().BeTrue();
+        result.Success.Should().BeTrue();
     }
 
     [Fact]
     public void FreeSpace_ShouldReturnCorrectCount()
     {
-        var item = CreateItem("Herb", stackSize: 10);
+        var item = CreateItem("Herb", 10);
         var container = CreateContainer(
             new InventorySlot(),
             new InventorySlot { Item = item, Quantity = 5 },
             new InventorySlot { Item = item, Quantity = 10 }
         );
 
-    var result = _service.FreeSpace(container);
+        var result = _service.FreeSpace(container);
 
-    result.Result.Should().Be(2); // 1 empty + 1 partially filled
+        result.Result.Should().Be(2); // 1 empty + 1 partially filled
     }
 
     // Helpers
 
-    private Item CreateItem(string name, int stackSize = 1) => new(Guid.NewGuid(),"Miscellaneous")
+    private Item CreateItem(string name, int stackSize = 1)
     {
-        Id = Guid.NewGuid(),
-        Name = name,
-        TypeCode = "Miscellaneous",
-        StackSize = stackSize
-    };
+        return new Item(Guid.NewGuid(), "Miscellaneous")
+        {
+            Id = Guid.NewGuid(), Name = name, TypeCode = "Miscellaneous", StackSize = stackSize
+        };
+    }
 
     private IInventoryContainer CreateContainer(params InventorySlot[] slots)
     {

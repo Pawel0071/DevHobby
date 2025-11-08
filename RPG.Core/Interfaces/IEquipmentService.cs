@@ -1,6 +1,4 @@
 using RPG.Core.Common;
-using RPG.Core.Services.EquipmentService;
-using RPG.Domain.Common;
 using RPG.Domain.Entities;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;

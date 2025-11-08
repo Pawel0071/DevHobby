@@ -9,10 +9,10 @@ namespace RPG.Core.Services.LevelService;
 
 public class LevelingService : ILevelingService
 {
-    private readonly IStatsService _statsService;
-    private readonly ISkillService _skillService;
     private readonly IExperienceProvider _experienceProvider;
     private readonly ILogger<LevelingService> _logger;
+    private readonly ISkillService _skillService;
+    private readonly IStatsService _statsService;
 
     public LevelingService(
         IStatsService statsService,
@@ -26,7 +26,7 @@ public class LevelingService : ILevelingService
         _logger = logger;
     }
 
-    public ServiceResult<bool> LevelUp(Character character, int amount = 0)
+    public ServiceResult<bool> LevelUp(Character character, long amount = 0)
     {
         _logger.Debug($"Attempting to level up character '{character.Id}' at level {character.Level}.");
 
@@ -51,7 +51,7 @@ public class LevelingService : ILevelingService
         return true.ToResult();
     }
 
-    public ServiceResult<bool> GrantExperience(Character character, int amount)
+    public ServiceResult<bool> GrantExperience(Character character, long amount)
     {
         _logger.Debug($"Granting {amount} XP to character '{character.Id}' at level {character.Level}.");
 
@@ -64,7 +64,8 @@ public class LevelingService : ILevelingService
         character.Experience += amount;
         character.ExperienceToNextLevel -= amount;
 
-        _logger.Info($"Character '{character.Id}' now has {character.Experience} XP. Remaining to next level: {character.ExperienceToNextLevel}.");
+        _logger.Info(
+            $"Character '{character.Id}' now has {character.Experience} XP. Remaining to next level: {character.ExperienceToNextLevel}.");
 
         if (character.ExperienceToNextLevel <= 0)
         {

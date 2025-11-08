@@ -1,8 +1,8 @@
 using RPG.Core.Common;
 using RPG.Core.Interfaces;
-using RPG.Domain.Common;
 using RPG.Domain.Entities;
 using RPG.Domain.Entities.Items;
+using RPG.Domain.Entities.Skills;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Core.Services.SkillService;
@@ -10,7 +10,7 @@ namespace RPG.Core.Services.SkillService;
 public class SkillService : ISkillService
 {
     private readonly ILogger<SkillService> _logger;
-    
+
     public SkillService(ILogger<SkillService> logger)
     {
         _logger = logger;

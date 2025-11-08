@@ -1,4 +1,3 @@
-
 using RPG.Domain.Entities;
 
 namespace RPG.GameServer.Interfaces;

@@ -1,3 +1,5 @@
 namespace RPG.Application.Interfaces;
 
-public interface ICommand { }
+public interface ICommand
+{
+}

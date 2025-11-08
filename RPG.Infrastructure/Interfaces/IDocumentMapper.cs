@@ -1,19 +1,24 @@
+using RPG.Domain.Common;
+using RPG.Infrastructure.Documents;
+
 namespace RPG.Infrastructure.Interfaces;
 
 /// <summary>
-/// Mapper for converting between domain entities and MongoDB documents
+///     Mapper for converting between domain entities and MongoDB documents
 /// </summary>
 /// <typeparam name="TEntity">Domain entity type</typeparam>
 /// <typeparam name="TDocument">MongoDB document type</typeparam>
-public interface IDocumentMapper<TEntity, TDocument> where TEntity : class where TDocument : class
+public interface IDocumentMapper<TEntity, TDocument> 
+    where TEntity : class, IDomainEntity 
+    where TDocument : class, IMongoDocument
 {
     /// <summary>
-    /// Converts a domain entity to a MongoDB document
+    ///     Converts a domain entity to a MongoDB document
     /// </summary>
     TDocument ToDocument(TEntity entity);
-    
+
     /// <summary>
-    /// Converts a MongoDB document to a domain entity
+    ///     Converts a MongoDB document to a domain entity
     /// </summary>
     TEntity ToDomain(TDocument document);
 }

@@ -22,10 +22,9 @@ public class StatsServiceTests
     [Fact]
     public void ModifyStats_ShouldApplyModifier_AndUpdateDerivedValues()
     {
-        var character = new Character(Guid.NewGuid(), CharacterClass.Warrior, null, null)
+        var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
-            Id = Guid.NewGuid(),
-            Name = "TestWarrior"
+            Id = Guid.NewGuid(), Name = "TestWarrior"
         };
 
         // start with base/modified stats zeros
@@ -37,8 +36,8 @@ public class StatsServiceTests
 
         result.Success.Should().BeTrue();
         // ModifiedStats should reflect added values
-        character.ModifiedStats.Stats[StatsProperty.Vitality].Should().Be(2);
-        character.ModifiedStats.Stats[StatsProperty.Strength].Should().Be(3);
+        character.ModifiedStats[StatsProperty.Vitality].Should().Be(2);
+        character.ModifiedStats[StatsProperty.Strength].Should().Be(3);
 
         // Strategy should update derived values
         character.MaxHealth.Should().Be(2 * 25);
@@ -48,15 +47,11 @@ public class StatsServiceTests
     [Fact]
     public void UnModifyStats_ShouldRemoveModifier_AndUpdateDerivedValues()
     {
-        var character = new Character(Guid.NewGuid(), CharacterClass.Mage, null, null)
-        {
-            Id = Guid.NewGuid(),
-            Name = "TestMage"
-        };
+        var character = new Character(Guid.NewGuid(), CharacterClass.Mage) { Id = Guid.NewGuid(), Name = "TestMage" };
 
         // prepare initial modified stats
-        character.ModifiedStats.Stats[StatsProperty.Vitality] = 5;
-        character.ModifiedStats.Stats[StatsProperty.Intelligence] = 4;
+        character.ModifiedStats[StatsProperty.Vitality] = 5;
+        character.ModifiedStats[StatsProperty.Intelligence] = 4;
 
         // apply subtraction
         var modifier = new StatsContainer();
@@ -66,8 +61,8 @@ public class StatsServiceTests
         var result = _service.UnModifyStats(character, modifier);
 
         result.Success.Should().BeTrue();
-        character.ModifiedStats.Stats[StatsProperty.Vitality].Should().Be(3);
-        character.ModifiedStats.Stats[StatsProperty.Intelligence].Should().Be(3);
+        character.ModifiedStats[StatsProperty.Vitality].Should().Be(3);
+        character.ModifiedStats[StatsProperty.Intelligence].Should().Be(3);
 
         // For Mage: MaxHealth = vitality * 15, MaxResource = intelligence * 15
         character.MaxHealth.Should().Be(3 * 15);
@@ -77,18 +72,14 @@ public class StatsServiceTests
     [Fact]
     public void InitStats_ShouldInitializeBaseAndModifiedStats()
     {
-        var character = new Character(Guid.NewGuid(), CharacterClass.Druid, null, null)
-        {
-            Id = Guid.NewGuid(),
-            Name = "InitTest"
-        };
+        var character = new Character(Guid.NewGuid(), CharacterClass.Druid) { Id = Guid.NewGuid(), Name = "InitTest" };
 
         // call explicit interface implementation
         var result = ((IStatsService)_service).InitStats(character);
 
         result.Success.Should().BeTrue();
         // BaseStats should be initialized and copied to ModifiedStats
-        character.BaseStats.Stats.Values.Should().AllBeEquivalentTo(0);
-        character.ModifiedStats.Stats.Values.Should().AllBeEquivalentTo(0);
+        character.BaseStats.Values.Should().AllBeEquivalentTo(0);
+        character.ModifiedStats.Values.Should().AllBeEquivalentTo(0);
     }
 }

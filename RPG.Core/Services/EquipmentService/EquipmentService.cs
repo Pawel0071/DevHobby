@@ -11,8 +11,8 @@ namespace RPG.Core.Services.EquipmentService;
 public class EquipmentService : IEquipmentService
 {
     private readonly IInventoryService _inventoryService;
-    private readonly ISkillService _skillService;
     private readonly ILogger<EquipmentService> _logger;
+    private readonly ISkillService _skillService;
 
     public EquipmentService(
         IInventoryService inventoryService,
@@ -28,7 +28,7 @@ public class EquipmentService : IEquipmentService
     {
         _logger.Debug($"Attempting to equip item '{item.Name}' to slot '{slot}' for character '{character.Id}'.");
 
-        if (!_inventoryService.Contains(character.BackpackInventory, item).Result)
+        if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), item).Result)
         {
             _logger.Warn($"Item '{item.Name}' not found in inventory. Cannot equip.");
             return ErrorCodeDefinition.ItemNotFound.ToFail<bool>("Przedmiot nie znajduje się w ekwipunku.");
@@ -46,11 +46,12 @@ public class EquipmentService : IEquipmentService
             }
         }
 
-        var removeResult = _inventoryService.RemoveItem(character.BackpackInventory, item);
+        var removeResult = _inventoryService.RemoveItem(character.GetBackpackInventoryContainer(), item);
         if (!removeResult.Success)
         {
             _logger.Error($"Failed to remove item '{item.Name}' from inventory: {removeResult.Message}");
-            return ErrorCodeDefinition.InvalidOperation.ToFail<bool>($"Nie udało się usunąć przedmiotu z ekwipunku: {removeResult.Message}");
+            return ErrorCodeDefinition.InvalidOperation.ToFail<bool>(
+                $"Nie udało się usunąć przedmiotu z ekwipunku: {removeResult.Message}");
         }
 
         character.Equipments[slot] = item;
@@ -67,11 +68,12 @@ public class EquipmentService : IEquipmentService
             return ErrorCodeDefinition.InvalidOperation.ToFail<bool>("Slot jest pusty.");
         }
 
-        var addResult = _inventoryService.AddItem(character.BackpackInventory, item);
+        var addResult = _inventoryService.AddItem(character.GetBackpackInventoryContainer(), item);
         if (!addResult.Success)
         {
             _logger.Error($"Failed to add item '{item.Name}' back to inventory: {addResult.Message}");
-            return ErrorCodeDefinition.InvalidOperation.ToFail<bool>($"Nie udało się dodać przedmiotu do ekwipunku: {addResult.Message}");
+            return ErrorCodeDefinition.InvalidOperation.ToFail<bool>(
+                $"Nie udało się dodać przedmiotu do ekwipunku: {addResult.Message}");
         }
 
         character.Equipments[slot] = null!;
@@ -83,7 +85,7 @@ public class EquipmentService : IEquipmentService
     {
         _logger.Debug($"Swapping item '{item.Name}' into slot '{slot}' for character '{character.Id}'.");
 
-        if (!_inventoryService.Contains(character.BackpackInventory, item).Result)
+        if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), item).Result)
         {
             _logger.Warn($"Item '{item.Name}' not found in inventory. Cannot swap.");
             return ErrorCodeDefinition.ItemNotFound.ToFail<bool>("Przedmiot nie znajduje się w ekwipunku.");
@@ -105,7 +107,7 @@ public class EquipmentService : IEquipmentService
 
     public ServiceResult<Item[]> GetAllEquippedItems(Character character)
     {
-        var equippedItems = character.Equipments.Equipments.Values.Where(item => item != null)!;
+        var equippedItems = character.Equipments.Values.Where(item => item != null)!;
         var allEquippedItems = equippedItems as Item[] ?? equippedItems.ToArray();
         _logger.Debug($"Retrieved all equipped items for character '{character.Id}'. Count: {allEquippedItems.Length}");
         return allEquippedItems.ToResult();
