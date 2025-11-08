@@ -72,10 +72,10 @@ public class ItemDocumentMapperTests
 
         // Assert
         doc.Modifiers.Should().NotBeNull();
-        doc.Modifiers.Should().ContainKey(StatsProperty.Strength);
-        doc.Modifiers![StatsProperty.Strength].Should().Be(10);
-        doc.Modifiers.Should().ContainKey(StatsProperty.Dexterity);
-        doc.Modifiers[StatsProperty.Dexterity].Should().Be(5);
+        doc.Modifiers.Should().ContainKey(StatsProperty.Strength.ToString());
+        doc.Modifiers![StatsProperty.Strength.ToString()].Should().Be(10);
+        doc.Modifiers.Should().ContainKey(StatsProperty.Dexterity.ToString());
+        doc.Modifiers[StatsProperty.Dexterity.ToString()].Should().Be(5);
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public class ItemDocumentMapperTests
             Id = Guid.NewGuid(),
             Name = "Test Weapon",
             TypeCode = "weapon",
-            Modifiers = new Dictionary<StatsProperty, int> { { StatsProperty.Strength, 15 } }
+            Modifiers = new Dictionary<string, int> { { StatsProperty.Strength.ToString(), 15 } }
         };
 
         // Act
@@ -301,10 +301,10 @@ public class ItemDocumentMapperTests
         // Arrange
         var doc = new ItemDocument
         {
-            Modifiers = new Dictionary<StatsProperty, int>
+            Modifiers = new Dictionary<string, int>
             {
-                { StatsProperty.Strength, 20 },
-                { StatsProperty.Vitality, 15 }
+                { StatsProperty.Strength.ToString(), 20 },
+                { StatsProperty.Vitality.ToString(), 15 }
             }
         };
 
@@ -414,7 +414,7 @@ public class ItemDocumentMapperTests
             Id = Guid.NewGuid(),
             Name = "Epic Item",
             TypeCode = "epic_weapon",
-            Modifiers = new Dictionary<StatsProperty, int> { { StatsProperty.Strength, 100 } },
+            Modifiers = new Dictionary<string, int> { { StatsProperty.Strength.ToString(), 100 } },
             SocketNo = 2,
             SkillIds = new List<Guid> { Guid.NewGuid() }
         };
@@ -447,7 +447,7 @@ public class ItemDocumentMapperTests
             Id = Guid.NewGuid(),
             Name = "Legendary Item",
             TypeCode = "legendary_item",
-            Modifiers = new Dictionary<StatsProperty, int> { { StatsProperty.Strength, 150 } },
+            Modifiers = new Dictionary<string, int> { { StatsProperty.Strength.ToString(), 150 } },
             SocketNo = 3,
             SkillIds = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() }
         };

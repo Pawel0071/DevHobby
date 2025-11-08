@@ -7,7 +7,7 @@ namespace RPG.Infrastructure.Mappers;
 /// <summary>
 ///     Mapper for converting between WorldState domain entity and WorldStateDocument
 /// </summary>
-public class WorldStateDocumentMapper
+public class WorldStateDocumentMapper : IDocumentMapper<WorldState, WorldStateDocument>
 {
     private readonly ILogger<WorldStateDocumentMapper> _logger;
 
@@ -25,7 +25,7 @@ public class WorldStateDocumentMapper
         };
     }
 
-    public WorldState ToEntity(WorldStateDocument document)
+    public WorldState ToDomain(WorldStateDocument document)
     {
         _logger.Debug($"Converting WorldStateDocument to WorldState. Id={document.Id}, WorldId={document.WorldId}");
         var worldState = WorldState.Create(document.WorldId, document.WorldName);
@@ -36,4 +36,6 @@ public class WorldStateDocumentMapper
 
         return worldState;
     }
+
+    public WorldState ToEntity(WorldStateDocument document) => ToDomain(document);
 }

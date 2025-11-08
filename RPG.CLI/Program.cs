@@ -7,8 +7,14 @@ using RPG.Application;
 using RPG.Application.Handlers;
 using RPG.CLI.Commands;
 using RPG.CLI.FunctionalTests;
+using RPG.CLI.Scenarios;
 using RPG.Core;
+using RPG.Domain.Entities;
 using RPG.Domain.Entities.Items;
+using RPG.Domain.Entities.MapObjects;
+using RPG.Domain.Entities.Npcs;
+using RPG.Domain.Entities.Quests;
+using RPG.Domain.Entities.Skills;
 using RPG.Infrastructure;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Helpers;
@@ -40,8 +46,17 @@ var builder = Host.CreateDefaultBuilder(args)
         services.AddCore(configuration);
         services.AddApplication(configuration);
 
-        // Register required document mapper(s)
+        services.AddSingleton<LocationMapper>();
+
+        // Register document mappers for all entity/document pairs used by DocumentRepository.
+        services.AddSingleton<IDocumentMapper<Character, CharacterDocument>, CharacterDocumentMapper>();
         services.AddSingleton<IDocumentMapper<Item, ItemDocument>, ItemDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<Skill, SkillDocument>, SkillDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<Quest, QuestDocument>, QuestDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<Npc, NpcDocument>, NpcDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<Player, PlayerDocument>, PlayerDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<MapObject, MapObjectDocument>, MapObjectDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<WorldState, WorldStateDocument>, WorldStateDocumentMapper>();
 
         // Persistence strategies mirror the PersistenceService configuration but operate on the in-memory repositories.
         foreach (var mapping in DocumentMappingRegistry.All)
@@ -68,6 +83,7 @@ var builder = Host.CreateDefaultBuilder(args)
         services.AddSingleton<FunctionalTestRabbitMqPublisher>();
         services.AddSingleton<IRabbitMqPublisher>(sp => sp.GetRequiredService<FunctionalTestRabbitMqPublisher>());
         services.AddSingleton<FunctionalTestRunner>();
+        services.AddSingleton<DocumentRepositoryScenarioRunner>();
     });
 
 using var host = builder.Build();
@@ -81,5 +97,8 @@ rootCommand.AddCommand(equipCommand.Build());
 
 var functionalTestsCommand = new FunctionalTestsCommand(services);
 rootCommand.AddCommand(functionalTestsCommand.Build());
+
+var documentTestsCommand = new DocumentRepositoryCommand(services);
+rootCommand.AddCommand(documentTestsCommand.Build());
 
 await rootCommand.InvokeAsync(args);

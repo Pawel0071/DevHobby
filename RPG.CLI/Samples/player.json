@@ -1,0 +1,7 @@
+{
+  "entity": "player",
+  "username": "cli-player",
+  "email": "cli.player@example.com",
+  "isOnline": true,
+  "isBanned": false
+}

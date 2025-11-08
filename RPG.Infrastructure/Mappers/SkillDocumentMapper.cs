@@ -10,7 +10,7 @@ namespace RPG.Infrastructure.Mappers;
 ///     Mapper for converting between Skill domain entity and SkillDocument
 ///     Components are serialized to JSON for flexible storage
 /// </summary>
-public class SkillDocumentMapper
+public class SkillDocumentMapper : IDocumentMapper<Skill, SkillDocument>
 {
     private readonly ILogger<SkillDocumentMapper> _logger;
 
@@ -36,7 +36,7 @@ public class SkillDocumentMapper
         };
     }
 
-    public Skill ToEntity(SkillDocument document)
+    public Skill ToDomain(SkillDocument document)
     {
         _logger.Debug($"Converting SkillDocument to Skill. Id={document.Id}, Name={document.Name}");
         var skill = Skill.Create(document.Name, document.Description);
@@ -56,6 +56,8 @@ public class SkillDocumentMapper
 
         return skill;
     }
+
+    public Skill ToEntity(SkillDocument document) => ToDomain(document);
 
     private ISkillComponent? DeserializeComponent(ComponentData componentData)
     {

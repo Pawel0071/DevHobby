@@ -1,7 +1,8 @@
+using System;
+using System.Collections.Generic;
 using MongoDB.Driver;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
-using System.Collections.Generic;
 
 namespace RPG.Infrastructure.Repositories.MongoDB;
 
@@ -44,7 +45,7 @@ public class MongoDocumentRepository : IMongoDocumentRepository
 
             var collection = _database.GetCollection<TDocument>(TDocument.CollectionName);
             var id = document.Id;
-            var filter = Builders<TDocument>.Filter.Eq("_id", id);
+            var filter = Builders<TDocument>.Filter.Eq(d => d.Id, id);
 
             await collection.ReplaceOneAsync(
                 filter,
@@ -79,13 +80,14 @@ public class MongoDocumentRepository : IMongoDocumentRepository
             });
 
             var collection = _database.GetCollection<TDocument>(TDocument.CollectionName);
-            var filter = Builders<TDocument>.Filter.Eq("_id", id);
+            var normalizedId = NormalizeId(id);
+            var filter = Builders<TDocument>.Filter.Eq(d => d.Id, normalizedId);
             var document = await collection.Find(filter).FirstOrDefaultAsync(cancellationToken);
 
             if (document != null)
-                _logger.Debug($"{typeof(TDocument).Name} found. Id={id}");
+                _logger.Debug($"{typeof(TDocument).Name} found. Id={normalizedId}");
             else
-                _logger.Debug($"{typeof(TDocument).Name} not found. Id={id}");
+                _logger.Debug($"{typeof(TDocument).Name} not found. Id={normalizedId}");
 
             return document;
         }
@@ -211,16 +213,17 @@ public class MongoDocumentRepository : IMongoDocumentRepository
             });
 
             var collection = _database.GetCollection<TDocument>(TDocument.CollectionName);
-            var filter = Builders<TDocument>.Filter.Eq("_id", id);
+            var normalizedId = NormalizeId(id);
+            var filter = Builders<TDocument>.Filter.Eq(d => d.Id, normalizedId);
             var result = await collection.DeleteOneAsync(filter, cancellationToken);
 
             if (result.DeletedCount > 0)
             {
-                _logger.Info($"{typeof(TDocument).Name} deleted. Id={id}");
+                _logger.Info($"{typeof(TDocument).Name} deleted. Id={normalizedId}");
                 return true;
             }
 
-            _logger.Warn($"{typeof(TDocument).Name} not found for deletion. Id={id}");
+            _logger.Warn($"{typeof(TDocument).Name} not found for deletion. Id={normalizedId}");
             return false;
         }
         catch (Exception ex)
@@ -234,5 +237,15 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     private string GetDatabaseName()
     {
         return _database?.DatabaseNamespace?.DatabaseName ?? "unknown";
+    }
+
+    private static Guid NormalizeId(object id)
+    {
+        return id switch
+        {
+            Guid guid => guid,
+            string text when Guid.TryParse(text, out var parsed) => parsed,
+            _ => throw new ArgumentException($"Unsupported identifier type: {id.GetType()}", nameof(id))
+        };
     }
 }

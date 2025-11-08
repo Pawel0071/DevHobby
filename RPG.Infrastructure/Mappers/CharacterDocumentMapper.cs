@@ -74,12 +74,12 @@ public class CharacterDocumentMapper : IDocumentMapper<Character, CharacterDocum
 
         // Map Skills
         doc.Skills = entity.Skills.ToDictionary(
-            kvp => kvp.Key.Id,
+            kvp => kvp.Key.Id.ToString(),
             kvp => kvp.Value.ToString()
         );
 
         doc.ActiveSkills = entity.ActiveSkills.ToDictionary(
-            kvp => kvp.Key.Id,
+            kvp => kvp.Key.Id.ToString(),
             kvp => kvp.Value
         );
 
@@ -145,12 +145,14 @@ public class CharacterDocumentMapper : IDocumentMapper<Character, CharacterDocum
         // Skills dictionary: Skill ID -> SkillAvailability
         foreach (var skill in document.Skills)
             if (Enum.TryParse<SkillAvailability>(skill.Value, out var availability))
+            {
                 _logger?.Debug(
                     $"Skill {skill.Key} has availability {availability}. Skill entity needs to be loaded separately.");
-            // Skill entities need to be resolved from skill repository
-            // This is typically done by the service layer after mapping
+            }
             else
+            {
                 _logger?.Warn($"Invalid SkillAvailability '{skill.Value}' for skill {skill.Key}. Skipping.");
+            }
 
         // Map ActiveSkills - Skill entities need to be loaded from repository
         foreach (var activeSkill in document.ActiveSkills)

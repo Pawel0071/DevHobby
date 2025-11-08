@@ -1,0 +1,7 @@
+{
+  "entity": "skill",
+  "name": "CLI Flame Surge",
+  "description": "Launches a cone of fire dealing area damage.",
+  "iconId": "icon_fire_cone",
+  "tags": ["fire", "area", "cli"]
+}

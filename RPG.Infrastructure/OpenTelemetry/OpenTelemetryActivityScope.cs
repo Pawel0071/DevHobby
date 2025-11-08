@@ -6,7 +6,20 @@ namespace RPG.Infrastructure.OpenTelemetry;
 public class OpenTelemetryActivityScope : IActivityScope
 {
     private static readonly ActivitySource Source = new("RPG.GameServer");
+    private static readonly ActivityListener Listener;
     private readonly ILogger<OpenTelemetryActivityScope> _logger;
+
+    static OpenTelemetryActivityScope()
+    {
+        Listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == Source.Name,
+            Sample = static (ref ActivityCreationOptions<ActivityContext> options) => ActivitySamplingResult.AllData,
+            SampleUsingParentId = static (ref ActivityCreationOptions<string> options) => ActivitySamplingResult.AllData
+        };
+
+        ActivitySource.AddActivityListener(Listener);
+    }
 
     public OpenTelemetryActivityScope(ILogger<OpenTelemetryActivityScope> logger)
     {

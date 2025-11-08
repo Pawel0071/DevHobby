@@ -48,8 +48,8 @@ public class CharacterDocument : IMongoDocument
     public List<InventorySlotDocument> Bank { get; set; } = new();
 
     // Skills (Skill ID -> SkillAvailability)
-    public Dictionary<Guid, string> Skills { get; set; } = new(); // Skill ID -> SkillAvailability enum as string
-    public Dictionary<Guid, DateTime> ActiveSkills { get; set; } = new(); // Skill ID -> Activation time
+    public Dictionary<string, string> Skills { get; set; } = new(); // Skill ID -> SkillAvailability enum as string
+    public Dictionary<string, DateTime> ActiveSkills { get; set; } = new(); // Skill ID -> Activation time
 
     // Timestamps
     public DateTime CreatedAt { get; set; }

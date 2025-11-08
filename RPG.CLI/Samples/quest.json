@@ -1,0 +1,17 @@
+{
+  "entity": "quest",
+  "title": "CLI Artifact Retrieval",
+  "description": "Recover the lost artifact from the ancient vault.",
+  "questGiver": "Archivist Rhea",
+  "startLocation": {
+    "worldId": "30000000-0000-0000-0000-000000000003",
+    "mapId": "map-ancient-vault",
+    "zone": "Vault Entrance",
+    "position": {
+      "x": 15.5,
+      "y": 4.0,
+      "z": -2.0
+    }
+  },
+  "tags": ["cli", "story", "artifact"]
+}

@@ -20,7 +20,7 @@ public class ItemDocument : IMongoDocument
     public List<string> Tags { get; set; } = new();
 
     // Komponenty jako dane
-    public Dictionary<StatsProperty, int>? Modifiers { get; set; }
+    public Dictionary<string, int>? Modifiers { get; set; }
     public int? SocketNo { get; set; }
     public List<Guid>? SkillIds { get; set; }
     public Guid? QuestId { get; set; }

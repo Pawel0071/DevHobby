@@ -1,0 +1,17 @@
+{
+  "entity": "mapobject",
+  "name": "CLI Treasure Chest",
+  "description": "A chest placed for CLI validation steps.",
+  "worldId": "50000000-0000-0000-0000-000000000005",
+  "zoneId": "hidden-vault",
+  "location": {
+    "mapId": "caverns",
+    "zone": "Vault",
+    "position": {
+      "x": 8.0,
+      "y": 1.0,
+      "z": -12.0
+    }
+  },
+  "tags": ["container", "cli", "rare"]
+}

@@ -1,0 +1,15 @@
+{
+  "entity": "character",
+  "name": "CLI Sample Paladin",
+  "playerId": "10000000-0000-0000-0000-000000000001",
+  "sessionId": "20000000-0000-0000-0000-000000000002",
+  "class": "Warrior",
+  "level": 12,
+  "experience": 2400,
+  "experienceToNextLevel": 3200,
+  "currentHealth": 135,
+  "maxHealth": 150,
+  "currentResource": 40,
+  "maxResource": 80,
+  "tags": ["cli", "sample", "paladin"]
+}

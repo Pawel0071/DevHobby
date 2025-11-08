@@ -7,7 +7,7 @@ namespace RPG.Infrastructure.Mappers;
 /// <summary>
 ///     Mapper for converting between Player domain entity and PlayerDocument
 /// </summary>
-public class PlayerDocumentMapper
+public class PlayerDocumentMapper : IDocumentMapper<Player, PlayerDocument>
 {
     private readonly ILogger<PlayerDocumentMapper> _logger;
 
@@ -32,7 +32,7 @@ public class PlayerDocumentMapper
         };
     }
 
-    public Player ToEntity(PlayerDocument document)
+    public Player ToDomain(PlayerDocument document)
     {
         _logger.Debug($"Converting PlayerDocument to Player. Id={document.Id}, Username={document.Username}");
         var player = Player.Create(document.Username, document.Email);
@@ -47,4 +47,6 @@ public class PlayerDocumentMapper
 
         return player;
     }
+
+    public Player ToEntity(PlayerDocument document) => ToDomain(document);
 }

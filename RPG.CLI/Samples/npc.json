@@ -1,0 +1,17 @@
+{
+  "entity": "npc",
+  "name": "cli_npc",
+  "displayName": "CLI Provisioner",
+  "description": "A friendly vendor who supports CLI testing.",
+  "worldId": "40000000-0000-0000-0000-000000000004",
+  "spawn": {
+    "mapId": "central-market",
+    "zone": "Stalls",
+    "position": {
+      "x": 2.0,
+      "y": 0.0,
+      "z": -6.0
+    }
+  },
+  "tags": ["merchant", "friendly", "cli"]
+}

@@ -10,7 +10,7 @@ namespace RPG.Infrastructure.Mappers;
 ///     Mapper for converting between MapObject domain entity and MapObjectDocument
 ///     Components are serialized to JSON for flexible storage
 /// </summary>
-public class MapObjectDocumentMapper
+public class MapObjectDocumentMapper : IDocumentMapper<MapObject, MapObjectDocument>
 {
     private readonly ILogger<MapObjectDocumentMapper> _logger;
     private readonly LocationMapper _locationMapper;
@@ -43,7 +43,7 @@ public class MapObjectDocumentMapper
         };
     }
 
-    public MapObject ToEntity(MapObjectDocument document)
+    public MapObject ToDomain(MapObjectDocument document)
     {
         _logger.Debug($"Converting MapObjectDocument to MapObject. Id={document.Id}, Name={document.Name}");
         var location = _locationMapper.ToEntity(document.Location);
@@ -66,27 +66,40 @@ public class MapObjectDocumentMapper
         foreach (var componentData in document.Components)
         {
             var component = DeserializeComponent(componentData);
-            if (component != null) mapObject.Components.Add(component);
+            if (component != null)
+            {
+                mapObject.Components.Add(component);
+            }
         }
 
         return mapObject;
     }
+
+    public MapObject ToEntity(MapObjectDocument document) => ToDomain(document);
     
     private IMapObjectComponent? DeserializeComponent(ComponentData componentData)
     {
-        return componentData.Type switch
+        try
         {
-            nameof(ContainerComponent) => JsonSerializer.Deserialize<ContainerComponent>(componentData.Data),
-            nameof(LockableComponent) => JsonSerializer.Deserialize<LockableComponent>(componentData.Data),
-            nameof(DoorComponent) => JsonSerializer.Deserialize<DoorComponent>(componentData.Data),
-            nameof(TriggerComponent) => JsonSerializer.Deserialize<TriggerComponent>(componentData.Data),
-            nameof(CraftingStationComponent) =>
-                JsonSerializer.Deserialize<CraftingStationComponent>(componentData.Data),
-            nameof(ResourceNodeComponent) => JsonSerializer.Deserialize<ResourceNodeComponent>(componentData.Data),
-            nameof(DestructibleComponent) => JsonSerializer.Deserialize<DestructibleComponent>(componentData.Data),
-            nameof(PortalComponent) => JsonSerializer.Deserialize<PortalComponent>(componentData.Data),
-            nameof(InteractionComponent) => JsonSerializer.Deserialize<InteractionComponent>(componentData.Data),
-            _ => null
-        };
+            return componentData.Type switch
+            {
+                nameof(ContainerComponent) => JsonSerializer.Deserialize<ContainerComponent>(componentData.Data),
+                nameof(LockableComponent) => JsonSerializer.Deserialize<LockableComponent>(componentData.Data),
+                nameof(DoorComponent) => JsonSerializer.Deserialize<DoorComponent>(componentData.Data),
+                nameof(TriggerComponent) => JsonSerializer.Deserialize<TriggerComponent>(componentData.Data),
+                nameof(CraftingStationComponent) =>
+                    JsonSerializer.Deserialize<CraftingStationComponent>(componentData.Data),
+                nameof(ResourceNodeComponent) => JsonSerializer.Deserialize<ResourceNodeComponent>(componentData.Data),
+                nameof(DestructibleComponent) => JsonSerializer.Deserialize<DestructibleComponent>(componentData.Data),
+                nameof(PortalComponent) => JsonSerializer.Deserialize<PortalComponent>(componentData.Data),
+                nameof(InteractionComponent) => JsonSerializer.Deserialize<InteractionComponent>(componentData.Data),
+                _ => null
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.Warn($"Failed to deserialize map object component '{componentData.Type}'. Skipping. Error: {ex.Message}");
+            return null;
+        }
     }
 }

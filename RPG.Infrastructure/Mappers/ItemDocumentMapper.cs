@@ -38,9 +38,13 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
         };
 
         // Map components to document fields
-        if (entity.GetComponent<StatsComponent>() is { } stats)
-            if (stats.Stats != null)
-                doc.Modifiers = new Dictionary<StatsProperty, int>(stats.Stats.Stats);
+        if (entity.GetComponent<StatsComponent>() is { } stats && stats.Stats is { } statContainer)
+        {
+            doc.Modifiers = statContainer.Stats.ToDictionary(
+                kvp => kvp.Key.ToString(),
+                kvp => kvp.Value
+            );
+        }
 
         if (entity.GetComponent<SocketComponent>() is { } socket)
             doc.SocketNo = socket.SocketNo;
@@ -101,10 +105,26 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
     public static IItemComponent? CreateComponent(Type type, ItemDocument doc)
     {
         if (type == typeof(StatsComponent) && doc.Modifiers is { Count: > 0 })
-            return new StatsComponent
+        {
+            var parsed = new Dictionary<StatsProperty, int>();
+            foreach (var (key, value) in doc.Modifiers!)
             {
-                Stats = new StatsContainer(new Dictionary<StatsProperty, int>(doc.Modifiers!))
-            };
+                if (Enum.TryParse<StatsProperty>(key, out var stat))
+                {
+                    parsed[stat] = value;
+                }
+            }
+
+            if (parsed.Count > 0)
+            {
+                return new StatsComponent
+                {
+                    Stats = new StatsContainer(parsed)
+                };
+            }
+
+            return null;
+        }
 
         if (type == typeof(SocketComponent) && doc.SocketNo.HasValue)
             return new SocketComponent { SocketNo = doc.SocketNo.Value };

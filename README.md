@@ -49,6 +49,12 @@ cd RPG.GameServer
 dotnet run
 ```
 
+CLI – scenariusze DocumentRepository:
+```bash
+./scripts/run_document_repository_tests.sh            # wszystkie encje
+./scripts/run_document_repository_tests.sh Character  # pojedyncza encja
+```
+
 ### Docker / Compose
 W repo znajduje się aktualny `compose.yaml` uruchamiający infrastrukturę oraz wybrane serwisy workers:
 
