@@ -42,6 +42,8 @@ public class CharacterDocument : IMongoDocument
 
     // Location
     public LocationData Location { get; set; } = new();
+    public bool IsMoving { get; set; }
+    public bool IsRotating { get; set; }
 
     // Equipment (EquipmentSlot enum as string -> Item ID)
     public Dictionary<string, Guid> Equipment { get; set; } = new();

@@ -406,6 +406,8 @@ internal static class DocumentRepositoryScenarioFactory
                 };
 
                 character.SetCurrentLocation(location);
+                character.SetMovementState(true);
+                character.SetRotationState(false);
 
                 character.BaseStats[StatsProperty.Strength] = 12;
                 character.BaseStats[StatsProperty.Intelligence] = 8;
@@ -457,6 +459,8 @@ internal static class DocumentRepositoryScenarioFactory
                 var currentLocation = entity.CurrentLocation;
                 currentLocation.Position += new Vector3(3, 0, -2);
                 currentLocation.Rotation = 90f;
+                entity.SetMovementState(false);
+                entity.SetRotationState(true);
             },
             assertDocument: (entity, document) =>
             {
@@ -522,6 +526,16 @@ internal static class DocumentRepositoryScenarioFactory
                     !string.Equals(document.Location.ZoneName, entity.CurrentLocation.ZoneName, StringComparison.Ordinal))
                 {
                     throw new InvalidOperationException("Character location metadata mismatch.");
+                }
+
+                if (document.IsMoving != entity.IsMoving)
+                {
+                    throw new InvalidOperationException("Character movement state mismatch.");
+                }
+
+                if (document.IsRotating != entity.IsRotating)
+                {
+                    throw new InvalidOperationException("Character rotation state mismatch.");
                 }
             });
     }
@@ -1037,6 +1051,9 @@ internal static class DocumentRepositoryScenarioFactory
                 npc.Components.Add(dialogueComponent);
                 npc.Components.Add(questGiverComponent);
 
+                npc.SetMovementState(true);
+                npc.SetRotationState(false);
+
                 return npc;
             },
             mutateEntity: entity =>
@@ -1052,6 +1069,9 @@ internal static class DocumentRepositoryScenarioFactory
 
                 var questGiver = entity.Components.OfType<QuestGiverComponent>().First();
                 questGiver.AvailableQuests.Add(Guid.NewGuid());
+
+                entity.SetMovementState(false);
+                entity.SetRotationState(true);
             },
             assertDocument: (entity, document) =>
             {
@@ -1078,6 +1098,12 @@ internal static class DocumentRepositoryScenarioFactory
                 var questGiverEntity = entity.Components.OfType<QuestGiverComponent>().First();
                 if (!questGiverDoc.AvailableQuests.OrderBy(x => x).SequenceEqual(questGiverEntity.AvailableQuests.OrderBy(x => x)))
                     throw new InvalidOperationException("NPC quest giver component mismatch.");
+
+                if (document.IsMoving != entity.IsMoving)
+                    throw new InvalidOperationException("NPC movement state mismatch.");
+
+                if (document.IsRotating != entity.IsRotating)
+                    throw new InvalidOperationException("NPC rotation state mismatch.");
             },
             assertEntity: (expected, actual) =>
             {
@@ -1098,6 +1124,12 @@ internal static class DocumentRepositoryScenarioFactory
                                        ?? throw new InvalidOperationException("NPC quest giver component missing after round-trip.");
                 if (!actualQuestGiver.AvailableQuests.OrderBy(x => x).SequenceEqual(expectedQuestGiver.AvailableQuests.OrderBy(x => x)))
                     throw new InvalidOperationException("NPC quest list mismatch after round-trip.");
+
+                if (actual.IsMoving != expected.IsMoving)
+                    throw new InvalidOperationException("NPC movement state mismatch after round-trip.");
+
+                if (actual.IsRotating != expected.IsRotating)
+                    throw new InvalidOperationException("NPC rotation state mismatch after round-trip.");
             });
     }
 
@@ -1150,6 +1182,9 @@ internal static class DocumentRepositoryScenarioFactory
                 npc.Components.Add(lootableComponent);
                 npc.Components.Add(trainerComponent);
 
+                npc.SetMovementState(true);
+                npc.SetRotationState(true);
+
                 return npc;
             },
             mutateEntity: entity =>
@@ -1184,6 +1219,9 @@ internal static class DocumentRepositoryScenarioFactory
                 {
                     trainer.Specialization = "Advanced Defensive Combat";
                 }
+
+                entity.SetMovementState(false);
+                entity.SetRotationState(false);
             },
             assertDocument: (entity, document) =>
             {
@@ -1209,6 +1247,16 @@ internal static class DocumentRepositoryScenarioFactory
                 if (!string.Equals(trainerDoc.Specialization, trainerEntity.Specialization, StringComparison.Ordinal))
                 {
                     throw new InvalidOperationException("NPC trainer specialization mismatch.");
+                }
+
+                if (document.IsMoving != entity.IsMoving)
+                {
+                    throw new InvalidOperationException("NPC movement state mismatch.");
+                }
+
+                if (document.IsRotating != entity.IsRotating)
+                {
+                    throw new InvalidOperationException("NPC rotation state mismatch.");
                 }
 
             },
@@ -1237,6 +1285,16 @@ internal static class DocumentRepositoryScenarioFactory
                 if (!string.Equals(actualTrainer.Specialization, expectedTrainer.Specialization, StringComparison.Ordinal))
                 {
                     throw new InvalidOperationException("NPC trainer specialization mismatch after round-trip.");
+                }
+
+                if (actual.IsMoving != expected.IsMoving)
+                {
+                    throw new InvalidOperationException("NPC movement state mismatch after round-trip.");
+                }
+
+                if (actual.IsRotating != expected.IsRotating)
+                {
+                    throw new InvalidOperationException("NPC rotation state mismatch after round-trip.");
                 }
 
             });

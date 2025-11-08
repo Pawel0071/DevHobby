@@ -64,6 +64,8 @@ public sealed class Character : IDomainEntity, IItemContainer, IStats, ILevel, I
     public int CurrentResource { get; set; }
     public int MaxResource { get; set; }
     public Location CurrentLocation { get; private set; }
+    public bool IsMoving { get; private set; }
+    public bool IsRotating { get; private set; }
 
     // Container accessors for services
     public IInventoryContainer GetBankStorageContainer()
@@ -99,5 +101,15 @@ public sealed class Character : IDomainEntity, IItemContainer, IStats, ILevel, I
     public void SetCurrentLocation(Location location)
     {
         CurrentLocation = location ?? throw new ArgumentNullException(nameof(location));
+    }
+
+    public void SetMovementState(bool isMoving)
+    {
+        IsMoving = isMoving;
+    }
+
+    public void SetRotationState(bool isRotating)
+    {
+        IsRotating = isRotating;
     }
 }

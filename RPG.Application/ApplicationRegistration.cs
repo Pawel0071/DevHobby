@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RPG.Application.Commands;
+using RPG.Application.Events;
 using RPG.Application.Handlers;
 using RPG.Application.Interfaces;
 
@@ -20,6 +21,10 @@ public static class ApplicationRegistration
         services.AddScoped<ICommandHandler<GainExperienceCommand>, CharacterCommandHandler>();
         services.AddScoped<ICommandHandler<LevelUpCommand>, CharacterCommandHandler>();
         services.AddScoped<ICommandHandler<StartMovementCommand>, CharacterCommandHandler>();
+        services.AddScoped<ICommandHandler<StopMovementCommand>, CharacterCommandHandler>();
+        services.AddScoped<ICommandHandler<StartRotationCommand>, CharacterCommandHandler>();
+        services.AddScoped<ICommandHandler<StopRotationCommand>, CharacterCommandHandler>();
+        services.AddSingleton<IGameEventDispatcher, GameEventDispatcher>();
 
         return services;
     }

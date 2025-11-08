@@ -1,6 +1,9 @@
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace RPG.Application.Interfaces;
 
 public interface IGameEventDispatcher
 {
-    void Dispatch<TEvent>(TEvent gameEvent);
+    Task DispatchAsync<TEvent>(TEvent gameEvent, CancellationToken cancellationToken = default);
 }

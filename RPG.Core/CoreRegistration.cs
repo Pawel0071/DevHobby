@@ -7,6 +7,7 @@ using RPG.Core.Services.LevelService;
 using RPG.Core.Services.MovementService;
 using RPG.Core.Services.SkillService;
 using RPG.Core.Services.StatsService;
+using RPG.Domain.Interfaces;
 
 namespace RPG.Core;
 
@@ -18,6 +19,7 @@ public static class CoreRegistration
         services.AddSingleton<IInventoryService, InventoryService>();
         services.AddSingleton<ISkillService, SkillService>();
         services.AddSingleton<IStatsService, StatsService>();
+    services.AddSingleton<IExperienceProvider, DefaultExperienceProvider>();
         services.AddSingleton<ILevelingService, LevelingService>();
         services.AddSingleton<IMovementService, MovementService>();
         return services;

@@ -26,7 +26,7 @@ public class MovementService : IMovementService
             return ErrorCodeDefinition.InvalidOperation.ToFail<Location>("Character is required for movement.");
         }
 
-        return MoveInternal(
+        var result = MoveInternal(
             entityType: "character",
             entityId: character.Id,
             location: character.CurrentLocation,
@@ -34,6 +34,13 @@ public class MovementService : IMovementService
             direction: direction,
             deltaTime: deltaTime,
             speedOverride: speedOverride);
+
+        if (result.Success)
+        {
+            character.SetMovementState(true);
+        }
+
+        return result;
     }
 
     public ServiceResult<Location> Move(Npc npc, Vector3 direction, float deltaTime, float? speedOverride = null)
@@ -43,7 +50,7 @@ public class MovementService : IMovementService
             return ErrorCodeDefinition.InvalidOperation.ToFail<Location>("NPC is required for movement.");
         }
 
-        return MoveInternal(
+        var result = MoveInternal(
             entityType: "npc",
             entityId: npc.Id,
             location: npc.CurrentLocation,
@@ -51,6 +58,119 @@ public class MovementService : IMovementService
             direction: direction,
             deltaTime: deltaTime,
             speedOverride: speedOverride);
+
+        if (result.Success)
+        {
+            npc.SetMovementState(true);
+        }
+
+        return result;
+    }
+
+    public ServiceResult<Location> Stop(Character character)
+    {
+        if (character == null)
+        {
+            return ErrorCodeDefinition.InvalidOperation.ToFail<Location>("Character is required for movement stop.");
+        }
+
+        var result = StopInternal("character", character.Id, character.CurrentLocation);
+        if (result.Success)
+        {
+            character.SetMovementState(false);
+        }
+
+        return result;
+    }
+
+    public ServiceResult<Location> Stop(Npc npc)
+    {
+        if (npc == null)
+        {
+            return ErrorCodeDefinition.InvalidOperation.ToFail<Location>("NPC is required for movement stop.");
+        }
+
+        var result = StopInternal("npc", npc.Id, npc.CurrentLocation);
+        if (result.Success)
+        {
+            npc.SetMovementState(false);
+        }
+
+        return result;
+    }
+
+    public ServiceResult<float> Rotate(Character character, Vector3 direction)
+    {
+        if (character == null)
+        {
+            return ErrorCodeDefinition.InvalidOperation.ToFail<float>("Character is required for rotation.");
+        }
+
+        var result = RotateInternal(
+            entityType: "character",
+            entityId: character.Id,
+            location: character.CurrentLocation,
+            direction: direction);
+
+        if (result.Success)
+        {
+            character.SetRotationState(true);
+        }
+
+        return result;
+    }
+
+    public ServiceResult<float> Rotate(Npc npc, Vector3 direction)
+    {
+        if (npc == null)
+        {
+            return ErrorCodeDefinition.InvalidOperation.ToFail<float>("NPC is required for rotation.");
+        }
+
+        var result = RotateInternal(
+            entityType: "npc",
+            entityId: npc.Id,
+            location: npc.CurrentLocation,
+            direction: direction);
+
+        if (result.Success)
+        {
+            npc.SetRotationState(true);
+        }
+
+        return result;
+    }
+
+    public ServiceResult<float> StopRotation(Character character)
+    {
+        if (character == null)
+        {
+            return ErrorCodeDefinition.InvalidOperation.ToFail<float>("Character is required to stop rotation.");
+        }
+
+        var result = StopRotationInternal("character", character.Id, character.CurrentLocation);
+        if (result.Success)
+        {
+            character.SetRotationState(false);
+        }
+
+        return result;
+    }
+
+    public ServiceResult<float> StopRotation(Npc npc)
+    {
+        if (npc == null)
+        {
+            return ErrorCodeDefinition.InvalidOperation.ToFail<float>("NPC is required to stop rotation.");
+        }
+
+        var result = StopRotationInternal("npc", npc.Id, npc.CurrentLocation);
+        if (result.Success)
+        {
+            npc.SetRotationState(false);
+        }
+
+        return result;
     }
 
     private ServiceResult<Location> MoveInternal(
@@ -74,8 +194,7 @@ public class MovementService : IMovementService
             return ErrorCodeDefinition.MovementDeltaInvalid.ToFail<Location>("Czas kroku ruchu musi być dodatni.");
         }
 
-        var directionLengthSquared = direction.LengthSquared();
-        if (directionLengthSquared < MinDirectionLengthSquared || float.IsNaN(directionLengthSquared))
+        if (!TryNormalizeDirection(direction, out var normalizedDirection))
         {
             _logger.Warn($"Attempted to move {entityType} {entityId} with invalid direction vector: {direction}.");
             return ErrorCodeDefinition.MovementInvalidDirection.ToFail<Location>("Kierunek ruchu jest niepoprawny.");
@@ -88,8 +207,6 @@ public class MovementService : IMovementService
             return ErrorCodeDefinition.MovementSpeedUnavailable.ToFail<Location>("Brak prędkości ruchu.");
         }
 
-        var directionLength = MathF.Sqrt(directionLengthSquared);
-        var normalizedDirection = direction / directionLength;
         var displacement = normalizedDirection * (effectiveSpeed * deltaTime);
 
         location.Position += displacement;
@@ -99,6 +216,57 @@ public class MovementService : IMovementService
             $"Moved {entityType} {entityId} by {displacement} (speed={effectiveSpeed}, delta={deltaTime}). New position: {location.Position}");
 
         return ServiceResult<Location>.Ok(location);
+    }
+
+    private ServiceResult<Location> StopInternal(string entityType, Guid entityId, Location location)
+    {
+        if (location == null)
+        {
+            _logger.Error($"{entityType} {entityId} has no location to stop movement.");
+            return ErrorCodeDefinition.InvalidOperation.ToFail<Location>("Brak lokalizacji do zatrzymania ruchu.");
+        }
+
+        _logger.Debug($"Stopping movement for {entityType} {entityId} at position {location.Position}.");
+        return ServiceResult<Location>.Ok(location);
+    }
+
+    private ServiceResult<float> RotateInternal(string entityType, Guid entityId, Location location, Vector3 direction)
+    {
+        if (location == null)
+        {
+            _logger.Error($"{entityType} {entityId} has no location to rotate.");
+            return ErrorCodeDefinition.InvalidOperation.ToFail<float>("Brak lokalizacji do obrotu.");
+        }
+
+        if (!TryNormalizeDirection(direction, out var normalizedDirection))
+        {
+            _logger.Warn($"Attempted to rotate {entityType} {entityId} with invalid direction vector: {direction}.");
+            return ErrorCodeDefinition.MovementInvalidDirection.ToFail<float>("Kierunek rotacji jest niepoprawny.");
+        }
+
+        var yawDegrees = CalculateYawDegrees(normalizedDirection);
+        if (float.IsNaN(yawDegrees))
+        {
+            _logger.Warn($"Rotation for {entityType} {entityId} produced invalid yaw.");
+            return ErrorCodeDefinition.MovementInvalidDirection.ToFail<float>("Nie udało się wyznaczyć rotacji.");
+        }
+
+        location.Rotation = yawDegrees;
+        _logger.Debug($"Rotated {entityType} {entityId} to yaw {yawDegrees} degrees.");
+
+        return ServiceResult<float>.Ok(yawDegrees);
+    }
+
+    private ServiceResult<float> StopRotationInternal(string entityType, Guid entityId, Location location)
+    {
+        if (location == null)
+        {
+            _logger.Error($"{entityType} {entityId} has no location to stop rotation.");
+            return ErrorCodeDefinition.InvalidOperation.ToFail<float>("Brak lokalizacji do zatrzymania rotacji.");
+        }
+
+        _logger.Debug($"Stopping rotation for {entityType} {entityId} at yaw {location.Rotation}.");
+        return ServiceResult<float>.Ok(location.Rotation);
     }
 
     private static float ResolveMoveSpeed(IDictionary<StatsProperty, int> stats)
@@ -113,6 +281,20 @@ public class MovementService : IMovementService
             : 0f;
     }
 
+    private static bool TryNormalizeDirection(Vector3 direction, out Vector3 normalizedDirection)
+    {
+        var directionLengthSquared = direction.LengthSquared();
+        if (directionLengthSquared < MinDirectionLengthSquared || float.IsNaN(directionLengthSquared))
+        {
+            normalizedDirection = Vector3.Zero;
+            return false;
+        }
+
+        var directionLength = MathF.Sqrt(directionLengthSquared);
+        normalizedDirection = direction / directionLength;
+        return true;
+    }
+
     private static void UpdateFacing(Location location, Vector3 direction)
     {
         if (direction.LengthSquared() < MinDirectionLengthSquared)
@@ -120,14 +302,25 @@ public class MovementService : IMovementService
             return;
         }
 
-        var yawRadians = MathF.Atan2(direction.X, direction.Z);
-        if (float.IsNaN(yawRadians))
+        var yawDegrees = CalculateYawDegrees(direction);
+        if (float.IsNaN(yawDegrees))
         {
             return;
         }
 
+        location.Rotation = yawDegrees;
+    }
+
+    private static float CalculateYawDegrees(Vector3 normalizedDirection)
+    {
+        var yawRadians = MathF.Atan2(normalizedDirection.X, normalizedDirection.Z);
+        if (float.IsNaN(yawRadians))
+        {
+            return float.NaN;
+        }
+
         var yawDegrees = yawRadians * (180f / MathF.PI);
-        location.Rotation = NormalizeAngle(yawDegrees);
+        return NormalizeAngle(yawDegrees);
     }
 
     private static float NormalizeAngle(float angle)

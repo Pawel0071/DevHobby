@@ -7,6 +7,7 @@ using RPG.Domain.Entities;
 using RPG.Domain.Entities.Npcs;
 using RPG.Domain.Enums;
 using RPG.Infrastructure.Interfaces;
+using Xunit;
 
 namespace RPG.UnitTest.Core.MovementServiceTests;
 
@@ -40,6 +41,7 @@ public class MovementServiceTests
         character.CurrentLocation.Position.Y.Should().Be(0f);
         character.CurrentLocation.Position.Z.Should().Be(0f);
         character.CurrentLocation.Rotation.Should().BeApproximately(90f, 0.0001f);
+        character.IsMoving.Should().BeTrue();
     }
 
     [Fact]
@@ -57,6 +59,7 @@ public class MovementServiceTests
 
         result.Success.Should().BeFalse();
         result.Error.Should().Be(ErrorCodeDefinition.MovementInvalidDirection);
+        character.IsMoving.Should().BeFalse();
     }
 
     [Fact]
@@ -72,5 +75,81 @@ public class MovementServiceTests
         npc.CurrentLocation.Position.Z.Should().BeApproximately(8f, 0.0001f);
         npc.CurrentLocation.Position.X.Should().BeApproximately(0f, 0.0001f);
         npc.CurrentLocation.Rotation.Should().BeApproximately(0f, 0.0001f);
+        npc.IsMoving.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Rotate_ShouldUpdateCharacterYaw()
+    {
+        var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
+        {
+            Id = Guid.NewGuid(),
+            Name = "Spinner"
+        };
+        character.SetCurrentLocation(Location.Create(Vector3.Zero, Guid.NewGuid()));
+
+        var result = _movementService.Rotate(character, new Vector3(1, 0, 1));
+
+        result.Success.Should().BeTrue();
+        result.Result.Should().BeApproximately(45f, 0.0001f);
+        character.CurrentLocation.Rotation.Should().BeApproximately(45f, 0.0001f);
+        character.IsRotating.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Rotate_WithInvalidDirection_ShouldFail()
+    {
+        var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
+        {
+            Id = Guid.NewGuid(),
+            Name = "Shaky"
+        };
+        character.SetCurrentLocation(Location.Create(Vector3.Zero, Guid.NewGuid()));
+
+        var result = _movementService.Rotate(character, Vector3.Zero);
+
+        result.Success.Should().BeFalse();
+        result.Error.Should().Be(ErrorCodeDefinition.MovementInvalidDirection);
+        character.IsRotating.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Stop_ShouldReturnCurrentLocation()
+    {
+        var worldId = Guid.NewGuid();
+        var character = new Character(Guid.NewGuid(), CharacterClass.Mage)
+        {
+            Id = Guid.NewGuid(),
+            Name = "Breaker"
+        };
+        var location = Location.Create(new Vector3(3, 0, -2), worldId);
+        character.SetCurrentLocation(location);
+        character.SetMovementState(true);
+
+        var result = _movementService.Stop(character);
+
+        result.Success.Should().BeTrue();
+        result.Result.Should().BeSameAs(location);
+        character.IsMoving.Should().BeFalse();
+    }
+
+    [Fact]
+    public void StopRotation_ShouldReturnCurrentYaw()
+    {
+        var character = new Character(Guid.NewGuid(), CharacterClass.Mage)
+        {
+            Id = Guid.NewGuid(),
+            Name = "YawKeeper"
+        };
+        var location = Location.Create(Vector3.Zero, Guid.NewGuid());
+        location.Rotation = 123.4f;
+        character.SetCurrentLocation(location);
+        character.SetRotationState(true);
+
+        var result = _movementService.StopRotation(character);
+
+        result.Success.Should().BeTrue();
+        result.Result.Should().BeApproximately(123.4f, 0.0001f);
+        character.IsRotating.Should().BeFalse();
     }
 }

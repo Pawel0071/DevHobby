@@ -1,3 +1,4 @@
+using System;
 using MongoDB.Driver;
 using RabbitMQ.Client;
 using StackExchange.Redis;
@@ -48,16 +49,41 @@ public class TestContainersFixture : IAsyncLifetime
         MongoClient = new MongoClient(MongoConnectionString);
         MongoDatabase = MongoClient.GetDatabase("rpg_test");
 
-    // Initialize Redis client (allow admin commands for cleanup)
-    var redisOptions = ConfigurationOptions.Parse(RedisConnectionString);
-    redisOptions.AllowAdmin = true;
-    RedisConnection = await ConnectionMultiplexer.ConnectAsync(redisOptions);
+        // Initialize Redis client (allow admin commands for cleanup)
+        var redisOptions = ConfigurationOptions.Parse(RedisConnectionString);
+        redisOptions.AllowAdmin = true;
+        RedisConnection = await ConnectionMultiplexer.ConnectAsync(redisOptions);
         RedisDatabase = RedisConnection.GetDatabase();
 
         // Initialize RabbitMQ client
         var factory = new ConnectionFactory { Uri = new Uri(RabbitConnectionString) };
         RabbitConnection = await factory.CreateConnectionAsync();
         RabbitChannel = await RabbitConnection.CreateChannelAsync();
+
+        // Ensure the default exchange expected by the application exists.
+        await RabbitChannel.ExchangeDeclareAsync("rpg_exchange", ExchangeType.Topic, durable: true, autoDelete: false);
+
+        await ResetStateAsync();
+    }
+
+
+    public async Task ResetStateAsync()
+    {
+        // Drop the database used by the application to ensure a clean slate between tests.
+        if (MongoClient != null)
+        {
+            await MongoClient.DropDatabaseAsync("rpg");
+            await MongoClient.DropDatabaseAsync("rpg_test");
+        }
+
+        if (RedisConnection != null)
+        {
+            foreach (var endpoint in RedisConnection.GetEndPoints())
+            {
+                var server = RedisConnection.GetServer(endpoint);
+                await server.FlushDatabaseAsync();
+            }
+        }
     }
 
     public async Task DisposeAsync()

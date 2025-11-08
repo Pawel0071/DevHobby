@@ -25,10 +25,14 @@ using RPG.Infrastructure.Mappers;
 using RPG.PersistenceService.Handlers;
 using RPG.PersistenceService.Services;
 using RedisWarmUp.Services;
+using CharacterServiceClient = RPG.GameServer.Protos.CharacterService.CharacterServiceClient;
+
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
 var builder = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((context, config) =>
     {
+        config.SetBasePath(AppContext.BaseDirectory);
         config.AddJsonFile("appsettings.json", false, true);
         config.AddJsonFile("../RPG.Infrastructure/appsettings.infrastructure.json", true, true);
         config.AddJsonFile("../RPG.Core/appsettings.core.json", true, true);
@@ -41,6 +45,12 @@ var builder = Host.CreateDefaultBuilder(args)
         services.AddInfrastructure(configuration);
         services.AddCore(configuration);
         services.AddApplication(configuration);
+
+        var gameServerAddress = configuration.GetValue<string>("GameServer:GrpcAddress") ?? "http://localhost:5124";
+        services.AddGrpcClient<CharacterServiceClient>(options =>
+        {
+            options.Address = new Uri(gameServerAddress);
+        });
 
         var otlpEndpoint = configuration.GetValue<string>("OpenTelemetry:OtlpEndpoint") ?? "http://localhost:4317";
 
@@ -111,6 +121,9 @@ rootCommand.AddCommand(functionalTestsCommand.Build());
 
 var documentTestsCommand = new DocumentRepositoryCommand(services);
 rootCommand.AddCommand(documentTestsCommand.Build());
+
+var characterGrpcCommand = new CharacterGrpcCommand(services);
+rootCommand.AddCommand(characterGrpcCommand.Build());
 
 try
 {

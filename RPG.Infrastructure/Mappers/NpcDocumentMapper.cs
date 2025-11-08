@@ -38,6 +38,8 @@ public class NpcDocumentMapper : IDocumentMapper<Npc, NpcDocument>
             MaxHealth = entity.MaxHealth,
             SpawnLocation = _locationMapper.ToDocument(entity.SpawnLocation),
             CurrentLocation = _locationMapper.ToDocument(entity.CurrentLocation ?? entity.SpawnLocation),
+            IsMoving = entity.IsMoving,
+            IsRotating = entity.IsRotating,
             WorldId = entity.WorldId,
             Tags = entity.Tags.ToList(),
             BaseStats = entity.BaseStats.ToDictionary(kvp => kvp.Key.ToString(), kvp => kvp.Value),
@@ -73,6 +75,8 @@ public class NpcDocumentMapper : IDocumentMapper<Npc, NpcDocument>
         {
             npc.SetCurrentLocation(spawnLocation);
         }
+        npc.SetMovementState(document.IsMoving);
+        npc.SetRotationState(document.IsRotating);
         npc.Components.Clear();
 
         if (document.BaseStats is not null)

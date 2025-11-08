@@ -21,3 +21,9 @@ public record ItemPickupEvent(Guid CharacterId, Item Item);
 public record ItemDroppedEvent(Guid CharacterId, Item Item);
 
 public record CharacterMovedEvent(Guid CharacterId, Location Location);
+
+public record CharacterMovementStoppedEvent(Guid CharacterId, Location Location);
+
+public record CharacterRotationStartedEvent(Guid CharacterId, float Rotation, Location Location);
+
+public record CharacterRotationStoppedEvent(Guid CharacterId, float Rotation, Location Location);

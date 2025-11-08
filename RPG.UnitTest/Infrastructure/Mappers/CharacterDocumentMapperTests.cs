@@ -159,6 +159,8 @@ public class CharacterDocumentMapperTests
         var location = Location.Create(new Vector3(5, 1, -3), worldId, "Map-1", "Zone-9");
         location.Rotation = 180f;
         character.SetCurrentLocation(location);
+    character.SetMovementState(true);
+    character.SetRotationState(true);
 
         var document = _mapper.ToDocument(character);
 
@@ -169,6 +171,8 @@ public class CharacterDocumentMapperTests
         document.Location.MapId.Should().Be("Map-1");
         document.Location.ZoneName.Should().Be("Zone-9");
         document.Location.Rotation.Should().Be(180f);
+    document.IsMoving.Should().BeTrue();
+    document.IsRotating.Should().BeTrue();
     }
 
     [Fact]
@@ -191,7 +195,9 @@ public class CharacterDocumentMapperTests
                 MapId = "Map-77",
                 ZoneName = "Dungeon",
                 Rotation = 90f
-            }
+            },
+            IsMoving = true,
+            IsRotating = false
         };
 
         var character = _mapper.ToDomain(document);
@@ -203,6 +209,8 @@ public class CharacterDocumentMapperTests
         character.CurrentLocation.MapId.Should().Be("Map-77");
         character.CurrentLocation.ZoneName.Should().Be("Dungeon");
         character.CurrentLocation.Rotation.Should().Be(90f);
+        character.IsMoving.Should().BeTrue();
+        character.IsRotating.Should().BeFalse();
     }
 }
 

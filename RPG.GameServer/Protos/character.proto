@@ -70,6 +70,9 @@ message BaseCharacter {
   map<int32, string> skillCooldowns = 10; // Using string for DateTime representation
   Location position = 11;
   repeated Effect activeEffects = 12;
+  bool isMoving = 13;
+  bool isRotating = 14;
+  float rotation = 15;
 }
 
 message Skill {
@@ -161,5 +164,20 @@ service CharacterService {
   rpc GetCharacter (CharacterIdRequest) returns (CharacterReply);
   rpc UpdateCharacter (CharacterRequest) returns (CharacterIdReply);
   rpc DeleteCharacter (CharacterIdRequest) returns (CharacterIdReply);
+  rpc StartMovement (MovementCommandRequest) returns (CharacterActionReply);
+  rpc StopMovement (CharacterIdRequest) returns (CharacterActionReply);
+  rpc StartRotation (MovementCommandRequest) returns (CharacterActionReply);
+  rpc StopRotation (CharacterIdRequest) returns (CharacterActionReply);
+}
+
+message MovementCommandRequest {
+  string characterId = 1;
+  int32 direction = 2;
+}
+
+message CharacterActionReply {
+  bool success = 1;
+  string errorCode = 2;
+  string message = 3;
 }
 

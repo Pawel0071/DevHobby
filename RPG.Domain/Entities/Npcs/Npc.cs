@@ -60,6 +60,8 @@ public class Npc : IDomainEntity
     public int MaxHealth { get; set; }
     public IDictionary<StatsProperty, int> BaseStats => BaseStatsContainer.Stats;
     public IDictionary<StatsProperty, int> ModifiedStats => ModifiedStatsContainer.Stats;
+    public bool IsMoving { get; private set; }
+    public bool IsRotating { get; private set; }
 
     private StatsContainer BaseStatsContainer { get; }
     private StatsContainer ModifiedStatsContainer { get; }
@@ -77,6 +79,16 @@ public class Npc : IDomainEntity
     public void SetCurrentLocation(Location location)
     {
         CurrentLocation = location ?? throw new ArgumentNullException(nameof(location));
+    }
+
+    public void SetMovementState(bool isMoving)
+    {
+        IsMoving = isMoving;
+    }
+
+    public void SetRotationState(bool isRotating)
+    {
+        IsRotating = isRotating;
     }
 
     private static Location CloneLocation(Location source)

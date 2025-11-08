@@ -12,6 +12,7 @@ using RPG.Infrastructure.Helpers;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Logger;
 using RPG.Infrastructure.OpenTelemetry;
+using RPG.Infrastructure.Repositories;
 using RPG.Infrastructure.Repositories.Orchestrators;
 using RPG.Infrastructure.Repositories.RabbitMQ;
 using RPG.Infrastructure.Repositories.Redis;
@@ -25,6 +26,7 @@ using RPG.Domain.Entities.Skills;
 using RPG.Domain.Entities.Quests;
 using RPG.Domain.Entities.Npcs;
 using RPG.Domain.Entities.MapObjects;
+using RPG.Domain.Interfaces;
 
 namespace RPG.Infrastructure;
 
@@ -87,6 +89,9 @@ public static class InfrastructureRegistration
                 return new NullRabbitMqPublisher(logger!);
             });
         }
+
+        // Domain repositories
+        services.AddScoped<ICharacterRepository, CharacterRepository>();
 
         // Dictionary Repositories - for loading definitions from MongoDB
         services.AddSingleton<IDictionaryRepository<TagDefinition>, DictionaryRepository<TagDefinition>>();

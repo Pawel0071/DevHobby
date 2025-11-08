@@ -29,6 +29,8 @@ public class NpcDocument : IMongoDocument
     // Spawn Location
     public LocationData SpawnLocation { get; set; } = new();
     public LocationData CurrentLocation { get; set; } = new();
+    public bool IsMoving { get; set; }
+    public bool IsRotating { get; set; }
 
     [BsonRepresentation(BsonType.String)] public Guid WorldId { get; set; }
 

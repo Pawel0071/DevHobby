@@ -9,4 +9,10 @@ public interface IMovementService
 {
     ServiceResult<Location> Move(Character character, Vector3 direction, float deltaTime, float? speedOverride = null);
     ServiceResult<Location> Move(Npc npc, Vector3 direction, float deltaTime, float? speedOverride = null);
+    ServiceResult<Location> Stop(Character character);
+    ServiceResult<Location> Stop(Npc npc);
+    ServiceResult<float> Rotate(Character character, Vector3 direction);
+    ServiceResult<float> Rotate(Npc npc, Vector3 direction);
+    ServiceResult<float> StopRotation(Character character);
+    ServiceResult<float> StopRotation(Npc npc);
 }

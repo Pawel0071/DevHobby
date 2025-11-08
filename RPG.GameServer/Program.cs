@@ -6,7 +6,12 @@ using RPG.Application;
 using RPG.Core;
 using RPG.GameServer.Controlers;
 using RPG.GameServer.Controllers;
+using RPG.GameServer.EventHandlers;
+using RPG.GameServer.Interfaces;
+using RPG.GameServer.Services;
 using RPG.Infrastructure;
+using RPG.Application.Events;
+using RPG.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +53,13 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddCore(builder.Configuration);
 builder.Services.AddApplication(builder.Configuration);
 
+builder.Services.AddSingleton<ICharacterStateBroadcaster, CharacterStateBroadcaster>();
+builder.Services.AddScoped<CharacterMovementEventHandler>();
+builder.Services.AddScoped<IGameEventHandler<CharacterMovedEvent>>(sp => sp.GetRequiredService<CharacterMovementEventHandler>());
+builder.Services.AddScoped<IGameEventHandler<CharacterMovementStoppedEvent>>(sp => sp.GetRequiredService<CharacterMovementEventHandler>());
+builder.Services.AddScoped<IGameEventHandler<CharacterRotationStartedEvent>>(sp => sp.GetRequiredService<CharacterMovementEventHandler>());
+builder.Services.AddScoped<IGameEventHandler<CharacterRotationStoppedEvent>>(sp => sp.GetRequiredService<CharacterMovementEventHandler>());
+
 // Serwisy gRPC
 builder.Services.AddScoped<CharacterServiceImpl>();
 builder.Services.AddScoped<SessionServiceImpl>();
@@ -69,3 +81,5 @@ app.MapGet("/", () =>
     "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 app.Run();
+
+public partial class Program;

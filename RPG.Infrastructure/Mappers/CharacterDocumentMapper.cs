@@ -58,7 +58,9 @@ public class CharacterDocumentMapper : IDocumentMapper<Character, CharacterDocum
             kvp => kvp.Value
         );
 
-    doc.Location = _locationMapper.ToDocument(entity.CurrentLocation);
+        doc.Location = _locationMapper.ToDocument(entity.CurrentLocation);
+        doc.IsMoving = entity.IsMoving;
+        doc.IsRotating = entity.IsRotating;
 
         // Map Equipment
         doc.Equipment = entity.Equipments
@@ -123,6 +125,9 @@ public class CharacterDocumentMapper : IDocumentMapper<Character, CharacterDocum
             var location = _locationMapper.ToEntity(document.Location);
             character.SetCurrentLocation(location);
         }
+
+        character.SetMovementState(document.IsMoving);
+        character.SetRotationState(document.IsRotating);
 
         // Map BaseStats
         foreach (var stat in document.BaseStats)

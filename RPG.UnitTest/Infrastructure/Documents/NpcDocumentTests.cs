@@ -31,6 +31,8 @@ public class NpcDocumentTests
         document.ModifiedStats.Should().NotBeNull().And.BeEmpty();
         document.DisplayName.Should().BeEmpty();
         document.Description.Should().BeEmpty();
+    document.IsMoving.Should().BeFalse();
+    document.IsRotating.Should().BeFalse();
     }
 
     [Fact]
@@ -76,7 +78,9 @@ public class NpcDocumentTests
             },
             SpawnLocation = location,
             CurrentLocation = currentLocation,
-            WorldId = Guid.NewGuid()
+            WorldId = Guid.NewGuid(),
+            IsMoving = true,
+            IsRotating = false
         };
 
         document.DisplayName.Should().Be("The Lich King");
@@ -91,5 +95,7 @@ public class NpcDocumentTests
         document.CurrentLocation.Should().BeSameAs(currentLocation);
         document.BaseStats.Should().ContainSingle().And.ContainKey("Strength").WhoseValue.Should().Be(100);
         document.ModifiedStats.Should().ContainSingle().And.ContainKey("Strength").WhoseValue.Should().Be(120);
+        document.IsMoving.Should().BeTrue();
+        document.IsRotating.Should().BeFalse();
     }
 }

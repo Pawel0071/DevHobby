@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Threading.Tasks;
 using RPG.Application.Commands;
 using RPG.Application.Events;
 using RPG.Application.Interfaces;
@@ -21,7 +22,10 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     ICommandHandler<PickUpItemCommand>,
     ICommandHandler<GainExperienceCommand>,
     ICommandHandler<LevelUpCommand>,
-    ICommandHandler<StartMovementCommand>
+    ICommandHandler<StartMovementCommand>,
+    ICommandHandler<StopMovementCommand>,
+    ICommandHandler<StartRotationCommand>,
+    ICommandHandler<StopRotationCommand>
 
 {
     private const float DefaultMovementDeltaSeconds = 1f;
@@ -40,8 +44,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         IStatsService statsService,
         IMovementService movementService,
         IGameEventDispatcher eventDispatcher,
-    IDictionaryRegistry<TagDefinition> tagRegistry
-    )
+        IDictionaryRegistry<TagDefinition> tagRegistry)
     {
         _characterRepo = characterRepo;
         _inventoryService = inventoryService;
@@ -73,7 +76,62 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         }
 
         await _characterRepo.SaveAsync(character);
-        _eventDispatcher.Dispatch(new CharacterMovedEvent(command.CharacterId, character.CurrentLocation));
+        await _eventDispatcher.DispatchAsync(new CharacterMovedEvent(command.CharacterId, character.CurrentLocation));
+
+        return CommandResult.Ok();
+    }
+
+    public async Task<CommandResult> HandleAsync(StopMovementCommand command)
+    {
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+
+        var stopResult = _movementService.Stop(character);
+        if (!stopResult.Success)
+        {
+            return CommandResult.Fail(CommandError.InvalidOperation, stopResult.Message, stopResult);
+        }
+
+        var location = stopResult.Result ?? character.CurrentLocation;
+        await _eventDispatcher.DispatchAsync(new CharacterMovementStoppedEvent(command.CharacterId, location));
+
+        return CommandResult.Ok();
+    }
+
+    public async Task<CommandResult> HandleAsync(StartRotationCommand command)
+    {
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+
+        if (!TryGetDirectionVector(command.Direction, out var direction))
+        {
+            return CommandResult.Fail(CommandError.InvalidOperation, "Niepoprawny kierunek rotacji.");
+        }
+
+        var rotationResult = _movementService.Rotate(character, direction);
+        if (!rotationResult.Success)
+        {
+            return CommandResult.Fail(CommandError.InvalidOperation, rotationResult.Message, rotationResult);
+        }
+
+        var rotation = rotationResult.Result;
+
+        await _characterRepo.SaveAsync(character);
+        await _eventDispatcher.DispatchAsync(new CharacterRotationStartedEvent(command.CharacterId, rotation, character.CurrentLocation));
+
+        return CommandResult.Ok();
+    }
+
+    public async Task<CommandResult> HandleAsync(StopRotationCommand command)
+    {
+        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+
+        var stopRotationResult = _movementService.StopRotation(character);
+        if (!stopRotationResult.Success)
+        {
+            return CommandResult.Fail(CommandError.InvalidOperation, stopRotationResult.Message, stopRotationResult);
+        }
+
+        var rotation = stopRotationResult.Result;
+        await _eventDispatcher.DispatchAsync(new CharacterRotationStoppedEvent(command.CharacterId, rotation, character.CurrentLocation));
 
         return CommandResult.Ok();
     }
@@ -87,7 +145,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         var result = _inventoryService.RemoveItem(character.GetBackpackInventoryContainer(), command.Item);
 
         if (result.Success)
-            _eventDispatcher.Dispatch(new ItemDroppedEvent(command.CharacterId, command.Item));
+            await _eventDispatcher.DispatchAsync(new ItemDroppedEvent(command.CharacterId, command.Item));
 
         return CommandResult.Ok();
     }
@@ -111,7 +169,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         if (!equipResult.Success)
             return CommandResult.Fail(CommandError.InvalidOperation, equipResult.Message, equipResult);
 
-        _eventDispatcher.Dispatch(new ItemEquippedEvent(command.CharacterId, command.Slot, command.Item));
+        await _eventDispatcher.DispatchAsync(new ItemEquippedEvent(command.CharacterId, command.Slot, command.Item));
         var statsContainer = command.Item.GetComponent<StatsComponent>()?.Stats;
         if (statsContainer == null)
             return CommandResult.Fail(CommandError.ItemNotHaveStatsDef, equipResult.Message, equipResult);
@@ -147,7 +205,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
             return CommandResult.Fail(CommandError.ItemNotFound, "");
         if (_inventoryService.IsFull(character.GetBankStorageContainer()).Result)
         {
-            _eventDispatcher.Dispatch(new InventoryFullEvent(command.CharacterId, command.Item));
+            await _eventDispatcher.DispatchAsync(new InventoryFullEvent(command.CharacterId, command.Item));
             return CommandResult.Fail(CommandError.InventoryFull, "");
         }
 
@@ -155,7 +213,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         var result = _inventoryService.AddItem(character.GetBackpackInventoryContainer(), command.Item);
 
         if (result.Success)
-            _eventDispatcher.Dispatch(new ItemGottenFromBankEvent(command.CharacterId, command.Item));
+            await _eventDispatcher.DispatchAsync(new ItemGottenFromBankEvent(command.CharacterId, command.Item));
 
         return CommandResult.Ok();
     }
@@ -175,7 +233,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         var result = _inventoryService.AddItem(character.GetBackpackInventoryContainer(), command.Item);
 
         if (result.Success)
-            _eventDispatcher.Dispatch(new ItemPickupEvent(command.CharacterId, command.Item));
+            await _eventDispatcher.DispatchAsync(new ItemPickupEvent(command.CharacterId, command.Item));
 
         return CommandResult.Ok();
     }
@@ -188,7 +246,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
         if (_inventoryService.IsFull(character.GetBankStorageContainer()).Result)
         {
-            _eventDispatcher.Dispatch(new InventoryFullEvent(command.CharacterId, command.Item));
+            await _eventDispatcher.DispatchAsync(new InventoryFullEvent(command.CharacterId, command.Item));
             return CommandResult.Fail(CommandError.InventoryFull, "");
         }
 
@@ -196,7 +254,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         var result = _inventoryService.AddItem(character.GetBankStorageContainer(), command.Item);
 
         if (result.Success)
-            _eventDispatcher.Dispatch(new ItemPutToBankEvent(command.CharacterId, command.Item));
+            await _eventDispatcher.DispatchAsync(new ItemPutToBankEvent(command.CharacterId, command.Item));
 
         return CommandResult.Ok();
     }
@@ -208,14 +266,14 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
         if (_inventoryService.IsFull(character.GetBankStorageContainer()).Result)
         {
-            _eventDispatcher.Dispatch(new InventoryFullEvent(command.CharacterId, item));
+            await _eventDispatcher.DispatchAsync(new InventoryFullEvent(command.CharacterId, item));
             return CommandResult.Fail(CommandError.InventoryFull, "");
         }
 
         var result = _equipmentService.Unequip(character, command.Slot);
 
         if (result.Success)
-            _eventDispatcher.Dispatch(new ItemUnequippedEvent(command.CharacterId, command.Slot, item));
+            await _eventDispatcher.DispatchAsync(new ItemUnequippedEvent(command.CharacterId, command.Slot, item));
         else
             return CommandResult.Fail(CommandError.InvalidOperation, result.Message, result);
         var statsContainer = item.GetComponent<StatsComponent>()?.Stats;
@@ -238,7 +296,10 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
         var result = _inventoryService.RemoveItem(character.GetBackpackInventoryContainer(), command.Item);
 
-        if (result.Success) _eventDispatcher.Dispatch(new ItemUsedEvent(command.CharacterId, command.Item));
+        if (result.Success)
+        {
+            await _eventDispatcher.DispatchAsync(new ItemUsedEvent(command.CharacterId, command.Item));
+        }
 
         return CommandResult.Ok();
     }
@@ -260,4 +321,5 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
         return vector != Vector3.Zero;
     }
+
 }
