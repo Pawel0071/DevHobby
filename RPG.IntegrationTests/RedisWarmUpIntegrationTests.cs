@@ -37,6 +37,8 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         // Register Infrastructure logger adapter
         services.AddSingleton(typeof(Infrastructure.Interfaces.ILogger<>), typeof(LoggerAdapter<>));
 
+    services.AddSingleton<IActivityScope, NoopActivityScope>();
+
         // Register MongoDB and Redis
         services.AddSingleton(_mongoDatabase);
         services.AddSingleton(_redisDatabase);
@@ -359,6 +361,11 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         {
             _logger.LogDebug(message);
         }
+    }
+
+    private sealed class NoopActivityScope : IActivityScope
+    {
+        public IDisposable? Start(string name, IDictionary<string, object>? tags = null) => null;
     }
 
     private async Task FlushRedisAsync()

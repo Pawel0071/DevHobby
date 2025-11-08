@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using RPG.Domain.Common;
 using RPG.Infrastructure.Documents;
@@ -23,6 +24,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.Orchestrators
         private readonly TestMapper _mapper = new();
         private readonly DocumentRepository _repository;
         private readonly CancellationToken _cancellationToken = CancellationToken.None;
+        private readonly IServiceProvider _serviceProvider;
 
         public DocumentRepositoryTests()
         {
@@ -30,12 +32,23 @@ namespace RPG.UnitTest.Infrastructure.Repositories.Orchestrators
                 .Setup(r => r.GetMapping<TestEntity>())
                 .Returns((typeof(TestDocument), (object)_mapper));
 
+            var services = new ServiceCollection();
+            services.AddSingleton<IMongoDocumentRepository>(_mongoRepository.Object);
+            services.AddSingleton<IRedisDocumentRepository>(_redisRepository.Object);
+            services.AddSingleton<IRabbitMqPublisher>(_rabbitMqPublisher.Object);
+            services.AddSingleton<IDocumentMapper<TestEntity, TestDocument>>(_mapper);
+            services.AddSingleton<ILogger<DocumentRepository>>(_logger);
+            services.AddSingleton<ILogger<DocumentRepositoryHandler<TestEntity, TestDocument>>>(_logger);
+
+            _serviceProvider = services.BuildServiceProvider();
+
             _repository = new DocumentRepository(
                 _typeResolver.Object,
                 _mongoRepository.Object,
                 _redisRepository.Object,
                 _rabbitMqPublisher.Object,
-                _logger);
+                _logger,
+                _serviceProvider);
         }
 
         [Fact]

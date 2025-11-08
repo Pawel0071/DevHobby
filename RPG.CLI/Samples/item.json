@@ -1,0 +1,13 @@
+{
+  "entity": "item",
+  "id": "6db8c641-9b7b-49e6-a4fb-9d3d6f6b2e44",
+  "name": "CLI Functional Test Blade",
+  "rarity": "Rare",
+  "typeCode": "weapon.test.blade",
+  "requiredLevel": 10,
+  "stackSize": 1,
+  "tags": ["weapon", "functional-test"],
+  "attributes": {
+    "description": "Functional pipeline verification sample"
+  }
+}

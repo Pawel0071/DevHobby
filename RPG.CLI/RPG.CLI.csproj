@@ -8,7 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RPG.Application\RPG.Application.csproj"/>
+    <ProjectReference Include="..\RPG.Application\RPG.Application.csproj" />
+    <ProjectReference Include="..\RPG.Core\RPG.Core.csproj" />
+    <ProjectReference Include="..\RPG.Infrastructure\RPG.Infrastructure.csproj" />
+    <ProjectReference Include="..\RPG.PersistenceService\RPG.PersistenceService.csproj" />
+    <ProjectReference Include="..\RedisWarmUp\RedisWarmUp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Samples\**\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

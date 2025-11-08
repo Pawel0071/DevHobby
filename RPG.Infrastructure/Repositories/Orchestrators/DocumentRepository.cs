@@ -10,29 +10,32 @@ namespace RPG.Infrastructure.Repositories.Orchestrators
         private readonly IMongoDocumentRepository _mongoRepository;
         private readonly IRedisDocumentRepository _redisRepository;
         private readonly IRabbitMqPublisher _rabbitMqPublisher;
-        private readonly ILogger<DocumentRepository> _logger;
+    private readonly ILogger<DocumentRepository> _logger;
+    private readonly IServiceProvider _serviceProvider;
 
         public DocumentRepository(
             IDocumentTypeResolver typeResolver,
             IMongoDocumentRepository mongoRepository,
             IRedisDocumentRepository redisRepository,
             IRabbitMqPublisher rabbitMqPublisher,
-            ILogger<DocumentRepository> logger)
+            ILogger<DocumentRepository> logger,
+            IServiceProvider serviceProvider)
         {
             _typeResolver = typeResolver;
             _mongoRepository = mongoRepository;
             _redisRepository = redisRepository;
             _rabbitMqPublisher = rabbitMqPublisher;
             _logger = logger;
+            _serviceProvider = serviceProvider;
         }
 
         private IDocumentRepositoryHandler<TEntity> GetHandler<TEntity>() where TEntity : class, IDomainEntity
         {
-            var (documentType, mapper) = _typeResolver.GetMapping<TEntity>();
+            var (documentType, _) = _typeResolver.GetMapping<TEntity>();
             _logger.Debug($"Creating handler for {typeof(TEntity).Name} -> {documentType.Name}");
             var handlerType = typeof(DocumentRepositoryHandler<,>).MakeGenericType(typeof(TEntity), documentType);
-            
-            var handler = Activator.CreateInstance(handlerType, _mongoRepository, _redisRepository, _rabbitMqPublisher, mapper, _logger);
+
+            var handler = ActivatorUtilities.CreateInstance(_serviceProvider, handlerType);
 
             if (handler is null)
             {
