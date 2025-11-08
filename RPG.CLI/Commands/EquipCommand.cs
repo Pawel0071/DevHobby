@@ -1,7 +1,7 @@
 using System.CommandLine;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using RPG.Application.Commands;
+using RPG.Application.Interfaces;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
 
@@ -9,11 +9,11 @@ namespace RPG.CLI.Commands;
 
 public class EquipCommand
 {
-    private readonly IMediator _mediator;
+    private readonly IServiceProvider _provider;
 
     public EquipCommand(IServiceProvider provider)
     {
-        _mediator = provider.GetRequiredService<IMediator>();
+        _provider = provider;
     }
 
     public Command Build()
@@ -26,9 +26,12 @@ public class EquipCommand
 
         cmd.SetHandler(async (characterId, slot, itemName) =>
             {
+                using var scope = _provider.CreateScope();
+                var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<EquipItemCommand>>();
+
                 var item = new Item(Guid.NewGuid(), itemName.ToLowerInvariant()) { Name = itemName };
                 var command = new EquipItemCommand(characterId, slot, item);
-                await _mediator.Send(command);
+                await handler.HandleAsync(command);
             },
             characterOption, slotOption, itemNameOption);
 

@@ -1,5 +1,4 @@
 ﻿using System.CommandLine;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,12 +34,6 @@ var builder = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
         var configuration = context.Configuration;
-
-        // MediatR
-        services.AddMediatR(cfg =>
-        {
-            cfg.RegisterServicesFromAssembly(typeof(CharacterCommandHandler).Assembly);
-        });
 
         services.AddInfrastructure(configuration);
         services.AddCore(configuration);

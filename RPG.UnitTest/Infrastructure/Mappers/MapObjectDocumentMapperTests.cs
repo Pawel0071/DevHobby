@@ -8,6 +8,7 @@ using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Mappers;
 using Xunit;
 using RPG.Infrastructure.Interfaces;
+using RPG.Domain.Entities.Items;
 
 namespace RPG.UnitTest.Infrastructure.Mappers;
 
@@ -23,8 +24,9 @@ public class MapObjectDocumentMapperTests
     {
         var mockMapperLogger = new Mock<ILogger<MapObjectDocumentMapper>>();
         var mockLocationMapperLogger = new Mock<ILogger<LocationMapper>>();
+        var mockItemMapper = new Mock<IDocumentMapper<Item, ItemDocument>>();
         _locationMapper = new LocationMapper(mockLocationMapperLogger.Object);
-        _mapper = new MapObjectDocumentMapper(mockMapperLogger.Object, _locationMapper);
+        _mapper = new MapObjectDocumentMapper(mockMapperLogger.Object, _locationMapper, mockItemMapper.Object);
     }
 
     [Fact]

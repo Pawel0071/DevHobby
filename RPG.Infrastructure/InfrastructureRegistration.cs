@@ -16,8 +16,15 @@ using RPG.Infrastructure.Repositories.Orchestrators;
 using RPG.Infrastructure.Repositories.RabbitMQ;
 using RPG.Infrastructure.Repositories.Redis;
 using RPG.Infrastructure.Repositories.MongoDB;
+using RPG.Infrastructure.Mappers;
 using Serilog;
 using StackExchange.Redis;
+using RPG.Domain.Entities;
+using RPG.Domain.Entities.Items;
+using RPG.Domain.Entities.Skills;
+using RPG.Domain.Entities.Quests;
+using RPG.Domain.Entities.Npcs;
+using RPG.Domain.Entities.MapObjects;
 
 namespace RPG.Infrastructure;
 
@@ -100,6 +107,17 @@ public static class InfrastructureRegistration
         services.AddSingleton<IMongoDocumentRepository, MongoDocumentRepository>();
         services.AddSingleton<IDocumentRepository, DocumentRepository>();
         services.AddSingleton<IDocumentTypeResolver, DocumentTypeResolver>();
+
+        // Document mappers and supporting helpers
+        services.AddSingleton<LocationMapper>();
+        services.AddSingleton<IDocumentMapper<Character, CharacterDocument>, CharacterDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<Item, ItemDocument>, ItemDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<Skill, SkillDocument>, SkillDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<Quest, QuestDocument>, QuestDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<Npc, NpcDocument>, NpcDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<Player, PlayerDocument>, PlayerDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<MapObject, MapObjectDocument>, MapObjectDocumentMapper>();
+        services.AddSingleton<IDocumentMapper<WorldState, WorldStateDocument>, WorldStateDocumentMapper>();
 
         // Health Checks
         services.AddHealthChecks()

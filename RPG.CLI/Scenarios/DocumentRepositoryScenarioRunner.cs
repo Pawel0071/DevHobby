@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Text.Json;
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using RPG.Domain.Common;
 using RPG.Domain.Containers;
@@ -44,7 +45,10 @@ internal sealed class DocumentRepositoryScenarioRunner
     {
         var scenarios = string.IsNullOrWhiteSpace(entityKey)
             ? _scenarios
-            : _scenarios.Where(s => string.Equals(s.Name, entityKey, StringComparison.OrdinalIgnoreCase)).ToList();
+            : _scenarios.Where(s =>
+                    string.Equals(s.Name, entityKey, StringComparison.OrdinalIgnoreCase) ||
+                    s.Name.StartsWith(entityKey + ".", StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
         if (scenarios.Count == 0)
         {
@@ -231,11 +235,114 @@ internal sealed class DocumentRepositoryScenario<TEntity, TDocument> : IDocument
         {
             var mongoDoc = await mongoRepository.GetByIdAsync<TDocument>(entityId, cancellationToken)
                           ?? throw new InvalidOperationException($"[{Name}] Mongo document missing after {stage}.");
+            LogDocumentName("Mongo", mongoDoc);
+            LogDocumentComponents("Mongo", mongoDoc);
             _assertDocument?.Invoke(entity, mongoDoc);
 
             var redisDoc = await redisRepository.GetByIdAsync<TDocument>(entityId, cancellationToken)
                           ?? throw new InvalidOperationException($"[{Name}] Redis document missing after {stage}.");
+            LogDocumentName("Redis", redisDoc);
+            LogDocumentComponents("Redis", redisDoc);
             _assertDocument?.Invoke(entity, redisDoc);
+        }
+
+        void LogDocumentName(string source, object document)
+        {
+            if (document is null)
+            {
+                return;
+            }
+
+            var name = TryExtractName(document);
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                logger.Info($"[{Name}] {source} document name: {name}");
+            }
+        }
+
+        static string? TryExtractName(object document)
+        {
+            var nameProperty = document.GetType().GetProperty("Name");
+            if (nameProperty?.GetValue(document) is string text && !string.IsNullOrWhiteSpace(text))
+            {
+                return text;
+            }
+
+            return null;
+        }
+
+        void LogDocumentComponents(string source, TDocument document)
+        {
+            var componentsText = document switch
+            {
+                ItemDocument itemDoc => DescribeItemComponents(itemDoc),
+                MapObjectDocument mapObjectDoc => DescribeComponentDataList(mapObjectDoc.Components),
+                NpcDocument npcDoc => DescribeComponentDataList(npcDoc.Components),
+                SkillDocument skillDoc => DescribeComponentDataList(skillDoc.Components),
+                QuestDocument questDoc => DescribeComponentDataList(questDoc.Components),
+                _ => null
+            };
+
+            if (!string.IsNullOrWhiteSpace(componentsText))
+            {
+                logger.Info($"[{Name}] {source} components: {componentsText}");
+            }
+        }
+
+        static string DescribeItemComponents(ItemDocument document)
+        {
+            var components = new List<string>();
+
+            if (document.Modifiers is { Count: > 0 })
+            {
+                components.Add("StatsComponent");
+            }
+
+            if (document.SocketNo.HasValue)
+            {
+                components.Add("SocketComponent");
+            }
+
+            if (document.SkillIds is { Count: > 0 })
+            {
+                components.Add("SkillGrantComponent");
+            }
+
+            if (document.QuestId.HasValue && document.StepId.HasValue)
+            {
+                components.Add("QuestItemComponent");
+            }
+
+            if (document.EquipmentSlots is { Count: > 0 } ||
+                document.IsTwoHanded.HasValue ||
+                document.SupportsDualWield.HasValue ||
+                document.IsUniqueEquip.HasValue)
+            {
+                components.Add("EquippableComponent");
+            }
+
+            if (document.UsedInItemIds is { Count: > 0 })
+            {
+                components.Add("CraftMaterialComponent");
+            }
+
+            return components.Count == 0
+                ? "(brak komponentów)"
+                : string.Join(", ", components);
+        }
+
+        static string DescribeComponentDataList(IReadOnlyCollection<ComponentData>? components)
+        {
+            if (components is not { Count: > 0 })
+            {
+                return "(brak komponentów)";
+            }
+
+            var names = components
+                .Select(component => string.IsNullOrWhiteSpace(component.Type) ? "(nieznany)" : component.Type)
+                .ToList();
+
+            return string.Join(", ", names);
         }
     }
 }
@@ -248,9 +355,11 @@ internal static class DocumentRepositoryScenarioFactory
         {
             CreateCharacterScenario(),
             CreateItemScenario(),
+            CreateItemCraftingScenario(),
             CreateSkillScenario(),
             CreateQuestScenario(),
             CreateNpcScenario(),
+            CreateNpcCombatScenario(),
             CreatePlayerScenario(),
             CreateMapObjectScenario(),
             CreateWorldStateScenario()
@@ -392,7 +501,7 @@ internal static class DocumentRepositoryScenarioFactory
     private static IDocumentRepositoryScenario CreateItemScenario()
     {
         return new DocumentRepositoryScenario<Item, ItemDocument>(
-            "item",
+            "item.socketed",
             createEntity: () =>
             {
                 var grantedSkillId = Guid.NewGuid();
@@ -504,6 +613,116 @@ internal static class DocumentRepositoryScenarioFactory
                 {
                     throw new InvalidOperationException("Unexpected quest linkage in document.");
                 }
+            });
+    }
+
+    private static IDocumentRepositoryScenario CreateItemCraftingScenario()
+    {
+        return new DocumentRepositoryScenario<Item, ItemDocument>(
+            "item.crafting",
+            createEntity: () =>
+            {
+                var recipeTargets = new List<string>
+                {
+                    "cli.recipe.sword",
+                    "cli.recipe.shield"
+                };
+
+                var item = new Item(Guid.NewGuid(), "cli.material")
+                {
+                    Name = "CLI Tempered Ingot",
+                    Rarity = ItemRarity.Uncommon,
+                    RequiredLevel = 12,
+                    StackSize = 15,
+                    Tags = new HashSet<string> { "cli", "crafting", "material" },
+                    Components = new List<IItemComponent>
+                    {
+                        new EquippableComponent
+                        {
+                            ValidSlots = new List<EquipmentSlot> { EquipmentSlot.Weapon1, EquipmentSlot.Weapon2 },
+                            IsTwoHanded = false,
+                            SupportsDualWield = true,
+                            IsUniqueEquip = false
+                        },
+                        new CraftMaterialComponent
+                        {
+                            UsedInItemIds = recipeTargets
+                        }
+                    }
+                };
+
+                return item;
+            },
+            mutateEntity: entity =>
+            {
+                entity.RequiredLevel += 3;
+                entity.StackSize = Math.Max(entity.StackSize, 20);
+                entity.Rarity = ItemRarity.Epic;
+
+                if (entity.Components.OfType<CraftMaterialComponent>().FirstOrDefault() is { } craftMaterial)
+                {
+                    craftMaterial.UsedInItemIds.Add("cli.recipe.legendary-axe");
+                }
+
+                if (entity.Components.OfType<EquippableComponent>().FirstOrDefault() is { } equippable)
+                {
+                    var updatedEquippable = new EquippableComponent
+                    {
+                        ValidSlots = equippable.ValidSlots.Concat(new[] { EquipmentSlot.Head }).ToList(),
+                        IsTwoHanded = true,
+                        SupportsDualWield = false,
+                        IsUniqueEquip = true
+                    };
+
+                    entity.Components.Remove(equippable);
+                    entity.Components.Add(updatedEquippable);
+                }
+            },
+            assertDocument: (entity, document) =>
+            {
+                if (document.EquipmentSlots is null)
+                    throw new InvalidOperationException("Item equippable slots missing in document.");
+
+                var equippable = entity.Components.OfType<EquippableComponent>().First();
+                if (!document.EquipmentSlots.OrderBy(x => x).SequenceEqual(equippable.ValidSlots.OrderBy(x => x)))
+                    throw new InvalidOperationException("Item equippable slots mismatch between entity and document.");
+
+                if (document.IsTwoHanded != equippable.IsTwoHanded ||
+                    document.SupportsDualWield != equippable.SupportsDualWield ||
+                    document.IsUniqueEquip != equippable.IsUniqueEquip)
+                {
+                    throw new InvalidOperationException("Item equippable flags mismatch between entity and document.");
+                }
+
+                var craftMaterial = entity.Components.OfType<CraftMaterialComponent>().First();
+                if (document.UsedInItemIds is null)
+                    throw new InvalidOperationException("Item craft material targets missing in document.");
+
+                if (!document.UsedInItemIds.OrderBy(x => x).SequenceEqual(craftMaterial.UsedInItemIds.OrderBy(x => x)))
+                    throw new InvalidOperationException("Item craft material targets mismatch between entity and document.");
+            },
+            assertEntity: (expected, actual) =>
+            {
+                var expectedEquippable = expected.Components.OfType<EquippableComponent>().First();
+                var actualEquippable = actual.Components.OfType<EquippableComponent>().FirstOrDefault()
+                                     ?? throw new InvalidOperationException("Item equippable component missing after round-trip.");
+
+                if (!actualEquippable.ValidSlots.OrderBy(x => x).SequenceEqual(expectedEquippable.ValidSlots.OrderBy(x => x)))
+                    throw new InvalidOperationException("Item equippable slots mismatch after round-trip.");
+
+                if (actualEquippable.IsTwoHanded != expectedEquippable.IsTwoHanded ||
+                    actualEquippable.SupportsDualWield != expectedEquippable.SupportsDualWield ||
+                    actualEquippable.IsUniqueEquip != expectedEquippable.IsUniqueEquip)
+                {
+                    throw new InvalidOperationException("Item equippable flags mismatch after round-trip.");
+                }
+
+                var expectedCraftMaterial = expected.Components.OfType<CraftMaterialComponent>().First();
+                var actualCraftMaterial = actual.Components.OfType<CraftMaterialComponent>().FirstOrDefault()
+                                        ?? throw new InvalidOperationException("Item craft material component missing after round-trip.");
+
+                if (!actualCraftMaterial.UsedInItemIds.OrderBy(x => x).SequenceEqual(expectedCraftMaterial.UsedInItemIds.OrderBy(x => x)))
+                    throw new InvalidOperationException("Item craft material targets mismatch after round-trip.");
             });
     }
 
@@ -737,7 +956,7 @@ internal static class DocumentRepositoryScenarioFactory
     private static IDocumentRepositoryScenario CreateNpcScenario()
     {
         return new DocumentRepositoryScenario<Npc, NpcDocument>(
-            "npc",
+            "npc.merchant",
             createEntity: () =>
             {
                 var npc = Npc.Create(
@@ -843,6 +1062,147 @@ internal static class DocumentRepositoryScenarioFactory
                                        ?? throw new InvalidOperationException("NPC quest giver component missing after round-trip.");
                 if (!actualQuestGiver.AvailableQuests.OrderBy(x => x).SequenceEqual(expectedQuestGiver.AvailableQuests.OrderBy(x => x)))
                     throw new InvalidOperationException("NPC quest list mismatch after round-trip.");
+            });
+    }
+
+    private static IDocumentRepositoryScenario CreateNpcCombatScenario()
+    {
+        return new DocumentRepositoryScenario<Npc, NpcDocument>(
+            "npc.combat",
+            createEntity: () =>
+            {
+                var npc = Npc.Create(
+                    "cli_npc_combat",
+                    "CLI Arena Champion",
+                    Location.Create(15, 3, 0, Guid.NewGuid(), "arena", "Battle Pit"),
+                    Guid.NewGuid(),
+                    new HashSet<string> { "hostile", "boss", "trainer" });
+
+                npc.Level = 40;
+                npc.Description = "A combat trainer who doubles as an arena boss.";
+
+                var combatComponent = new CombatComponent
+                {
+                    AggroRange = 18f,
+                    LeashRange = 24f,
+                    AiBehaviorScript = "aggressive-champion"
+                };
+                combatComponent.GetStatsContainer()[StatsProperty.Strength] = 55;
+                combatComponent.GetStatsContainer()[StatsProperty.Vitality] = 60;
+
+                var lootableComponent = new LootableComponent
+                {
+                    ExperienceReward = 1250,
+                    GoldReward = 375
+                };
+                var lootContainer = lootableComponent.GetLootContainer();
+                lootContainer.LootSlots[0].Item = CreateTestItem("cli.loot.amulet", "CLI Amulet of Resilience", ItemRarity.Rare);
+                lootContainer.LootSlots[0].MinQuantity = 1;
+                lootContainer.LootSlots[0].MaxQuantity = 1;
+                lootContainer.LootSlots[0].DropChance = 0.5f;
+                lootContainer.LootSlots[1].Item = CreateTestItem("cli.loot.sigil", "CLI Sigil of Guarding", ItemRarity.Epic);
+                lootContainer.LootSlots[1].MinQuantity = 1;
+                lootContainer.LootSlots[1].MaxQuantity = 1;
+                lootContainer.LootSlots[1].DropChance = 0.25f;
+
+                var trainerComponent = new TrainerComponent
+                {
+                    Specialization = "Defensive Combat"
+                };
+
+                npc.Components.Add(combatComponent);
+                npc.Components.Add(lootableComponent);
+                npc.Components.Add(trainerComponent);
+
+                return npc;
+            },
+            mutateEntity: entity =>
+            {
+                entity.Description += " The crowd cheers louder each round.";
+                entity.Level += 1;
+
+                if (entity.Components.OfType<CombatComponent>().FirstOrDefault() is { } combat)
+                {
+                    combat.AggroRange += 2f;
+                    combat.LeashRange += 1f;
+                    combat.AiBehaviorScript = "aggressive-overdrive";
+
+                    foreach (var statKey in combat.Stats.Keys.ToList())
+                    {
+                        combat.Stats[statKey] += 5;
+                    }
+                }
+
+                if (entity.Components.OfType<LootableComponent>().FirstOrDefault() is { } lootable)
+                {
+                    lootable.ExperienceReward += 250;
+                    lootable.GoldReward += 100;
+                    var lootContainer = lootable.GetLootContainer();
+                    lootContainer.LootSlots[2].Item = CreateTestItem("cli.loot.token", "CLI Arena Token", ItemRarity.Uncommon);
+                    lootContainer.LootSlots[2].MinQuantity = 1;
+                    lootContainer.LootSlots[2].MaxQuantity = 3;
+                    lootContainer.LootSlots[2].DropChance = 0.8f;
+                }
+
+                if (entity.Components.OfType<TrainerComponent>().FirstOrDefault() is { } trainer)
+                {
+                    trainer.Specialization = "Advanced Defensive Combat";
+                }
+            },
+            assertDocument: (entity, document) =>
+            {
+                var combatDoc = DeserializeComponent<CombatComponent>(document.Components);
+                var combatEntity = entity.Components.OfType<CombatComponent>().First();
+                if (Math.Abs(combatDoc.AggroRange - combatEntity.AggroRange) > 0.001f ||
+                    Math.Abs(combatDoc.LeashRange - combatEntity.LeashRange) > 0.001f ||
+                    !string.Equals(combatDoc.AiBehaviorScript, combatEntity.AiBehaviorScript, StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException("NPC combat component mismatch.");
+                }
+
+                var lootDoc = DeserializeComponent<LootableComponent>(document.Components);
+                var lootEntity = entity.Components.OfType<LootableComponent>().First();
+                if (lootDoc.ExperienceReward != lootEntity.ExperienceReward ||
+                    lootDoc.GoldReward != lootEntity.GoldReward)
+                {
+                    throw new InvalidOperationException("NPC lootable component rewards mismatch.");
+                }
+
+                var trainerDoc = DeserializeComponent<TrainerComponent>(document.Components);
+                var trainerEntity = entity.Components.OfType<TrainerComponent>().First();
+                if (!string.Equals(trainerDoc.Specialization, trainerEntity.Specialization, StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException("NPC trainer specialization mismatch.");
+                }
+
+            },
+            assertEntity: (expected, actual) =>
+            {
+                var expectedCombat = expected.Components.OfType<CombatComponent>().First();
+                var actualCombat = actual.Components.OfType<CombatComponent>().FirstOrDefault()
+                                  ?? throw new InvalidOperationException("NPC combat component missing after round-trip.");
+                if (!string.Equals(actualCombat.AiBehaviorScript, expectedCombat.AiBehaviorScript, StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException("NPC combat AI script mismatch after round-trip.");
+                }
+
+                var expectedLoot = expected.Components.OfType<LootableComponent>().First();
+                var actualLoot = actual.Components.OfType<LootableComponent>().FirstOrDefault()
+                                 ?? throw new InvalidOperationException("NPC lootable component missing after round-trip.");
+                if (actualLoot.ExperienceReward != expectedLoot.ExperienceReward ||
+                    actualLoot.GoldReward != expectedLoot.GoldReward)
+                {
+                    throw new InvalidOperationException("NPC loot rewards mismatch after round-trip.");
+                }
+
+                var expectedTrainer = expected.Components.OfType<TrainerComponent>().First();
+                var actualTrainer = actual.Components.OfType<TrainerComponent>().FirstOrDefault()
+                                   ?? throw new InvalidOperationException("NPC trainer component missing after round-trip.");
+                if (!string.Equals(actualTrainer.Specialization, expectedTrainer.Specialization, StringComparison.Ordinal))
+                {
+                    throw new InvalidOperationException("NPC trainer specialization mismatch after round-trip.");
+                }
+
             });
     }
 
