@@ -1,4 +1,4 @@
-wwusing System.Text;
+using System.Text;
 using Grpc.Core;
 using Grpc.Net.Client;
 using RPG.GameServer.Protos;
@@ -32,7 +32,7 @@ internal static class Program
 
         var serverAddress = Environment.GetEnvironmentVariable("RPG_GAMESERVER_URL") ?? "http://localhost:5124";
 
-    using var channel = GrpcChannel.ForAddress(serverAddress);
+        using var channel = GrpcChannel.ForAddress(serverAddress);
         var client = new CharacterService.CharacterServiceClient(channel);
 
         try
