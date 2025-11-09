@@ -1,17 +1,12 @@
-using System;
 using System.Numerics;
-using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
 using Moq;
 using RPG.Application.Broadcasters;
-using RPG.Application.Events;
-using RPG.Application.Events;
 using RPG.Domain.Entities;
 using RPG.Domain.Models;
-using Xunit;
+using RPG.Infrastructure.Interfaces;
 
-namespace RPG.UnitTest.GameServer;
+namespace RPG.UnitTest.Application;
 
 public class CharacterStateBroadcasterTests
 {

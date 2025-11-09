@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RPG.Application.Interfaces;
 
-namespace RPG.Application.Events;
+namespace RPG.Application.Dispatchers;
 
 public class GameEventDispatcher : IGameEventDispatcher
 {

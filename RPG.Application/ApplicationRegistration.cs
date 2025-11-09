@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RPG.Abstractions.Interfaces;
 using RPG.Application.Commands;
+using RPG.Application.Dispatchers;
 using RPG.Application.Events;
 using RPG.Application.Handlers;
 using RPG.Application.Interfaces;
@@ -25,6 +27,7 @@ public static class ApplicationRegistration
         services.AddScoped<ICommandHandler<StartRotationCommand>, CharacterCommandHandler>();
         services.AddScoped<ICommandHandler<StopRotationCommand>, CharacterCommandHandler>();
         services.AddSingleton<IGameEventDispatcher, GameEventDispatcher>();
+        services.AddSingleton<INpcCombatEventDispatcher, NpcCombatEventDispatcher>();
 
         return services;
     }

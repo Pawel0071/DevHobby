@@ -26,7 +26,8 @@ using RPG.Domain.Entities.Skills;
 using RPG.Domain.Entities.Quests;
 using RPG.Domain.Entities.Npcs;
 using RPG.Domain.Entities.MapObjects;
-using RPG.Domain.Interfaces;
+using DomainCharacterRepository = RPG.Domain.Interfaces.ICharacterRepository;
+using InfrastructureCharacterRepository = RPG.Infrastructure.Interfaces.ICharacterRepository;
 
 namespace RPG.Infrastructure;
 
@@ -91,7 +92,8 @@ public static class InfrastructureRegistration
         }
 
         // Domain repositories
-        services.AddScoped<ICharacterRepository, CharacterRepository>();
+    services.AddScoped<DomainCharacterRepository, CharacterRepository>();
+    services.AddScoped<InfrastructureCharacterRepository, CharacterRepository>();
 
         // Dictionary Repositories - for loading definitions from MongoDB
         services.AddSingleton<IDictionaryRepository<TagDefinition>, DictionaryRepository<TagDefinition>>();

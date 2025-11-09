@@ -1,17 +1,12 @@
-using System;
 using System.Numerics;
-using System.Threading;
-using System.Threading.Tasks;
 using Moq;
-using RPG.Abstractions;
 using RPG.Abstractions.Interfaces;
 using RPG.Application.Events;
 using RPG.Application.Handlers;
 using RPG.Domain.Entities;
 using RPG.Domain.Models;
-using Xunit;
 
-namespace RPG.UnitTest.GameServer;
+namespace RPG.UnitTest.Application;
 
 public class CharacterMovementEventHandlerTests
 {

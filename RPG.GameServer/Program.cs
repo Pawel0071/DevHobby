@@ -2,15 +2,18 @@ using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using RPG.Abstractions;
+using RPG.Abstractions.Interfaces;
 using RPG.Application;
+using RPG.Application.Broadcasters;
 using RPG.Core;
 using RPG.GameServer.Controlers;
 using RPG.GameServer.Controllers;
-using RPG.GameServer.EventHandlers;
-using RPG.GameServer.Interfaces;
-using RPG.GameServer.Services;
+using RPG.Core.Interfaces.NpcServices;
+using RPG.Core.Services.NpcServices;
 using RPG.Infrastructure;
 using RPG.Application.Events;
+using RPG.Application.Handlers;
 using RPG.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,6 +62,9 @@ builder.Services.AddScoped<IGameEventHandler<CharacterMovedEvent>>(sp => sp.GetR
 builder.Services.AddScoped<IGameEventHandler<CharacterMovementStoppedEvent>>(sp => sp.GetRequiredService<CharacterMovementEventHandler>());
 builder.Services.AddScoped<IGameEventHandler<CharacterRotationStartedEvent>>(sp => sp.GetRequiredService<CharacterMovementEventHandler>());
 builder.Services.AddScoped<IGameEventHandler<CharacterRotationStoppedEvent>>(sp => sp.GetRequiredService<CharacterMovementEventHandler>());
+builder.Services.AddSingleton<INpcAiService, NpcAiService>();
+builder.Services.AddHostedService<NpcAiHostedService>();
+builder.Services.AddSingleton<INpcCombatService, NpcCombatService>();
 
 // Serwisy gRPC
 builder.Services.AddScoped<CharacterServiceImpl>();

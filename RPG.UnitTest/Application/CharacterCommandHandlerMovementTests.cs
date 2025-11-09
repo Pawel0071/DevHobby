@@ -15,13 +15,14 @@ using RPG.Domain.Entities;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
 using RPG.Infrastructure.Interfaces;
+using DomainCharacterRepository = RPG.Domain.Interfaces.ICharacterRepository;
 using Xunit;
 
 namespace RPG.UnitTest.Application;
 
 public class CharacterCommandHandlerMovementTests
 {
-    private readonly Mock<ICharacterRepository> _characterRepository = new();
+    private readonly Mock<DomainCharacterRepository> _characterRepository = new();
     private readonly Mock<IGameEventDispatcher> _eventDispatcher = new();
     private readonly MovementService _movementService;
     private readonly CharacterCommandHandler _handler;

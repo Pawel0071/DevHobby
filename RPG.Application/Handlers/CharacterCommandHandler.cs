@@ -6,13 +6,13 @@ using RPG.Application.Commands;
 using RPG.Application.Events;
 using RPG.Application.Diagnostics;
 using RPG.Application.Interfaces;
-using RPG.Core.Application.Handlers;
 using RPG.Core.Interfaces;
 using RPG.Domain.Common;
 using RPG.Domain.Enums;
 using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Interfaces;
 using RPG.Infrastructure.Interfaces;
+using DomainCharacterRepository = RPG.Domain.Interfaces.ICharacterRepository;
 
 namespace RPG.Application.Handlers;
 
@@ -32,7 +32,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
 {
     private const float DefaultMovementDeltaSeconds = 1f;
-    private readonly ICharacterRepository _characterRepo;
+    private readonly DomainCharacterRepository _characterRepo;
     private readonly IEquipmentService _equipmentService;
     private readonly IGameEventDispatcher _eventDispatcher;
     private readonly IInventoryService _inventoryService;
@@ -41,7 +41,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     private readonly IDictionaryRegistry<TagDefinition> _tagRegistry;
 
     public CharacterCommandHandler(
-        ICharacterRepository characterRepo,
+    DomainCharacterRepository characterRepo,
         IInventoryService inventoryService,
         IEquipmentService equipmentService,
         IStatsService statsService,

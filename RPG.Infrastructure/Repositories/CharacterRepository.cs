@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using RPG.Domain.Entities;
-using RPG.Domain.Interfaces;
 using RPG.Infrastructure.Interfaces;
+using DomainCharacterRepository = RPG.Domain.Interfaces.ICharacterRepository;
+using InfrastructureCharacterRepository = RPG.Infrastructure.Interfaces.ICharacterRepository;
 
 namespace RPG.Infrastructure.Repositories;
 
-public class CharacterRepository : ICharacterRepository
+public class CharacterRepository : DomainCharacterRepository, InfrastructureCharacterRepository
 {
     private readonly IDocumentRepository _documentRepository;
     private readonly ILogger<CharacterRepository> _logger;
@@ -46,7 +47,45 @@ public class CharacterRepository : ICharacterRepository
 
     public async Task SaveAsync(Character character)
     {
+        await UpsertAsync(character, "saved");
+    }
+
+    public Task<Character> CreateAsync(Character character)
+    {
+        return UpsertAsync(character, "created");
+    }
+
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        var removed = await _documentRepository.DeleteAsync<Character>(id);
+        if (!removed)
+        {
+            _logger.Warn($"Character {id} not found when attempting delete.");
+        }
+
+        return removed;
+    }
+
+    public async Task<Character?> GetAsync(string id)
+    {
+        if (Guid.TryParse(id, out var guid))
+        {
+            return await _documentRepository.GetByIdAsync<Character>(guid);
+        }
+
+        var characters = await _documentRepository.GetAllAsync<Character>();
+        return characters.FirstOrDefault(c => string.Equals(c.Name, id, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public Task<Character> UpdateAsync(Character character)
+    {
+        return UpsertAsync(character, "updated");
+    }
+
+    private async Task<Character> UpsertAsync(Character character, string action)
+    {
         await _documentRepository.UpsertAsync(character);
-        _logger.Debug($"Character {character.Id} saved.");
+        _logger.Debug($"Character {character.Id} {action}.");
+        return character;
     }
 }

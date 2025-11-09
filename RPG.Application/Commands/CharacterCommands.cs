@@ -50,18 +50,18 @@ public record LearnSkillCommand(Guid CharacterId, Guid SkillId) : ICommand;
 
 public record RespecSkillsCommand(Guid CharacterId) : ICommand;
 
-public record ApplyBuffCommand(Guid CharacterId, Skill Buff);
+public record ApplyBuffCommand(Guid CharacterId, Skill Buff) : ICommand;
 
-public record RemoveBuffCommand(Guid CharacterId, Skill Buff);
+public record RemoveBuffCommand(Guid CharacterId, Skill Buff): ICommand;
 
-public record ApplyDebuffCommand(Guid CharacterId, Skill Debuff);
+public record ApplyDebuffCommand(Guid CharacterId, Skill Debuff): ICommand;
 
-public record DieCommand(Guid CharacterId);
+public record DieCommand(Guid CharacterId): ICommand;
 
-public record LoginCharacterCommand(Guid CharacterId);
+public record LoginCharacterCommand(Guid CharacterId): ICommand;
 
-public record LogoutCharacterCommand(Guid CharacterId);
+public record LogoutCharacterCommand(Guid CharacterId): ICommand;
 
-public record SaveCharacterStateCommand(Guid CharacterId);
+public record SaveCharacterStateCommand(Guid CharacterId): ICommand;
 
-public record LoadCharacterStateCommand(Guid CharacterId);
+public record LoadCharacterStateCommand(Guid CharacterId): ICommand;

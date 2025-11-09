@@ -1,4 +1,5 @@
-using RPG.Core.Application.Handlers;
+using RPG.Application.Commands;
+using RPG.Application.Handlers;
 
 namespace RPG.Application.Interfaces;
 

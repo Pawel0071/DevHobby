@@ -3,6 +3,7 @@ using Grpc.Net.Client;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using RPG.Domain.Interfaces;
+using DomainCharacterRepository = RPG.Domain.Interfaces.ICharacterRepository;
 using RPG.GameServer.Protos;
 using CharacterServiceClient = RPG.GameServer.Protos.CharacterService.CharacterServiceClient;
 using ProtoCharacterClass = RPG.GameServer.Protos.CharacterClass;
@@ -42,7 +43,7 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
 
         var characterId = Guid.Parse(response.CharacterId);
         using var scope = factory.Services.CreateScope();
-        var repository = scope.ServiceProvider.GetRequiredService<ICharacterRepository>();
+    var repository = scope.ServiceProvider.GetRequiredService<DomainCharacterRepository>();
         var character = await repository.GetByIdAsync(characterId);
 
         character.Name.Should().Be("IntegrationHero");
@@ -73,7 +74,7 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
 
         using (var scope = factory.Services.CreateScope())
         {
-            var repository = scope.ServiceProvider.GetRequiredService<ICharacterRepository>();
+            var repository = scope.ServiceProvider.GetRequiredService<DomainCharacterRepository>();
             var character = await repository.GetByIdAsync(Guid.Parse(createReply.CharacterId));
 
             character.IsMoving.Should().BeTrue();
@@ -93,7 +94,7 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
 
         using (var scope = factory.Services.CreateScope())
         {
-            var repository = scope.ServiceProvider.GetRequiredService<ICharacterRepository>();
+            var repository = scope.ServiceProvider.GetRequiredService<DomainCharacterRepository>();
             var character = await repository.GetByIdAsync(Guid.Parse(createReply.CharacterId));
 
             character.IsRotating.Should().BeTrue();

@@ -9,6 +9,8 @@
   <ItemGroup>
     <ProjectReference Include="..\RPG.Domain\RPG.Domain.csproj"/>
     <ProjectReference Include="..\RPG.Infrastructure\RPG.Infrastructure.csproj"/>
+    <ProjectReference Include="..\RPG.AI\RPG.AI.csproj"/>
+    <ProjectReference Include="..\RPG.Abstractions\RPG.Abstractions.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
