@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="../RPG.GameServer/Protos/character.proto" GrpcServices="Client" />
+    <Protobuf Include="../RPG.GameServer/Protos/character.proto" GrpcServices="Client" ProtoRoot="../RPG.GameServer/Protos" />
+    <Protobuf Include="../RPG.GameServer/Protos/session.proto" GrpcServices="Client" ProtoRoot="../RPG.GameServer/Protos" />
   </ItemGroup>
 </Project>

@@ -163,7 +163,7 @@ services:
     container_name: redis_warmup
     build:
       context: .
-      dockerfile: RedisWormUp/Dockerfile
+      dockerfile: RedisWarmUp/Dockerfile
     environment:
       ConnectionStrings__Mongo: "mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb?authSource=admin"
       ConnectionStrings__Redis: "redis:6379"
@@ -198,6 +198,30 @@ services:
       redis:
         condition: service_healthy
       mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: on-failure
+
+  rpg.gameserver:
+    image: rpg.gameserver
+    container_name: rpg_gameserver
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: RPG.GameServer/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://0.0.0.0:8080"
+    ports:
+      - "5124:8080"
+      - "5125:8081"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy

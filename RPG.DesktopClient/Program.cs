@@ -24,6 +24,7 @@ internal static class Program
         { 7, (-1, 0, "←") },
         { 8, (-1, -1, "↖") },
     };
+    private static readonly TimeSpan HeartbeatInterval = TimeSpan.FromSeconds(5);
 
     public static async Task Main()
     {
@@ -33,14 +34,16 @@ internal static class Program
         var serverAddress = Environment.GetEnvironmentVariable("RPG_GAMESERVER_URL") ?? "http://localhost:5124";
 
         using var channel = GrpcChannel.ForAddress(serverAddress);
-        var client = new CharacterService.CharacterServiceClient(channel);
+        var characterClient = new CharacterService.CharacterServiceClient(channel);
+        var sessionClient = new SessionService.SessionServiceClient(channel);
+        var player = CreatePlayerProfile();
 
         try
         {
             Console.CursorVisible = false;
 
-            var session = await CreateCharacterAsync(client);
-            var controller = new CharacterConsoleController(client, session);
+            var session = await InitializeGameSessionAsync(characterClient, sessionClient, player);
+            var controller = new CharacterConsoleController(characterClient, sessionClient, session);
 
             await controller.RunAsync();
         }
@@ -58,11 +61,53 @@ internal static class Program
         }
     }
 
-    private static async Task<CharacterSession> CreateCharacterAsync(CharacterService.CharacterServiceClient client)
+    private static PlayerProfile CreatePlayerProfile()
+    {
+        var playerId = Guid.NewGuid();
+        var displayName = $"ConsolePlayer-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
+        // TODO: Replace stubbed player profile with authenticated login and player identification.
+
+        return new PlayerProfile(playerId, displayName);
+    }
+
+    private static async Task<CharacterSession> InitializeGameSessionAsync(
+        CharacterService.CharacterServiceClient characterClient,
+        SessionService.SessionServiceClient sessionClient,
+        PlayerProfile player)
     {
         var characterId = Guid.NewGuid();
-        var sessionId = Guid.NewGuid();
 
+        var sessionReply = await sessionClient.CreateSessionAsync(new CreateSessionRequest
+        {
+            CharacterId = characterId.ToString(),
+            PlayerId = player.PlayerId.ToString()
+        });
+
+        var sessionId = Guid.Parse(sessionReply.Session.Id);
+
+        try
+        {
+            var createdCharacterId = await CreateCharacterAsync(characterClient, characterId, sessionId, player);
+            return new CharacterSession(createdCharacterId, sessionId, player.PlayerId, player.DisplayName);
+        }
+        catch
+        {
+            await sessionClient.EndSessionAsync(new EndSessionRequest
+            {
+                SessionId = sessionId.ToString()
+            });
+
+            throw;
+        }
+    }
+
+    private static async Task<Guid> CreateCharacterAsync(
+        CharacterService.CharacterServiceClient client,
+        Guid characterId,
+        Guid sessionId,
+        PlayerProfile player)
+    {
         var request = new CharacterRequest
         {
             Character = new PlayerCharacter
@@ -72,7 +117,7 @@ internal static class Program
                 BaseCharacter = new BaseCharacter
                 {
                     Id = characterId.ToString(),
-                    Name = $"ConsoleHero-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
+                    Name = $"{player.DisplayName}-Hero",
                     Level = 1,
                     MaxHealth = 100,
                     CurrentHealth = 100,
@@ -98,14 +143,13 @@ internal static class Program
         };
 
         var response = await client.CreateCharacterAsync(request);
-        var createdCharacterId = Guid.Parse(response.CharacterId);
-
-        return new CharacterSession(createdCharacterId, sessionId);
+        return Guid.Parse(response.CharacterId);
     }
 
     private sealed class CharacterConsoleController
     {
-        private readonly CharacterService.CharacterServiceClient _client;
+    private readonly CharacterService.CharacterServiceClient _client;
+    private readonly SessionService.SessionServiceClient _sessionClient;
         private readonly CharacterSession _session;
         private readonly object _drawLock = new();
 
@@ -123,11 +167,18 @@ internal static class Program
     private static readonly TimeSpan InputReleaseDelay = TimeSpan.FromMilliseconds(200);
     private DateTime _lastMovementInput = DateTime.MinValue;
     private DateTime _lastRotationInput = DateTime.MinValue;
+    private DateTime _lastHeartbeat = DateTime.MinValue;
 
-        public CharacterConsoleController(CharacterService.CharacterServiceClient client, CharacterSession session)
+        public CharacterConsoleController(
+            CharacterService.CharacterServiceClient client,
+            SessionService.SessionServiceClient sessionClient,
+            CharacterSession session)
         {
             _client = client;
+            _sessionClient = sessionClient;
             _session = session;
+
+            LogInfo($"Gracz {_session.PlayerName} rozpoczął sesję {_session.SessionId}.");
         }
 
         public async Task RunAsync()
@@ -137,6 +188,8 @@ internal static class Program
                 var keys = PollKeys();
                 await ProcessKeysAsync(keys);
                 UpdatePosition();
+
+                await MaybeSendHeartbeatAsync(DateTime.UtcNow);
 
                 lock (_drawLock)
                 {
@@ -377,13 +430,72 @@ internal static class Program
             _position = (newX, newY);
         }
 
+        private async Task MaybeSendHeartbeatAsync(DateTime now)
+        {
+            if (now - _lastHeartbeat < HeartbeatInterval)
+            {
+                return;
+            }
+
+            await SendHeartbeatAsync(now);
+        }
+
+        private async Task SendHeartbeatAsync(DateTime timestamp)
+        {
+            try
+            {
+                await _sessionClient.HeartbeatSessionAsync(new SessionHeartbeatRequest
+                {
+                    SessionId = _session.SessionId.ToString(),
+                    Location = new Location
+                    {
+                        X = _position.x,
+                        Y = _position.y,
+                        Z = 0
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                LogError($"Heartbeat failed: {ex.Message}");
+            }
+            finally
+            {
+                _lastHeartbeat = timestamp;
+            }
+        }
+
         private async Task ShutdownAsync()
         {
             await ReleaseMovementAsync();
             await ReleaseRotationAsync();
+
+            try
+            {
+                await _sessionClient.EndSessionAsync(new EndSessionRequest
+                {
+                    SessionId = _session.SessionId.ToString()
+                });
+
+                LogInfo($"Sesja {_session.SessionId} została zakończona.");
+            }
+            catch (Exception ex)
+            {
+                LogError($"Zamknięcie sesji nie powiodło się: {ex.Message}");
+            }
         }
 
         private void LogError(string message)
+        {
+            EnqueueMessage($"Błąd: {message}");
+        }
+
+        private void LogInfo(string message)
+        {
+            EnqueueMessage(message);
+        }
+
+        private void EnqueueMessage(string message)
         {
             lock (_drawLock)
             {
@@ -430,6 +542,8 @@ internal static class Program
                 .AppendLine("  Enter – zatrzymaj rotację")
                 .AppendLine("  Esc – zakończ aplikację")
                 .AppendLine()
+                .AppendLine($"Gracz: {_session.PlayerName}")
+                .AppendLine($"Sesja: {_session.SessionId}")
                 .AppendLine($"Postać: {_session.CharacterId}")
                 .AppendLine($"Pozycja: {_position.x},{_position.y}")
                 .AppendLine($"Facing: {_facingDirection}")
@@ -465,5 +579,7 @@ internal static class Program
         }
     }
 
-    private sealed record CharacterSession(Guid CharacterId, Guid SessionId);
+    private sealed record CharacterSession(Guid CharacterId, Guid SessionId, Guid PlayerId, string PlayerName);
+
+    private sealed record PlayerProfile(Guid PlayerId, string DisplayName);
 }

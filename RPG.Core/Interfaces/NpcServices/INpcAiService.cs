@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,4 +12,5 @@ public interface INpcAiService
     Task<IReadOnlyList<AiEvaluationResult>> TickAsync(CancellationToken cancellationToken = default);
     IReadOnlyCollection<NpcStateSnapshot> GetNpcSnapshots();
     IReadOnlyCollection<AiEvaluationResult> GetLastEvaluations();
+    void RegisterExternalThreat(Guid npcId, Guid characterId, float threatAmount, float? distance = null);
 }

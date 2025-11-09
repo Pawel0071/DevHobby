@@ -11,10 +11,10 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' "/>
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' "/>
   <ItemGroup>
-  <Protobuf Include="Protos\character.proto" GrpcServices="Server,Client"/>
-    <Protobuf Include="Protos\session.proto" GrpcServices="Server"/>
-    <Protobuf Include="Protos\world.proto" GrpcServices="Server"/>
-    <Protobuf Include="Protos\interaction.proto" GrpcServices="Server"/>
+  <Protobuf Include="Protos\character.proto" GrpcServices="Server,Client" ProtoRoot="Protos" />
+    <Protobuf Include="Protos\session.proto" GrpcServices="Server" ProtoRoot="Protos" />
+    <Protobuf Include="Protos\world.proto" GrpcServices="Server" ProtoRoot="Protos" />
+    <Protobuf Include="Protos\interaction.proto" GrpcServices="Server" ProtoRoot="Protos" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +34,19 @@
   <ItemGroup>
     <Content Include="..\.dockerignore">
       <Link>.dockerignore</Link>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="../RPG.Infrastructure/appsettings.infrastructure.json">
+      <Link>appsettings.infrastructure.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../RPG.Infrastructure/appsettings.infrastructure.Development.json">
+      <Link>appsettings.infrastructure.Development.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 

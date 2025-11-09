@@ -12,7 +12,7 @@ builder.Configuration
     .AddJsonFile("../RPG.Infrastructure/appsettings.infrastructure.json", true, true);
 
 // Register Infrastructure (MongoDB, Redis, Logging, etc.)
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.ApplicationName);
 
 // Register warm-up strategies
 foreach (var mapping in DocumentMappingRegistry.All)

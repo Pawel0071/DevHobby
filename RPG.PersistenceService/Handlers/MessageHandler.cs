@@ -1,6 +1,6 @@
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
 using RPG.Infrastructure.Documents;
+using RPG.Infrastructure.Interfaces;
 using RPG.PersistenceService.Helpers;
 using RPG.PersistenceService.Services;
 
@@ -11,13 +11,13 @@ namespace RPG.PersistenceService.Handlers;
 /// </summary>
 public class MessageHandler
 {
-    private readonly ILogger<MessageHandler> _logger;
+    private readonly RPG.Infrastructure.Interfaces.ILogger<MessageHandler> _logger;
     private readonly Dictionary<string, IDocumentPersistenceStrategy> _strategies;
     private readonly IServiceProvider _serviceProvider;
 
     public MessageHandler(
-        IEnumerable<IDocumentPersistenceStrategy> strategies,
-        ILogger<MessageHandler> logger,
+    IEnumerable<IDocumentPersistenceStrategy> strategies,
+    RPG.Infrastructure.Interfaces.ILogger<MessageHandler> logger,
         IServiceProvider serviceProvider)
     {
         _logger = logger;
@@ -26,7 +26,7 @@ public class MessageHandler
         
         foreach (var strategy in _strategies)
         {
-            _logger.LogDebug($"Registered persistence strategy for collection: {strategy.Key}");
+            _logger.Debug($"Registered persistence strategy for collection: {strategy.Key}");
         }
     }
 
@@ -37,18 +37,18 @@ public class MessageHandler
             var collectionName = DocumentTypeMapper.GetCollectionNameFromRoutingKey(routingKey);
             var operation = DetermineOperation(routingKey);
 
-            _logger.LogDebug($"Processing message. Collection={collectionName}, Operation={operation}, RoutingKey={routingKey}");
+            _logger.Info($"Processing message. Collection={collectionName}, Operation={operation}, RoutingKey={routingKey}");
 
             if (!_strategies.TryGetValue(collectionName, out var strategy))
             {
-                _logger.LogWarning($"No persistence strategy found for collection: {collectionName}");
+                _logger.Warn($"No persistence strategy found for collection: {collectionName}");
                 return;
             }
 
             var documentType = DocumentTypeMapper.GetDocumentTypeFromCollectionName(collectionName);
             if (documentType == null)
             {
-                _logger.LogWarning($"No document type mapping found for collection: {collectionName}");
+                _logger.Warn($"No document type mapping found for collection: {collectionName}");
                 return;
             }
             
@@ -56,7 +56,7 @@ public class MessageHandler
 
             if (document == null)
             {
-                _logger.LogWarning("Failed to deserialize message to a known document type.");
+                _logger.Warn("Failed to deserialize message to a known document type.");
                 return;
             }
 
@@ -71,7 +71,7 @@ public class MessageHandler
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error processing message. RoutingKey={routingKey}");
+            _logger.Error($"Error processing message. RoutingKey={routingKey}", ex);
             throw;
         }
     }
@@ -84,7 +84,7 @@ public class MessageHandler
     {
         var id = document.Id.ToString();
         await strategy.DeleteAsync(id, cancellationToken);
-        _logger.LogDebug($"Document deleted from MongoDB: {collectionName}/{id}");
+        _logger.Info($"Document deleted from MongoDB: {collectionName}/{id}");
     }
 
     private async Task HandleUpsertAsync(
@@ -94,7 +94,7 @@ public class MessageHandler
         CancellationToken cancellationToken)
     {
         await strategy.UpsertAsync(document, cancellationToken);
-        _logger.LogDebug($"Document upserted to MongoDB: {collectionName}/{document.Id}");
+        _logger.Info($"Document upserted to MongoDB: {collectionName}/{document.Id}");
     }
 
     private static string DetermineOperation(string routingKey)

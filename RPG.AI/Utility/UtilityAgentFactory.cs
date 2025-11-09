@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RPG.AI.Utility.Actions;
+using RPG.Domain.Entities.Npcs.NpcComponents;
 using RPG.Domain.Entities.Skills;
 
 namespace RPG.AI.Utility;
@@ -34,6 +35,13 @@ public static class UtilityAgentFactory
                 "return-to-spawn",
                 settings.ReturnToSpawnTolerance,
                 weight: 2f))
+            .Register(UtilityActionCatalog.Patrol(
+                "patrol-route",
+                settings.PatrolRadius,
+                settings.PatrolWaypointCount,
+                settings.PatrolStopDistance,
+                settings.PatrolDwellTime,
+                weight: 1.5f))
             .Register(UtilityActionCatalog.Idle("idle", settings.IdleAnimation, weight: 0.5f));
     }
 
@@ -70,6 +78,13 @@ public static class UtilityAgentFactory
                 "return",
                 settings.ReturnToSpawnTolerance,
                 weight: 1f))
+            .Register(UtilityActionCatalog.Patrol(
+                "patrol-route",
+                settings.PatrolRadius,
+                settings.PatrolWaypointCount,
+                settings.PatrolStopDistance,
+                settings.PatrolDwellTime,
+                weight: 1.2f))
             .Register(UtilityActionCatalog.Idle("idle", settings.IdleAnimation, weight: 0.2f));
     }
 
@@ -113,6 +128,13 @@ public static class UtilityAgentFactory
                 "return",
                 settings.ReturnToSpawnTolerance,
                 weight: 1f))
+            .Register(UtilityActionCatalog.Patrol(
+                "patrol-route",
+                settings.PatrolRadius,
+                settings.PatrolWaypointCount,
+                settings.PatrolStopDistance,
+                settings.PatrolDwellTime,
+                weight: 1.1f))
             .Register(UtilityActionCatalog.Idle("idle", settings.IdleAnimation, weight: 0.2f));
     }
 
@@ -156,23 +178,81 @@ public static class UtilityAgentFactory
                 "reset",
                 settings.ReturnToSpawnTolerance,
                 weight: 1f))
+            .Register(UtilityActionCatalog.Patrol(
+                "patrol-route",
+                settings.PatrolRadius,
+                settings.PatrolWaypointCount,
+                settings.PatrolStopDistance,
+                settings.PatrolDwellTime,
+                weight: 1.5f))
             .Register(UtilityActionCatalog.Idle("idle", settings.BossIdleAnimation, weight: 0.2f));
     }
 
-    public static UtilityAgent CreateFriendlyMerchant(float interactionRange, IEnumerable<Guid> quests, UtilityAgentSettings? settings = null)
+    public static UtilityAgent CreateFriendlyMerchant(
+        DialogueComponent? dialogue,
+        MerchantComponent? merchant,
+        QuestGiverComponent? questGiver,
+        UtilityAgentSettings? settings = null)
     {
         settings ??= UtilityAgentSettings.Default;
-        var questArray = quests?.ToArray() ?? Array.Empty<Guid>();
+        var interactionRange = settings.InteractionRange;
+        var scriptName = string.IsNullOrWhiteSpace(dialogue?.DialogueScript)
+            ? settings.DialogueScript
+            : dialogue!.DialogueScript;
+    var dialogueParameters = ToDialogueParameters(dialogue);
+        var questArray = questGiver?.AvailableQuests?.ToArray() ?? settings.DefaultQuestIds.ToArray();
 
-        return new UtilityAgent("friendly-merchant")
+        var agent = new UtilityAgent("friendly-merchant")
             .Register(UtilityActionCatalog.AcquireTarget("await-player", interactionRange, weight: 2f))
-            .Register(UtilityActionCatalog.Dialogue("greet", settings.DialogueScript, interactionRange, weight: 3f))
-            .Register(UtilityActionCatalog.OpenMerchant("open-merchant", interactionRange, weight: 4f))
-            .Register(UtilityActionCatalog.OfferQuest("offer-quest", questArray, interactionRange, weight: 2f))
-            .Register(UtilityActionCatalog.Idle("idle", settings.IdleAnimation, weight: 0.5f));
+            .Register(UtilityActionCatalog.Dialogue("greet", scriptName, interactionRange, dialogueParameters, weight: 3f))
+            .Register(UtilityActionCatalog.React("acknowledge", "wave", weight: 1.2f));
+
+        if (merchant != null)
+        {
+            agent.Register(UtilityActionCatalog.OpenMerchant("open-merchant", interactionRange, weight: 4f));
+        }
+
+        if (questArray.Length > 0)
+        {
+            agent.Register(UtilityActionCatalog.OfferQuest("offer-quest", questArray, interactionRange, weight: 2f));
+        }
+
+        return agent.Register(UtilityActionCatalog.Idle("idle", settings.IdleAnimation, weight: 0.5f));
     }
 
-    public static UtilityAgent? GetByName(string scriptName, IDictionary<string, Skill> skills, UtilityAgentSettings? settings = null)
+    public static UtilityAgent CreateFriendlyGreeter(
+        DialogueComponent? dialogue,
+        QuestGiverComponent? questGiver,
+        UtilityAgentSettings? settings = null)
+    {
+        settings ??= UtilityAgentSettings.Default;
+        var interactionRange = settings.InteractionRange;
+        var scriptName = string.IsNullOrWhiteSpace(dialogue?.DialogueScript)
+            ? settings.DialogueScript
+            : dialogue!.DialogueScript;
+    var dialogueParameters = ToDialogueParameters(dialogue);
+        var questArray = questGiver?.AvailableQuests?.ToArray() ?? Array.Empty<Guid>();
+
+        var agent = new UtilityAgent("friendly")
+            .Register(UtilityActionCatalog.AcquireTarget("await-player", interactionRange, weight: 2f))
+            .Register(UtilityActionCatalog.Dialogue("greet", scriptName, interactionRange, dialogueParameters, weight: 3.5f))
+            .Register(UtilityActionCatalog.React("respond", "nod", weight: 1.5f));
+
+        if (questArray.Length > 0)
+        {
+            agent.Register(UtilityActionCatalog.OfferQuest("offer-quest", questArray, interactionRange, weight: 2.5f));
+        }
+
+        return agent.Register(UtilityActionCatalog.Idle("idle", settings.IdleAnimation, weight: 0.6f));
+    }
+
+    public static UtilityAgent? GetByName(
+        string scriptName,
+        IDictionary<string, Skill> skills,
+        UtilityAgentSettings? settings = null,
+        DialogueComponent? dialogue = null,
+        MerchantComponent? merchant = null,
+        QuestGiverComponent? questGiver = null)
     {
         settings ??= UtilityAgentSettings.Default;
         var lookup = scriptName.ToLowerInvariant();
@@ -191,9 +271,11 @@ public static class UtilityAgentFactory
                 RequireSkill(skills, "power-attack"),
                 RequireSkill(skills, "basic-attack"),
                 settings),
-            "friendly-merchant" => CreateFriendlyMerchant(settings.InteractionRange, Array.Empty<Guid>(), settings),
-            "friendly-questgiver" => CreateFriendlyMerchant(settings.InteractionRange, settings.DefaultQuestIds, settings),
-            "friendly-greeter" or "friendly" => CreateFriendlyMerchant(settings.InteractionRange, Array.Empty<Guid>(), settings),
+            "friendly-merchant" => merchant != null
+                ? CreateFriendlyMerchant(dialogue, merchant, questGiver, settings)
+                : CreateFriendlyGreeter(dialogue, questGiver, settings),
+            "friendly-questgiver" => CreateFriendlyMerchant(dialogue, merchant, questGiver, settings),
+            "friendly-greeter" or "friendly" => CreateFriendlyGreeter(dialogue, questGiver, settings),
             _ => null
         };
     }
@@ -206,6 +288,19 @@ public static class UtilityAgentFactory
         }
 
         return skill;
+    }
+
+    private static IDictionary<string, object?> ToDialogueParameters(DialogueComponent? dialogue)
+    {
+        if (dialogue?.ScriptParameters is { Count: > 0 })
+        {
+            return dialogue.ScriptParameters.ToDictionary(
+                kvp => kvp.Key,
+                kvp => (object?)kvp.Value,
+                StringComparer.OrdinalIgnoreCase);
+        }
+
+        return new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
     }
 }
 
@@ -236,6 +331,10 @@ public sealed record UtilityAgentSettings(
     float BossChaseRange,
     float BossAggroRadius,
     float ReturnToSpawnTolerance,
+    float PatrolRadius,
+    int PatrolWaypointCount,
+    float PatrolStopDistance,
+    TimeSpan PatrolDwellTime,
     string? IdleAnimation,
     string BossIdleAnimation,
     string DialogueScript,
@@ -269,6 +368,10 @@ public sealed record UtilityAgentSettings(
         BossChaseRange: 45f,
         BossAggroRadius: 40f,
         ReturnToSpawnTolerance: 1f,
+    PatrolRadius: 8f,
+    PatrolWaypointCount: 6,
+    PatrolStopDistance: 0.75f,
+    PatrolDwellTime: TimeSpan.FromSeconds(2),
         IdleAnimation: "idle",
         BossIdleAnimation: "taunt",
         DialogueScript: "merchant-greeting",

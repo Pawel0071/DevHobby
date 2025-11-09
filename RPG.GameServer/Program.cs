@@ -1,7 +1,4 @@
-using OpenTelemetry.Exporter;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
+using System.IO;
 using RPG.Abstractions;
 using RPG.Abstractions.Interfaces;
 using RPG.Application;
@@ -18,41 +15,34 @@ using RPG.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var environmentName = builder.Environment.EnvironmentName;
+
 builder.Configuration
-    .AddJsonFile("appsettings.json", false, true)
-    .AddJsonFile("../RPG.Infrastructure/appsettings.infrastructure.json", true, true)
-    .AddJsonFile("../RPG.Core/appsettings.core.json", true, true)
-    .AddJsonFile("../RPG.Application/appsettings.application.json", true, true);
+    .SetBasePath(builder.Environment.ContentRootPath)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+var infrastructureCandidates = new[]
+{
+    Path.Combine(AppContext.BaseDirectory, "appsettings.infrastructure.json"),
+    Path.Combine(AppContext.BaseDirectory, $"appsettings.infrastructure.{environmentName}.json"),
+    Path.Combine(builder.Environment.ContentRootPath, "..", "RPG.Infrastructure", "appsettings.infrastructure.json"),
+    Path.Combine(builder.Environment.ContentRootPath, "..", "RPG.Infrastructure", $"appsettings.infrastructure.{environmentName}.json")
+};
+
+foreach (var candidate in infrastructureCandidates)
+{
+    if (File.Exists(candidate))
+    {
+        builder.Configuration.AddJsonFile(candidate, optional: false, reloadOnChange: true);
+    }
+}
 
 // gRPC
 builder.Services.AddGrpc();
 
-// OpenTelemetry - Tracing i Metrics
-var otlpEndpoint = builder.Configuration.GetValue<string>("OpenTelemetry:OtlpEndpoint") ?? "http://localhost:4317";
-
-builder.Services.AddOpenTelemetry()
-    .ConfigureResource(resource => resource
-        .AddService("RPG.GameServer", serviceVersion: "1.0.0"))
-    .WithTracing(tracing => tracing
-        .AddSource("RPG.GameServer") // Nasz ActivitySource z OpenTelemetryActivityScope
-        .AddAspNetCoreInstrumentation(options =>
-        {
-            options.RecordException = true;
-            options.Filter = context => !context.Request.Path.StartsWithSegments("/health");
-        })
-        .AddGrpcClientInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddOtlpExporter(options =>
-        {
-            options.Endpoint = new Uri(otlpEndpoint);
-            options.Protocol = OtlpExportProtocol.Grpc;
-        }))
-    .WithMetrics(metrics => metrics
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddPrometheusExporter());
-
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.ApplicationName);
 builder.Services.AddCore(builder.Configuration);
 builder.Services.AddApplication(builder.Configuration);
 

@@ -513,6 +513,37 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
             };
         }
 
+        if (documentType == typeof(GameSessionDocument))
+        {
+            return new GameSessionDocument
+            {
+                Id = Guid.NewGuid(),
+                PlayerId = Guid.NewGuid(),
+                CharacterId = Guid.NewGuid(),
+                Status = "Active",
+                StartedAt = DateTime.UtcNow.AddMinutes(-10),
+                LastActivityAt = DateTime.UtcNow,
+                IpAddress = "127.0.0.1",
+                ServerRegion = "eu-central",
+                ClientVersion = "1.0.0",
+                CurrentWorldId = Guid.NewGuid(),
+                CurrentZoneId = "zone-1",
+                CurrentLocation = new LocationData { X = 1, Y = 2, Z = 3 },
+                SessionDurationSeconds = 600,
+                ActionsPerformed = 5,
+                MonstersKilled = 3,
+                QuestsCompleted = 1,
+                GoldEarned = 100,
+                ExperienceGained = 250,
+                PartyId = Guid.NewGuid(),
+                IsPartyLeader = true,
+                CurrentInstanceId = Guid.NewGuid(),
+                IsAfk = false,
+                IsInCombat = false,
+                DisconnectCount = 0
+            };
+        }
+
         if (documentType == typeof(MapObjectDocument))
         {
             return new MapObjectDocument

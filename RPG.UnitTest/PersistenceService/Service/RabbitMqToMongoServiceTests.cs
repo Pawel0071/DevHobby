@@ -4,6 +4,7 @@ using RPG.Infrastructure.Interfaces;
 using RPG.PersistenceService.Handlers;
 using RPG.PersistenceService.Service;
 using RPG.PersistenceService.Services;
+using MessageLogger = RPG.Infrastructure.Interfaces.ILogger<RPG.PersistenceService.Handlers.MessageHandler>;
 
 namespace RPG.UnitTest.PersistenceService.Service;
 
@@ -39,7 +40,7 @@ public class RabbitMqToMongoServiceTests
 
     private static MessageHandler CreateMessageHandler()
     {
-        var loggerMock = new Mock<Microsoft.Extensions.Logging.ILogger<MessageHandler>>();
+        var loggerMock = new Mock<MessageLogger>();
         var spMock = new Mock<IServiceProvider>();
         return new MessageHandler(Array.Empty<IDocumentPersistenceStrategy>(), loggerMock.Object, spMock.Object);
     }

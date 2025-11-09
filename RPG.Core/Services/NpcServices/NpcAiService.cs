@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using RPG.AI.Core;
 using RPG.AI.Directives;
@@ -9,6 +11,7 @@ using RPG.Core.Interfaces;
 using RPG.Core.Interfaces.NpcServices;
 using RPG.Abstractions.Interfaces;
 using RPG.Domain.Entities;
+using RPG.Domain.Entities.Items;
 using RPG.Domain.Entities.Npcs;
 using RPG.Domain.Entities.Npcs.NpcComponents;
 using RPG.Domain.Entities.Skills;
@@ -49,6 +52,7 @@ public sealed class NpcAiService : INpcAiService
     private readonly IMovementService _movementService;
     private readonly ICharacterStateBroadcaster _stateBroadcaster;
     private readonly INpcCombatService _combatService;
+    private readonly IRabbitMqPublisher _publisher;
     private readonly ILogger<NpcAiService> _logger;
     private readonly UtilityAgentSettings _settings;
     private readonly ConcurrentDictionary<Guid, Npc> _npcs = new();
@@ -62,14 +66,16 @@ public sealed class NpcAiService : INpcAiService
     public NpcAiService(
         IDocumentRepository documentRepository,
         IMovementService movementService,
-    ICharacterStateBroadcaster stateBroadcaster,
+        ICharacterStateBroadcaster stateBroadcaster,
         INpcCombatService combatService,
+        IRabbitMqPublisher publisher,
         ILogger<NpcAiService> logger)
     {
         _documentRepository = documentRepository;
         _movementService = movementService;
         _stateBroadcaster = stateBroadcaster;
         _combatService = combatService;
+        _publisher = publisher;
         _logger = logger;
         _settings = UtilityAgentSettings.Default;
     }
@@ -123,6 +129,22 @@ public sealed class NpcAiService : INpcAiService
     public IReadOnlyCollection<AiEvaluationResult> GetLastEvaluations()
     {
         return _lastEvaluations;
+    }
+
+    public void RegisterExternalThreat(Guid npcId, Guid characterId, float threatAmount, float? distance = null)
+    {
+        if (npcId == Guid.Empty || characterId == Guid.Empty)
+        {
+            return;
+        }
+
+        if (threatAmount <= 0f)
+        {
+            return;
+        }
+
+        var entry = BoostThreat(npcId, characterId, threatAmount, distance);
+        _logger.Debug($"Registered external threat {entry.Score:0.##} for NPC {npcId} from character {characterId}.");
     }
 
     private async Task EnsureNpcCacheAsync(CancellationToken cancellationToken)
@@ -528,6 +550,22 @@ public sealed class NpcAiService : INpcAiService
                     ExecuteIdle(npc, log);
                     break;
 
+                case AiDirectiveType.BeginDialogue:
+                    await ExecuteBeginDialogueAsync(npc, context, directive, log, cancellationToken).ConfigureAwait(false);
+                    break;
+
+                case AiDirectiveType.OpenShop:
+                    await ExecuteOpenShopAsync(npc, context, directive, log, cancellationToken).ConfigureAwait(false);
+                    break;
+
+                case AiDirectiveType.OfferQuest:
+                    await ExecuteOfferQuestAsync(npc, context, directive, log, cancellationToken).ConfigureAwait(false);
+                    break;
+
+                case AiDirectiveType.Reaction:
+                    await ExecuteReactionAsync(npc, context, directive, log, cancellationToken).ConfigureAwait(false);
+                    break;
+
                 default:
                     log.Add($"No runtime handler for directive '{directive.Type}'.");
                     break;
@@ -759,6 +797,155 @@ public sealed class NpcAiService : INpcAiService
         log.Add($"Using skill '{skillName}' ({skillIdText}) targeting {targetDescription}.");
     }
 
+    private async Task ExecuteBeginDialogueAsync(
+        Npc npc,
+        AiContext context,
+        AiDirective directive,
+        ICollection<string> log,
+        CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+
+        var targetId = directive.TargetId ?? context.Target?.Id;
+        if (targetId is null)
+        {
+            log.Add("BeginDialogue directive skipped: target not available.");
+            return;
+        }
+
+        var dialogue = npc.Components.OfType<DialogueComponent>().FirstOrDefault();
+        var scriptName = !string.IsNullOrWhiteSpace(directive.ScriptName)
+            ? directive.ScriptName!
+            : !string.IsNullOrWhiteSpace(dialogue?.DialogueScript)
+                ? dialogue!.DialogueScript
+                : _settings.DialogueScript;
+
+    var baseParameters = ToParameterDictionary(dialogue?.ScriptParameters);
+        var parameters = MergeParameters(baseParameters, directive.Metadata);
+
+        var message = new NpcDialogueMessage(
+            npc.Id,
+            targetId,
+            scriptName,
+            parameters,
+            DateTime.UtcNow);
+
+        await _publisher.PublishAsync("npc.interaction.dialogue", message).ConfigureAwait(false);
+
+        context.SetBlackboardValue("activeDialogueScript", scriptName);
+        log.Add($"Initiated dialogue '{scriptName}' with character {targetId}.");
+    }
+
+    private async Task ExecuteOpenShopAsync(
+        Npc npc,
+        AiContext context,
+        AiDirective directive,
+        ICollection<string> log,
+        CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+
+        var targetId = directive.TargetId ?? context.Target?.Id;
+        if (targetId is null)
+        {
+            log.Add("OpenShop directive skipped: target not available.");
+            return;
+        }
+
+        var merchant = npc.Components.OfType<MerchantComponent>().FirstOrDefault();
+        if (merchant == null)
+        {
+            log.Add("OpenShop directive skipped: NPC lacks merchant component.");
+            return;
+        }
+
+        var items = BuildMerchantInventorySnapshot(merchant);
+        var message = new NpcTradeOfferMessage(
+            npc.Id,
+            targetId,
+            items,
+            merchant.GlobalPriceModifier == 0 ? 1f : merchant.GlobalPriceModifier,
+            DateTime.UtcNow);
+
+        await _publisher.PublishAsync("npc.interaction.trade", message).ConfigureAwait(false);
+
+        context.SetBlackboardValue("merchantSession", targetId.Value);
+        log.Add($"Opened merchant interface for character {targetId} with {items.Count} items available.");
+    }
+
+    private async Task ExecuteOfferQuestAsync(
+        Npc npc,
+        AiContext context,
+        AiDirective directive,
+        ICollection<string> log,
+        CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+
+        var targetId = directive.TargetId ?? context.Target?.Id;
+        if (targetId is null)
+        {
+            log.Add("OfferQuest directive skipped: target not available.");
+            return;
+        }
+
+        var questGiver = npc.Components.OfType<QuestGiverComponent>().FirstOrDefault();
+        var questIds = ExtractQuestIds(directive.Metadata)
+            ?? (questGiver?.AvailableQuests as IEnumerable<Guid>)
+            ?? Array.Empty<Guid>();
+
+        var questArray = questIds.ToArray();
+        if (questArray.Length == 0)
+        {
+            log.Add("OfferQuest directive skipped: no quests available.");
+            return;
+        }
+
+        var message = new NpcQuestOfferMessage(
+            npc.Id,
+            targetId,
+            questArray,
+            DateTime.UtcNow);
+
+        await _publisher.PublishAsync("npc.interaction.quest", message).ConfigureAwait(false);
+
+        log.Add($"Offered {questArray.Length} quest(s) to character {targetId}.");
+    }
+
+    private async Task ExecuteReactionAsync(
+        Npc npc,
+        AiContext context,
+        AiDirective directive,
+        ICollection<string> log,
+        CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+
+        var reaction = directive.Metadata != null && directive.Metadata.TryGetValue("reaction", out var value)
+            ? Convert.ToString(value, CultureInfo.InvariantCulture)
+            : null;
+
+        if (string.IsNullOrWhiteSpace(reaction))
+        {
+            log.Add("Reaction directive skipped: missing reaction type.");
+            return;
+        }
+
+        var targetId = directive.TargetId ?? context.Target?.Id;
+        var metadata = ConvertMetadataToStrings(directive.Metadata);
+
+        var message = new NpcReactionMessage(
+            npc.Id,
+            targetId,
+            reaction!,
+            DateTime.UtcNow,
+            metadata);
+
+        await _publisher.PublishAsync("npc.interaction.reaction", message).ConfigureAwait(false);
+
+        log.Add($"Performed reaction '{reaction}' targeting {(targetId?.ToString() ?? "world")}.");
+    }
+
     private ThreatEntry BoostThreat(Guid npcId, Guid targetId, float bonus, float? distance = null)
     {
         var table = _threatTables.GetOrAdd(npcId, _ => new Dictionary<Guid, ThreatEntry>());
@@ -785,6 +972,140 @@ public sealed class NpcAiService : INpcAiService
 
         table[targetId] = created;
         return created;
+    }
+
+    private static IReadOnlyDictionary<string, object?> ToParameterDictionary(Dictionary<string, object>? source)
+    {
+        if (source is { Count: > 0 })
+        {
+            return source.ToDictionary(
+                pair => pair.Key,
+                pair => (object?)pair.Value,
+                StringComparer.OrdinalIgnoreCase);
+        }
+
+        return new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static Dictionary<string, string> MergeParameters(
+        IReadOnlyDictionary<string, object?> baseParameters,
+        IReadOnlyDictionary<string, object?>? overrides)
+    {
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var pair in baseParameters)
+        {
+            result[pair.Key] = ToInvariantString(pair.Value);
+        }
+
+        if (overrides != null)
+        {
+            foreach (var pair in overrides)
+            {
+                result[pair.Key] = ToInvariantString(pair.Value);
+            }
+        }
+
+        return result;
+    }
+
+    private static List<MerchantItemSnapshot> BuildMerchantInventorySnapshot(MerchantComponent merchant)
+    {
+        var items = new List<MerchantItemSnapshot>(merchant.MerchantInventory.Count);
+
+        foreach (var slot in merchant.MerchantInventory)
+        {
+            if (slot.IsEmpty || slot.Item is not { } item)
+            {
+                continue;
+            }
+
+            var quantity = Math.Max(1, slot.Quantity);
+            var modifier = ResolvePriceModifier(merchant, item);
+            items.Add(new MerchantItemSnapshot(item.Id, item.Name, quantity, modifier));
+        }
+
+        return items;
+    }
+
+    private static float ResolvePriceModifier(MerchantComponent merchant, Item item)
+    {
+        if (merchant.PriceModifiers is { Count: > 0 })
+        {
+            var idKey = item.Id.ToString("N", CultureInfo.InvariantCulture);
+            if (merchant.PriceModifiers.TryGetValue(idKey, out var byId))
+            {
+                return byId;
+            }
+
+            if (!string.IsNullOrWhiteSpace(item.Name))
+            {
+                var nameKey = item.Name.ToLowerInvariant();
+                if (merchant.PriceModifiers.TryGetValue(nameKey, out var byName))
+                {
+                    return byName;
+                }
+            }
+        }
+
+        return merchant.GlobalPriceModifier == 0 ? 1f : merchant.GlobalPriceModifier;
+    }
+
+    private static IEnumerable<Guid>? ExtractQuestIds(IReadOnlyDictionary<string, object?>? metadata)
+    {
+        if (metadata == null || !metadata.TryGetValue("quests", out var value) || value == null)
+        {
+            return null;
+        }
+
+        return value switch
+        {
+            IEnumerable<Guid> guidEnumerable => guidEnumerable,
+            IEnumerable<object> objects => objects
+                .Select(TryConvertGuid)
+                .Where(guid => guid != Guid.Empty)
+                .ToArray(),
+            Guid guid => new[] { guid },
+            string s when Guid.TryParse(s, out var parsed) => new[] { parsed },
+            _ => null
+        };
+    }
+
+    private static IReadOnlyDictionary<string, string>? ConvertMetadataToStrings(IReadOnlyDictionary<string, object?>? metadata)
+    {
+        if (metadata == null || metadata.Count == 0)
+        {
+            return null;
+        }
+
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var pair in metadata)
+        {
+            result[pair.Key] = ToInvariantString(pair.Value);
+        }
+
+        return result;
+    }
+
+    private static Guid TryConvertGuid(object value)
+    {
+        return value switch
+        {
+            Guid guid => guid,
+            string s when Guid.TryParse(s, out var parsed) => parsed,
+            _ => Guid.Empty
+        };
+    }
+
+    private static string ToInvariantString(object? value)
+    {
+        return value switch
+        {
+            null => string.Empty,
+            string s => s,
+            IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+            _ => value.ToString() ?? string.Empty
+        };
     }
 
     private void UpdateNpcSnapshot(Npc npc)

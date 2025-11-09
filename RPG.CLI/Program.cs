@@ -42,7 +42,7 @@ var builder = Host.CreateDefaultBuilder(args)
     {
         var configuration = context.Configuration;
 
-        services.AddInfrastructure(configuration);
+    services.AddInfrastructure(configuration, context.HostingEnvironment.ApplicationName);
         services.AddCore(configuration);
         services.AddApplication(configuration);
 

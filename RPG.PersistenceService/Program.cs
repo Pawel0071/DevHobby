@@ -16,7 +16,7 @@ var builder = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
         var configuration = context.Configuration;
-        services.AddInfrastructure(configuration);
+    services.AddInfrastructure(configuration, context.HostingEnvironment.ApplicationName);
 
         foreach (var mapping in DocumentMappingRegistry.All)
         {
@@ -35,10 +35,11 @@ var builder = Host.CreateDefaultBuilder(args)
         // Register MessageHandler
         services.AddSingleton<MessageHandler>();
 
-        // Register RabbitMqToMongoService
-        services.AddSingleton<RabbitMqToMongoService>();
+    // Register RabbitMQ listener service
+    services.AddSingleton<IRabbitMqToMongoService, RabbitMqToMongoService>();
+    services.AddHostedService<RabbitMqListenerHostedService>();
     });
 
-using var host = builder.Build();
-await host.Services.GetRequiredService<RabbitMqToMongoService>().StartListeningAsync();
+var host = builder.Build();
+await host.RunAsync();
 

@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,6 +19,10 @@ using RPG.Infrastructure.Repositories.RabbitMQ;
 using RPG.Infrastructure.Repositories.Redis;
 using RPG.Infrastructure.Repositories.MongoDB;
 using RPG.Infrastructure.Mappers;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using StackExchange.Redis;
 using RPG.Domain.Entities;
@@ -33,11 +38,19 @@ namespace RPG.Infrastructure;
 
 public static class InfrastructureRegistration
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddInfrastructure(
+        this IServiceCollection services,
+        IConfiguration config,
+        string? clientProvidedName = null)
     {
         var rabbitConfig = config.GetSection("RabbitMQ").Get<RabbitMqSettings>();
         var redisConn = config.GetConnectionString("Redis");
         var mongoConn = config.GetConnectionString("Mongo");
+
+        var resolvedClientProvidedName = clientProvidedName
+            ?? config.GetValue<string>("RabbitMQ:ClientProvidedName")
+            ?? config.GetValue<string>("ApplicationName")
+            ?? AppDomain.CurrentDomain.FriendlyName;
 
         // Logger - Konfiguracja Seriloga
         Log.Logger = new LoggerConfiguration()
@@ -47,6 +60,39 @@ public static class InfrastructureRegistration
 
         services.AddSingleton(typeof(ILogger<>), typeof(SerilogWrapper<>));
         services.AddSingleton<IActivityScope, OpenTelemetryActivityScope>();
+
+        // OpenTelemetry - Telemetria wspólna dla usług infrastruktury
+        var otlpEndpoint = config.GetValue<string>("OpenTelemetry:OtlpEndpoint");
+        var serviceName = config.GetValue<string>("OpenTelemetry:ServiceName") ?? "RPG.GameServer";
+        var serviceVersion = config.GetValue<string>("OpenTelemetry:ServiceVersion") ?? "1.0.0";
+
+        services.AddOpenTelemetry()
+            .ConfigureResource(resource => resource.AddService(serviceName, serviceVersion: serviceVersion))
+            .WithTracing(tracing =>
+            {
+                tracing
+                    .AddSource(serviceName)
+                    .AddAspNetCoreInstrumentation(options =>
+                    {
+                        options.RecordException = true;
+                        options.Filter = context => !context.Request.Path.StartsWithSegments("/health");
+                    })
+                    .AddHttpClientInstrumentation()
+                    .AddGrpcClientInstrumentation();
+
+                if (!string.IsNullOrWhiteSpace(otlpEndpoint))
+                {
+                    tracing.AddOtlpExporter(options =>
+                    {
+                        options.Endpoint = new Uri(otlpEndpoint);
+                        options.Protocol = OtlpExportProtocol.Grpc;
+                    });
+                }
+            })
+            .WithMetrics(metrics => metrics
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                .AddPrometheusExporter());
 
         // Redis
         services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -69,6 +115,11 @@ public static class InfrastructureRegistration
                     Password = rabbitConfig.Password,
                     VirtualHost = rabbitConfig.VirtualHost
                 };
+
+                if (!string.IsNullOrWhiteSpace(resolvedClientProvidedName))
+                {
+                    factory.ClientProvidedName = resolvedClientProvidedName;
+                }
                 return factory.CreateConnectionAsync().GetAwaiter().GetResult();
             });
 
@@ -121,7 +172,8 @@ public static class InfrastructureRegistration
         services.AddSingleton<IDocumentMapper<Item, ItemDocument>, ItemDocumentMapper>();
         services.AddSingleton<IDocumentMapper<Skill, SkillDocument>, SkillDocumentMapper>();
         services.AddSingleton<IDocumentMapper<Quest, QuestDocument>, QuestDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<Npc, NpcDocument>, NpcDocumentMapper>();
+    services.AddSingleton<IDocumentMapper<Npc, NpcDocument>, NpcDocumentMapper>();
+    services.AddSingleton<IDocumentMapper<GameSession, GameSessionDocument>, GameSessionDocumentMapper>();
         services.AddSingleton<IDocumentMapper<Player, PlayerDocument>, PlayerDocumentMapper>();
         services.AddSingleton<IDocumentMapper<MapObject, MapObjectDocument>, MapObjectDocumentMapper>();
         services.AddSingleton<IDocumentMapper<WorldState, WorldStateDocument>, WorldStateDocumentMapper>();

@@ -96,12 +96,20 @@ public class NpcAiServiceTests
         log.Should().Contain(entry => entry.StartsWith("Moving towards destination", StringComparison.Ordinal));
     }
 
-    private static (NpcAiService Service, Mock<IDocumentRepository> DocumentRepository, Mock<IMovementService> Movement, Mock<ICharacterStateBroadcaster> Broadcaster, Mock<INpcCombatService> Combat, Mock<ILogger<NpcAiService>> Logger) CreateService()
+    private static (
+        NpcAiService Service,
+        Mock<IDocumentRepository> DocumentRepository,
+        Mock<IMovementService> Movement,
+        Mock<ICharacterStateBroadcaster> Broadcaster,
+        Mock<INpcCombatService> Combat,
+        Mock<IRabbitMqPublisher> Publisher,
+        Mock<ILogger<NpcAiService>> Logger) CreateService()
     {
         var documentRepository = new Mock<IDocumentRepository>();
         var movement = new Mock<IMovementService>();
         var broadcaster = new Mock<ICharacterStateBroadcaster>();
         var combat = new Mock<INpcCombatService>();
+        var publisher = new Mock<IRabbitMqPublisher>();
         var logger = new Mock<ILogger<NpcAiService>>();
 
         broadcaster.Setup(b => b.GetSnapshots()).Returns(Array.Empty<CharacterStateSnapshot>());
@@ -111,8 +119,15 @@ public class NpcAiServiceTests
         movement.Setup(m => m.Stop(It.IsAny<Npc>()))
             .Returns((Npc npc) => ServiceResult<Location>.Ok(npc.CurrentLocation));
 
-        var service = new NpcAiService(documentRepository.Object, movement.Object, broadcaster.Object, combat.Object, logger.Object);
-        return (service, documentRepository, movement, broadcaster, combat, logger);
+        var service = new NpcAiService(
+            documentRepository.Object,
+            movement.Object,
+            broadcaster.Object,
+            combat.Object,
+            publisher.Object,
+            logger.Object);
+
+        return (service, documentRepository, movement, broadcaster, combat, publisher, logger);
     }
 
     private static Task<IReadOnlyList<string>> InvokeExecuteDirectivesAsync(

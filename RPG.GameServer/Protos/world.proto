@@ -1,5 +1,5 @@
 syntax = "proto3";
-import "Protos/character.proto";
+import "character.proto";
 
 option csharp_namespace = "RPG.GameServer.Protos";
 

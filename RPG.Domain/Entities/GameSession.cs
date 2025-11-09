@@ -1,3 +1,4 @@
+using RPG.Domain.Common;
 using RPG.Domain.Enums;
 
 namespace RPG.Domain.Entities;
@@ -7,7 +8,7 @@ namespace RPG.Domain.Entities;
 ///     Tracks player connection, character selection, and session state.
 ///     Pure data entity - logic handled by services.
 /// </summary>
-public class GameSession
+public class GameSession : IDomainEntity
 {
     private GameSession()
     {
@@ -16,20 +17,20 @@ public class GameSession
         ClientVersion = string.Empty;
     }
 
-    public Guid Id { get; private set; }
-    public Guid PlayerId { get; private set; }
+    public Guid Id { get; set; }
+    public Guid PlayerId { get; set; }
     public Guid? CharacterId { get; set; }
 
     // Session State
     public GameSessionStatus Status { get; set; }
-    public DateTime StartedAt { get; private set; }
+    public DateTime StartedAt { get; set; }
     public DateTime? EndedAt { get; set; }
     public DateTime LastActivityAt { get; set; }
 
     // Connection Info
-    public string IpAddress { get; private set; }
-    public string ServerRegion { get; private set; }
-    public string ClientVersion { get; private set; }
+    public string IpAddress { get; set; }
+    public string ServerRegion { get; set; }
+    public string ClientVersion { get; set; }
 
     // Current State
     public Guid? CurrentWorldId { get; set; }
@@ -65,11 +66,12 @@ public class GameSession
         Guid playerId,
         string ipAddress,
         string serverRegion,
-        string clientVersion)
+        string clientVersion,
+        Guid? sessionId = null)
     {
         return new GameSession
         {
-            Id = Guid.NewGuid(),
+            Id = sessionId ?? Guid.NewGuid(),
             PlayerId = playerId,
             Status = GameSessionStatus.Connected,
             StartedAt = DateTime.UtcNow,
@@ -78,5 +80,36 @@ public class GameSession
             ServerRegion = serverRegion,
             ClientVersion = clientVersion
         };
+    }
+
+    public bool IsActive => Status is GameSessionStatus.Connected or GameSessionStatus.InGame;
+
+    public void AttachCharacter(Guid characterId)
+    {
+        CharacterId = characterId;
+    }
+
+    public void UpdateActivity(DateTime timestamp, Location? location = null)
+    {
+        LastActivityAt = timestamp;
+        if (location != null)
+        {
+            CurrentLocation = location;
+        }
+
+        SessionDurationSeconds = (long)Math.Max(0, (timestamp - StartedAt).TotalSeconds);
+    }
+
+    public void MarkEnded(DateTime timestamp)
+    {
+        Status = GameSessionStatus.Ended;
+        EndedAt = timestamp;
+        UpdateActivity(timestamp);
+    }
+
+    public void MarkDisconnected(DateTime timestamp)
+    {
+        Status = GameSessionStatus.Disconnected;
+        UpdateActivity(timestamp);
     }
 }

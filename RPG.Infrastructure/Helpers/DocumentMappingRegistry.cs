@@ -60,6 +60,12 @@ public static class DocumentMappingRegistry
             DocumentType: typeof(PlayerDocument),
             MapperServiceType: typeof(IDocumentMapper<Player, PlayerDocument>)),
         new(
+            EntityKey: "gamesession",
+            CollectionName: GameSessionDocument.CollectionName,
+            EntityType: typeof(GameSession),
+            DocumentType: typeof(GameSessionDocument),
+            MapperServiceType: typeof(IDocumentMapper<GameSession, GameSessionDocument>)),
+        new(
             EntityKey: "mapobject",
             CollectionName: MapObjectDocument.CollectionName,
             EntityType: typeof(MapObject),
