@@ -1,6 +1,7 @@
 using System.Text;
 using Grpc.Core;
 using Grpc.Net.Client;
+using Microsoft.Extensions.Configuration;
 using RPG.GameServer.Protos;
 using Spectre.Console;
 using Spectre.Console.Rendering;
@@ -9,8 +10,8 @@ namespace RPG.DesktopClient;
 
 internal static class Program
 {
-    private const int BoardWidth = 25;
-    private const int BoardHeight = 13;
+    private const int BoardWidth = 35;
+    private const int BoardHeight = 17;
     private const float StepPerSecond = 5f;
 
     private static readonly Dictionary<int, (int dx, int dy, string arrow)> DirectionVectors = new()
@@ -31,7 +32,15 @@ internal static class Program
         Console.OutputEncoding = Encoding.UTF8;
         Console.TreatControlCAsInput = true;
 
-        var serverAddress = Environment.GetEnvironmentVariable("RPG_GAMESERVER_URL") ?? "http://localhost:5124";
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+            .AddEnvironmentVariables()
+            .Build();
+
+        var serverAddress = configuration.GetValue<string>("GameServer:GrpcAddress")
+                             ?? Environment.GetEnvironmentVariable("RPG_GAMESERVER_URL")
+                             ?? "http://localhost:5124";
 
         using var channel = GrpcChannel.ForAddress(serverAddress);
         var characterClient = new CharacterService.CharacterServiceClient(channel);
@@ -156,9 +165,7 @@ internal static class Program
         private (int x, int y) _position = (BoardWidth / 2, BoardHeight / 2);
         private int _facingDirection = 1;
         private bool _movementActive;
-        private bool _rotationActive;
         private int _movementDirection = 1;
-    private int _rotationDirection = 1;
     private double _movementRemainder;
     private DateTime _lastUpdate = DateTime.UtcNow;
     private bool _isRunning = true;
@@ -166,8 +173,10 @@ internal static class Program
     private const int MaxMessages = 5;
     private static readonly TimeSpan InputReleaseDelay = TimeSpan.FromMilliseconds(200);
     private DateTime _lastMovementInput = DateTime.MinValue;
-    private DateTime _lastRotationInput = DateTime.MinValue;
     private DateTime _lastHeartbeat = DateTime.MinValue;
+        private const int RotationLeftCommand = 7;
+        private const int RotationRightCommand = 3;
+        private const string ArrowColor = "orange1";
 
         public CharacterConsoleController(
             CharacterService.CharacterServiceClient client,
@@ -219,12 +228,10 @@ internal static class Program
             if (keys.Count == 0)
             {
                 await MaybeReleaseMovementAsync(now);
-                await MaybeReleaseRotationAsync(now);
                 return;
             }
 
             var handledMovement = false;
-            var handledRotation = false;
 
             foreach (var keyInfo in keys)
             {
@@ -232,37 +239,36 @@ internal static class Program
                 {
                     case ConsoleKey.W:
                     case ConsoleKey.UpArrow:
-                        await StartMovementAsync(1);
+                        await StartRelativeMovementAsync(MovementIntent.Forward);
                         handledMovement = true;
                         _lastMovementInput = now;
                         break;
                     case ConsoleKey.S:
                     case ConsoleKey.DownArrow:
-                        await StartMovementAsync(5);
+                        await StartRelativeMovementAsync(MovementIntent.Backward);
                         handledMovement = true;
                         _lastMovementInput = now;
                         break;
                     case ConsoleKey.A:
                     case ConsoleKey.LeftArrow:
-                        await StartMovementAsync(7);
+                        await StartRelativeMovementAsync(MovementIntent.StrafeLeft);
                         handledMovement = true;
                         _lastMovementInput = now;
                         break;
                     case ConsoleKey.D:
                     case ConsoleKey.RightArrow:
-                        await StartMovementAsync(3);
+                        await StartRelativeMovementAsync(MovementIntent.StrafeRight);
                         handledMovement = true;
                         _lastMovementInput = now;
                         break;
                     case ConsoleKey.Q:
-                        await StartRotationAsync(7);
-                        handledRotation = true;
-                        _lastRotationInput = now;
+                        await RotateAsync(-1);
                         break;
                     case ConsoleKey.E:
-                        await StartRotationAsync(3);
-                        handledRotation = true;
-                        _lastRotationInput = now;
+                        await RotateAsync(1);
+                        break;
+                    case ConsoleKey.Spacebar:
+                        await ReleaseMovementAsync();
                         break;
                     case ConsoleKey.Escape:
                         await ShutdownAsync();
@@ -275,14 +281,89 @@ internal static class Program
             {
                 await MaybeReleaseMovementAsync(now);
             }
+        }
 
-            if (!handledRotation)
+        private enum MovementIntent
+        {
+            Forward,
+            Backward,
+            StrafeLeft,
+            StrafeRight
+        }
+
+        private static int NormalizeDirection(int direction)
+        {
+            return ((direction - 1 + 8) % 8) + 1;
+        }
+
+        private static int OffsetDirection(int baseDirection, int offset)
+        {
+            return NormalizeDirection(baseDirection + offset);
+        }
+
+        private async Task StartRelativeMovementAsync(MovementIntent intent)
+        {
+            var direction = intent switch
             {
-                await MaybeReleaseRotationAsync(now);
+                MovementIntent.Forward => _facingDirection,
+                MovementIntent.Backward => OffsetDirection(_facingDirection, 4),
+                MovementIntent.StrafeLeft => OffsetDirection(_facingDirection, -2),
+                MovementIntent.StrafeRight => OffsetDirection(_facingDirection, 2),
+                _ => _facingDirection
+            };
+
+            await StartMovementAsync(direction, updateFacing: false);
+        }
+
+        private async Task RotateAsync(int step)
+        {
+            if (step == 0)
+            {
+                return;
+            }
+
+            var rotationCommand = step < 0 ? RotationLeftCommand : RotationRightCommand;
+            var characterId = _session.CharacterId.ToString();
+            var rotationStarted = false;
+
+            try
+            {
+                await _client.StartRotationAsync(new MovementCommandRequest
+                {
+                    CharacterId = characterId,
+                    Direction = rotationCommand
+                });
+
+                rotationStarted = true;
+                _facingDirection = OffsetDirection(_facingDirection, step);
+            }
+            catch (Exception ex)
+            {
+                LogError($"Rotation failed: {ex.Message}");
+            }
+
+            if (rotationStarted)
+            {
+                await StopRotationAsync(characterId);
             }
         }
 
-        private async Task StartMovementAsync(int direction)
+        private async Task StopRotationAsync(string characterId)
+        {
+            try
+            {
+                await _client.StopRotationAsync(new CharacterIdRequest
+                {
+                    CharacterId = characterId
+                });
+            }
+            catch (Exception ex)
+            {
+                LogError($"StopRotation failed: {ex.Message}");
+            }
+        }
+
+        private async Task StartMovementAsync(int direction, bool updateFacing)
         {
             if (!DirectionVectors.ContainsKey(direction))
             {
@@ -301,7 +382,10 @@ internal static class Program
 
                     _movementActive = true;
                     _movementDirection = direction;
-                    _facingDirection = direction;
+                    if (updateFacing)
+                    {
+                        _facingDirection = direction;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -337,64 +421,6 @@ internal static class Program
             if (_movementActive && now - _lastMovementInput > InputReleaseDelay)
             {
                 await ReleaseMovementAsync();
-            }
-        }
-
-        private async Task StartRotationAsync(int direction)
-        {
-            if (!DirectionVectors.ContainsKey(direction))
-            {
-                return;
-            }
-
-            if (!_rotationActive || _rotationDirection != direction)
-            {
-                try
-                {
-                    await _client.StartRotationAsync(new MovementCommandRequest
-                    {
-                        CharacterId = _session.CharacterId.ToString(),
-                        Direction = direction
-                    });
-
-                    _rotationActive = true;
-                    _rotationDirection = direction;
-                    _facingDirection = direction;
-                }
-                catch (Exception ex)
-                {
-                    LogError($"StartRotation failed: {ex.Message}");
-                }
-            }
-        }
-
-        private async Task ReleaseRotationAsync()
-        {
-            if (!_rotationActive)
-            {
-                return;
-            }
-
-            try
-            {
-                await _client.StopRotationAsync(new CharacterIdRequest
-                {
-                    CharacterId = _session.CharacterId.ToString()
-                });
-
-                _rotationActive = false;
-            }
-            catch (Exception ex)
-            {
-                LogError($"StopRotation failed: {ex.Message}");
-            }
-        }
-
-        private async Task MaybeReleaseRotationAsync(DateTime now)
-        {
-            if (_rotationActive && now - _lastRotationInput > InputReleaseDelay)
-            {
-                await ReleaseRotationAsync();
             }
         }
 
@@ -468,7 +494,7 @@ internal static class Program
         private async Task ShutdownAsync()
         {
             await ReleaseMovementAsync();
-            await ReleaseRotationAsync();
+            await StopRotationAsync(_session.CharacterId.ToString());
 
             try
             {
@@ -510,47 +536,67 @@ internal static class Program
 
         private static string BuildBoard((int x, int y) position, int facingDirection)
         {
-            var buffer = new string[BoardHeight];
-            for (var y = 0; y < BoardHeight; y++)
-            {
-                var line = new char[BoardWidth];
-                Array.Fill(line, '.');
-                buffer[y] = new string(line);
-            }
-
             if (!DirectionVectors.TryGetValue(facingDirection, out var vector))
             {
                 vector = DirectionVectors[1];
             }
 
             var arrow = vector.arrow;
-            var sb = new StringBuilder(buffer[position.y]);
-            sb[position.x] = arrow[0];
-            buffer[position.y] = sb.ToString();
+            var boardBuilder = new StringBuilder();
 
-            return string.Join('\n', buffer);
+            for (var y = 0; y < BoardHeight; y++)
+            {
+                for (var x = 0; x < BoardWidth; x++)
+                {
+                    if (x == position.x && y == position.y)
+                    {
+                        boardBuilder.Append('[')
+                                    .Append(ArrowColor)
+                                    .Append(']')
+                                    .Append(arrow)
+                                    .Append("[/]");
+                    }
+                    else
+                    {
+                        boardBuilder.Append("[grey30].[/]");
+                    }
+                }
+
+                if (y < BoardHeight - 1)
+                {
+                    boardBuilder.Append('\n');
+                }
+            }
+
+            return boardBuilder.ToString();
         }
 
         private IRenderable Render()
         {
             var board = BuildBoard(_position, _facingDirection);
+            var facingVector = DirectionVectors.TryGetValue(_facingDirection, out var vector)
+                ? vector
+                : DirectionVectors[1];
+            var facingAngle = (_facingDirection - 1) * 45;
             var status = new StringBuilder()
                 .AppendLine("Sterowanie:")
-                .AppendLine("  W/S/A/D lub strzałki – start ruchu")
+                .AppendLine("  Q / E – obrót o 45° (lewo / prawo)")
+                .AppendLine("  W – ruch do przodu względem kierunku")
+                .AppendLine("  S – ruch do tyłu")
+                .AppendLine("  A / D – ruch w lewo / prawo (strafe)")
+                .AppendLine("  Strzałki działają analogicznie do WASD")
                 .AppendLine("  Spacja – zatrzymaj ruch")
-                .AppendLine("  Q / E – rozpocznij rotację (lewo / prawo)")
-                .AppendLine("  Enter – zatrzymaj rotację")
+                .AppendLine("  Pomarańczowa strzałka pokazuje aktualny kierunek")
                 .AppendLine("  Esc – zakończ aplikację")
                 .AppendLine()
                 .AppendLine($"Gracz: {_session.PlayerName}")
                 .AppendLine($"Sesja: {_session.SessionId}")
                 .AppendLine($"Postać: {_session.CharacterId}")
                 .AppendLine($"Pozycja: {_position.x},{_position.y}")
-                .AppendLine($"Facing: {_facingDirection}")
-                .AppendLine($"Ruch: {_movementActive} (dir {_movementDirection})")
-                .AppendLine($"Rotacja: {_rotationActive} (dir {_rotationDirection})");
+                .AppendLine($"Facing: {facingAngle}° ({facingVector.arrow}) [dir {_facingDirection}]")
+                .AppendLine($"Ruch: {_movementActive} (dir {_movementDirection})");
 
-            var boardPanel = new Panel(new Text(board))
+            var boardPanel = new Panel(new Markup(board))
             {
                 Header = new PanelHeader("RPG Desktop Client"),
                 Padding = new Padding(2, 1),

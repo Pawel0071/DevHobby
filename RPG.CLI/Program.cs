@@ -2,9 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenTelemetry.Exporter;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using RPG.Application;
 using RPG.Application.Handlers;
 using RPG.CLI.Commands;
@@ -42,7 +39,7 @@ var builder = Host.CreateDefaultBuilder(args)
     {
         var configuration = context.Configuration;
 
-    services.AddInfrastructure(configuration, context.HostingEnvironment.ApplicationName);
+        services.AddInfrastructure(configuration, context.HostingEnvironment.ApplicationName);
         services.AddCore(configuration);
         services.AddApplication(configuration);
 
@@ -51,21 +48,6 @@ var builder = Host.CreateDefaultBuilder(args)
         {
             options.Address = new Uri(gameServerAddress);
         });
-
-        var otlpEndpoint = configuration.GetValue<string>("OpenTelemetry:OtlpEndpoint") ?? "http://localhost:4317";
-
-        services.AddOpenTelemetry()
-            .ConfigureResource(resource => resource
-                .AddService("RPG.GameServer", serviceVersion: "1.0.0"))
-            .WithTracing(tracing => tracing
-                .AddSource("RPG.GameServer")
-                .AddOtlpExporter(options =>
-                {
-                    options.Endpoint = new Uri(otlpEndpoint);
-                    options.Protocol = OtlpExportProtocol.Grpc;
-                }));
-
-        services.AddSingleton<LocationMapper>();
 
         // Register document mappers for all entity/document pairs used by DocumentRepository.
         services.AddSingleton<IDocumentMapper<Character, CharacterDocument>, CharacterDocumentMapper>();
@@ -110,6 +92,10 @@ await host.StartAsync();
 
 var services = host.Services;
 
+var endpointLogger = services.GetRequiredService<RPG.Infrastructure.Interfaces.ILogger<Program>>();
+var configurationRoot = services.GetRequiredService<IConfiguration>();
+LogEndpointConfiguration(endpointLogger, configurationRoot);
+
 // CLI root
 var rootCommand = new RootCommand("RPG CLI");
 
@@ -133,3 +119,38 @@ finally
 {
     await host.StopAsync();
 }
+
+static void LogEndpointConfiguration(RPG.Infrastructure.Interfaces.ILogger<Program> logger, IConfiguration configuration)
+{
+    var mongo = RedactCredentials(configuration.GetConnectionString("Mongo"));
+    var redis = configuration.GetConnectionString("Redis") ?? "not configured";
+    var rabbitSection = configuration.GetSection("RabbitMQ");
+    var rabbitHost = rabbitSection.GetValue<string>("Host") ?? "not configured";
+    var rabbitPort = rabbitSection.GetValue<int?>("Port")?.ToString() ?? "default";
+    var rabbit = $"{rabbitHost}:{rabbitPort}";
+    var gameServer = configuration.GetValue<string>("GameServer:GrpcAddress") ?? "http://localhost:5124";
+    var otlp = configuration.GetValue<string>("OpenTelemetry:OtlpEndpoint") ?? "not configured";
+
+    logger.Info($"Configured endpoints => GameServer gRPC: {gameServer}, Mongo: {mongo}, Redis: {redis}, RabbitMQ: {rabbit}, OTLP: {otlp}");
+}
+
+static string RedactCredentials(string? connectionString)
+{
+    if (string.IsNullOrWhiteSpace(connectionString))
+    {
+        return "not configured";
+    }
+
+    var schemeSeparatorIndex = connectionString.IndexOf("://", StringComparison.Ordinal);
+    var credentialsSeparatorIndex = connectionString.IndexOf('@');
+
+    if (schemeSeparatorIndex >= 0 && credentialsSeparatorIndex > schemeSeparatorIndex)
+    {
+        var prefix = connectionString[..(schemeSeparatorIndex + 3)];
+        var hostPort = connectionString[(credentialsSeparatorIndex + 1)..];
+        return prefix + "***@" + hostPort;
+    }
+
+    return connectionString;
+}
+

@@ -63,7 +63,9 @@ public static class InfrastructureRegistration
 
         // OpenTelemetry - Telemetria wspólna dla usług infrastruktury
         var otlpEndpoint = config.GetValue<string>("OpenTelemetry:OtlpEndpoint");
-        var serviceName = config.GetValue<string>("OpenTelemetry:ServiceName") ?? "RPG.GameServer";
+    var serviceName = config.GetValue<string>("OpenTelemetry:ServiceName")
+              ?? clientProvidedName
+              ?? "RPG.GameServer";
         var serviceVersion = config.GetValue<string>("OpenTelemetry:ServiceVersion") ?? "1.0.0";
 
         services.AddOpenTelemetry()
