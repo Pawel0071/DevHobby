@@ -1,80 +1,108 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RPG.Domain.Common;
+using RPG.Core.Interfaces;
+using RPG.Domain.Entities;
 using RPG.Domain.Entities.MapObjects;
 using RPG.Domain.Entities.MapObjects.MapObjectComponents;
 using RPG.Domain.Entities.Npcs;
 using RPG.Domain.Entities.Npcs.NpcComponents;
 
-namespace RPG.Domain.Entities;
+namespace RPG.Core.Services.World;
 
-/// <summary>
-///     Domain entity representing world state.
-///     Pure data entity - logic handled by services.
-/// </summary>
-public class WorldState : IDomainEntity
+public class WorldStateService : IWorldStateService
 {
-    private WorldState()
+    public void UpsertCharacter(WorldState world, Character character)
     {
-        WorldName = string.Empty;
-        Characters = new List<Character>();
-        Npcs = new List<Npc>();
-        MapObjects = new List<MapObject>();
+        ArgumentNullException.ThrowIfNull(world);
+        ArgumentNullException.ThrowIfNull(character);
+
+        var copy = CloneCharacter(character);
+        var index = world.Characters.FindIndex(c => c.Id == copy.Id);
+        if (index >= 0)
+        {
+            world.Characters[index] = copy;
+        }
+        else
+        {
+            world.Characters.Add(copy);
+        }
+
+        TouchFrom(world, copy.LastUpdated);
     }
 
-    public Guid Id { get; private set; }
-    public Guid WorldId { get; private set; }
-    public string WorldName { get; set; }
-    public DateTime LastUpdated { get; set; }
-    public List<Character> Characters { get; }
-    public List<Npc> Npcs { get; }
-    public List<MapObject> MapObjects { get; }
-
-    public static WorldState Create(Guid worldId, string worldName)
+    public void RemoveCharacter(WorldState world, Guid characterId)
     {
-        return new WorldState
+        ArgumentNullException.ThrowIfNull(world);
+
+        if (world.Characters.RemoveAll(c => c.Id == characterId) > 0)
         {
-            Id = Guid.NewGuid(),
-            WorldId = worldId,
-            WorldName = worldName,
-            LastUpdated = DateTime.UtcNow
-        };
+            Touch(world, DateTime.UtcNow);
+        }
     }
 
-    public static WorldState Hydrate(
-        Guid id,
-        Guid worldId,
-        string worldName,
-        DateTime lastUpdated,
-    IEnumerable<Character>? characters = null,
-    IEnumerable<Npc>? npcs = null,
-    IEnumerable<MapObject>? mapObjects = null)
+    public void UpsertNpc(WorldState world, Npc npc)
     {
-        var worldState = new WorldState
-        {
-            Id = id,
-            WorldId = worldId,
-            WorldName = worldName,
-            LastUpdated = lastUpdated
-        };
+        ArgumentNullException.ThrowIfNull(world);
+        ArgumentNullException.ThrowIfNull(npc);
 
-        if (characters != null)
+        var copy = CloneNpc(npc);
+        var index = world.Npcs.FindIndex(n => n.Id == copy.Id);
+        if (index >= 0)
         {
-            worldState.Characters.AddRange(characters.Select(CloneCharacter));
+            world.Npcs[index] = copy;
+        }
+        else
+        {
+            world.Npcs.Add(copy);
         }
 
-        if (npcs != null)
+        TouchFrom(world, copy.LastUpdated);
+    }
+
+    public void UpsertMapObject(WorldState world, MapObject mapObject)
+    {
+        ArgumentNullException.ThrowIfNull(world);
+        ArgumentNullException.ThrowIfNull(mapObject);
+
+        var copy = CloneMapObject(mapObject);
+        var index = world.MapObjects.FindIndex(o => o.Id == copy.Id);
+        if (index >= 0)
         {
-            worldState.Npcs.AddRange(npcs.Select(CloneNpc));
+            world.MapObjects[index] = copy;
+        }
+        else
+        {
+            world.MapObjects.Add(copy);
         }
 
-        if (mapObjects != null)
-        {
-            worldState.MapObjects.AddRange(mapObjects.Select(CloneMapObject));
-        }
+        TouchFrom(world, copy.LastUpdated);
+    }
 
-        return worldState;
+    public void Touch(WorldState world, DateTime timestamp)
+    {
+        ArgumentNullException.ThrowIfNull(world);
+        world.LastUpdated = timestamp;
+    }
+
+    public WorldState Clone(WorldState world)
+    {
+        ArgumentNullException.ThrowIfNull(world);
+
+        return WorldState.Hydrate(
+            world.Id,
+            world.WorldId,
+            world.WorldName,
+            world.LastUpdated,
+            world.Characters.Select(CloneCharacter),
+            world.Npcs.Select(CloneNpc),
+            world.MapObjects.Select(CloneMapObject));
+    }
+
+    private static void TouchFrom(WorldState world, DateTime timestamp)
+    {
+        var effective = timestamp == default ? DateTime.UtcNow : timestamp;
+        world.LastUpdated = effective;
     }
 
     private static Character CloneCharacter(Character source)
@@ -116,7 +144,7 @@ public class WorldState : IDomainEntity
 
     private static Npc CloneNpc(Npc source)
     {
-    var clone = Npc.Create(source.Name, source.DisplayName, CloneLocation(source.SpawnLocation), source.WorldId, new HashSet<string>(source.Tags));
+        var clone = Npc.Create(source.Name, source.DisplayName, CloneLocation(source.SpawnLocation), source.WorldId, new HashSet<string>(source.Tags));
 
         typeof(Npc).GetProperty("Id")!.SetValue(clone, source.Id);
         clone.Description = source.Description;
@@ -130,7 +158,6 @@ public class WorldState : IDomainEntity
         clone.LastUpdated = source.LastUpdated;
         clone.RespawnAt = source.RespawnAt;
 
-        // Copy stats
         foreach (var stat in source.BaseStats)
         {
             clone.BaseStats[stat.Key] = stat.Value;
@@ -141,7 +168,6 @@ public class WorldState : IDomainEntity
             clone.ModifiedStats[stat.Key] = stat.Value;
         }
 
-        // Copy components (shallow copy)
         clone.Components = source.Components is null
             ? new List<INpcComponent>()
             : new List<INpcComponent>(source.Components);
@@ -151,7 +177,8 @@ public class WorldState : IDomainEntity
 
     private static MapObject CloneMapObject(MapObject source)
     {
-        var clone = MapObject.Create(source.Name, CloneLocation(source.Location), source.WorldId, source.ZoneId);
+        var locationClone = CloneLocation(source.Location);
+        var clone = MapObject.Create(source.Name, locationClone, source.WorldId, source.ZoneId);
 
         typeof(MapObject).GetProperty("Id")!.SetValue(clone, source.Id);
         clone.DisplayName = source.DisplayName;
@@ -164,6 +191,7 @@ public class WorldState : IDomainEntity
         clone.Components = source.Components is null
             ? new List<IMapObjectComponent>()
             : new List<IMapObjectComponent>(source.Components);
+
         return clone;
     }
 

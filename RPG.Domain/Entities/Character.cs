@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using RPG.Domain.Common;
 using RPG.Domain.Common.Interfaces;
 using RPG.Domain.Containers;
@@ -26,7 +28,9 @@ public sealed class Character : IDomainEntity, IItemContainer, IStats, ILevel, I
         BankStorageContainer = new InventoryContainer(20);
         BackpackInventoryContainer = new InventoryContainer(20);
         CurrentLocation = new Location();
-        Level = 1;
+    Level = 1;
+    StatusEffects = new HashSet<string>();
+    LastUpdated = DateTime.UtcNow;
     }
 
     public required Guid Id { get; init; }
@@ -66,6 +70,10 @@ public sealed class Character : IDomainEntity, IItemContainer, IStats, ILevel, I
     public Location CurrentLocation { get; private set; }
     public bool IsMoving { get; private set; }
     public bool IsRotating { get; private set; }
+    public bool IsOnline { get; set; }
+    public bool IsInCombat { get; set; }
+    public DateTime LastUpdated { get; set; }
+    public HashSet<string> StatusEffects { get; set; }
 
     // Container accessors for services
     public IInventoryContainer GetBankStorageContainer()

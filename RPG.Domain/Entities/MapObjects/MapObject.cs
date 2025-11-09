@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using RPG.Domain.Common;
 
 namespace RPG.Domain.Entities.MapObjects;
@@ -18,6 +21,8 @@ public class MapObject : IDomainEntity
         Location = new Location();
         Tags = new HashSet<string>();
         Components = new List<IMapObjectComponent>();
+        State = new Dictionary<string, string>();
+        LastUpdated = DateTime.UtcNow;
     }
 
     public Guid Id { get; private set; }
@@ -39,6 +44,12 @@ public class MapObject : IDomainEntity
 
     // Components for capabilities
     public List<IMapObjectComponent> Components { get; set; }
+
+    // Arbitrary map object state (e.g., lock status, resource counts)
+    public Dictionary<string, string> State { get; set; }
+
+    // Timestamp for last update in world state context
+    public DateTime LastUpdated { get; set; }
 
     public static MapObject Create(
         string name,

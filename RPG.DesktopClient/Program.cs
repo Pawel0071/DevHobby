@@ -1,4 +1,7 @@
+using System.Globalization;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Configuration;
@@ -45,14 +48,58 @@ internal static class Program
         using var channel = GrpcChannel.ForAddress(serverAddress);
         var characterClient = new CharacterService.CharacterServiceClient(channel);
         var sessionClient = new SessionService.SessionServiceClient(channel);
+        var worldClient = new WorldService.WorldServiceClient(channel);
         var player = CreatePlayerProfile();
+        var automationMode = string.Equals(Environment.GetEnvironmentVariable("RPG_AUTOMATION_MODE"), "1", StringComparison.OrdinalIgnoreCase);
+        TimeSpan? automationDuration = null;
+
+        var automationDurationEnv = Environment.GetEnvironmentVariable("RPG_AUTOMATION_DURATION");
+        if (int.TryParse(automationDurationEnv, NumberStyles.Integer, CultureInfo.InvariantCulture, out var seconds) && seconds > 0)
+        {
+            automationDuration = TimeSpan.FromSeconds(seconds);
+        }
 
         try
         {
             Console.CursorVisible = false;
 
             var session = await InitializeGameSessionAsync(characterClient, sessionClient, player);
-            var controller = new CharacterConsoleController(characterClient, sessionClient, session);
+
+            JoinWorldReply joinReply;
+            try
+            {
+                joinReply = await worldClient.JoinWorldAsync(new JoinWorldRequest
+                {
+                    SessionId = session.SessionId.ToString()
+                });
+            }
+            catch
+            {
+                await sessionClient.EndSessionAsync(new EndSessionRequest
+                {
+                    SessionId = session.SessionId.ToString()
+                });
+
+                throw;
+            }
+
+            var worldMetadata = joinReply.Snapshot?.Metadata;
+            if (worldMetadata != null && Guid.TryParse(worldMetadata.WorldId, out var parsedWorldId))
+            {
+                session = session with { WorldId = parsedWorldId };
+            }
+
+            if (joinReply.SpawnLocation != null)
+            {
+                session = session with { SpawnLocation = joinReply.SpawnLocation };
+            }
+
+            if (worldMetadata != null)
+            {
+                session = session with { WorldName = worldMetadata.WorldName };
+            }
+
+            var controller = new CharacterConsoleController(characterClient, sessionClient, worldClient, session, joinReply, automationMode, automationDuration);
 
             await controller.RunAsync();
         }
@@ -157,23 +204,41 @@ internal static class Program
 
     private sealed class CharacterConsoleController
     {
-    private readonly CharacterService.CharacterServiceClient _client;
-    private readonly SessionService.SessionServiceClient _sessionClient;
+        private const string OtherPlayerColor = "springgreen1";
+
+        private readonly CharacterService.CharacterServiceClient _client;
+        private readonly SessionService.SessionServiceClient _sessionClient;
+        private readonly WorldService.WorldServiceClient _worldClient;
         private readonly CharacterSession _session;
         private readonly object _drawLock = new();
+    private readonly Dictionary<Guid, (int x, int y, string displayName)> _otherCharacters = new();
 
         private (int x, int y) _position = (BoardWidth / 2, BoardHeight / 2);
         private int _facingDirection = 1;
         private bool _movementActive;
         private int _movementDirection = 1;
-    private double _movementRemainder;
-    private DateTime _lastUpdate = DateTime.UtcNow;
-    private bool _isRunning = true;
-    private readonly Queue<string> _messages = new();
-    private const int MaxMessages = 5;
-    private static readonly TimeSpan InputReleaseDelay = TimeSpan.FromMilliseconds(200);
-    private DateTime _lastMovementInput = DateTime.MinValue;
-    private DateTime _lastHeartbeat = DateTime.MinValue;
+        private double _movementRemainder;
+        private DateTime _lastUpdate = DateTime.UtcNow;
+        private bool _isRunning = true;
+        private readonly Queue<string> _messages = new();
+        private const int MaxMessages = 5;
+        private static readonly TimeSpan InputReleaseDelay = TimeSpan.FromMilliseconds(200);
+        private DateTime _lastMovementInput = DateTime.MinValue;
+        private DateTime _lastHeartbeat = DateTime.MinValue;
+        private Guid? _worldId;
+        private string? _worldName;
+        private CancellationTokenSource? _worldStreamCts;
+        private Task? _worldStreamTask;
+        private int _worldPopulation;
+        private readonly bool _automationMode;
+        private readonly TimeSpan _automationDuration;
+        private readonly TaskCompletionSource<bool>? _firstSnapshotTcs;
+    private long _lastSnapshotTick;
+    private double _worldMinX = double.MaxValue;
+    private double _worldMaxX = double.MinValue;
+    private double _worldMinY = double.MaxValue;
+    private double _worldMaxY = double.MinValue;
+    private bool _hasWorldBounds;
         private const int RotationLeftCommand = 7;
         private const int RotationRightCommand = 3;
         private const string ArrowColor = "orange1";
@@ -181,17 +246,52 @@ internal static class Program
         public CharacterConsoleController(
             CharacterService.CharacterServiceClient client,
             SessionService.SessionServiceClient sessionClient,
-            CharacterSession session)
+            WorldService.WorldServiceClient worldClient,
+            CharacterSession session,
+            JoinWorldReply joinReply,
+            bool automationMode,
+            TimeSpan? automationDuration)
         {
             _client = client;
             _sessionClient = sessionClient;
+            _worldClient = worldClient;
             _session = session;
+            _worldId = session.WorldId;
+            _worldName = session.WorldName;
+            _automationMode = automationMode;
+            _automationDuration = automationDuration ?? TimeSpan.FromSeconds(6);
+            _firstSnapshotTcs = _automationMode ? new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously) : null;
+
+            if (session.SpawnLocation != null)
+            {
+                UpdateWorldBounds(session.SpawnLocation);
+                _position = MapWorldToBoard(session.SpawnLocation);
+            }
+
+            ApplyWorldSnapshot(joinReply.Snapshot);
+
+            if (_worldId.HasValue)
+            {
+                StartWorldStream(_worldId.Value);
+            }
+
+            if (_worldId.HasValue)
+            {
+                var worldLabel = _worldName ?? _worldId.Value.ToString();
+                LogInfo($"Dołączono do świata {worldLabel}.");
+            }
 
             LogInfo($"Gracz {_session.PlayerName} rozpoczął sesję {_session.SessionId}.");
         }
 
         public async Task RunAsync()
         {
+            if (_automationMode)
+            {
+                await RunAutomationAsync();
+                return;
+            }
+
             while (_isRunning)
             {
                 var keys = PollKeys();
@@ -495,6 +595,22 @@ internal static class Program
         {
             await ReleaseMovementAsync();
             await StopRotationAsync(_session.CharacterId.ToString());
+            await StopWorldStreamAsync();
+
+            if (_worldId.HasValue)
+            {
+                try
+                {
+                    await _worldClient.LeaveWorldAsync(new WorldMembershipRequest
+                    {
+                        SessionId = _session.SessionId.ToString()
+                    });
+                }
+                catch (Exception ex)
+                {
+                    LogError($"Opuszczenie świata nie powiodło się: {ex.Message}");
+                }
+            }
 
             try
             {
@@ -514,11 +630,19 @@ internal static class Program
         private void LogError(string message)
         {
             EnqueueMessage($"Błąd: {message}");
+            if (_automationMode)
+            {
+                AnsiConsole.MarkupLine($"[red]{message}[/]");
+            }
         }
 
         private void LogInfo(string message)
         {
             EnqueueMessage(message);
+            if (_automationMode)
+            {
+                AnsiConsole.MarkupLine(message);
+            }
         }
 
         private void EnqueueMessage(string message)
@@ -534,7 +658,7 @@ internal static class Program
             }
         }
 
-        private static string BuildBoard((int x, int y) position, int facingDirection)
+    private static string BuildBoard((int x, int y) position, int facingDirection, IReadOnlyCollection<(int x, int y)> otherCharacters)
         {
             if (!DirectionVectors.TryGetValue(facingDirection, out var vector))
             {
@@ -543,6 +667,24 @@ internal static class Program
 
             var arrow = vector.arrow;
             var boardBuilder = new StringBuilder();
+            var otherOccupancy = new Dictionary<(int x, int y), int>();
+
+            foreach (var other in otherCharacters)
+            {
+                if (other == position)
+                {
+                    continue;
+                }
+
+                if (otherOccupancy.TryGetValue(other, out var count))
+                {
+                    otherOccupancy[other] = count + 1;
+                }
+                else
+                {
+                    otherOccupancy[other] = 1;
+                }
+            }
 
             for (var y = 0; y < BoardHeight; y++)
             {
@@ -554,6 +696,14 @@ internal static class Program
                                     .Append(ArrowColor)
                                     .Append(']')
                                     .Append(arrow)
+                                    .Append("[/]");
+                    }
+                    else if (otherOccupancy.TryGetValue((x, y), out var occupants))
+                    {
+                        boardBuilder.Append('[')
+                                    .Append(OtherPlayerColor)
+                                    .Append(']')
+                                    .Append(occupants > 1 ? '+' : 'P')
                                     .Append("[/]");
                     }
                     else
@@ -573,7 +723,8 @@ internal static class Program
 
         private IRenderable Render()
         {
-            var board = BuildBoard(_position, _facingDirection);
+            var otherCharacters = _otherCharacters.Values.ToList();
+            var board = BuildBoard(_position, _facingDirection, otherCharacters.Select(c => (c.x, c.y)).ToList());
             var facingVector = DirectionVectors.TryGetValue(_facingDirection, out var vector)
                 ? vector
                 : DirectionVectors[1];
@@ -595,6 +746,29 @@ internal static class Program
                 .AppendLine($"Pozycja: {_position.x},{_position.y}")
                 .AppendLine($"Facing: {facingAngle}° ({facingVector.arrow}) [dir {_facingDirection}]")
                 .AppendLine($"Ruch: {_movementActive} (dir {_movementDirection})");
+
+            if (_worldId.HasValue)
+            {
+                var worldLabel = _worldName ?? _worldId.Value.ToString();
+                status.AppendLine($"Świat: {worldLabel}")
+                      .AppendLine($"Gracze w świecie: {_worldPopulation}");
+            }
+
+            if (otherCharacters.Count > 0)
+            {
+                status.AppendLine()
+                      .AppendLine("Inni gracze w pobliżu:");
+
+                foreach (var other in otherCharacters.Take(5))
+                {
+                    status.AppendLine($"  - {other.displayName} ({other.x},{other.y})");
+                }
+
+                if (otherCharacters.Count > 5)
+                {
+                    status.AppendLine($"  ... i {otherCharacters.Count - 5} więcej");
+                }
+            }
 
             var boardPanel = new Panel(new Markup(board))
             {
@@ -623,9 +797,271 @@ internal static class Program
 
             return new Columns(boardPanel, infoPanel);
         }
+
+        private async Task RunAutomationAsync()
+        {
+            LogInfo("Automation mode aktywny – oczekiwanie na strumień świata.");
+
+            var snapshotTask = _firstSnapshotTcs?.Task ?? Task.CompletedTask;
+            var initial = await Task.WhenAny(snapshotTask, Task.Delay(_automationDuration));
+            if (initial != snapshotTask)
+            {
+                LogError("Nie odebrano migawki świata przed upływem limitu czasu w trybie automatycznym.");
+            }
+
+            var watch = DateTime.UtcNow + _automationDuration;
+            while (DateTime.UtcNow < watch)
+            {
+                await MaybeSendHeartbeatAsync(DateTime.UtcNow);
+                await Task.Delay(200);
+            }
+
+            var boundsSummary = _hasWorldBounds
+                ? FormattableString.Invariant($"X {_worldMinX:F2} – {_worldMaxX:F2}, Y {_worldMinY:F2} – {_worldMaxY:F2}")
+                : "brak danych";
+
+            LogInfo($"Ostatnia migawka świata: {_lastSnapshotTick}.");
+            LogInfo($"Zaobserwowane granice świata: {boundsSummary}.");
+
+            if (_otherCharacters.Count > 0)
+            {
+                foreach (var other in _otherCharacters.Values.Take(10))
+                {
+                    LogInfo($"Postać {other.displayName} na ({other.x},{other.y}).");
+                }
+            }
+
+            await ShutdownAsync();
+            _isRunning = false;
+        }
+
+        private void StartWorldStream(Guid worldId)
+        {
+            if (_worldStreamTask != null)
+            {
+                return;
+            }
+
+            var cts = new CancellationTokenSource();
+            _worldStreamCts = cts;
+            _worldStreamTask = StreamWorldStateAsync(worldId, cts.Token);
+        }
+
+        private async Task StreamWorldStateAsync(Guid worldId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                using var call = _worldClient.StreamWorldState(new WorldStreamRequest
+                {
+                    SessionId = _session.SessionId.ToString(),
+                    WorldId = worldId.ToString(),
+                    IntervalMilliseconds = 500
+                }, cancellationToken: cancellationToken);
+
+                var responseStream = call.ResponseStream;
+                while (await responseStream.MoveNext(cancellationToken))
+                {
+                    ApplyWorldSnapshot(responseStream.Current.Snapshot);
+                }
+            }
+            catch (RpcException ex) when (ex.StatusCode == StatusCode.Cancelled && cancellationToken.IsCancellationRequested)
+            {
+                // graceful shutdown
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                // stream cancelled
+            }
+            catch (Exception ex)
+            {
+                LogError($"World stream error: {ex.Message}");
+            }
+        }
+
+        private async Task StopWorldStreamAsync()
+        {
+            var cts = _worldStreamCts;
+            var task = _worldStreamTask;
+            _worldStreamCts = null;
+            _worldStreamTask = null;
+
+            if (cts == null)
+            {
+                return;
+            }
+
+            try
+            {
+                cts.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // already disposed
+            }
+
+            if (task != null)
+            {
+                try
+                {
+                    var completed = await Task.WhenAny(task, Task.Delay(2000));
+                    if (completed == task && task.IsFaulted && task.Exception != null)
+                    {
+                        LogError($"World stream zakończył się błędem: {task.Exception.GetBaseException().Message}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogError($"Zatrzymanie strumienia świata nie powiodło się: {ex.Message}");
+                }
+            }
+
+            cts.Dispose();
+        }
+
+        private void ApplyWorldSnapshot(WorldSnapshot? snapshot)
+        {
+            if (snapshot == null)
+            {
+                return;
+            }
+
+            if (snapshot.Metadata != null)
+            {
+                if (Guid.TryParse(snapshot.Metadata.WorldId, out var parsedWorldId))
+                {
+                    _worldId = parsedWorldId;
+                }
+
+                if (!string.IsNullOrWhiteSpace(snapshot.Metadata.WorldName))
+                {
+                    _worldName = snapshot.Metadata.WorldName;
+                }
+            }
+
+            lock (_drawLock)
+            {
+                _otherCharacters.Clear();
+
+                if (snapshot.Characters != null)
+                {
+                    var population = 0;
+
+                    foreach (var character in snapshot.Characters)
+                    {
+                        if (character == null || !character.IsOnline)
+                        {
+                            continue;
+                        }
+
+                        population++;
+
+                        if (!Guid.TryParse(character.CharacterId, out var characterId))
+                        {
+                            continue;
+                        }
+
+                        UpdateWorldBounds(character.Location);
+                        var location = MapWorldToBoard(character.Location);
+
+                        if (characterId == _session.CharacterId)
+                        {
+                            _position = location;
+                            continue;
+                        }
+
+                        var displayName = string.IsNullOrWhiteSpace(character.DisplayName)
+                            ? character.CharacterId
+                            : character.DisplayName;
+
+                        _otherCharacters[characterId] = (location.x, location.y, displayName);
+                    }
+
+                    _worldPopulation = population;
+                }
+                else
+                {
+                    _worldPopulation = 0;
+                }
+            }
+
+            if (snapshot.LastUpdated > 0)
+            {
+                Interlocked.Exchange(ref _lastSnapshotTick, snapshot.LastUpdated);
+            }
+
+            _firstSnapshotTcs?.TrySetResult(true);
+        }
+
+        private void UpdateWorldBounds(Location? location)
+        {
+            if (location == null)
+            {
+                return;
+            }
+
+            if (!_hasWorldBounds)
+            {
+                _worldMinX = _worldMaxX = location.X;
+                _worldMinY = _worldMaxY = location.Y;
+                _hasWorldBounds = true;
+                return;
+            }
+
+            if (location.X < _worldMinX)
+            {
+                _worldMinX = location.X;
+            }
+
+            if (location.X > _worldMaxX)
+            {
+                _worldMaxX = location.X;
+            }
+
+            if (location.Y < _worldMinY)
+            {
+                _worldMinY = location.Y;
+            }
+
+            if (location.Y > _worldMaxY)
+            {
+                _worldMaxY = location.Y;
+            }
+        }
+
+        private (int x, int y) MapWorldToBoard(Location? location)
+        {
+            if (location == null)
+            {
+                return (BoardWidth / 2, BoardHeight / 2);
+            }
+
+            var minX = _hasWorldBounds ? _worldMinX : location.X;
+            var maxX = _hasWorldBounds ? _worldMaxX : location.X;
+            var minY = _hasWorldBounds ? _worldMinY : location.Y;
+            var maxY = _hasWorldBounds ? _worldMaxY : location.Y;
+
+            var width = Math.Max(1d, maxX - minX);
+            var height = Math.Max(1d, maxY - minY);
+
+            var normalizedX = (location.X - minX) / width;
+            var normalizedY = (location.Y - minY) / height;
+
+            var boardX = (int)Math.Round(normalizedX * (BoardWidth - 1), MidpointRounding.AwayFromZero);
+            var boardY = (int)Math.Round(normalizedY * (BoardHeight - 1), MidpointRounding.AwayFromZero);
+
+            var clampedX = Math.Clamp(boardX, 0, BoardWidth - 1);
+            var clampedY = Math.Clamp(boardY, 0, BoardHeight - 1);
+
+            return (clampedX, clampedY);
+        }
     }
 
-    private sealed record CharacterSession(Guid CharacterId, Guid SessionId, Guid PlayerId, string PlayerName);
+    private sealed record CharacterSession(Guid CharacterId, Guid SessionId, Guid PlayerId, string PlayerName)
+    {
+        public Guid? WorldId { get; init; }
+        public string? WorldName { get; init; }
+        public Location? SpawnLocation { get; init; }
+    }
 
     private sealed record PlayerProfile(Guid PlayerId, string DisplayName);
 }

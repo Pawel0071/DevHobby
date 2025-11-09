@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using RPG.Domain.Common;
 using RPG.Domain.Containers;
 using RPG.Domain.Enums;
@@ -40,10 +42,12 @@ public class Npc : IDomainEntity
         Description = string.Empty;
         SpawnLocation = new Location();
         CurrentLocation = new Location();
-        Tags = new HashSet<string>();
-        Components = new List<INpcComponent>();
-        BaseStatsContainer = new StatsContainer();
-        ModifiedStatsContainer = new StatsContainer();
+    Tags = new HashSet<string>();
+    Components = new List<INpcComponent>();
+    BaseStatsContainer = new StatsContainer();
+    ModifiedStatsContainer = new StatsContainer();
+    LastUpdated = DateTime.UtcNow;
+    IsAlive = true;
     }
 
     public Guid Id { get; private set; }
@@ -62,6 +66,9 @@ public class Npc : IDomainEntity
     public IDictionary<StatsProperty, int> ModifiedStats => ModifiedStatsContainer.Stats;
     public bool IsMoving { get; private set; }
     public bool IsRotating { get; private set; }
+    public bool IsAlive { get; set; }
+    public DateTime LastUpdated { get; set; }
+    public DateTime? RespawnAt { get; set; }
 
     private StatsContainer BaseStatsContainer { get; }
     private StatsContainer ModifiedStatsContainer { get; }

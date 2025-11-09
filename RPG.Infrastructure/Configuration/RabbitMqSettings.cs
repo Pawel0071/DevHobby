@@ -2,6 +2,7 @@ namespace RPG.Infrastructure.Configuration;
 
 public class RabbitMqSettings
 {
+    public string? ConnectionString { get; set; }
     public string Host { get; set; } = default!;
     public int Port { get; set; } = 5672;
     public string Username { get; set; } = "guest";

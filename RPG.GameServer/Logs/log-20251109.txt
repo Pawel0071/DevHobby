@@ -1,0 +1,318 @@
+2025-11-09 18:02:51.421 +01:00 [INF] RabbitMqPublisher initialized: Exchange=rpg_exchange, Queue=rpg_persistence_queue, RoutingKey=#
+2025-11-09 18:02:51.470 +01:00 [INF] NPC AI hosted service started with tick interval 00:00:00.5000000.
+2025-11-09 18:02:51.571 +01:00 [INF] Read 4 NpcDocument documents from MongoDB
+2025-11-09 18:02:51.608 +01:00 [INF] Loaded 4 NPCs for AI evaluation.
+2025-11-09 18:02:51.613 +01:00 [ERR] Failed to create utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:02:51.616 +01:00 [INF] Using idle fallback utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae
+2025-11-09 18:02:51.618 +01:00 [ERR] Failed to create utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:02:51.618 +01:00 [INF] Using idle fallback utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0
+2025-11-09 18:02:51.618 +01:00 [ERR] Failed to create utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:02:51.619 +01:00 [INF] Using idle fallback utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd
+2025-11-09 18:02:51.619 +01:00 [ERR] Failed to create utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:02:51.619 +01:00 [INF] Using idle fallback utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2
+2025-11-09 18:03:05.817 +01:00 [INF] NPC AI hosted service is stopping.
+2025-11-09 18:06:35.630 +01:00 [INF] RabbitMqPublisher initialized: Exchange=rpg_exchange, Queue=rpg_persistence_queue, RoutingKey=#
+2025-11-09 18:06:35.677 +01:00 [INF] NPC AI hosted service started with tick interval 00:00:00.5000000.
+2025-11-09 18:06:35.760 +01:00 [INF] Read 4 NpcDocument documents from MongoDB
+2025-11-09 18:06:35.799 +01:00 [INF] Loaded 4 NPCs for AI evaluation.
+2025-11-09 18:06:35.803 +01:00 [ERR] Failed to create utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:06:35.807 +01:00 [INF] Using idle fallback utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae
+2025-11-09 18:06:35.810 +01:00 [ERR] Failed to create utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:06:35.810 +01:00 [INF] Using idle fallback utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0
+2025-11-09 18:06:35.810 +01:00 [ERR] Failed to create utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:06:35.810 +01:00 [INF] Using idle fallback utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd
+2025-11-09 18:06:35.810 +01:00 [ERR] Failed to create utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:06:35.810 +01:00 [INF] Using idle fallback utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2
+2025-11-09 18:20:19.892 +01:00 [INF] NPC AI hosted service is stopping.
+2025-11-09 18:21:05.856 +01:00 [INF] RabbitMqPublisher initialized: Exchange=rpg_exchange, Queue=rpg_persistence_queue, RoutingKey=#
+2025-11-09 18:21:05.900 +01:00 [INF] NPC AI hosted service started with tick interval 00:00:00.5000000.
+2025-11-09 18:21:05.980 +01:00 [INF] Read 4 NpcDocument documents from MongoDB
+2025-11-09 18:21:06.018 +01:00 [INF] Loaded 4 NPCs for AI evaluation.
+2025-11-09 18:21:06.023 +01:00 [ERR] Failed to create utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:21:06.025 +01:00 [INF] Using idle fallback utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae
+2025-11-09 18:21:06.027 +01:00 [ERR] Failed to create utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:21:06.027 +01:00 [INF] Using idle fallback utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0
+2025-11-09 18:21:06.027 +01:00 [ERR] Failed to create utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:21:06.027 +01:00 [INF] Using idle fallback utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd
+2025-11-09 18:21:06.027 +01:00 [ERR] Failed to create utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:21:06.027 +01:00 [INF] Using idle fallback utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2
+2025-11-09 18:21:41.451 +01:00 [INF] NPC AI hosted service is stopping.
+2025-11-09 18:27:05.734 +01:00 [INF] RabbitMqPublisher initialized: Exchange=rpg_exchange, Queue=rpg_persistence_queue, RoutingKey=#
+2025-11-09 18:27:05.784 +01:00 [INF] NPC AI hosted service started with tick interval 00:00:00.5000000.
+2025-11-09 18:27:05.870 +01:00 [INF] Read 4 NpcDocument documents from MongoDB
+2025-11-09 18:27:05.911 +01:00 [INF] Loaded 4 NPCs for AI evaluation.
+2025-11-09 18:27:05.917 +01:00 [ERR] Failed to create utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:27:05.920 +01:00 [INF] Using idle fallback utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae
+2025-11-09 18:27:05.923 +01:00 [ERR] Failed to create utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:27:05.923 +01:00 [INF] Using idle fallback utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0
+2025-11-09 18:27:05.923 +01:00 [ERR] Failed to create utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:27:05.923 +01:00 [INF] Using idle fallback utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd
+2025-11-09 18:27:05.923 +01:00 [ERR] Failed to create utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:27:05.923 +01:00 [INF] Using idle fallback utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2
+2025-11-09 18:31:15.727 +01:00 [INF] RabbitMqPublisher initialized: Exchange=rpg_exchange, Queue=rpg_persistence_queue, RoutingKey=#
+2025-11-09 18:31:15.772 +01:00 [INF] NPC AI hosted service started with tick interval 00:00:00.5000000.
+2025-11-09 18:31:15.855 +01:00 [INF] Read 4 NpcDocument documents from MongoDB
+2025-11-09 18:31:15.897 +01:00 [INF] Loaded 4 NPCs for AI evaluation.
+2025-11-09 18:31:15.902 +01:00 [ERR] Failed to create utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:31:15.905 +01:00 [INF] Using idle fallback utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae
+2025-11-09 18:31:15.908 +01:00 [ERR] Failed to create utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:31:15.908 +01:00 [INF] Using idle fallback utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0
+2025-11-09 18:31:15.908 +01:00 [ERR] Failed to create utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:31:15.908 +01:00 [INF] Using idle fallback utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd
+2025-11-09 18:31:15.908 +01:00 [ERR] Failed to create utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:31:15.908 +01:00 [INF] Using idle fallback utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2
+2025-11-09 18:31:48.697 +01:00 [INF] NPC AI hosted service is stopping.
+2025-11-09 18:32:30.298 +01:00 [INF] RabbitMqPublisher initialized: Exchange=rpg_exchange, Queue=rpg_persistence_queue, RoutingKey=#
+2025-11-09 18:32:30.346 +01:00 [INF] NPC AI hosted service started with tick interval 00:00:00.5000000.
+2025-11-09 18:32:30.432 +01:00 [INF] Read 4 NpcDocument documents from MongoDB
+2025-11-09 18:32:30.473 +01:00 [INF] Loaded 4 NPCs for AI evaluation.
+2025-11-09 18:32:30.477 +01:00 [ERR] Failed to create utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:32:30.480 +01:00 [INF] Using idle fallback utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae
+2025-11-09 18:32:30.482 +01:00 [ERR] Failed to create utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:32:30.482 +01:00 [INF] Using idle fallback utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0
+2025-11-09 18:32:30.483 +01:00 [ERR] Failed to create utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:32:30.483 +01:00 [INF] Using idle fallback utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd
+2025-11-09 18:32:30.483 +01:00 [ERR] Failed to create utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:32:30.483 +01:00 [INF] Using idle fallback utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2
+2025-11-09 18:35:13.200 +01:00 [INF] NPC AI hosted service is stopping.
+2025-11-09 18:39:30.523 +01:00 [INF] RabbitMqPublisher initialized: Exchange=rpg_exchange, Queue=rpg_persistence_queue, RoutingKey=#
+2025-11-09 18:39:30.574 +01:00 [INF] NPC AI hosted service started with tick interval 00:00:00.5000000.
+2025-11-09 18:39:30.659 +01:00 [INF] Read 4 NpcDocument documents from MongoDB
+2025-11-09 18:39:30.701 +01:00 [INF] Loaded 4 NPCs for AI evaluation.
+2025-11-09 18:39:30.706 +01:00 [ERR] Failed to create utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:39:30.711 +01:00 [INF] Using idle fallback utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae
+2025-11-09 18:39:30.713 +01:00 [ERR] Failed to create utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:39:30.713 +01:00 [INF] Using idle fallback utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0
+2025-11-09 18:39:30.713 +01:00 [ERR] Failed to create utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:39:30.713 +01:00 [INF] Using idle fallback utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd
+2025-11-09 18:39:30.714 +01:00 [ERR] Failed to create utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:39:30.714 +01:00 [INF] Using idle fallback utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2
+2025-11-09 18:39:45.175 +01:00 [INF] NPC AI hosted service is stopping.
+2025-11-09 18:47:38.190 +01:00 [INF] RabbitMqPublisher initialized: Exchange=rpg_exchange, Queue=rpg_persistence_queue, RoutingKey=#
+2025-11-09 18:47:38.239 +01:00 [INF] NPC AI hosted service started with tick interval 00:00:00.5000000.
+2025-11-09 18:47:38.327 +01:00 [INF] Read 4 NpcDocument documents from MongoDB
+2025-11-09 18:47:38.370 +01:00 [INF] Loaded 4 NPCs for AI evaluation.
+2025-11-09 18:47:38.376 +01:00 [ERR] Failed to create utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:47:38.379 +01:00 [INF] Using idle fallback utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae
+2025-11-09 18:47:38.381 +01:00 [ERR] Failed to create utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:47:38.381 +01:00 [INF] Using idle fallback utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0
+2025-11-09 18:47:38.381 +01:00 [ERR] Failed to create utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:47:38.382 +01:00 [INF] Using idle fallback utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd
+2025-11-09 18:47:38.382 +01:00 [ERR] Failed to create utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:47:38.382 +01:00 [INF] Using idle fallback utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2
+2025-11-09 18:47:53.183 +01:00 [INF] NPC AI hosted service is stopping.
+2025-11-09 18:48:48.296 +01:00 [INF] RabbitMqPublisher initialized: Exchange=rpg_exchange, Queue=rpg_persistence_queue, RoutingKey=#
+2025-11-09 18:48:48.359 +01:00 [INF] NPC AI hosted service started with tick interval 00:00:00.5000000.
+2025-11-09 18:48:48.457 +01:00 [INF] Read 4 NpcDocument documents from MongoDB
+2025-11-09 18:48:48.503 +01:00 [INF] Loaded 4 NPCs for AI evaluation.
+2025-11-09 18:48:48.508 +01:00 [ERR] Failed to create utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:48:48.514 +01:00 [INF] Using idle fallback utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae
+2025-11-09 18:48:48.517 +01:00 [ERR] Failed to create utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:48:48.517 +01:00 [INF] Using idle fallback utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0
+2025-11-09 18:48:48.517 +01:00 [ERR] Failed to create utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:48:48.518 +01:00 [INF] Using idle fallback utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd
+2025-11-09 18:48:48.518 +01:00 [ERR] Failed to create utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:48:48.518 +01:00 [INF] Using idle fallback utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2
+2025-11-09 18:50:05.380 +01:00 [INF] NPC AI hosted service is stopping.
+2025-11-09 18:50:57.810 +01:00 [INF] RabbitMqPublisher initialized: Exchange=rpg_exchange, Queue=rpg_persistence_queue, RoutingKey=#
+2025-11-09 18:50:57.858 +01:00 [INF] NPC AI hosted service started with tick interval 00:00:00.5000000.
+2025-11-09 18:50:57.947 +01:00 [INF] Read 4 NpcDocument documents from MongoDB
+2025-11-09 18:50:57.989 +01:00 [INF] Loaded 4 NPCs for AI evaluation.
+2025-11-09 18:50:57.994 +01:00 [ERR] Failed to create utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:50:57.997 +01:00 [INF] Using idle fallback utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae
+2025-11-09 18:50:57.999 +01:00 [ERR] Failed to create utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:50:57.999 +01:00 [INF] Using idle fallback utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0
+2025-11-09 18:50:57.999 +01:00 [ERR] Failed to create utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:50:57.999 +01:00 [INF] Using idle fallback utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd
+2025-11-09 18:50:57.999 +01:00 [ERR] Failed to create utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:50:57.999 +01:00 [INF] Using idle fallback utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2
+2025-11-09 18:51:41.181 +01:00 [INF] NPC AI hosted service is stopping.
+2025-11-09 18:53:01.693 +01:00 [INF] RabbitMqPublisher initialized: Exchange=rpg_exchange, Queue=rpg_persistence_queue, RoutingKey=#
+2025-11-09 18:53:01.743 +01:00 [INF] NPC AI hosted service started with tick interval 00:00:00.5000000.
+2025-11-09 18:53:01.829 +01:00 [INF] Read 4 NpcDocument documents from MongoDB
+2025-11-09 18:53:01.870 +01:00 [INF] Loaded 4 NPCs for AI evaluation.
+2025-11-09 18:53:01.876 +01:00 [ERR] Failed to create utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:53:01.878 +01:00 [INF] Using idle fallback utility agent for NPC 1eede104-5de4-47b2-a36b-5ac59a71e6ae
+2025-11-09 18:53:01.881 +01:00 [ERR] Failed to create utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:53:01.881 +01:00 [INF] Using idle fallback utility agent for NPC 9dd11a57-0d79-48e2-9433-94901596a1a0
+2025-11-09 18:53:01.881 +01:00 [ERR] Failed to create utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:53:01.881 +01:00 [INF] Using idle fallback utility agent for NPC 098b72f9-92c3-4510-b1ba-2062a22ad4dd
+2025-11-09 18:53:01.881 +01:00 [ERR] Failed to create utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2 using script 'boss'.
+System.ArgumentException: Skill 'ultimate' is required for this behavior. (Parameter 'skills')
+   at RPG.AI.Utility.UtilityAgentFactory.RequireSkill(IDictionary`2 skills, String key) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 287
+   at RPG.AI.Utility.UtilityAgentFactory.GetByName(String scriptName, IDictionary`2 skills, UtilityAgentSettings settings, DialogueComponent dialogue, MerchantComponent merchant, QuestGiverComponent questGiver) in /Volumes/Data/Repositories/DevHobby/RPG.AI/Utility/UtilityAgentFactory.cs:line 269
+   at RPG.Core.Services.NpcServices.NpcAiService.CreateAgentFor(Npc npc) in /Volumes/Data/Repositories/DevHobby/RPG.Core/Services/NpcServices/NpcAiService.cs:line 362
+2025-11-09 18:53:01.881 +01:00 [INF] Using idle fallback utility agent for NPC 475fb2b3-fe4d-4440-b4c5-0784684db8d2
+2025-11-09 18:54:23.274 +01:00 [INF] NPC AI hosted service is stopping.
