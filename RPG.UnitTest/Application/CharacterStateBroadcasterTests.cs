@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
+using RPG.Application.Broadcasters;
+using RPG.Application.Events;
+using RPG.Application.Events;
 using RPG.Domain.Entities;
-using RPG.GameServer.Models;
-using RPG.GameServer.Services;
+using RPG.Domain.Models;
 using Xunit;
 
 namespace RPG.UnitTest.GameServer;

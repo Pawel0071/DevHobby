@@ -1,4 +1,4 @@
-namespace RPG.Core.Application.Handlers;
+namespace RPG.Application.Handlers;
 
 public enum CommandError
 {
