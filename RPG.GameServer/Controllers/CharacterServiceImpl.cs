@@ -75,12 +75,22 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
 
 		if (baseCharacter.Position != null)
 		{
+			var position = baseCharacter.Position;
+			var hasWorldId = Guid.TryParse(position.WorldId, out var parsedWorldId);
+			var worldId = hasWorldId ? parsedWorldId : Guid.NewGuid();
+			var mapId = position.MapId ?? string.Empty;
+			var zoneName = position.ZoneName ?? string.Empty;
+
 			var location = DomainLocation.Create(
-				(float)baseCharacter.Position.X,
-				(float)baseCharacter.Position.Y,
-				(float)baseCharacter.Position.Z,
-				Guid.NewGuid());
-			location.Rotation = baseCharacter.Rotation;
+				(float)position.X,
+				(float)position.Y,
+				(float)position.Z,
+				worldId,
+				mapId,
+				zoneName);
+
+			location.WorldId = hasWorldId ? parsedWorldId : null;
+			location.Rotation = position.Rotation != 0 ? position.Rotation : baseCharacter.Rotation;
 			character.SetCurrentLocation(location);
 		}
 
@@ -106,7 +116,7 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
 
 		try
 		{
-			var result = await _startMovementHandler.HandleAsync(new StartMovementCommand(characterId, request.Direction));
+			var result = await _startMovementHandler.HandleAsync(new StartMovementCommand(characterId, request.Direction, request.PreserveFacing));
 			return ToReply(result);
 		}
 		catch (KeyNotFoundException ex)

@@ -1,164 +1,138 @@
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using RPG.Core.Interfaces;
 using RPG.Domain.Entities;
+using RPG.Domain.Entities.Items;
 using RPG.Domain.Entities.MapObjects;
 using RPG.Domain.Entities.Npcs;
-using RPG.Infrastructure.Documents;
+using RPG.Domain.Entities.Skills;
+using RPG.Infrastructure.Helpers;
 using RPG.Infrastructure.Interfaces;
+using RPG.WorldSeeder.Seeders;
 
 namespace RPG.WorldSeeder.Services;
 
 internal sealed class WorldSeederService
 {
-    private const int WorldWidth = 50;
-    private const int WorldHeight = 30;
-    private const string MapId = "starter.map";
-    private const string ZoneName = "starter.zone";
-    private static readonly Guid StarterWorldId = Guid.Parse("c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d");
+    private static readonly HashSet<string> SeededEntityKeys = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "item",
+        "skill",
+        "npc",
+        "mapobject",
+        "worldstate"
+    };
 
-    private readonly IMongoDocumentRepository _mongoRepository;
-    private readonly IDocumentMapper<WorldState, WorldStateDocument> _worldMapper;
+    private readonly SeedDataLoader _seedDataLoader;
+    private readonly IDocumentRepository _documentRepository;
     private readonly IWorldStateService _worldStateService;
-    private readonly Microsoft.Extensions.Logging.ILogger<WorldSeederService> _logger;
+    private readonly IMongoDatabase _mongoDatabase;
+    private readonly ILogger<WorldSeederService> _logger;
 
     public WorldSeederService(
-        IMongoDocumentRepository mongoRepository,
-        IDocumentMapper<WorldState, WorldStateDocument> worldMapper,
+        SeedDataLoader seedDataLoader,
+        IDocumentRepository documentRepository,
         IWorldStateService worldStateService,
-    Microsoft.Extensions.Logging.ILogger<WorldSeederService> logger)
+        IMongoDatabase mongoDatabase,
+        ILogger<WorldSeederService> logger)
     {
-        _mongoRepository = mongoRepository;
-        _worldMapper = worldMapper;
+        _seedDataLoader = seedDataLoader;
+        _documentRepository = documentRepository;
         _worldStateService = worldStateService;
+        _mongoDatabase = mongoDatabase;
         _logger = logger;
     }
 
     public async Task SeedAsync(CancellationToken cancellationToken = default)
     {
-        _logger.LogInformation("Seeding world definition for {WorldName} ({WorldId})", "Starter Grounds", StarterWorldId);
+    _logger.Info("Preparing world seed data from JSON definitions...");
 
-        var existingWorlds = await _mongoRepository.GetAllAsync<WorldStateDocument>(cancellationToken);
-        var existing = existingWorlds.FirstOrDefault(w => w.WorldId == StarterWorldId);
+        await ClearMongoCollectionsAsync(cancellationToken).ConfigureAwait(false);
 
-        var persistentId = existing?.Id ?? Guid.NewGuid();
-        var now = DateTime.UtcNow;
+        var data = await _seedDataLoader.LoadAsync(cancellationToken).ConfigureAwait(false);
 
-        var world = WorldState.Hydrate(persistentId, StarterWorldId, "Starter Grounds", now);
+        await SeedItemsAsync(data.Items.Values, cancellationToken).ConfigureAwait(false);
+        await SeedSkillsAsync(data.Skills.Values, cancellationToken).ConfigureAwait(false);
+        await SeedMapObjectsAsync(data.MapObjects, cancellationToken).ConfigureAwait(false);
+        await SeedNpcsAsync(data.Npcs, cancellationToken).ConfigureAwait(false);
 
-        SeedNpcs(world, now);
-        SeedMapObjects(world, now);
+    var worldState = PrepareWorldState(data.WorldState, data.Npcs, data.MapObjects);
+        await _documentRepository.UpsertAsync(worldState, cancellationToken).ConfigureAwait(false);
 
-        _worldStateService.Touch(world, now);
-
-        var document = _worldMapper.ToDocument(world);
-        await _mongoRepository.UpsertAsync(document, cancellationToken);
-
-        _logger.LogInformation("World {WorldId} persisted with {NpcCount} NPCs and {ObjectCount} map objects.", StarterWorldId, world.Npcs.Count, world.MapObjects.Count);
+        _logger.Info(
+            $"World seeding completed. Items: {data.Items.Count}, Skills: {data.Skills.Count}, NPCs: {data.Npcs.Count}, MapObjects: {data.MapObjects.Count}.");
     }
 
-    private void SeedNpcs(WorldState world, DateTime timestamp)
+    private async Task SeedItemsAsync(IEnumerable<Item> items, CancellationToken cancellationToken)
     {
-        var guideLocation = CreateLocation(12, 8, 180f);
-        var friendlyNpc = Npc.Create("starter.npc.village-guide", "Village Guide", CloneLocation(guideLocation), StarterWorldId, new HashSet<string> { "friendly", "guide", "questgiver" });
-        typeof(Npc).GetProperty("Id")!.SetValue(friendlyNpc, Guid.Parse("6fd699a7-2ebb-4b31-8b16-603bcb35c1a4"));
-        friendlyNpc.SetCurrentLocation(guideLocation);
-        friendlyNpc.IsAlive = true;
-        friendlyNpc.LastUpdated = timestamp;
-        friendlyNpc.RespawnAt = null;
-
-        var scoutLocation = CreateLocation(34, 12, 90f);
-        var hostileScout = Npc.Create("starter.npc.goblin-scout", "Goblin Scout", CloneLocation(scoutLocation), StarterWorldId, new HashSet<string> { "enemy", "goblin", "scout" });
-        typeof(Npc).GetProperty("Id")!.SetValue(hostileScout, Guid.Parse("49f0ce44-6e37-4d80-9f33-a8a894fe6a77"));
-        hostileScout.SetCurrentLocation(scoutLocation);
-        hostileScout.IsAlive = true;
-        hostileScout.LastUpdated = timestamp;
-        hostileScout.RespawnAt = timestamp.AddMinutes(3);
-
-        var warriorLocation = CreateLocation(40, 20, 270f);
-        var hostileWarrior = Npc.Create("starter.npc.goblin-warrior", "Goblin Warrior", CloneLocation(warriorLocation), StarterWorldId, new HashSet<string> { "enemy", "goblin", "melee" });
-        typeof(Npc).GetProperty("Id")!.SetValue(hostileWarrior, Guid.Parse("3a07884f-2f3c-49fb-b7a9-449e6bd01958"));
-        hostileWarrior.SetCurrentLocation(warriorLocation);
-        hostileWarrior.IsAlive = true;
-        hostileWarrior.LastUpdated = timestamp;
-        hostileWarrior.RespawnAt = timestamp.AddMinutes(5);
-
-        _worldStateService.UpsertNpc(world, friendlyNpc);
-        _worldStateService.UpsertNpc(world, hostileScout);
-        _worldStateService.UpsertNpc(world, hostileWarrior);
+        foreach (var item in items)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await _documentRepository.UpsertAsync(item, cancellationToken).ConfigureAwait(false);
+        }
     }
 
-    private void SeedMapObjects(WorldState world, DateTime timestamp)
+    private async Task SeedSkillsAsync(IEnumerable<Skill> skills, CancellationToken cancellationToken)
     {
-        var oakTree = MapObject.Create("starter.tree.oak", CreateLocation(8, 5, 0f), StarterWorldId, ZoneName);
-        typeof(MapObject).GetProperty("Id")!.SetValue(oakTree, Guid.Parse("b7c9cecb-4d93-4ee0-8a86-e363df3ae73c"));
-        oakTree.DisplayName = "Ancient Oak";
-        oakTree.IsActive = true;
-        oakTree.LastUpdated = timestamp;
-        oakTree.Tags = new HashSet<string> { "tree", "scenery" };
-        oakTree.State = new Dictionary<string, string>
+        foreach (var skill in skills)
         {
-            ["species"] = "oak",
-            ["height"] = "12"
-        };
-
-        var pineTree = MapObject.Create("starter.tree.pine", CreateLocation(42, 6, 45f), StarterWorldId, ZoneName);
-        typeof(MapObject).GetProperty("Id")!.SetValue(pineTree, Guid.Parse("f2ddbaea-35c4-4af5-9e6e-00722ed9951b"));
-        pineTree.DisplayName = "Tall Pine";
-        pineTree.IsActive = true;
-        pineTree.LastUpdated = timestamp;
-        pineTree.Tags = new HashSet<string> { "tree", "scenery" };
-        pineTree.State = new Dictionary<string, string>
-        {
-            ["species"] = "pine",
-            ["height"] = "15"
-        };
-
-        var townHall = MapObject.Create("starter.building.townhall", CreateLocation(18, 10, 180f), StarterWorldId, ZoneName);
-        typeof(MapObject).GetProperty("Id")!.SetValue(townHall, Guid.Parse("0cb43a3f-bd3c-4dc6-8781-f1024a816569"));
-        townHall.DisplayName = "Town Hall";
-        townHall.IsActive = true;
-        townHall.LastUpdated = timestamp;
-        townHall.Tags = new HashSet<string> { "building", "hub" };
-        townHall.State = new Dictionary<string, string>
-        {
-            ["worldWidth"] = WorldWidth.ToString(CultureInfo.InvariantCulture),
-            ["worldHeight"] = WorldHeight.ToString(CultureInfo.InvariantCulture),
-            ["floors"] = "2"
-        };
-
-        var treasureChest = MapObject.Create("starter.chest.community", CreateLocation(25, 15, 0f), StarterWorldId, ZoneName);
-        typeof(MapObject).GetProperty("Id")!.SetValue(treasureChest, Guid.Parse("a3aa4c7d-2d4d-4b0c-9f4d-2fe62f0d45ed"));
-        treasureChest.DisplayName = "Community Chest";
-        treasureChest.IsActive = true;
-        treasureChest.LastUpdated = timestamp;
-        treasureChest.Tags = new HashSet<string> { "chest", "interactive" };
-        treasureChest.State = new Dictionary<string, string>
-        {
-            ["lockState"] = "unlocked",
-            ["lootTable"] = "starter.community"
-        };
-
-        _worldStateService.UpsertMapObject(world, oakTree);
-        _worldStateService.UpsertMapObject(world, pineTree);
-        _worldStateService.UpsertMapObject(world, townHall);
-        _worldStateService.UpsertMapObject(world, treasureChest);
+            cancellationToken.ThrowIfCancellationRequested();
+            await _documentRepository.UpsertAsync(skill, cancellationToken).ConfigureAwait(false);
+        }
     }
 
-    private static Location CreateLocation(float x, float y, float rotationDegrees)
+    private async Task SeedMapObjectsAsync(IEnumerable<MapObject> mapObjects, CancellationToken cancellationToken)
     {
-        var location = Location.Create(new Vector3(x, y, 0f), StarterWorldId, MapId, ZoneName);
-        location.Rotation = rotationDegrees;
-        return location;
+        foreach (var mapObject in mapObjects)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await _documentRepository.UpsertAsync(mapObject, cancellationToken).ConfigureAwait(false);
+        }
     }
 
-    private static Location CloneLocation(Location location)
+    private async Task SeedNpcsAsync(IEnumerable<Npc> npcs, CancellationToken cancellationToken)
     {
-        var clone = Location.Create(location.Position, location.WorldId ?? StarterWorldId, location.MapId, location.ZoneName);
-        clone.Rotation = location.Rotation;
-        return clone;
+        foreach (var npc in npcs)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await _documentRepository.UpsertAsync(npc, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private WorldState PrepareWorldState(WorldState worldState, IReadOnlyList<Npc> npcs, IReadOnlyList<MapObject> mapObjects)
+    {
+        typeof(WorldState).GetProperty("Id")?.SetValue(worldState, worldState.WorldId);
+
+        worldState.Characters.Clear();
+        worldState.Npcs.Clear();
+        worldState.MapObjects.Clear();
+
+        foreach (var npc in npcs)
+        {
+            _worldStateService.UpsertNpc(worldState, npc);
+        }
+
+        foreach (var mapObject in mapObjects)
+        {
+            _worldStateService.UpsertMapObject(worldState, mapObject);
+        }
+
+        _worldStateService.Touch(worldState, DateTime.UtcNow);
+        return worldState;
+    }
+
+    private async Task ClearMongoCollectionsAsync(CancellationToken cancellationToken)
+    {
+        foreach (var mapping in DocumentMappingRegistry.All.Where(def => SeededEntityKeys.Contains(def.EntityKey)))
+        {
+            try
+            {
+                await _mongoDatabase.DropCollectionAsync(mapping.CollectionName, cancellationToken).ConfigureAwait(false);
+                _logger.Info($"Dropped MongoDB collection {mapping.CollectionName} before seeding.");
+            }
+            catch (MongoCommandException ex) when (string.Equals(ex.CodeName, "NamespaceNotFound", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.Debug($"MongoDB collection {mapping.CollectionName} did not exist prior to seeding.");
+            }
+        }
     }
 }

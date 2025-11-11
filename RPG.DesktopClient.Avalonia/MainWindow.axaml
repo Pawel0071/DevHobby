@@ -1,0 +1,138 @@
+<Window xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:RPG.DesktopClient.Avalonia.ViewModels"
+        mc:Ignorable="d"
+        x:Class="RPG.DesktopClient.Avalonia.MainWindow"
+        Title="RPG Desktop Client"
+        Width="1280"
+    Height="720"
+    Background="#101418"
+    x:DataType="vm:MainWindowViewModel">
+    <Grid ColumnDefinitions="3*,2*">
+        <Border Grid.Column="0"
+                Margin="16"
+                Padding="16"
+                Background="#151b22"
+                CornerRadius="12">
+            <ItemsControl ItemsSource="{Binding BoardCells}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Columns="{Binding $parent[Window].DataContext.BoardWidth}"
+                                     Rows="{Binding $parent[Window].DataContext.BoardHeight}" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:BoardCellViewModel">
+                        <Border Background="{Binding Background}"
+                                BorderBrush="#222"
+                                BorderThickness="0.5"
+                                ToolTip.Tip="{Binding Tooltip}">
+                            <TextBlock Text="{Binding Glyph}"
+                                       Foreground="{Binding Foreground}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontSize="16"
+                                       FontWeight="Bold" />
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+
+        <ScrollViewer Grid.Column="1" Margin="16">
+            <StackPanel Spacing="16">
+                <Border Padding="12" Background="#151b22" CornerRadius="8">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Sesja" FontWeight="Bold" Margin="0,0,0,8" />
+                        <TextBlock Text="{Binding PlayerName, StringFormat=Gracz: {0}}" />
+                        <TextBlock Text="{Binding SessionId, StringFormat=Sesja: {0}}" />
+                        <TextBlock Text="{Binding WorldName, StringFormat=Świat: {0}}" />
+                        <TextBlock Text="{Binding PlayerPosition, StringFormat=Pozycja: {0}}" />
+                        <TextBlock Text="{Binding WorldBounds, StringFormat=Granice: {0}}" />
+                        <TextBlock Text="{Binding LastSnapshot, StringFormat=Ostatnia migawka: {0}}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Padding="12" Background="#151b22" CornerRadius="8">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Podsumowanie" FontWeight="Bold" Margin="0,0,0,8" />
+                        <TextBlock Text="{Binding WorldPopulation, StringFormat=Gracze: {0}}" />
+                        <TextBlock Text="{Binding NpcCount, StringFormat=NPC: {0}}" />
+                        <TextBlock Text="{Binding MapObjectCount, StringFormat=Obiekty mapy: {0}}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Padding="12" Background="#151b22" CornerRadius="8" Height="200">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="NPC w pobliżu" FontWeight="Bold" />
+                        <ListBox ItemsSource="{Binding NearbyNpcs}" BorderBrush="#272e37" BorderThickness="1" Background="#11161d">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:EntityInfoViewModel">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                        <TextBlock Text="{Binding Position, StringFormat=Pozycja: {0}}" FontSize="12" />
+                                        <TextBlock Text="{Binding Details}" FontSize="12" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
+
+                <Border Padding="12" Background="#151b22" CornerRadius="8" Height="200">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Obiekty mapy" FontWeight="Bold" />
+                        <ListBox ItemsSource="{Binding MapObjects}" BorderBrush="#272e37" BorderThickness="1" Background="#11161d">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:EntityInfoViewModel">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                        <TextBlock Text="{Binding Position, StringFormat=Pozycja: {0}}" FontSize="12" />
+                                        <TextBlock Text="{Binding Details}" FontSize="12" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
+
+                <Border Padding="12" Background="#151b22" CornerRadius="8" Height="240">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Wszystkie obiekty" FontWeight="Bold" />
+                        <ListBox ItemsSource="{Binding WorldEntities}"
+                                 BorderBrush="#272e37"
+                                 BorderThickness="1"
+                                 Background="#11161d"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:EntityInfoViewModel">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" />
+                                        <TextBlock Text="{Binding Position, StringFormat=Pozycja: {0}}" FontSize="12" />
+                                        <TextBlock Text="{Binding Details}" FontSize="12" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
+
+                <Border Padding="12" Background="#151b22" CornerRadius="8" Height="150">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Komunikaty" FontWeight="Bold" />
+                        <ListBox ItemsSource="{Binding Messages}" BorderBrush="#272e37" BorderThickness="1" Background="#11161d">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:MessageViewModel">
+                                    <TextBlock Text="{Binding Text}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

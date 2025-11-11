@@ -76,7 +76,7 @@ public class CharacterCommandHandlerMovementTests
         var result = await _handler.HandleAsync(command);
 
         result.Success.Should().BeTrue();
-        character.CurrentLocation.Position.Z.Should().BeApproximately(5f, 0.0001f);
+    character.CurrentLocation.Position.Y.Should().BeApproximately(0.5f, 0.0001f);
         _characterRepository.Verify(repo => repo.SaveAsync(character), Times.Once);
         _eventDispatcher.Verify(
             dispatcher => dispatcher.DispatchAsync(It.Is<CharacterMovedEvent>(e =>

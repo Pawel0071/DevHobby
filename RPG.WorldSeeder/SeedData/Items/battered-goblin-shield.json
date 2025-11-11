@@ -1,0 +1,9 @@
+{
+  "id": "f4a0f45d-2d38-4009-8f32-63b4db7cd3c6",
+  "typeCode": "shield.basic",
+  "name": "Battered Goblin Shield",
+  "rarity": "Uncommon",
+  "requiredLevel": 2,
+  "stackSize": 1,
+  "tags": ["shield", "goblin"]
+}

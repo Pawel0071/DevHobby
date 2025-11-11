@@ -354,12 +354,15 @@ public sealed class NpcAiService : INpcAiService
     private UtilityAgent CreateAgentFor(Npc npc)
     {
         var combat = npc.Components.OfType<CombatComponent>().FirstOrDefault();
+        var dialogue = npc.Components.OfType<DialogueComponent>().FirstOrDefault();
+        var merchant = npc.Components.OfType<MerchantComponent>().FirstOrDefault();
+        var questGiver = npc.Components.OfType<QuestGiverComponent>().FirstOrDefault();
         var script = ResolveBehaviorScript(npc, combat);
         var skills = BuildSkillLookup(combat);
 
         try
         {
-            var agent = UtilityAgentFactory.GetByName(script, skills, _settings);
+            var agent = UtilityAgentFactory.GetByName(script, skills, _settings, dialogue, merchant, questGiver);
             if (agent != null)
             {
                 return agent;

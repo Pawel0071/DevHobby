@@ -13,8 +13,8 @@ namespace RPG.DesktopClient;
 
 internal static class Program
 {
-    private const int BoardWidth = 35;
-    private const int BoardHeight = 17;
+    private const int BoardWidth = 45;
+    private const int BoardHeight = 21;
     private const float StepPerSecond = 5f;
 
     private static readonly Dictionary<int, (int dx, int dy, string arrow)> DirectionVectors = new()
@@ -212,6 +212,13 @@ internal static class Program
         private readonly CharacterSession _session;
         private readonly object _drawLock = new();
     private readonly Dictionary<Guid, (int x, int y, string displayName)> _otherCharacters = new();
+    private readonly Dictionary<Guid, NpcBoardEntity> _npcs = new();
+    private readonly Dictionary<Guid, MapObjectBoardEntity> _mapObjects = new();
+    private readonly Dictionary<(int x, int y), TileDetails> _tileDetails = new();
+	private readonly List<(string Label, int X, int Y)> _spawnPoints = new();
+    private Location? _lastWorldLocation;
+	private WorldNpcSummary _npcSummary = WorldNpcSummary.Empty;
+	private WorldMapSummary _mapSummary = WorldMapSummary.Empty;
 
         private (int x, int y) _position = (BoardWidth / 2, BoardHeight / 2);
         private int _facingDirection = 1;
@@ -370,6 +377,10 @@ internal static class Program
                     case ConsoleKey.Spacebar:
                         await ReleaseMovementAsync();
                         break;
+                    case ConsoleKey.Enter:
+                    case ConsoleKey.I:
+                        InspectCurrentTile();
+                        break;
                     case ConsoleKey.Escape:
                         await ShutdownAsync();
                         _isRunning = false;
@@ -428,14 +439,21 @@ internal static class Program
 
             try
             {
-                await _client.StartRotationAsync(new MovementCommandRequest
+                var reply = await _client.StartRotationAsync(new MovementCommandRequest
                 {
                     CharacterId = characterId,
                     Direction = rotationCommand
                 });
 
-                rotationStarted = true;
-                _facingDirection = OffsetDirection(_facingDirection, step);
+                if (!reply.Success)
+                {
+                    LogError($"StartRotation odrzucone ({reply.ErrorCode}): {reply.Message}");
+                }
+                else
+                {
+                    rotationStarted = true;
+                    _facingDirection = OffsetDirection(_facingDirection, step);
+                }
             }
             catch (Exception ex)
             {
@@ -452,10 +470,15 @@ internal static class Program
         {
             try
             {
-                await _client.StopRotationAsync(new CharacterIdRequest
+                var reply = await _client.StopRotationAsync(new CharacterIdRequest
                 {
                     CharacterId = characterId
                 });
+
+                if (!reply.Success)
+                {
+                    LogError($"StopRotation odrzucone ({reply.ErrorCode}): {reply.Message}");
+                }
             }
             catch (Exception ex)
             {
@@ -474,11 +497,17 @@ internal static class Program
             {
                 try
                 {
-                    await _client.StartMovementAsync(new MovementCommandRequest
+                    var reply = await _client.StartMovementAsync(new MovementCommandRequest
                     {
                         CharacterId = _session.CharacterId.ToString(),
                         Direction = direction
                     });
+
+                    if (!reply.Success)
+                    {
+                        LogError($"StartMovement odrzucone ({reply.ErrorCode}): {reply.Message}");
+                        return;
+                    }
 
                     _movementActive = true;
                     _movementDirection = direction;
@@ -503,10 +532,16 @@ internal static class Program
 
             try
             {
-                await _client.StopMovementAsync(new CharacterIdRequest
+                var reply = await _client.StopMovementAsync(new CharacterIdRequest
                 {
                     CharacterId = _session.CharacterId.ToString()
                 });
+
+                if (!reply.Success)
+                {
+                    LogError($"StopMovement odrzucone ({reply.ErrorCode}): {reply.Message}");
+                    return;
+                }
 
                 _movementActive = false;
             }
@@ -573,12 +608,7 @@ internal static class Program
                 await _sessionClient.HeartbeatSessionAsync(new SessionHeartbeatRequest
                 {
                     SessionId = _session.SessionId.ToString(),
-                    Location = new Location
-                    {
-                        X = _position.x,
-                        Y = _position.y,
-                        Z = 0
-                    }
+                    Location = BuildHeartbeatLocation()
                 });
             }
             catch (Exception ex)
@@ -588,6 +618,28 @@ internal static class Program
             finally
             {
                 _lastHeartbeat = timestamp;
+            }
+        }
+
+        private Location? BuildHeartbeatLocation()
+        {
+            lock (_drawLock)
+            {
+                if (_lastWorldLocation == null)
+                {
+                    return null;
+                }
+
+                return new Location
+                {
+                    X = _lastWorldLocation.X,
+                    Y = _lastWorldLocation.Y,
+                    Z = _lastWorldLocation.Z,
+                    WorldId = _lastWorldLocation.WorldId,
+                    MapId = _lastWorldLocation.MapId,
+                    ZoneName = _lastWorldLocation.ZoneName,
+                    Rotation = _lastWorldLocation.Rotation
+                };
             }
         }
 
@@ -658,7 +710,12 @@ internal static class Program
             }
         }
 
-    private static string BuildBoard((int x, int y) position, int facingDirection, IReadOnlyCollection<(int x, int y)> otherCharacters)
+    private static string BuildBoard(
+            (int x, int y) position,
+            int facingDirection,
+            IReadOnlyCollection<(int x, int y)> otherCharacters,
+            IReadOnlyCollection<BoardEntity> npcEntities,
+            IReadOnlyCollection<BoardEntity> mapEntities)
         {
             if (!DirectionVectors.TryGetValue(facingDirection, out var vector))
             {
@@ -686,6 +743,22 @@ internal static class Program
                 }
             }
 
+            var npcLookup = npcEntities
+                .GroupBy(npc => (npc.X, npc.Y))
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Count() > 1
+                        ? new BoardSymbol("&", group.First().Color)
+                        : new BoardSymbol(group.First().Glyph, group.First().Color));
+
+            var mapLookup = mapEntities
+                .GroupBy(obj => (obj.X, obj.Y))
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Count() > 1
+                        ? new BoardSymbol("#", group.First().Color)
+                        : new BoardSymbol(group.First().Glyph, group.First().Color));
+
             for (var y = 0; y < BoardHeight; y++)
             {
                 for (var x = 0; x < BoardWidth; x++)
@@ -706,6 +779,22 @@ internal static class Program
                                     .Append(occupants > 1 ? '+' : 'P')
                                     .Append("[/]");
                     }
+                    else if (npcLookup.TryGetValue((x, y), out var npcSymbol))
+                    {
+                        boardBuilder.Append('[')
+                                    .Append(npcSymbol.Color)
+                                    .Append(']')
+                                    .Append(npcSymbol.Glyph)
+                                    .Append("[/]");
+                    }
+                    else if (mapLookup.TryGetValue((x, y), out var mapSymbol))
+                    {
+                        boardBuilder.Append('[')
+                                    .Append(mapSymbol.Color)
+                                    .Append(']')
+                                    .Append(mapSymbol.Glyph)
+                                    .Append("[/]");
+                    }
                     else
                     {
                         boardBuilder.Append("[grey30].[/]");
@@ -724,7 +813,14 @@ internal static class Program
         private IRenderable Render()
         {
             var otherCharacters = _otherCharacters.Values.ToList();
-            var board = BuildBoard(_position, _facingDirection, otherCharacters.Select(c => (c.x, c.y)).ToList());
+            var npcEntities = _npcs.Values.Select(n => n.ToBoardEntity()).ToList();
+            var mapEntities = _mapObjects.Values.Select(m => m.ToBoardEntity()).ToList();
+            var board = BuildBoard(
+                _position,
+                _facingDirection,
+                otherCharacters.Select(c => (c.x, c.y)).ToList(),
+                npcEntities,
+                mapEntities);
             var facingVector = DirectionVectors.TryGetValue(_facingDirection, out var vector)
                 ? vector
                 : DirectionVectors[1];
@@ -745,7 +841,19 @@ internal static class Program
                 .AppendLine($"Postać: {_session.CharacterId}")
                 .AppendLine($"Pozycja: {_position.x},{_position.y}")
                 .AppendLine($"Facing: {facingAngle}° ({facingVector.arrow}) [dir {_facingDirection}]")
-                .AppendLine($"Ruch: {_movementActive} (dir {_movementDirection})");
+                .AppendLine($"Ruch: {_movementActive} (dir {_movementDirection})")
+                .AppendLine($"NPC na mapie: {npcEntities.Count}")
+                .AppendLine($"Obiekty mapy: {mapEntities.Count}")
+                .AppendLine($"Granice świata: {GetWorldBoundsSummary()}");
+
+            status.AppendLine($"NPC ogółem: {_npcSummary.Total}, przyjaźni: {_npcSummary.Friendly}, wrodzy: {_npcSummary.Hostile}, kupcy: {_npcSummary.Merchants}, trenerzy: {_npcSummary.Trainers}");
+            status.AppendLine($"Obiekty: spawn {_mapSummary.SpawnPoints}, struktury {_mapSummary.Structures}, targ {_mapSummary.Markets}, trening {_mapSummary.TrainingZones}, interaktywne {_mapSummary.Interactive}");
+
+            if (_lastSnapshotTick > 0)
+            {
+                var lastSnapshotLocal = DateTimeOffset.FromUnixTimeMilliseconds(_lastSnapshotTick).ToLocalTime();
+                status.AppendLine($"Ostatnia migawka: {lastSnapshotLocal:yyyy-MM-dd HH:mm:ss}");
+            }
 
             if (_worldId.HasValue)
             {
@@ -769,6 +877,58 @@ internal static class Program
                     status.AppendLine($"  ... i {otherCharacters.Count - 5} więcej");
                 }
             }
+
+            if (npcEntities.Count > 0)
+            {
+                status.AppendLine()
+                      .AppendLine("NPC w pobliżu:");
+
+                foreach (var npc in npcEntities.Take(5))
+                {
+                    status.AppendLine($"  - {npc.DisplayName} ({npc.X},{npc.Y})");
+                }
+
+                if (npcEntities.Count > 5)
+                {
+                    status.AppendLine($"  ... i {npcEntities.Count - 5} więcej");
+                }
+            }
+            else
+            {
+                status.AppendLine()
+                      .AppendLine("NPC w pobliżu: brak danych (poczekaj na aktualizację świata)");
+            }
+
+            if (_spawnPoints.Count > 0)
+            {
+                status.AppendLine()
+                      .AppendLine("Punkty odrodzenia:");
+
+                foreach (var spawn in _spawnPoints.Take(5))
+                {
+                    status.AppendLine($"  - {spawn.Label} ({spawn.X},{spawn.Y})");
+                }
+
+                if (_spawnPoints.Count > 5)
+                {
+                    status.AppendLine($"  ... i {_spawnPoints.Count - 5} więcej");
+                }
+            }
+
+            status.AppendLine()
+                  .AppendLine("Legenda mapy:")
+                  .AppendLine("  ! – wrogie NPC")
+                  .AppendLine("  $ – kupcy")
+                  .AppendLine("  T – trenerzy")
+                  .AppendLine("  F – przyjaźni NPC")
+                  .AppendLine("  H – budynki / struktury")
+            .AppendLine("  M – stragany / rynek")
+            .AppendLine("  X – strefy treningowe")
+            .AppendLine("  S – punkty odrodzenia")
+            .AppendLine("  C – skrzynie / interakcje")
+            .AppendLine("  ^ – las / drzewa")
+            .AppendLine("  ~ – woda / doki")
+            .AppendLine("  = – ścieżki");
 
             var boardPanel = new Panel(new Markup(board))
             {
@@ -795,7 +955,152 @@ internal static class Program
                 Border = BoxBorder.Rounded
             };
 
-            return new Columns(boardPanel, infoPanel);
+            var entityPanel = BuildEntityPanel();
+            var serverDataPanel = BuildServerDataPanel();
+            var rightColumn = new Rows(infoPanel, entityPanel, serverDataPanel);
+
+            return new Columns(boardPanel, rightColumn);
+        }
+
+        private string GetWorldBoundsSummary()
+        {
+            if (!_hasWorldBounds)
+            {
+                return "brak danych";
+            }
+
+            return FormattableString.Invariant($"X {_worldMinX:F1} – {_worldMaxX:F1}, Y {_worldMinY:F1} – {_worldMaxY:F1}");
+        }
+
+        private IRenderable BuildEntityPanel()
+        {
+            var table = new Table().Title("Otoczenie");
+            table.AddColumn(new TableColumn("Typ"));
+            table.AddColumn(new TableColumn("Nazwa"));
+            table.AddColumn(new TableColumn("Szczegóły"));
+
+            if (_tileDetails.TryGetValue(_position, out var tile) && (tile.Npcs.Count > 0 || tile.MapObjects.Count > 0))
+            {
+                foreach (var npc in tile.Npcs)
+                {
+                    var details = new StringBuilder();
+                    details.Append("Stan: ").Append(npc.IsAlive ? "żywy" : "nieaktywny");
+
+                    if (npc.Tags.Count > 0)
+                    {
+                        details.Append(" | Tagi: ").Append(string.Join(", ", npc.Tags.Take(5)));
+                        if (npc.Tags.Count > 5)
+                        {
+                            details.Append(" +").Append(npc.Tags.Count - 5);
+                        }
+                    }
+
+                    details.Append(" | Pozycja: ")
+                        .AppendFormat(CultureInfo.InvariantCulture, "{0:0.0},{1:0.0}", npc.Location.X, npc.Location.Y);
+
+                    table.AddRow("NPC", npc.DisplayName, details.ToString());
+                }
+
+                foreach (var mapObject in tile.MapObjects)
+                {
+                    var details = new StringBuilder();
+                    details.Append("Stan: ").Append(mapObject.IsActive ? "aktywne" : "nieaktywne");
+
+                    if (mapObject.Tags.Count > 0)
+                    {
+                        details.Append(" | Tagi: ").Append(string.Join(", ", mapObject.Tags.Take(5)));
+                        if (mapObject.Tags.Count > 5)
+                        {
+                            details.Append(" +").Append(mapObject.Tags.Count - 5);
+                        }
+                    }
+
+                    if (mapObject.State.Count > 0)
+                    {
+                        var preview = mapObject.State.Take(2).Select(kvp => $"{kvp.Key}={kvp.Value}");
+                        details.Append(" | Stan: ").Append(string.Join("; ", preview));
+                    }
+
+                    details.Append(" | Pozycja: ")
+                        .AppendFormat(CultureInfo.InvariantCulture, "{0:0.0},{1:0.0}", mapObject.Location.X, mapObject.Location.Y);
+
+                    table.AddRow("Obiekt", mapObject.DisplayName, details.ToString());
+                }
+            }
+            else
+            {
+                table.AddRow("-", "Brak", "Na tym polu nie ma NPC ani obiektów.");
+            }
+
+            return new Panel(table)
+            {
+                Header = new PanelHeader("Szczegóły pola"),
+                Padding = new Padding(1, 0),
+                Border = BoxBorder.Rounded
+            };
+        }
+
+        private IRenderable BuildServerDataPanel()
+        {
+            var table = new Table().Title("Dane z serwera");
+            table.AddColumn(new TableColumn("Typ"));
+            table.AddColumn(new TableColumn("Nazwa"));
+            table.AddColumn(new TableColumn("Pozycja świata"));
+            table.AddColumn(new TableColumn("Na planszy"));
+
+            var hasRows = false;
+
+            if (_lastWorldLocation != null)
+            {
+                var label = string.IsNullOrWhiteSpace(_session.PlayerName)
+                    ? _session.CharacterId.ToString()
+                    : _session.PlayerName;
+
+                table.AddRow("Postać", label, FormatWorldLocation(_lastWorldLocation), FormatBoardPosition(_position));
+                hasRows = true;
+            }
+
+            foreach (var npc in _npcs.Values.OrderBy(n => n.DisplayName).Take(5))
+            {
+                if (npc.Location == null)
+                {
+                    continue;
+                }
+
+                table.AddRow("NPC", npc.DisplayName, FormatWorldLocation(npc.Location), FormatBoardPosition((npc.X, npc.Y)));
+                hasRows = true;
+            }
+
+            foreach (var mapObject in _mapObjects.Values.OrderBy(m => m.DisplayName).Take(5))
+            {
+                if (mapObject.Location == null)
+                {
+                    continue;
+                }
+
+                table.AddRow("Obiekt", mapObject.DisplayName, FormatWorldLocation(mapObject.Location), FormatBoardPosition((mapObject.X, mapObject.Y)));
+                hasRows = true;
+            }
+
+            if (_hasWorldBounds)
+            {
+                var worldLabel = _worldName ?? _worldId?.ToString() ?? "-";
+                var bounds = FormattableString.Invariant($"X {_worldMinX:0.0}–{_worldMaxX:0.0}, Y {_worldMinY:0.0}–{_worldMaxY:0.0}");
+                table.AddRow("Świat", worldLabel, bounds, FormattableString.Invariant($"{BoardWidth}x{BoardHeight}"));
+                hasRows = true;
+            }
+
+            if (!hasRows)
+            {
+                table.AddRow("-", "Brak danych", "-", "-");
+            }
+
+            return new Panel(table)
+            {
+                Header = new PanelHeader("Migawka serwera"),
+                Padding = new Padding(1, 0),
+                Border = BoxBorder.Rounded
+            };
         }
 
         private async Task RunAutomationAsync()
@@ -822,6 +1127,9 @@ internal static class Program
 
             LogInfo($"Ostatnia migawka świata: {_lastSnapshotTick}.");
             LogInfo($"Zaobserwowane granice świata: {boundsSummary}.");
+            LogInfo($"Widoczne NPC: {_npcs.Count}, obiekty mapy: {_mapObjects.Count}.");
+            LogInfo($"Podsumowanie NPC – przyjaźni: {_npcSummary.Friendly}, wrodzy: {_npcSummary.Hostile}, kupcy: {_npcSummary.Merchants}, trenerzy: {_npcSummary.Trainers}.");
+            LogInfo($"Podsumowanie obiektów – spawn: {_mapSummary.SpawnPoints}, struktury: {_mapSummary.Structures}, targ: {_mapSummary.Markets}, trening: {_mapSummary.TrainingZones}, interaktywne: {_mapSummary.Interactive}.");
 
             if (_otherCharacters.Count > 0)
             {
@@ -938,9 +1246,36 @@ internal static class Program
                 }
             }
 
+            var mapObjectList = snapshot.MapObjects?
+                .Where(o => o != null && o.Location != null)
+                .ToList()
+                ?? new List<WorldMapObject>();
+
+            var npcList = snapshot.Npcs?
+                .Where(n => n != null && n.Location != null)
+                .ToList()
+                ?? new List<WorldNpc>();
+
+            var npcSummary = BuildNpcSummary(npcList);
+            var mapSummary = BuildMapSummary(mapObjectList);
+
             lock (_drawLock)
             {
                 _otherCharacters.Clear();
+                _mapObjects.Clear();
+                _npcs.Clear();
+                _spawnPoints.Clear();
+                _tileDetails.Clear();
+
+                foreach (var mapObject in mapObjectList)
+                {
+                    UpdateWorldBounds(mapObject.Location);
+                }
+
+                foreach (var npc in npcList)
+                {
+                    UpdateWorldBounds(npc.Location);
+                }
 
                 if (snapshot.Characters != null)
                 {
@@ -965,6 +1300,18 @@ internal static class Program
 
                         if (characterId == _session.CharacterId)
                         {
+                            _lastWorldLocation = character.Location != null
+                                ? new Location
+                                {
+                                    X = character.Location.X,
+                                    Y = character.Location.Y,
+                                    Z = character.Location.Z,
+                                    WorldId = character.Location.WorldId,
+                                    MapId = character.Location.MapId,
+                                    ZoneName = character.Location.ZoneName,
+                                    Rotation = character.Location.Rotation
+                                }
+                                : null;
                             _position = location;
                             continue;
                         }
@@ -982,6 +1329,69 @@ internal static class Program
                 {
                     _worldPopulation = 0;
                 }
+
+                foreach (var npc in npcList)
+                {
+                    if (!Guid.TryParse(npc.NpcId, out var npcId))
+                    {
+                        continue;
+                    }
+
+                    var board = MapWorldToBoard(npc.Location);
+                    var symbol = ResolveNpcSymbol(npc);
+                    var label = string.IsNullOrWhiteSpace(npc.Name) ? npc.NpcId : npc.Name;
+
+                    var npcEntity = new NpcBoardEntity(
+                        npcId,
+                        label,
+                        board.x,
+                        board.y,
+                        symbol.Glyph,
+                        symbol.Color,
+                        npc.Location,
+                        npc.Tags.ToList(),
+                        npc.IsAlive);
+
+                    _npcs[npcId] = npcEntity;
+                    AddTileNpc(board, npcEntity);
+                }
+
+                foreach (var mapObject in mapObjectList)
+                {
+                    if (!Guid.TryParse(mapObject.MapObjectId, out var mapObjectId))
+                    {
+                        continue;
+                    }
+
+                    var board = MapWorldToBoard(mapObject.Location);
+                    var symbol = ResolveMapObjectSymbol(mapObject);
+                    var label = string.IsNullOrWhiteSpace(mapObject.DisplayName)
+                        ? mapObject.Name
+                        : mapObject.DisplayName;
+
+                    var mapEntity = new MapObjectBoardEntity(
+                        mapObjectId,
+                        label,
+                        board.x,
+                        board.y,
+                        symbol.Glyph,
+                        symbol.Color,
+                        mapObject.Location,
+                        mapObject.Tags.ToList(),
+                        mapObject.State.ToDictionary(entry => entry.Key, entry => entry.Value),
+                        mapObject.IsActive);
+
+                    _mapObjects[mapObjectId] = mapEntity;
+                    AddTileMapObject(board, mapEntity);
+
+                    if (HasTag(mapObject.Tags, "spawn"))
+                    {
+                        _spawnPoints.Add((label, board.x, board.y));
+                    }
+                }
+
+                _npcSummary = npcSummary;
+                _mapSummary = mapSummary;
             }
 
             if (snapshot.LastUpdated > 0)
@@ -1053,6 +1463,313 @@ internal static class Program
             var clampedY = Math.Clamp(boardY, 0, BoardHeight - 1);
 
             return (clampedX, clampedY);
+        }
+
+        private static BoardSymbol ResolveNpcSymbol(WorldNpc npc)
+        {
+            if (HasTag(npc?.Tags, "enemy") || HasTag(npc?.Tags, "hostile"))
+            {
+                return new BoardSymbol("!", "red1");
+            }
+
+            if (HasTag(npc?.Tags, "merchant"))
+            {
+                return new BoardSymbol("$", "gold1");
+            }
+
+            if (HasTag(npc?.Tags, "trainer"))
+            {
+                return new BoardSymbol("T", "springgreen2");
+            }
+
+            if (HasTag(npc?.Tags, "friendly") || HasTag(npc?.Tags, "quest"))
+            {
+                return new BoardSymbol("F", "deepskyblue1");
+            }
+
+            return new BoardSymbol("N", "silver");
+        }
+
+        private static BoardSymbol ResolveMapObjectSymbol(WorldMapObject mapObject)
+        {
+            if (HasTag(mapObject?.Tags, "spawn"))
+            {
+                return new BoardSymbol("S", "yellow3");
+            }
+
+            if (HasTag(mapObject?.Tags, "market") || HasTag(mapObject?.Tags, "merchant"))
+            {
+                return new BoardSymbol("M", "orange3");
+            }
+
+            if (HasTag(mapObject?.Tags, "building") || HasTag(mapObject?.Tags, "structure") || HasTag(mapObject?.Tags, "hub"))
+            {
+                return new BoardSymbol("H", "gold3");
+            }
+
+            if (HasTag(mapObject?.Tags, "training") || HasTag(mapObject?.Tags, "arena"))
+            {
+                return new BoardSymbol("X", "plum3");
+            }
+
+            if (HasTag(mapObject?.Tags, "chest") || HasTag(mapObject?.Tags, "interactive"))
+            {
+                return new BoardSymbol("C", "lightgoldenrod1");
+            }
+
+            if (HasTag(mapObject?.Tags, "water") || HasTag(mapObject?.Tags, "dock"))
+            {
+                return new BoardSymbol("~", "teal");
+            }
+
+            if (HasTag(mapObject?.Tags, "path") || HasTag(mapObject?.Tags, "cobblestone"))
+            {
+                return new BoardSymbol("=", "grey70");
+            }
+
+            if (HasTag(mapObject?.Tags, "tree") || HasTag(mapObject?.Tags, "forest") || HasTag(mapObject?.Tags, "shrine") || HasTag(mapObject?.Tags, "lore"))
+            {
+                return new BoardSymbol("^", "green3");
+            }
+
+            return new BoardSymbol("#", "silver");
+        }
+
+        private static bool HasTag(IEnumerable<string>? tags, string value)
+        {
+            if (tags is null)
+            {
+                return false;
+            }
+
+            return tags.Any(tag =>
+                !string.IsNullOrWhiteSpace(tag) &&
+                tag.Contains(value, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private void AddTileNpc((int x, int y) boardPosition, NpcBoardEntity entity)
+        {
+            if (!_tileDetails.TryGetValue(boardPosition, out var tile))
+            {
+                tile = new TileDetails();
+                _tileDetails[boardPosition] = tile;
+            }
+
+            tile.Npcs.Add(entity);
+        }
+
+        private void AddTileMapObject((int x, int y) boardPosition, MapObjectBoardEntity entity)
+        {
+            if (!_tileDetails.TryGetValue(boardPosition, out var tile))
+            {
+                tile = new TileDetails();
+                _tileDetails[boardPosition] = tile;
+            }
+
+            tile.MapObjects.Add(entity);
+        }
+
+        private void InspectCurrentTile()
+        {
+            bool hasTile;
+            TileDetails? tile;
+            lock (_drawLock)
+            {
+                hasTile = _tileDetails.TryGetValue(_position, out tile);
+            }
+
+            if (!hasTile || tile == null || (tile.Npcs.Count == 0 && tile.MapObjects.Count == 0))
+            {
+                LogInfo("Wybrane pole jest puste.");
+                return;
+            }
+
+            LogInfo("Szczegóły bieżącego pola:");
+
+            foreach (var npc in tile.Npcs)
+            {
+                var tags = npc.Tags.Count > 0 ? string.Join(',', npc.Tags) : "brak";
+                LogInfo(FormattableString.Invariant($"  NPC: {npc.DisplayName} [{tags}] @ {npc.Location.X:0.0},{npc.Location.Y:0.0}"));
+            }
+
+            foreach (var mapObject in tile.MapObjects)
+            {
+                var tags = mapObject.Tags.Count > 0 ? string.Join(',', mapObject.Tags) : "brak";
+                var state = mapObject.State.Count > 0
+                    ? string.Join("; ", mapObject.State.Take(3).Select(kvp => $"{kvp.Key}={kvp.Value}"))
+                    : "brak";
+
+                LogInfo(FormattableString.Invariant($"  Obiekt: {mapObject.DisplayName} [{tags}] @ {mapObject.Location.X:0.0},{mapObject.Location.Y:0.0} (stan: {state})"));
+            }
+        }
+
+        private static WorldNpcSummary BuildNpcSummary(IReadOnlyCollection<WorldNpc> npcs)
+        {
+            if (npcs.Count == 0)
+            {
+                return WorldNpcSummary.Empty;
+            }
+
+            var friendly = 0;
+            var hostile = 0;
+            var merchants = 0;
+            var trainers = 0;
+
+            foreach (var npc in npcs)
+            {
+                if (HasTag(npc.Tags, "friendly"))
+                {
+                    friendly++;
+                }
+
+                if (HasTag(npc.Tags, "hostile") || HasTag(npc.Tags, "enemy"))
+                {
+                    hostile++;
+                }
+
+                if (HasTag(npc.Tags, "merchant"))
+                {
+                    merchants++;
+                }
+
+                if (HasTag(npc.Tags, "trainer"))
+                {
+                    trainers++;
+                }
+            }
+
+            return new WorldNpcSummary(npcs.Count, friendly, hostile, merchants, trainers);
+        }
+
+        private static WorldMapSummary BuildMapSummary(IReadOnlyCollection<WorldMapObject> mapObjects)
+        {
+            if (mapObjects.Count == 0)
+            {
+                return WorldMapSummary.Empty;
+            }
+
+            var spawn = 0;
+            var structures = 0;
+            var markets = 0;
+            var training = 0;
+            var interactive = 0;
+            var water = 0;
+            var paths = 0;
+            var nature = 0;
+            var other = 0;
+
+            foreach (var mapObject in mapObjects)
+            {
+                if (HasTag(mapObject.Tags, "spawn"))
+                {
+                    spawn++;
+                }
+                else if (HasTag(mapObject.Tags, "market") || HasTag(mapObject.Tags, "merchant"))
+                {
+                    markets++;
+                }
+                else if (HasTag(mapObject.Tags, "building") || HasTag(mapObject.Tags, "structure") || HasTag(mapObject.Tags, "hub"))
+                {
+                    structures++;
+                }
+                else if (HasTag(mapObject.Tags, "training") || HasTag(mapObject.Tags, "arena"))
+                {
+                    training++;
+                }
+                else if (HasTag(mapObject.Tags, "chest") || HasTag(mapObject.Tags, "interactive"))
+                {
+                    interactive++;
+                }
+                else if (HasTag(mapObject.Tags, "water") || HasTag(mapObject.Tags, "dock"))
+                {
+                    water++;
+                }
+                else if (HasTag(mapObject.Tags, "path") || HasTag(mapObject.Tags, "cobblestone"))
+                {
+                    paths++;
+                }
+                else if (HasTag(mapObject.Tags, "tree") || HasTag(mapObject.Tags, "forest") || HasTag(mapObject.Tags, "shrine") || HasTag(mapObject.Tags, "lore"))
+                {
+                    nature++;
+                }
+                else
+                {
+                    other++;
+                }
+            }
+
+            return new WorldMapSummary(spawn, structures, markets, training, interactive, water, paths, nature, other);
+        }
+
+        private sealed record BoardEntity(int X, int Y, string DisplayName, string Glyph, string Color);
+
+        private readonly record struct BoardSymbol(string Glyph, string Color);
+
+        private sealed record NpcBoardEntity(
+            Guid Id,
+            string DisplayName,
+            int X,
+            int Y,
+            string Glyph,
+            string Color,
+            Location Location,
+            IReadOnlyList<string> Tags,
+            bool IsAlive)
+        {
+            public BoardEntity ToBoardEntity() => new(X, Y, DisplayName, Glyph, Color);
+        }
+
+        private sealed record MapObjectBoardEntity(
+            Guid Id,
+            string DisplayName,
+            int X,
+            int Y,
+            string Glyph,
+            string Color,
+            Location Location,
+            IReadOnlyList<string> Tags,
+            IReadOnlyDictionary<string, string> State,
+            bool IsActive)
+        {
+            public BoardEntity ToBoardEntity() => new(X, Y, DisplayName, Glyph, Color);
+        }
+
+        private sealed class TileDetails
+        {
+            public List<NpcBoardEntity> Npcs { get; } = new();
+            public List<MapObjectBoardEntity> MapObjects { get; } = new();
+        }
+
+        private readonly record struct WorldNpcSummary(int Total, int Friendly, int Hostile, int Merchants, int Trainers)
+        {
+            public static WorldNpcSummary Empty => new(0, 0, 0, 0, 0);
+        }
+
+        private readonly record struct WorldMapSummary(int SpawnPoints, int Structures, int Markets, int TrainingZones, int Interactive, int Water, int Paths, int Nature, int Other)
+        {
+            public static WorldMapSummary Empty => new(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        }
+
+        private static string FormatWorldLocation(Location location)
+        {
+            var coordinates = FormattableString.Invariant($"{location.X:0.0},{location.Y:0.0}");
+
+            if (Math.Abs(location.Z) > 0.01)
+            {
+                coordinates += FormattableString.Invariant($" (Z {location.Z:0.0})");
+            }
+
+            if (!string.IsNullOrWhiteSpace(location.ZoneName))
+            {
+                coordinates += FormattableString.Invariant($" [{location.ZoneName}]");
+            }
+
+            return coordinates;
+        }
+
+        private static string FormatBoardPosition((int x, int y) boardPosition)
+        {
+            return FormattableString.Invariant($"{boardPosition.x},{boardPosition.y}");
         }
     }
 

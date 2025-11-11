@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using RPG.Domain.Entities.MapObjects;
 using RPG.Domain.Entities.Npcs;
 using RPG.Domain.Models;
 using RPG.GameServer.Protos;
+using RPG.Infrastructure.Interfaces;
 using DomainWorldState = RPG.Domain.Entities.WorldState;
 using ProtoWorldState = RPG.GameServer.Protos.WorldState;
 
@@ -20,21 +22,24 @@ namespace RPG.GameServer.Controllers;
 
 public class WorldServiceImpl : WorldService.WorldServiceBase
 {
-	private readonly ICharacterStateBroadcaster _stateBroadcaster;
-	private readonly INpcAiService _npcAiService;
-    private readonly IWorldSessionManager _worldSessionManager;
-    private readonly RPG.Infrastructure.Interfaces.ILogger<WorldServiceImpl> _logger;
+		private readonly ICharacterStateBroadcaster _stateBroadcaster;
+		private readonly INpcAiService _npcAiService;
+		private readonly IWorldSessionManager _worldSessionManager;
+		private readonly IDocumentRepository _documentRepository;
+		private readonly RPG.Infrastructure.Interfaces.ILogger<WorldServiceImpl> _logger;
 
 	public WorldServiceImpl(
         ICharacterStateBroadcaster stateBroadcaster,
         INpcAiService npcAiService,
-        IWorldSessionManager worldSessionManager,
-		RPG.Infrastructure.Interfaces.ILogger<WorldServiceImpl> logger)
+			IWorldSessionManager worldSessionManager,
+	        IDocumentRepository documentRepository,
+			RPG.Infrastructure.Interfaces.ILogger<WorldServiceImpl> logger)
 	{
-		_stateBroadcaster = stateBroadcaster;
-		_npcAiService = npcAiService;
-        _worldSessionManager = worldSessionManager;
-        _logger = logger;
+			_stateBroadcaster = stateBroadcaster;
+			_npcAiService = npcAiService;
+			_worldSessionManager = worldSessionManager;
+			_documentRepository = documentRepository;
+			_logger = logger;
 	}
 
 	public override Task<WorldReply> GetWorldState(WorldRequest request, ServerCallContext context)
@@ -78,7 +83,7 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 
 			return new JoinWorldReply
 			{
-				Snapshot = ToSnapshot(joinResult.World),
+				Snapshot = await ToSnapshotAsync(joinResult.World, context.CancellationToken).ConfigureAwait(false),
 				SpawnLocation = ToProtoLocation(joinResult.SpawnLocation)
 			};
 		}
@@ -103,13 +108,48 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 			var world = await _worldSessionManager.GetWorldForSessionAsync(sessionId, context.CancellationToken).ConfigureAwait(false);
 			return new WorldReply
 			{
-				State = ConvertToLegacyState(world)
+				State = await ConvertToLegacyStateAsync(world, context.CancellationToken).ConfigureAwait(false)
 			};
 		}
 		catch (InvalidOperationException ex)
 		{
 			throw new RpcException(new Status(StatusCode.FailedPrecondition, ex.Message));
 		}
+	}
+
+	public override async Task<WorldSnapshotReply> GetWorldSnapshot(WorldSnapshotRequest request, ServerCallContext context)
+	{
+		var cancellationToken = context.CancellationToken;
+		DomainWorldState world;
+		if (!string.IsNullOrWhiteSpace(request.WorldId))
+		{
+			if (!Guid.TryParse(request.WorldId, out var worldId))
+			{
+				throw new RpcException(new Status(StatusCode.InvalidArgument, "worldId must be a valid GUID."));
+			}
+
+			world = await _worldSessionManager.GetWorldAsync(worldId, cancellationToken).ConfigureAwait(false);
+		}
+		else if (!string.IsNullOrWhiteSpace(request.SessionId))
+		{
+			if (!Guid.TryParse(request.SessionId, out var sessionId))
+			{
+				throw new RpcException(new Status(StatusCode.InvalidArgument, "sessionId must be a valid GUID."));
+			}
+
+			world = await _worldSessionManager.GetWorldForSessionAsync(sessionId, cancellationToken).ConfigureAwait(false);
+		}
+		else
+		{
+			throw new RpcException(new Status(StatusCode.InvalidArgument, "Either worldId or sessionId must be provided."));
+		}
+
+		var snapshot = await ToSnapshotAsync(world, cancellationToken).ConfigureAwait(false);
+		_logger.Info($"World snapshot resolved: {DescribeSnapshot(snapshot)}");
+		return new WorldSnapshotReply
+		{
+			Snapshot = snapshot
+		};
 	}
 
 	public override async Task StreamWorldState(WorldStreamRequest request, IServerStreamWriter<WorldUpdate> responseStream, ServerCallContext context)
@@ -142,7 +182,7 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 				var world = await _worldSessionManager.GetWorldAsync(resolvedWorldId, context.CancellationToken).ConfigureAwait(false);
 				var update = new WorldUpdate
 				{
-					Snapshot = ToSnapshot(world)
+					Snapshot = await ToSnapshotAsync(world, context.CancellationToken).ConfigureAwait(false)
 				};
 
 				await responseStream.WriteAsync(update).ConfigureAwait(false);
@@ -171,12 +211,7 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 			MaxMana = 0,
 			CurrentMana = 0,
 			Stats = new Stats(),
-			Position = new Protos.Location
-			{
-				X = snapshot.Location.Position.X,
-				Y = snapshot.Location.Position.Y,
-				Z = snapshot.Location.Position.Z
-			},
+			Position = ToProtoLocation(snapshot.Location),
 			IsMoving = snapshot.IsMoving,
 			IsRotating = snapshot.IsRotating,
 			Rotation = snapshot.Rotation
@@ -200,12 +235,7 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 			MaxMana = 0,
 			CurrentMana = 0,
 			Stats = new Stats(),
-			Position = new Protos.Location
-			{
-				X = snapshot.Location.Position.X,
-				Y = snapshot.Location.Position.Y,
-				Z = snapshot.Location.Position.Z
-			},
+			Position = ToProtoLocation(snapshot.Location),
 			IsMoving = snapshot.IsMoving,
 			IsRotating = snapshot.IsRotating,
 			Rotation = snapshot.Rotation
@@ -217,7 +247,7 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 		};
 	}
 
-	private static WorldSnapshot ToSnapshot(DomainWorldState world)
+	private async Task<WorldSnapshot> ToSnapshotAsync(DomainWorldState world, CancellationToken cancellationToken)
 	{
 		var snapshot = new WorldSnapshot
 		{
@@ -229,38 +259,74 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 			LastUpdated = new DateTimeOffset(world.LastUpdated).ToUnixTimeMilliseconds()
 		};
 
-		snapshot.Characters.AddRange(world.Characters.Select(ToProtoCharacter));
-		snapshot.Npcs.AddRange(world.Npcs.Select(ToProtoNpc));
-		snapshot.MapObjects.AddRange(world.MapObjects.Select(ToProtoMapObject));
+		var characterTasks = world.Characters
+			.Select(id => _documentRepository.GetByIdAsync<Character>(id, cancellationToken))
+			.ToList();
+		var npcTasks = world.Npcs
+			.Select(id => _documentRepository.GetByIdAsync<Npc>(id, cancellationToken))
+			.ToList();
+		var mapObjectTasks = world.MapObjects
+			.Select(id => _documentRepository.GetByIdAsync<MapObject>(id, cancellationToken))
+			.ToList();
+
+		var characters = await Task.WhenAll(characterTasks).ConfigureAwait(false);
+		var npcs = await Task.WhenAll(npcTasks).ConfigureAwait(false);
+		var mapObjects = await Task.WhenAll(mapObjectTasks).ConfigureAwait(false);
+
+		snapshot.Characters.AddRange(characters
+			.Where(character => character != null)
+			.Select(character => ToProtoCharacter(character!)));
+
+		snapshot.Npcs.AddRange(npcs
+			.Where(npc => npc != null)
+			.Select(npc => ToProtoNpc(npc!)));
+
+		snapshot.MapObjects.AddRange(mapObjects
+			.Where(mapObject => mapObject != null)
+			.Select(mapObject => ToProtoMapObject(mapObject!)));
 		return snapshot;
 	}
 
-	private static ProtoWorldState ConvertToLegacyState(DomainWorldState world)
+	private async Task<ProtoWorldState> ConvertToLegacyStateAsync(DomainWorldState world, CancellationToken cancellationToken)
 	{
 		var legacyState = new ProtoWorldState
 		{
 			Timestamp = new DateTimeOffset(world.LastUpdated).ToUnixTimeMilliseconds()
 		};
 
-		legacyState.VisibleCharacters.AddRange(world.Characters.Select(character => new PlayerCharacter
-		{
-			BaseCharacter = new BaseCharacter
-			{
-				Id = character.Id.ToString(),
-				Name = character.Name,
-				Position = ToProtoLocation(character.CurrentLocation)
-			}
-		}));
+		var characterTasks = world.Characters
+			.Select(id => _documentRepository.GetByIdAsync<Character>(id, cancellationToken))
+			.ToList();
+		var npcTasks = world.Npcs
+			.Select(id => _documentRepository.GetByIdAsync<Npc>(id, cancellationToken))
+			.ToList();
 
-		legacyState.VisibleNPCs.AddRange(world.Npcs.Select(npc => new PlayerCharacter
-		{
-			BaseCharacter = new BaseCharacter
+		var characters = await Task.WhenAll(characterTasks).ConfigureAwait(false);
+		var npcs = await Task.WhenAll(npcTasks).ConfigureAwait(false);
+
+		legacyState.VisibleCharacters.AddRange(characters
+			.Where(character => character != null)
+			.Select(character => new PlayerCharacter
 			{
-				Id = npc.Id.ToString(),
-				Name = npc.Name,
-				Position = ToProtoLocation(npc.CurrentLocation)
-			}
-		}));
+				BaseCharacter = new BaseCharacter
+				{
+					Id = character!.Id.ToString(),
+					Name = character.Name,
+					Position = ToProtoLocation(character.CurrentLocation)
+				}
+			}));
+
+		legacyState.VisibleNPCs.AddRange(npcs
+			.Where(npc => npc != null)
+			.Select(npc => new PlayerCharacter
+			{
+				BaseCharacter = new BaseCharacter
+				{
+					Id = npc!.Id.ToString(),
+					Name = npc.Name,
+					Position = ToProtoLocation(npc.CurrentLocation)
+				}
+			}));
 
 		return legacyState;
 	}
@@ -287,7 +353,7 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 		var proto = new WorldNpc
 		{
 			NpcId = npc.Id.ToString(),
-			Name = npc.Name,
+			Name = string.IsNullOrWhiteSpace(npc.DisplayName) ? npc.Name : npc.DisplayName,
 			Location = ToProtoLocation(npc.CurrentLocation),
 			IsAlive = npc.IsAlive,
 			LastUpdated = new DateTimeOffset(npc.LastUpdated).ToUnixTimeMilliseconds(),
@@ -325,7 +391,21 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 		{
 			X = location.Position.X,
 			Y = location.Position.Y,
-			Z = location.Position.Z
+			Z = location.Position.Z,
+			WorldId = location.WorldId.HasValue ? location.WorldId.Value.ToString() : string.Empty,
+			MapId = location.MapId ?? string.Empty,
+			ZoneName = location.ZoneName ?? string.Empty,
+			Rotation = location.Rotation
 		};
+	}
+
+	private static string DescribeSnapshot(WorldSnapshot snapshot)
+	{
+		var worldName = snapshot.Metadata?.WorldName ?? "?";
+		var worldId = snapshot.Metadata?.WorldId ?? "?";
+		var characterCount = snapshot.Characters?.Count ?? 0;
+		var npcCount = snapshot.Npcs?.Count ?? 0;
+		var mapObjectCount = snapshot.MapObjects?.Count ?? 0;
+		return FormattableString.Invariant($"świat={worldName} ({worldId}), gracze={characterCount}, npc={npcCount}, obiekty={mapObjectCount}");
 	}
 }

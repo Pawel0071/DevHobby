@@ -31,7 +31,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     ICommandHandler<StopRotationCommand>
 
 {
-    private const float DefaultMovementDeltaSeconds = 1f;
+    private const float DefaultMovementDeltaSeconds = 0.1f;
     private readonly DomainCharacterRepository _characterRepo;
     private readonly IEquipmentService _equipmentService;
     private readonly IGameEventDispatcher _eventDispatcher;
@@ -75,7 +75,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
             return CommandResult.Fail(CommandError.InvalidOperation, "Postać nie posiada prędkości ruchu.");
         }
 
-        var moveResult = _movementService.Move(character, direction, DefaultMovementDeltaSeconds);
+    var moveResult = _movementService.Move(character, direction, DefaultMovementDeltaSeconds, preserveFacing: command.PreserveFacing);
         if (!moveResult.Success)
         {
             return CommandResult.Fail(CommandError.InvalidOperation, moveResult.Message, moveResult);
@@ -321,14 +321,14 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     {
         vector = direction switch
         {
-            1 => new Vector3(0f, 0f, 1f), // forward
-            2 => new Vector3(1f, 0f, 1f), // forward-right
+            1 => new Vector3(0f, 1f, 0f), // forward
+            2 => new Vector3(1f, 1f, 0f), // forward-right
             3 => new Vector3(1f, 0f, 0f), // right
-            4 => new Vector3(1f, 0f, -1f), // backward-right
-            5 => new Vector3(0f, 0f, -1f), // backward
-            6 => new Vector3(-1f, 0f, -1f), // backward-left
+            4 => new Vector3(1f, -1f, 0f), // backward-right
+            5 => new Vector3(0f, -1f, 0f), // backward
+            6 => new Vector3(-1f, -1f, 0f), // backward-left
             7 => new Vector3(-1f, 0f, 0f), // left
-            8 => new Vector3(-1f, 0f, 1f), // forward-left
+            8 => new Vector3(-1f, 1f, 0f), // forward-left
             _ => Vector3.Zero
         };
 

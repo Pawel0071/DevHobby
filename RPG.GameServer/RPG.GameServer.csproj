@@ -12,8 +12,8 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' "/>
   <ItemGroup>
   <Protobuf Include="Protos\character.proto" GrpcServices="Server,Client" ProtoRoot="Protos" />
-    <Protobuf Include="Protos\session.proto" GrpcServices="Server" ProtoRoot="Protos" />
-    <Protobuf Include="Protos\world.proto" GrpcServices="Server" ProtoRoot="Protos" />
+    <Protobuf Include="Protos\session.proto" GrpcServices="Server,Client" ProtoRoot="Protos" />
+    <Protobuf Include="Protos\world.proto" GrpcServices="Server,Client" ProtoRoot="Protos" />
     <Protobuf Include="Protos\interaction.proto" GrpcServices="Server" ProtoRoot="Protos" />
   </ItemGroup>
 

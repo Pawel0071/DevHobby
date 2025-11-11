@@ -1,0 +1,35 @@
+{
+  "id": "f0c6b7c2-5d49-4c45-8e58-9e6aa4a3d482",
+  "name": "Ultimate",
+  "description": "A signature finishing move reserved for true heroes.",
+  "iconId": "icon_skill_ultimate",
+  "tags": ["ultimate", "melee", "finisher"],
+  "components": [
+    {
+      "type": "Damage",
+      "properties": {
+        "baseDamage": 78,
+        "minDamage": 62,
+        "maxDamage": 96,
+        "scalingFactor": 1.8,
+        "scalingStat": "strength",
+        "damageType": "physical",
+        "critMultiplier": 2.5
+      }
+    },
+    {
+      "type": "Cooldown",
+      "properties": {
+        "cooldownSeconds": 30,
+        "useGlobalCooldown": false,
+        "maxCharges": 1
+      }
+    },
+    {
+      "type": "Requirement",
+      "properties": {
+        "requiredLevel": 8
+      }
+    }
+  ]
+}

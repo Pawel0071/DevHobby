@@ -1,0 +1,79 @@
+{
+  "id": "49f0ce44-6e37-4d80-9f33-a8a894fe6a77",
+  "name": "starter.npc.goblin-scout",
+  "displayName": "Goblin Scout",
+  "description": "Quick-footed goblin sentry watching the outskirts.",
+  "level": 3,
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "spawnLocation": {
+    "position": { "x": 48.0, "y": 28.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 90.0
+  },
+  "currentLocation": {
+    "position": { "x": 48.0, "y": 28.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 90.0
+  },
+  "tags": ["enemy", "hostile", "goblin", "scout"],
+  "isAlive": true,
+  "lastUpdated": "2024-01-01T00:00:00Z",
+  "components": [
+    {
+      "type": "Combat",
+      "properties": {
+        "aggroRange": 16.0,
+        "leashRange": 30.0,
+        "aiBehaviorScript": "hostile",
+        "stats": {
+          "Agility": 9,
+          "Dexterity": 8,
+          "HitChance": 6
+        },
+        "skills": [
+          {
+            "skillId": "7e3e2f0a-2b61-44f4-9437-01610c2a2792",
+            "availability": "Learnt"
+          },
+          {
+            "skillId": "a4e5d208-2d6d-4ff7-b214-6f5df0c0a99f",
+            "availability": "Learnt"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Lootable",
+      "properties": {
+        "experienceReward": 45,
+        "goldReward": 14,
+        "lootTable": [
+          {
+            "slot": 0,
+            "itemId": "386af0f2-7b9d-41e2-a47d-7f4f1d8b94cf",
+            "minQuantity": 1,
+            "maxQuantity": 3,
+            "dropChance": 0.35
+          }
+        ]
+      }
+    },
+    {
+      "type": "Respawn",
+      "properties": {
+        "respawnTimeSeconds": 200,
+        "respawnLocation": {
+          "position": { "x": 48.0, "y": 28.0, "z": 0.0 },
+          "mapId": "starter.map",
+          "zoneName": "starter.zone",
+          "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+          "rotation": 90.0
+        }
+      }
+    }
+  ]
+}

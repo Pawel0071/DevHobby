@@ -1,0 +1,82 @@
+{
+  "id": "0f98fd9e-8c03-4c24-b1de-799c8fea45e4",
+  "name": "starter.npc.forge-master",
+  "displayName": "Forge Master Hilda",
+  "description": "Renowned blacksmith keeping the town equipped.",
+  "level": 8,
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "spawnLocation": {
+  "position": { "x": 12.0, "y": 20.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 90.0
+  },
+  "currentLocation": {
+  "position": { "x": 12.0, "y": 20.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 90.0
+  },
+  "tags": ["friendly", "merchant", "trainer", "blacksmith"],
+  "isAlive": true,
+  "lastUpdated": "2024-01-01T00:00:00Z",
+  "components": [
+    {
+      "type": "Merchant",
+      "properties": {
+        "goldAmount": 600,
+        "globalPriceModifier": 1.05,
+        "inventory": [
+          {
+            "slot": 0,
+            "itemId": "5f8c4d32-d7aa-4f74-85a7-274e889f3c59",
+            "quantity": 5
+          },
+          {
+            "slot": 1,
+            "itemId": "2210bf9e-4a46-4a38-9718-6b655d2fe4b7",
+            "quantity": 10
+          },
+          {
+            "slot": 2,
+            "itemId": "c9a6139c-357a-4bd8-8832-6cd473929839",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    {
+      "type": "Trainer",
+      "properties": {
+        "specialization": "Weapon Mastery",
+        "teachableSkills": [
+          {
+            "skillId": "7e3e2f0a-2b61-44f4-9437-01610c2a2792",
+            "availability": "Available"
+          },
+          {
+            "skillId": "22f5a2be-62ee-4de3-840d-0a8d7e3c9c0f",
+            "availability": "Available"
+          },
+          {
+            "skillId": "f0c6b7c2-5d49-4c45-8e58-9e6aa4a3d482",
+            "availability": "UnAvailable"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Dialogue",
+      "properties": {
+        "dialogueScript": "starter.blacksmith",
+        "greetingText": "Need your gear tempered?",
+        "farewellText": "Keep your blades sharp.",
+        "scriptParameters": {
+          "service": "forging"
+        }
+      }
+    }
+  ]
+}

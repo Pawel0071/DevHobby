@@ -78,7 +78,7 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
             var character = await repository.GetByIdAsync(Guid.Parse(createReply.CharacterId));
 
             character.IsMoving.Should().BeTrue();
-            character.CurrentLocation.Position.Z.Should().BeGreaterThan(0f);
+            character.CurrentLocation.Position.Y.Should().BeGreaterThan(0f);
         }
 
         var stopMove = await client.StopMovementAsync(new CharacterIdRequest { CharacterId = createReply.CharacterId });
@@ -134,7 +134,16 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
                     MaxMana = 60,
                     CurrentMana = 60,
                     Stats = new ProtoStats { MoveSpeed = 5, Strength = 15, Vitality = 12 },
-                    Position = new ProtoLocation { X = 1, Y = 2, Z = 3 }
+                    Position = new ProtoLocation
+                    {
+                        X = 1,
+                        Y = 2,
+                        Z = 3,
+                        WorldId = "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+                        MapId = "starter.map",
+                        ZoneName = "starter.zone",
+                        Rotation = 0
+                    }
                 }
             }
         };

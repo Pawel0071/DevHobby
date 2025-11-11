@@ -555,7 +555,12 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
                 Location = new LocationData { X = 10, Y = 0, Z = -5 },
                 RotationYaw = 45,
                 WorldId = Guid.NewGuid(),
-                ZoneId = "test-zone"
+                ZoneId = "test-zone",
+                IsActive = true,
+                Tags = new List<string> { "warmup" },
+                Components = new List<ComponentData>(),
+                State = new Dictionary<string, string>(),
+                LastUpdated = DateTime.UtcNow
             };
         }
 

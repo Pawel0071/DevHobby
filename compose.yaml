@@ -208,7 +208,7 @@ services:
   rpg.gameserver:
     image: rpg.gameserver
     container_name: rpg_gameserver
-    platform: linux/amd64
+    platform: linux/arm64
     build:
       context: .
       dockerfile: RPG.GameServer/Dockerfile

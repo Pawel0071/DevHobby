@@ -1,0 +1,88 @@
+{
+  "id": "6fd699a7-2ebb-4b31-8b16-603bcb35c1a4",
+  "name": "starter.npc.village-guide",
+  "displayName": "Village Guide",
+  "description": "Friendly mentor who greets new arrivals.",
+  "level": 5,
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "spawnLocation": {
+  "position": { "x": 16.0, "y": 10.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 0.0
+  },
+  "currentLocation": {
+  "position": { "x": 16.0, "y": 10.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 0.0
+  },
+  "tags": ["friendly", "guide", "questgiver", "trainer", "merchant"],
+  "isAlive": true,
+  "lastUpdated": "2024-01-01T00:00:00Z",
+  "components": [
+    {
+      "type": "Dialogue",
+      "properties": {
+        "dialogueScript": "starter.guide",
+        "greetingText": "Welcome to the Starter Grounds, hero!",
+        "farewellText": "Stay vigilant out there.",
+        "scriptParameters": {
+          "questId": "starter.quest.welcome",
+          "greetingAnimation": "wave",
+          "tone": "mentor"
+        }
+      }
+    },
+    {
+      "type": "QuestGiver",
+      "properties": {
+        "availableQuests": [
+          "d19cdcc7-9a32-4a64-b6aa-2ff4b1e2e37b",
+          "9fb5112f-0906-4a82-9bb6-9e4e6ce9931a"
+        ]
+      }
+    },
+    {
+      "type": "Trainer",
+      "properties": {
+        "specialization": "Combat Basics",
+        "teachableSkills": [
+          {
+            "skillId": "7e3e2f0a-2b61-44f4-9437-01610c2a2792",
+            "availability": "Available"
+          },
+          {
+            "skillId": "22f5a2be-62ee-4de3-840d-0a8d7e3c9c0f",
+            "availability": "UnAvailable"
+          },
+          {
+            "skillId": "f0c6b7c2-5d49-4c45-8e58-9e6aa4a3d482",
+            "availability": "UnAvailable"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Merchant",
+      "properties": {
+        "goldAmount": 250,
+        "globalPriceModifier": 0.95,
+        "inventory": [
+          {
+            "slot": 0,
+            "itemId": "5f8c4d32-d7aa-4f74-85a7-274e889f3c59",
+            "quantity": 5
+          },
+          {
+            "slot": 1,
+            "itemId": "2210bf9e-4a46-4a38-9718-6b655d2fe4b7",
+            "quantity": 10
+          }
+        ]
+      }
+    }
+  ]
+}

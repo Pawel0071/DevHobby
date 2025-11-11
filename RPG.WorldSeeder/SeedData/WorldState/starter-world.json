@@ -1,0 +1,26 @@
+{
+  "id": "bb29f463-642c-4f9b-8f9f-19f9a9b88bd9",
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "worldName": "Starter Grounds",
+  "lastUpdated": "2024-01-01T00:00:00Z",
+  "characters": [],
+  "npcs": [
+    "6fd699a7-2ebb-4b31-8b16-603bcb35c1a4",
+    "0f98fd9e-8c03-4c24-b1de-799c8fea45e4",
+    "ab0f1f0c-6bbc-4fc5-9f23-2a2bffe0c54d",
+    "49f0ce44-6e37-4d80-9f33-a8a894fe6a77",
+    "3a07884f-2f3c-49fb-b7a9-449e6bd01958",
+    "b54b4c4a-19a2-4f87-8c25-ec0befa0d630"
+  ],
+  "mapObjects": [
+    "5b0d17a4-a312-4c97-973e-7d8087e2fa27",
+    "0cb43a3f-bd3c-4dc6-8781-f1024a816569",
+    "2fefcbfb-09af-4c23-ab35-4e782201dc3a",
+    "d7cfaae4-52d8-4a3e-aa0d-2b6d5a6c1f07",
+    "60f3d65d-6448-4840-b1b4-585d6ac0f828",
+    "7c5a8f7c-74a7-4e4c-b5c7-1a3f5237d048",
+    "36b9991e-079f-4b25-bf64-99d8ef4f1f3d",
+    "1f3a0f77-16b6-4d99-93d9-1394d1f3f0b1",
+    "8331d8f0-5472-4697-9bb2-1e5f7027a7b9"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "8331d8f0-5472-4697-9bb2-1e5f7027a7b9",
+  "name": "starter.building.house-south",
+  "displayName": "South Village House",
+  "location": {
+  "position": { "x": 16.0, "y": 8.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 0.0
+  },
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "zoneId": "starter.zone",
+  "isActive": true,
+  "rotationYaw": 0.0,
+  "tags": ["building", "house", "residential"],
+  "state": {
+    "textureKey": "house",
+    "billboardScale": "12",
+    "floors": "1",
+    "occupancy": "elder"
+  },
+  "lastUpdated": "2024-01-01T00:00:00Z"
+}

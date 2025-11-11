@@ -1,0 +1,22 @@
+{
+  "id": "60f3d65d-6448-4840-b1b4-585d6ac0f828",
+  "name": "starter.market.stall-south",
+  "displayName": "Market Stall (South)",
+  "location": {
+  "position": { "x": 20.0, "y": 20.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 270.0 
+  },
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "zoneId": "starter.zone",
+  "isActive": true,
+  "rotationYaw": 270.0,
+  "tags": ["market", "stall", "merchant", "building"],
+  "state": {
+    "billboardScale": "8",
+    "goods": "provisions"
+  },
+  "lastUpdated": "2024-01-01T00:00:00Z"
+}

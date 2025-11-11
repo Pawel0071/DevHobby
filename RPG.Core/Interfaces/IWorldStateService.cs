@@ -1,4 +1,6 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using RPG.Domain.Entities;
 using RPG.Domain.Entities.MapObjects;
 using RPG.Domain.Entities.Npcs;
@@ -13,4 +15,5 @@ public interface IWorldStateService
     void UpsertMapObject(WorldState world, MapObject mapObject);
     void Touch(WorldState world, DateTime timestamp);
     WorldState Clone(WorldState world);
+    Task<Location> DetermineSpawnLocationAsync(WorldState world, Character character, string? spawnType = null, bool useExistingLocation = true, CancellationToken cancellationToken = default);
 }

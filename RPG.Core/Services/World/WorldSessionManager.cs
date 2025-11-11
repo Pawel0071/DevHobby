@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Threading;
@@ -18,6 +19,9 @@ public class WorldSessionManager : IWorldSessionManager
 {
     private static readonly Guid DefaultWorldId = Guid.Parse("c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d");
     private const string DefaultWorldName = "Starter Grounds";
+    private const string DefaultMapId = "starter.map";
+    private const string DefaultZoneName = "starter.zone";
+    private const string DefaultSpawnType = "player-default";
 
     private readonly IDocumentRepository _documentRepository;
     private readonly ILogger<WorldSessionManager> _logger;
@@ -49,14 +53,17 @@ public class WorldSessionManager : IWorldSessionManager
         var character = await LoadCharacterAsync(session.CharacterId.Value, cancellationToken).ConfigureAwait(false);
 
         var spawnLocation = new Location();
+        var reuseExistingLocation = session.CurrentWorldId.HasValue && session.CurrentWorldId.Value == world.WorldId;
         var worldLock = _worldLocks.GetOrAdd(world.WorldId, _ => new SemaphoreSlim(1, 1));
         await worldLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            spawnLocation = DetermineSpawnLocation(world, character);
+            spawnLocation = await _worldStateService
+                .DetermineSpawnLocationAsync(world, character, DefaultSpawnType, reuseExistingLocation, cancellationToken)
+                .ConfigureAwait(false);
             spawnLocation.WorldId ??= world.WorldId;
-            spawnLocation.MapId = string.IsNullOrWhiteSpace(spawnLocation.MapId) ? "starter.map" : spawnLocation.MapId;
-            spawnLocation.ZoneName = string.IsNullOrWhiteSpace(spawnLocation.ZoneName) ? "starter.zone" : spawnLocation.ZoneName;
+            spawnLocation.MapId = string.IsNullOrWhiteSpace(spawnLocation.MapId) ? DefaultMapId : spawnLocation.MapId;
+            spawnLocation.ZoneName = string.IsNullOrWhiteSpace(spawnLocation.ZoneName) ? DefaultZoneName : spawnLocation.ZoneName;
 
             character.SetCurrentLocation(spawnLocation);
             character.SetMovementState(false);
@@ -175,19 +182,12 @@ public class WorldSessionManager : IWorldSessionManager
         }
 
         var worldLock = _worldLocks.GetOrAdd(world.WorldId, _ => new SemaphoreSlim(1, 1));
+        Character? characterSnapshot = null;
         await worldLock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            var existing = world.Characters.FirstOrDefault(c => c.Id == session.CharacterId.Value);
-            Character characterSnapshot;
-            if (existing != null)
-            {
-                characterSnapshot = existing;
-            }
-            else
-            {
-                characterSnapshot = await LoadCharacterAsync(session.CharacterId.Value, cancellationToken).ConfigureAwait(false);
-            }
+            var characterId = session.CharacterId.Value;
+            characterSnapshot = await LoadCharacterAsync(characterId, cancellationToken).ConfigureAwait(false);
 
             characterSnapshot.SetCurrentLocation(location);
             characterSnapshot.IsOnline = true;
@@ -201,6 +201,11 @@ public class WorldSessionManager : IWorldSessionManager
         finally
         {
             worldLock.Release();
+        }
+
+        if (characterSnapshot != null)
+        {
+            await _documentRepository.UpsertAsync(characterSnapshot, cancellationToken).ConfigureAwait(false);
         }
 
         await _documentRepository.UpsertAsync(session, cancellationToken).ConfigureAwait(false);
@@ -262,15 +267,30 @@ public class WorldSessionManager : IWorldSessionManager
         campfire.Tags = new HashSet<string> { "rest", "starter" };
         campfire.State = new Dictionary<string, string> { { "temperature", "warm" } };
 
-        var world = WorldState.Hydrate(
-            id,
-            worldId,
-            DefaultWorldName,
-            now,
-            Array.Empty<Character>(),
-            new[] { guideNpc },
-            new[] { campfire });
+        var spawnLocation = Location.Create(new Vector3(8f, 4f, 0f), worldId, DefaultMapId, DefaultZoneName);
+        spawnLocation.Rotation = 180f;
 
+        var spawnPoint = MapObject.Create("starter.spawn.default", CloneLocation(spawnLocation), worldId, DefaultZoneName);
+        spawnPoint.DisplayName = "Arrival Beacon";
+        spawnPoint.IsActive = true;
+        spawnPoint.LastUpdated = now;
+        spawnPoint.Tags = new HashSet<string> { "spawn-point", "player" };
+        spawnPoint.State = new Dictionary<string, string>
+        {
+            ["spawnType"] = DefaultSpawnType,
+            ["priority"] = "0",
+            ["rotation"] = spawnLocation.Rotation.ToString(CultureInfo.InvariantCulture)
+        };
+
+        var world = WorldState.Hydrate(id, worldId, DefaultWorldName, now);
+        _worldStateService.UpsertNpc(world, guideNpc);
+        _worldStateService.UpsertMapObject(world, campfire);
+        _worldStateService.UpsertMapObject(world, spawnPoint);
+        _worldStateService.Touch(world, now);
+
+        await _documentRepository.UpsertAsync(guideNpc, cancellationToken).ConfigureAwait(false);
+        await _documentRepository.UpsertAsync(campfire, cancellationToken).ConfigureAwait(false);
+        await _documentRepository.UpsertAsync(spawnPoint, cancellationToken).ConfigureAwait(false);
         await PersistWorldAsync(world, cancellationToken).ConfigureAwait(false);
         return world;
     }
@@ -280,19 +300,6 @@ public class WorldSessionManager : IWorldSessionManager
         var clone = Location.Create(location.Position, location.WorldId ?? DefaultWorldId, location.MapId, location.ZoneName);
         clone.Rotation = location.Rotation;
         return clone;
-    }
-
-    private static Location DetermineSpawnLocation(WorldState world, Character character)
-    {
-        var currentLocation = character.CurrentLocation;
-        if (currentLocation != null && currentLocation.WorldId == world.WorldId)
-        {
-            return Location.Create(currentLocation.Position, world.WorldId, currentLocation.MapId, currentLocation.ZoneName);
-        }
-
-        var spawn = Location.Create(new Vector3(8f, 4f, 0f), world.WorldId, "starter.map", "starter.zone");
-        spawn.Rotation = 180f;
-        return spawn;
     }
 
     private async Task<WorldState> GetWorldReferenceAsync(Guid worldId, bool createIfMissing, CancellationToken cancellationToken)

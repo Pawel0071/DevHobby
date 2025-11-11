@@ -87,6 +87,23 @@ public sealed class GameServerFactory : WebApplicationFactory<IntegrationEntryPo
 
         services.AddSingleton<IRabbitMqPublisher>(_ => new NullRabbitMqPublisher(null));
         services.AddSingleton<IRabbitMqConsumer>(_ => new NoOpRabbitMqConsumer());
+
+        RegisterWorldSeederDependencies(services);
+    }
+
+    private static void RegisterWorldSeederDependencies(IServiceCollection services)
+    {
+        var seedDataLoaderType = Type.GetType("RPG.WorldSeeder.Seeders.SeedDataLoader, RPG.WorldSeeder", throwOnError: false);
+        if (seedDataLoaderType != null)
+        {
+            services.TryAddSingleton(seedDataLoaderType);
+        }
+
+        var worldSeederServiceType = Type.GetType("RPG.WorldSeeder.Services.WorldSeederService, RPG.WorldSeeder", throwOnError: false);
+        if (worldSeederServiceType != null)
+        {
+            services.TryAddSingleton(worldSeederServiceType);
+        }
     }
 
     private sealed class NoOpRabbitMqConsumer : IRabbitMqConsumer

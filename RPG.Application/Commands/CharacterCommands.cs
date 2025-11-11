@@ -24,7 +24,7 @@ public record GainExperienceCommand(Guid CharacterId, int Amount) : ICommand;
 
 public record LevelUpCommand(Guid CharacterId) : ICommand;
 
-public record StartMovementCommand(Guid CharacterId, int Direction) : ICommand;
+public record StartMovementCommand(Guid CharacterId, int Direction, bool PreserveFacing = false) : ICommand;
 
 public record StopMovementCommand(Guid CharacterId) : ICommand;
 

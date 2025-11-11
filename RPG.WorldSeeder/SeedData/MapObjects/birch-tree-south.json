@@ -1,0 +1,23 @@
+{
+  "id": "a1f6de77-82ea-4f8b-9a26-93b1bf5fa123",
+  "name": "starter.decor.tree-birch-south",
+  "displayName": "Birch Tree",
+  "location": {
+  "position": { "x": 20.0, "y": 10.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 15.0
+  },
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "zoneId": "starter.zone",
+  "isActive": true,
+  "rotationYaw": 15.0,
+  "tags": ["tree", "birch", "nature", "scenery"],
+  "state": {
+    "textureKey": "tree",
+    "variant": "birch",
+    "size": "medium"
+  },
+  "lastUpdated": "2024-01-01T00:00:00Z"
+}

@@ -123,6 +123,10 @@ message Location {
   double x = 1;
   double y = 2;
   double z = 3;
+  string worldId = 4;
+  string mapId = 5;
+  string zoneName = 6;
+  float rotation = 7;
 }
 
 enum Effect {
@@ -173,6 +177,7 @@ service CharacterService {
 message MovementCommandRequest {
   string characterId = 1;
   int32 direction = 2;
+  bool preserveFacing = 3;
 }
 
 message CharacterActionReply {

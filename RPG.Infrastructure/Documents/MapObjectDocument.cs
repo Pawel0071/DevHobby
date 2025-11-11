@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -36,6 +38,11 @@ public class MapObjectDocument : IMongoDocument
     // Components stored as JSON strings (will be deserialized by mapper)
     // Each component is serialized to JSON for flexible storage
     public List<ComponentData> Components { get; set; } = new();
+
+    // Arbitrary map object state persisted for the client snapshot
+    public Dictionary<string, string> State { get; set; } = new();
+
+    public DateTime LastUpdated { get; set; }
 }
 
 /// <summary>

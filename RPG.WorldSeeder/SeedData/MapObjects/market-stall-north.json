@@ -1,0 +1,22 @@
+{
+  "id": "d7cfaae4-52d8-4a3e-aa0d-2b6d5a6c1f07",
+  "name": "starter.market.stall-north",
+  "displayName": "Market Stall (North)",
+  "location": {
+  "position": { "x": 12.0, "y": 20.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 90.0
+  },
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "zoneId": "starter.zone",
+  "isActive": true,
+  "rotationYaw": 90.0,
+  "tags": ["market", "stall", "merchant", "building"],
+  "state": {
+    "billboardScale": "8",
+    "goods": "armor"
+  },
+  "lastUpdated": "2024-01-01T00:00:00Z"
+}

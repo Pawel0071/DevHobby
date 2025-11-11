@@ -1,41 +1,55 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Numerics;
+using System.Threading;
+using System.Threading.Tasks;
 using RPG.Core.Interfaces;
 using RPG.Domain.Entities;
 using RPG.Domain.Entities.MapObjects;
-using RPG.Domain.Entities.MapObjects.MapObjectComponents;
 using RPG.Domain.Entities.Npcs;
-using RPG.Domain.Entities.Npcs.NpcComponents;
+using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Core.Services.World;
 
 public class WorldStateService : IWorldStateService
 {
+    private const string DefaultMapId = "starter.map";
+    private const string DefaultZoneName = "starter.zone";
+    private const string DefaultSpawnType = "player-default";
+    private const string SpawnPointTag = "spawn-point";
+    private const string SpawnTypeStateKey = "spawnType";
+    private const string SpawnPriorityStateKey = "priority";
+    private const string SpawnRotationStateKey = "rotation";
+    private const string FriendlyTag = "friendly";
+    private const string GuideTag = "guide";
+
+    private readonly IDocumentRepository _documentRepository;
+
+    public WorldStateService(IDocumentRepository documentRepository)
+    {
+        _documentRepository = documentRepository;
+    }
+
     public void UpsertCharacter(WorldState world, Character character)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(character);
 
-        var copy = CloneCharacter(character);
-        var index = world.Characters.FindIndex(c => c.Id == copy.Id);
-        if (index >= 0)
+        if (!world.Characters.Contains(character.Id))
         {
-            world.Characters[index] = copy;
-        }
-        else
-        {
-            world.Characters.Add(copy);
+            world.Characters.Add(character.Id);
         }
 
-        TouchFrom(world, copy.LastUpdated);
+        TouchFrom(world, character.LastUpdated);
     }
 
     public void RemoveCharacter(WorldState world, Guid characterId)
     {
         ArgumentNullException.ThrowIfNull(world);
 
-        if (world.Characters.RemoveAll(c => c.Id == characterId) > 0)
+        if (world.Characters.Remove(characterId))
         {
             Touch(world, DateTime.UtcNow);
         }
@@ -46,18 +60,12 @@ public class WorldStateService : IWorldStateService
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(npc);
 
-        var copy = CloneNpc(npc);
-        var index = world.Npcs.FindIndex(n => n.Id == copy.Id);
-        if (index >= 0)
+        if (!world.Npcs.Contains(npc.Id))
         {
-            world.Npcs[index] = copy;
-        }
-        else
-        {
-            world.Npcs.Add(copy);
+            world.Npcs.Add(npc.Id);
         }
 
-        TouchFrom(world, copy.LastUpdated);
+        TouchFrom(world, npc.LastUpdated);
     }
 
     public void UpsertMapObject(WorldState world, MapObject mapObject)
@@ -65,18 +73,12 @@ public class WorldStateService : IWorldStateService
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(mapObject);
 
-        var copy = CloneMapObject(mapObject);
-        var index = world.MapObjects.FindIndex(o => o.Id == copy.Id);
-        if (index >= 0)
+        if (!world.MapObjects.Contains(mapObject.Id))
         {
-            world.MapObjects[index] = copy;
-        }
-        else
-        {
-            world.MapObjects.Add(copy);
+            world.MapObjects.Add(mapObject.Id);
         }
 
-        TouchFrom(world, copy.LastUpdated);
+        TouchFrom(world, mapObject.LastUpdated);
     }
 
     public void Touch(WorldState world, DateTime timestamp)
@@ -94,9 +96,96 @@ public class WorldStateService : IWorldStateService
             world.WorldId,
             world.WorldName,
             world.LastUpdated,
-            world.Characters.Select(CloneCharacter),
-            world.Npcs.Select(CloneNpc),
-            world.MapObjects.Select(CloneMapObject));
+            world.Characters.ToList(),
+            world.Npcs.ToList(),
+            world.MapObjects.ToList());
+    }
+
+    public async Task<Location> DetermineSpawnLocationAsync(
+        WorldState world,
+        Character character,
+        string? spawnType = null,
+        bool useExistingLocation = true,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(world);
+        ArgumentNullException.ThrowIfNull(character);
+
+        if (useExistingLocation && character.CurrentLocation != null && character.CurrentLocation.WorldId == world.WorldId)
+        {
+            var existing = CloneLocation(character.CurrentLocation);
+            EnsureDefaults(existing, world.WorldId);
+            return existing;
+        }
+
+        var requestedSpawnType = string.IsNullOrWhiteSpace(spawnType) ? DefaultSpawnType : spawnType;
+
+        MapObject? bestSpawn = null;
+        var bestPriority = int.MaxValue;
+
+        foreach (var mapObjectId in world.MapObjects)
+        {
+            var mapObject = await _documentRepository.GetByIdAsync<MapObject>(mapObjectId, cancellationToken).ConfigureAwait(false);
+            if (mapObject is null)
+            {
+                continue;
+            }
+
+            if (!MatchesSpawnType(mapObject, requestedSpawnType))
+            {
+                continue;
+            }
+
+            var priority = ParsePriority(mapObject.State);
+            if (priority < bestPriority)
+            {
+                bestPriority = priority;
+                bestSpawn = mapObject;
+            }
+        }
+
+        if (bestSpawn != null)
+        {
+            var location = CloneLocation(bestSpawn.Location);
+
+            if (bestSpawn.State.TryGetValue(SpawnRotationStateKey, out var rotationText) &&
+                float.TryParse(rotationText, NumberStyles.Float, CultureInfo.InvariantCulture, out var rotationValue))
+            {
+                location.Rotation = rotationValue;
+            }
+            else if (bestSpawn.Location != null)
+            {
+                location.Rotation = bestSpawn.Location.Rotation;
+            }
+
+            EnsureDefaults(location, world.WorldId);
+            return location;
+        }
+
+        foreach (var npcId in world.Npcs)
+        {
+            var npc = await _documentRepository.GetByIdAsync<Npc>(npcId, cancellationToken).ConfigureAwait(false);
+            if (npc is null)
+            {
+                continue;
+            }
+
+            var hasGuideTag = npc.Tags.Any(tag => string.Equals(tag, GuideTag, StringComparison.OrdinalIgnoreCase));
+            var hasFriendlyTag = npc.Tags.Any(tag => string.Equals(tag, FriendlyTag, StringComparison.OrdinalIgnoreCase));
+
+            if (!hasGuideTag && !hasFriendlyTag)
+            {
+                continue;
+            }
+
+            var location = CloneLocation(npc.CurrentLocation ?? npc.SpawnLocation);
+            EnsureDefaults(location, world.WorldId);
+            return location;
+        }
+
+        var fallback = Location.Create(new Vector3(8f, 4f, 0f), world.WorldId, DefaultMapId, DefaultZoneName);
+        fallback.Rotation = 180f;
+        return fallback;
     }
 
     private static void TouchFrom(WorldState world, DateTime timestamp)
@@ -105,98 +194,13 @@ public class WorldStateService : IWorldStateService
         world.LastUpdated = effective;
     }
 
-    private static Character CloneCharacter(Character source)
+    private static Location CloneLocation(Location? location)
     {
-        var clone = new Character(source.SessionId, source.Class)
+        if (location is null)
         {
-            Id = source.Id,
-            Name = source.Name,
-            PlayerId = source.PlayerId,
-            Level = source.Level,
-            Experience = source.Experience,
-            ExperienceToNextLevel = source.ExperienceToNextLevel,
-            CurrentHealth = source.CurrentHealth,
-            MaxHealth = source.MaxHealth,
-            CurrentResource = source.CurrentResource,
-            MaxResource = source.MaxResource,
-            IsOnline = source.IsOnline,
-            IsInCombat = source.IsInCombat,
-            LastUpdated = source.LastUpdated,
-            StatusEffects = new HashSet<string>(source.StatusEffects)
-        };
-
-        clone.SetCurrentLocation(CloneLocation(source.CurrentLocation));
-        clone.SetMovementState(source.IsMoving);
-        clone.SetRotationState(source.IsRotating);
-
-        foreach (var stat in source.BaseStats)
-        {
-            clone.BaseStats[stat.Key] = stat.Value;
+            return new Location();
         }
 
-        foreach (var stat in source.ModifiedStats)
-        {
-            clone.ModifiedStats[stat.Key] = stat.Value;
-        }
-
-        return clone;
-    }
-
-    private static Npc CloneNpc(Npc source)
-    {
-        var clone = Npc.Create(source.Name, source.DisplayName, CloneLocation(source.SpawnLocation), source.WorldId, new HashSet<string>(source.Tags));
-
-        typeof(Npc).GetProperty("Id")!.SetValue(clone, source.Id);
-        clone.Description = source.Description;
-        clone.Level = source.Level;
-        clone.CurrentHealth = source.CurrentHealth;
-        clone.MaxHealth = source.MaxHealth;
-        clone.SetCurrentLocation(CloneLocation(source.CurrentLocation));
-        clone.SetMovementState(source.IsMoving);
-        clone.SetRotationState(source.IsRotating);
-        clone.IsAlive = source.IsAlive;
-        clone.LastUpdated = source.LastUpdated;
-        clone.RespawnAt = source.RespawnAt;
-
-        foreach (var stat in source.BaseStats)
-        {
-            clone.BaseStats[stat.Key] = stat.Value;
-        }
-
-        foreach (var stat in source.ModifiedStats)
-        {
-            clone.ModifiedStats[stat.Key] = stat.Value;
-        }
-
-        clone.Components = source.Components is null
-            ? new List<INpcComponent>()
-            : new List<INpcComponent>(source.Components);
-
-        return clone;
-    }
-
-    private static MapObject CloneMapObject(MapObject source)
-    {
-        var locationClone = CloneLocation(source.Location);
-        var clone = MapObject.Create(source.Name, locationClone, source.WorldId, source.ZoneId);
-
-        typeof(MapObject).GetProperty("Id")!.SetValue(clone, source.Id);
-        clone.DisplayName = source.DisplayName;
-        clone.Description = source.Description;
-        clone.IsActive = source.IsActive;
-        clone.RotationYaw = source.RotationYaw;
-        clone.LastUpdated = source.LastUpdated;
-        clone.Tags = new HashSet<string>(source.Tags);
-        clone.State = new Dictionary<string, string>(source.State);
-        clone.Components = source.Components is null
-            ? new List<IMapObjectComponent>()
-            : new List<IMapObjectComponent>(source.Components);
-
-        return clone;
-    }
-
-    private static Location CloneLocation(Location location)
-    {
         var clone = new Location
         {
             WorldId = location.WorldId,
@@ -207,5 +211,51 @@ public class WorldStateService : IWorldStateService
 
         clone.Position = location.Position;
         return clone;
+    }
+
+    private static void EnsureDefaults(Location location, Guid worldId)
+    {
+        location.WorldId ??= worldId;
+        if (string.IsNullOrWhiteSpace(location.MapId))
+        {
+            location.MapId = DefaultMapId;
+        }
+
+        if (string.IsNullOrWhiteSpace(location.ZoneName))
+        {
+            location.ZoneName = DefaultZoneName;
+        }
+    }
+
+    private static bool MatchesSpawnType(MapObject mapObject, string requestedSpawnType)
+    {
+        if (!mapObject.IsActive)
+        {
+            return false;
+        }
+
+        var hasSpawnTag = mapObject.Tags.Any(tag => string.Equals(tag, SpawnPointTag, StringComparison.OrdinalIgnoreCase));
+        if (!hasSpawnTag)
+        {
+            return false;
+        }
+
+        if (mapObject.State == null || !mapObject.State.TryGetValue(SpawnTypeStateKey, out var stateValue) || string.IsNullOrWhiteSpace(stateValue))
+        {
+            return string.Equals(requestedSpawnType, DefaultSpawnType, StringComparison.OrdinalIgnoreCase);
+        }
+
+        return string.Equals(stateValue, requestedSpawnType, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static int ParsePriority(IDictionary<string, string>? state)
+    {
+        if (state != null && state.TryGetValue(SpawnPriorityStateKey, out var priorityText) &&
+            int.TryParse(priorityText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
+        {
+            return parsed;
+        }
+
+        return int.MaxValue;
     }
 }

@@ -1,0 +1,23 @@
+{
+  "id": "7c5a8f7c-74a7-4e4c-b5c7-1a3f5237d048",
+  "name": "starter.decor.tree-pine-north",
+  "displayName": "Tall Pine",
+  "location": {
+  "position": { "x": 24.0, "y": 28.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 0.0
+  },
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "zoneId": "starter.zone",
+  "isActive": true,
+  "rotationYaw": 0.0,
+  "tags": ["tree", "pine", "nature", "scenery"],
+  "state": {
+    "textureKey": "tree_alt",
+    "variant": "pine",
+    "size": "large"
+  },
+  "lastUpdated": "2024-01-01T00:00:00Z"
+}

@@ -91,7 +91,8 @@ public class NpcAiServiceTests
             npc,
             It.IsAny<Vector3>(),
             It.Is<float>(delta => Math.Abs(delta - 1f) < 0.001f),
-            It.IsAny<float?>()), Times.Once);
+            It.IsAny<float?>(),
+            It.IsAny<bool>()), Times.Once);
 
         log.Should().Contain(entry => entry.StartsWith("Moving towards destination", StringComparison.Ordinal));
     }
@@ -114,8 +115,8 @@ public class NpcAiServiceTests
 
         broadcaster.Setup(b => b.GetSnapshots()).Returns(Array.Empty<CharacterStateSnapshot>());
 
-        movement.Setup(m => m.Move(It.IsAny<Npc>(), It.IsAny<Vector3>(), It.IsAny<float>(), It.IsAny<float?>()))
-            .Returns((Npc npc, Vector3 _, float _, float? _) => ServiceResult<Location>.Ok(npc.CurrentLocation));
+        movement.Setup(m => m.Move(It.IsAny<Npc>(), It.IsAny<Vector3>(), It.IsAny<float>(), It.IsAny<float?>(), It.IsAny<bool>()))
+            .Returns((Npc npc, Vector3 _, float _, float? _, bool _) => ServiceResult<Location>.Ok(npc.CurrentLocation));
         movement.Setup(m => m.Stop(It.IsAny<Npc>()))
             .Returns((Npc npc) => ServiceResult<Location>.Ok(npc.CurrentLocation));
 

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using FluentAssertions;
 using Moq;
@@ -43,6 +46,9 @@ public class MapObjectDocumentMapperTests
         mapObject.RotationYaw = 45.0f;
         mapObject.IsActive = true;
         mapObject.Tags = new HashSet<string> { "loot", "interactive" };
+    var lastUpdated = DateTime.UtcNow.AddMinutes(-5);
+    mapObject.LastUpdated = lastUpdated;
+    mapObject.State["lockState"] = "closed";
 
         // Act
         var document = _mapper.ToDocument(mapObject);
@@ -57,6 +63,9 @@ public class MapObjectDocumentMapperTests
         document.ZoneId.Should().Be(zoneId);
         document.IsActive.Should().BeTrue();
         document.Tags.Should().Contain("loot");
+    document.State.Should().ContainKey("lockState");
+    document.State["lockState"].Should().Be("closed");
+    document.LastUpdated.Should().Be(lastUpdated);
     }
 
     [Fact]
@@ -218,7 +227,9 @@ public class MapObjectDocumentMapperTests
             ZoneId = zoneId,
             IsActive = true,
             Tags = new List<string> { "decoration", "ancient" },
-            Components = new List<ComponentData>()
+            Components = new List<ComponentData>(),
+            State = new Dictionary<string, string> { ["lockState"] = "open" },
+            LastUpdated = new DateTime(2024, 1, 1, 12, 0, 0, DateTimeKind.Utc)
         };
 
         // Act
@@ -234,6 +245,9 @@ public class MapObjectDocumentMapperTests
         mapObject.ZoneId.Should().Be(zoneId);
         mapObject.IsActive.Should().BeTrue();
         mapObject.Tags.Should().Contain("decoration");
+    mapObject.State.Should().ContainKey("lockState");
+    mapObject.State["lockState"].Should().Be("open");
+    mapObject.LastUpdated.Should().Be(document.LastUpdated);
     }
 
     [Fact]
@@ -457,6 +471,9 @@ public class MapObjectDocumentMapperTests
         mapObject.Tags = new HashSet<string> { "test" };
         mapObject.Components.Add(new LockableComponent { IsLocked = true });
         mapObject.Components.Add(new InteractionComponent { InteractionPrompt = "Use" });
+    mapObject.State["lockState"] = "closed";
+    var expectedTimestamp = DateTime.UtcNow.AddHours(-1);
+    mapObject.LastUpdated = expectedTimestamp;
 
         // Act
         var document = _mapper.ToDocument(mapObject);
@@ -467,5 +484,8 @@ public class MapObjectDocumentMapperTests
         roundTrippedObject.DisplayName.Should().Be(mapObject.DisplayName);
         roundTrippedObject.Description.Should().Be(mapObject.Description);
         roundTrippedObject.Components.Should().HaveCount(2);
+    roundTrippedObject.State.Should().ContainKey("lockState");
+    roundTrippedObject.State["lockState"].Should().Be("closed");
+    roundTrippedObject.LastUpdated.Should().Be(expectedTimestamp);
     }
 }

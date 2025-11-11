@@ -1443,8 +1443,6 @@ internal static class DocumentRepositoryScenarioFactory
 
     private static IDocumentRepositoryScenario CreateWorldStateScenario()
     {
-        var worldStateService = new WorldStateService();
-
         return new DocumentRepositoryScenario<WorldState, WorldStateDocument>(
             "worldstate",
             createEntity: () =>
@@ -1455,87 +1453,46 @@ internal static class DocumentRepositoryScenarioFactory
                 var worldState = WorldState.Create(worldId, "CLI World");
                 worldState.LastUpdated = now;
 
-                var heroLocation = Location.Create(new Vector3(15, 4, 0), worldId, "cli.map", "training");
-                heroLocation.Rotation = 90f;
-
-                var characterState = new Character(Guid.NewGuid(), CharacterClass.Warrior)
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "CLI Hero",
-                    SessionId = Guid.NewGuid(),
-                    IsOnline = true,
-                    IsInCombat = false,
-                    LastUpdated = now,
-                    StatusEffects = new HashSet<string> { "buff.cli.speed" }
-                };
-                characterState.SetCurrentLocation(heroLocation);
-                worldStateService.UpsertCharacter(worldState, characterState);
-
-                var npcLocation = Location.Create(new Vector3(20, 7, 0), worldId, "cli.map", "training");
-                npcLocation.Rotation = 180f;
-
-                var npcState = Npc.Create("cli.quartermaster", "CLI Quartermaster", Location.Create(npcLocation.Position, worldId, npcLocation.MapId, npcLocation.ZoneName), worldId,
-                    new HashSet<string> { "vendor", "cli" });
-                typeof(Npc).GetProperty("Id")!.SetValue(npcState, Guid.NewGuid());
-                npcState.SetCurrentLocation(npcLocation);
-                npcState.IsAlive = true;
-                npcState.LastUpdated = now;
-                npcState.RespawnAt = null;
-                worldStateService.UpsertNpc(worldState, npcState);
-
-                var chestLocation = Location.Create(new Vector3(12, 6, 0), worldId, "cli.map", "training");
-                chestLocation.Rotation = 270f;
-
-                var mapObjectState = MapObject.Create("cli.training.chest", chestLocation, worldId, chestLocation.ZoneName);
-                typeof(MapObject).GetProperty("Id")!.SetValue(mapObjectState, Guid.NewGuid());
-                mapObjectState.DisplayName = "CLI Training Chest";
-                mapObjectState.IsActive = true;
-                mapObjectState.LastUpdated = now;
-                mapObjectState.Tags = new HashSet<string> { "chest", "cli" };
-                mapObjectState.State = new Dictionary<string, string> { { "lootTable", "cli.training" } };
-                worldStateService.UpsertMapObject(worldState, mapObjectState);
+                worldState.Characters.Add(Guid.NewGuid());
+                worldState.Npcs.Add(Guid.NewGuid());
+                worldState.MapObjects.Add(Guid.NewGuid());
 
                 return worldState;
             },
             mutateEntity: entity =>
             {
                 entity.WorldName = entity.WorldName + " Prime";
-                var updatedAt = DateTime.UtcNow;
+                entity.LastUpdated = DateTime.UtcNow;
 
-                var hero = entity.Characters.First();
-                hero.IsInCombat = true;
-                hero.LastUpdated = updatedAt;
-                hero.StatusEffects.Add("dot.cli.bleed");
-                worldStateService.UpsertCharacter(entity, hero);
+                if (!entity.Characters.Contains(Guid.Empty))
+                {
+                    entity.Characters.Add(Guid.NewGuid());
+                }
 
-                var chest = entity.MapObjects.First();
-                chest.IsActive = false;
-                chest.LastUpdated = updatedAt;
-                chest.State["lastOpenedBy"] = "CLI Hero";
-                worldStateService.UpsertMapObject(entity, chest);
+                if (entity.Npcs.Count > 0)
+                {
+                    entity.Npcs[0] = Guid.NewGuid();
+                }
+
+                var mapObjectId = Guid.NewGuid();
+                if (!entity.MapObjects.Contains(mapObjectId))
+                {
+                    entity.MapObjects.Add(mapObjectId);
+                }
             },
             assertDocument: (entity, document) =>
             {
                 if (!string.Equals(entity.WorldName, document.WorldName, StringComparison.Ordinal))
                     throw new InvalidOperationException("WorldState world name mismatch between entity and document.");
 
-                if (document.Characters.Count != 1 || document.Npcs.Count != 1 || document.MapObjects.Count != 1)
-                    throw new InvalidOperationException("WorldState document collections missing expected entries.");
+                if (!document.Characters.SequenceEqual(entity.Characters))
+                    throw new InvalidOperationException("WorldState character references mismatch in document.");
 
-                var characterDoc = document.Characters.First();
-                var characterEntity = entity.Characters.First();
-                if (!string.Equals(characterDoc.DisplayName, characterEntity.Name, StringComparison.Ordinal))
-                    throw new InvalidOperationException("Character display name mismatch in document.");
-                var expectedEffects = new HashSet<string>(characterEntity.StatusEffects);
-                if (!expectedEffects.SetEquals(characterDoc.StatusEffects ?? new HashSet<string>()))
-                    throw new InvalidOperationException("Character status effects mismatch in document.");
+                if (!document.Npcs.SequenceEqual(entity.Npcs))
+                    throw new InvalidOperationException("WorldState NPC references mismatch in document.");
 
-                var mapObjectDoc = document.MapObjects.First();
-                var mapObjectEntity = entity.MapObjects.First();
-                if (mapObjectDoc.IsActive != mapObjectEntity.IsActive)
-                    throw new InvalidOperationException("Map object active flag was not persisted.");
-                if (!mapObjectEntity.State.All(kvp => mapObjectDoc.State.TryGetValue(kvp.Key, out var value) && value == kvp.Value))
-                    throw new InvalidOperationException("Map object state metadata mismatch in document.");
+                if (!document.MapObjects.SequenceEqual(entity.MapObjects))
+                    throw new InvalidOperationException("WorldState map object references mismatch in document.");
             });
     }
 

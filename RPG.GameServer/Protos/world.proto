@@ -10,6 +10,7 @@ service WorldService {
   rpc JoinWorld (JoinWorldRequest) returns (JoinWorldReply);
   rpc LeaveWorld (WorldMembershipRequest) returns (WorldReply);
   rpc StreamWorldState (WorldStreamRequest) returns (stream WorldUpdate);
+  rpc GetWorldSnapshot (WorldSnapshotRequest) returns (WorldSnapshotReply);
 }
 
 message WorldState {
@@ -39,6 +40,15 @@ message JoinWorldReply {
 
 message WorldMembershipRequest {
   string sessionId = 1;
+}
+
+message WorldSnapshotRequest {
+  string worldId = 1;
+  string sessionId = 2;
+}
+
+message WorldSnapshotReply {
+  WorldSnapshot snapshot = 1;
 }
 
 message WorldStreamRequest {

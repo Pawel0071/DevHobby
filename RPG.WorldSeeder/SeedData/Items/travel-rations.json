@@ -1,0 +1,9 @@
+{
+  "id": "2210bf9e-4a46-4a38-9718-6b655d2fe4b7",
+  "typeCode": "consumable.food",
+  "name": "Travel Rations",
+  "rarity": "Common",
+  "requiredLevel": 1,
+  "stackSize": 20,
+  "tags": ["food", "provisions"]
+}

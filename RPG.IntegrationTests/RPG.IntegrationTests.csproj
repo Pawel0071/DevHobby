@@ -34,6 +34,7 @@
     <ProjectReference Include="..\RPG.Infrastructure\RPG.Infrastructure.csproj"/>
     <ProjectReference Include="..\RPG.PersistenceService\RPG.PersistenceService.csproj"/>
     <ProjectReference Include="..\RPG.GameServer\RPG.GameServer.csproj"/>
+    <ProjectReference Include="..\RPG.WorldSeeder\RPG.WorldSeeder.csproj"/>
   </ItemGroup>
 
   <ItemGroup>

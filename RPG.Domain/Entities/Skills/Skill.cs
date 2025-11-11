@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using RPG.Domain.Common;
 
 namespace RPG.Domain.Entities.Skills;
@@ -9,7 +10,8 @@ namespace RPG.Domain.Entities.Skills;
 /// </summary>
 public class Skill : IDomainEntity
 {
-    private Skill()
+    [JsonConstructor]
+    public Skill()
     {
         Name = string.Empty;
         Description = string.Empty;
@@ -17,6 +19,7 @@ public class Skill : IDomainEntity
         Components = new List<ISkillComponent>();
     }
 
+    [JsonInclude]
     public Guid Id { get; private set; }
     public string Name { get; set; }
     public string Description { get; set; }

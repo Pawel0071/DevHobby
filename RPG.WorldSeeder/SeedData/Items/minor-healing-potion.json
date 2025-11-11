@@ -1,0 +1,9 @@
+{
+  "id": "5f8c4d32-d7aa-4f74-85a7-274e889f3c59",
+  "typeCode": "consumable.potion",
+  "name": "Minor Healing Potion",
+  "rarity": "Common",
+  "requiredLevel": 1,
+  "stackSize": 10,
+  "tags": ["potion", "healing"]
+}

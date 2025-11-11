@@ -1,0 +1,79 @@
+{
+  "id": "b54b4c4a-19a2-4f87-8c25-ec0befa0d630",
+  "name": "starter.npc.goblin-shaman",
+  "displayName": "Goblin Shaman",
+  "description": "Mystic goblin channeling disruptive hexes.",
+  "level": 4,
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "spawnLocation": {
+    "position": { "x": 64.0, "y": 30.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 180.0
+  },
+  "currentLocation": {
+    "position": { "x": 64.0, "y": 30.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 180.0
+  },
+  "tags": ["enemy", "hostile", "goblin", "caster"],
+  "isAlive": true,
+  "lastUpdated": "2024-01-01T00:00:00Z",
+  "components": [
+    {
+      "type": "Combat",
+      "properties": {
+        "aggroRange": 18.0,
+        "leashRange": 32.0,
+        "aiBehaviorScript": "aggressive",
+        "stats": {
+          "Intelligence": 11,
+          "Wisdom": 8,
+          "HitChance": 7
+        },
+        "skills": [
+          {
+            "skillId": "7e3e2f0a-2b61-44f4-9437-01610c2a2792",
+            "availability": "Learnt"
+          },
+          {
+            "skillId": "0dd0d8ce-4f72-45eb-82f9-5f4d5201d15b",
+            "availability": "Learnt"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Lootable",
+      "properties": {
+        "experienceReward": 72,
+        "goldReward": 25,
+        "lootTable": [
+          {
+            "slot": 0,
+            "itemId": "5bd5f67f-e9cb-4a1e-aa59-2b8359f6b58f",
+            "minQuantity": 1,
+            "maxQuantity": 1,
+            "dropChance": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "type": "Respawn",
+      "properties": {
+        "respawnTimeSeconds": 360,
+        "respawnLocation": {
+          "position": { "x": 64.0, "y": 30.0, "z": 0.0 },
+          "mapId": "starter.map",
+          "zoneName": "starter.zone",
+          "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+          "rotation": 180.0
+        }
+      }
+    }
+  ]
+}

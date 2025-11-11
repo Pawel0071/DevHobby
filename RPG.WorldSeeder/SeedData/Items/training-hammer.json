@@ -1,0 +1,9 @@
+{
+  "id": "c9a6139c-357a-4bd8-8832-6cd473929839",
+  "typeCode": "weapon.training-hammer",
+  "name": "Training Hammer",
+  "rarity": "Common",
+  "requiredLevel": 2,
+  "stackSize": 1,
+  "tags": ["weapon", "training"]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "386af0f2-7b9d-41e2-a47d-7f4f1d8b94cf",
+  "typeCode": "consumable.poison",
+  "name": "Goblin Poison Vial",
+  "rarity": "Uncommon",
+  "requiredLevel": 1,
+  "stackSize": 3,
+  "tags": ["poison", "ranged"]
+}

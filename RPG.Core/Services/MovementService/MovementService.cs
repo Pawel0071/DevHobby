@@ -21,7 +21,7 @@ public class MovementService : IMovementService
         _logger = logger;
     }
 
-    public ServiceResult<Location> Move(Character character, Vector3 direction, float deltaTime, float? speedOverride = null)
+    public ServiceResult<Location> Move(Character character, Vector3 direction, float deltaTime, float? speedOverride = null, bool preserveFacing = false)
     {
         if (character == null)
         {
@@ -43,7 +43,8 @@ public class MovementService : IMovementService
             stats: character.ModifiedStats,
             direction: direction,
             deltaTime: deltaTime,
-            speedOverride: speedOverride);
+            speedOverride: speedOverride,
+            preserveFacing: preserveFacing);
 
         if (result.Success)
         {
@@ -53,7 +54,7 @@ public class MovementService : IMovementService
         return result;
     }
 
-    public ServiceResult<Location> Move(Npc npc, Vector3 direction, float deltaTime, float? speedOverride = null)
+    public ServiceResult<Location> Move(Npc npc, Vector3 direction, float deltaTime, float? speedOverride = null, bool preserveFacing = false)
     {
         if (npc == null)
         {
@@ -75,7 +76,8 @@ public class MovementService : IMovementService
             stats: npc.ModifiedStats,
             direction: direction,
             deltaTime: deltaTime,
-            speedOverride: speedOverride);
+            speedOverride: speedOverride,
+            preserveFacing: preserveFacing);
 
         if (result.Success)
         {
@@ -225,7 +227,8 @@ public class MovementService : IMovementService
         IDictionary<StatsProperty, int> stats,
         Vector3 direction,
         float deltaTime,
-        float? speedOverride)
+    float? speedOverride,
+    bool preserveFacing)
     {
         if (location == null)
         {
@@ -252,10 +255,10 @@ public class MovementService : IMovementService
             return ErrorCodeDefinition.MovementSpeedUnavailable.ToFail<Location>("Brak prędkości ruchu.");
         }
 
-        var displacement = normalizedDirection * (effectiveSpeed * deltaTime);
+    var displacement = normalizedDirection * (effectiveSpeed * deltaTime);
 
-        location.Position += displacement;
-        UpdateFacing(location, normalizedDirection);
+    location.Position += displacement;
+    UpdateFacing(location, normalizedDirection, preserveFacing);
 
         _logger.Debug(
             $"Moved {entityType} {entityId} by {displacement} (speed={effectiveSpeed}, delta={deltaTime}). New position: {location.Position}");
@@ -340,8 +343,13 @@ public class MovementService : IMovementService
         return true;
     }
 
-    private static void UpdateFacing(Location location, Vector3 direction)
+    private static void UpdateFacing(Location location, Vector3 direction, bool preserveFacing)
     {
+        if (preserveFacing)
+        {
+            return;
+        }
+
         if (direction.LengthSquared() < MinDirectionLengthSquared)
         {
             return;
@@ -358,7 +366,7 @@ public class MovementService : IMovementService
 
     private static float CalculateYawDegrees(Vector3 normalizedDirection)
     {
-        var yawRadians = MathF.Atan2(normalizedDirection.X, normalizedDirection.Z);
+        var yawRadians = MathF.Atan2(normalizedDirection.X, normalizedDirection.Y);
         if (float.IsNaN(yawRadians))
         {
             return float.NaN;

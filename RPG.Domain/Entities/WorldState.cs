@@ -1,11 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using RPG.Domain.Common;
-using RPG.Domain.Entities.MapObjects;
-using RPG.Domain.Entities.MapObjects.MapObjectComponents;
-using RPG.Domain.Entities.Npcs;
-using RPG.Domain.Entities.Npcs.NpcComponents;
 
 namespace RPG.Domain.Entities;
 
@@ -18,18 +13,18 @@ public class WorldState : IDomainEntity
     private WorldState()
     {
         WorldName = string.Empty;
-        Characters = new List<Character>();
-        Npcs = new List<Npc>();
-        MapObjects = new List<MapObject>();
+        Characters = new List<Guid>();
+        Npcs = new List<Guid>();
+        MapObjects = new List<Guid>();
     }
 
     public Guid Id { get; private set; }
     public Guid WorldId { get; private set; }
     public string WorldName { get; set; }
     public DateTime LastUpdated { get; set; }
-    public List<Character> Characters { get; }
-    public List<Npc> Npcs { get; }
-    public List<MapObject> MapObjects { get; }
+    public List<Guid> Characters { get; }
+    public List<Guid> Npcs { get; }
+    public List<Guid> MapObjects { get; }
 
     public static WorldState Create(Guid worldId, string worldName)
     {
@@ -47,9 +42,9 @@ public class WorldState : IDomainEntity
         Guid worldId,
         string worldName,
         DateTime lastUpdated,
-    IEnumerable<Character>? characters = null,
-    IEnumerable<Npc>? npcs = null,
-    IEnumerable<MapObject>? mapObjects = null)
+        IEnumerable<Guid>? characters = null,
+        IEnumerable<Guid>? npcs = null,
+        IEnumerable<Guid>? mapObjects = null)
     {
         var worldState = new WorldState
         {
@@ -61,123 +56,19 @@ public class WorldState : IDomainEntity
 
         if (characters != null)
         {
-            worldState.Characters.AddRange(characters.Select(CloneCharacter));
+            worldState.Characters.AddRange(characters);
         }
 
         if (npcs != null)
         {
-            worldState.Npcs.AddRange(npcs.Select(CloneNpc));
+            worldState.Npcs.AddRange(npcs);
         }
 
         if (mapObjects != null)
         {
-            worldState.MapObjects.AddRange(mapObjects.Select(CloneMapObject));
+            worldState.MapObjects.AddRange(mapObjects);
         }
 
         return worldState;
-    }
-
-    private static Character CloneCharacter(Character source)
-    {
-        var clone = new Character(source.SessionId, source.Class)
-        {
-            Id = source.Id,
-            Name = source.Name,
-            PlayerId = source.PlayerId,
-            Level = source.Level,
-            Experience = source.Experience,
-            ExperienceToNextLevel = source.ExperienceToNextLevel,
-            CurrentHealth = source.CurrentHealth,
-            MaxHealth = source.MaxHealth,
-            CurrentResource = source.CurrentResource,
-            MaxResource = source.MaxResource,
-            IsOnline = source.IsOnline,
-            IsInCombat = source.IsInCombat,
-            LastUpdated = source.LastUpdated,
-            StatusEffects = new HashSet<string>(source.StatusEffects)
-        };
-
-        clone.SetCurrentLocation(CloneLocation(source.CurrentLocation));
-        clone.SetMovementState(source.IsMoving);
-        clone.SetRotationState(source.IsRotating);
-
-        foreach (var stat in source.BaseStats)
-        {
-            clone.BaseStats[stat.Key] = stat.Value;
-        }
-
-        foreach (var stat in source.ModifiedStats)
-        {
-            clone.ModifiedStats[stat.Key] = stat.Value;
-        }
-
-        return clone;
-    }
-
-    private static Npc CloneNpc(Npc source)
-    {
-    var clone = Npc.Create(source.Name, source.DisplayName, CloneLocation(source.SpawnLocation), source.WorldId, new HashSet<string>(source.Tags));
-
-        typeof(Npc).GetProperty("Id")!.SetValue(clone, source.Id);
-        clone.Description = source.Description;
-        clone.Level = source.Level;
-        clone.CurrentHealth = source.CurrentHealth;
-        clone.MaxHealth = source.MaxHealth;
-        clone.SetCurrentLocation(CloneLocation(source.CurrentLocation));
-        clone.SetMovementState(source.IsMoving);
-        clone.SetRotationState(source.IsRotating);
-        clone.IsAlive = source.IsAlive;
-        clone.LastUpdated = source.LastUpdated;
-        clone.RespawnAt = source.RespawnAt;
-
-        // Copy stats
-        foreach (var stat in source.BaseStats)
-        {
-            clone.BaseStats[stat.Key] = stat.Value;
-        }
-
-        foreach (var stat in source.ModifiedStats)
-        {
-            clone.ModifiedStats[stat.Key] = stat.Value;
-        }
-
-        // Copy components (shallow copy)
-        clone.Components = source.Components is null
-            ? new List<INpcComponent>()
-            : new List<INpcComponent>(source.Components);
-
-        return clone;
-    }
-
-    private static MapObject CloneMapObject(MapObject source)
-    {
-        var clone = MapObject.Create(source.Name, CloneLocation(source.Location), source.WorldId, source.ZoneId);
-
-        typeof(MapObject).GetProperty("Id")!.SetValue(clone, source.Id);
-        clone.DisplayName = source.DisplayName;
-        clone.Description = source.Description;
-        clone.IsActive = source.IsActive;
-        clone.RotationYaw = source.RotationYaw;
-        clone.LastUpdated = source.LastUpdated;
-        clone.Tags = new HashSet<string>(source.Tags);
-        clone.State = new Dictionary<string, string>(source.State);
-        clone.Components = source.Components is null
-            ? new List<IMapObjectComponent>()
-            : new List<IMapObjectComponent>(source.Components);
-        return clone;
-    }
-
-    private static Location CloneLocation(Location location)
-    {
-        var clone = new Location
-        {
-            WorldId = location.WorldId,
-            MapId = location.MapId,
-            ZoneName = location.ZoneName,
-            Rotation = location.Rotation
-        };
-
-        clone.Position = location.Position;
-        return clone;
     }
 }

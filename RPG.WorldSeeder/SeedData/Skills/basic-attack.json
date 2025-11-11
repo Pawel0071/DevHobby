@@ -1,0 +1,35 @@
+{
+  "id": "7e3e2f0a-2b61-44f4-9437-01610c2a2792",
+  "name": "Basic Attack",
+  "description": "A quick melee strike that every adventurer learns on day one.",
+  "iconId": "icon_skill_basic_attack",
+  "tags": ["basic-attack", "melee", "starter"],
+  "components": [
+    {
+      "type": "Damage",
+      "properties": {
+        "baseDamage": 14,
+        "minDamage": 12,
+        "maxDamage": 16,
+        "scalingFactor": 1.0,
+        "scalingStat": "strength",
+        "damageType": "physical",
+        "critMultiplier": 1.8
+      }
+    },
+    {
+      "type": "Cooldown",
+      "properties": {
+        "cooldownSeconds": 2,
+        "useGlobalCooldown": true,
+        "globalCooldownMs": 1000
+      }
+    },
+    {
+      "type": "Requirement",
+      "properties": {
+        "requiredLevel": 1
+      }
+    }
+  ]
+}

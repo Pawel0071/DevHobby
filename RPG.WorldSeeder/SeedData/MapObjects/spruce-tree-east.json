@@ -1,0 +1,23 @@
+{
+  "id": "f9279fcb-3cbb-49d1-9b3b-7a2dd0e9e8cb",
+  "name": "starter.decor.tree-spruce-east",
+  "displayName": "Spruce Tree",
+  "location": {
+  "position": { "x": 26.0, "y": 22.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 330.0
+  },
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "zoneId": "starter.zone",
+  "isActive": true,
+  "rotationYaw": 330.0,
+  "tags": ["tree", "spruce", "nature", "scenery"],
+  "state": {
+    "textureKey": "tree_alt",
+    "variant": "spruce",
+    "size": "tall"
+  },
+  "lastUpdated": "2024-01-01T00:00:00Z"
+}

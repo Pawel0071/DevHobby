@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Entities.MapObjects;
@@ -45,7 +48,11 @@ public class MapObjectDocumentMapper : IDocumentMapper<MapObject, MapObjectDocum
             Tags = entity.Tags.ToList(),
             Components = entity.Components
                 .Select(component => SerializeComponent(component))
-                .ToList()
+                .ToList(),
+            State = entity.State?.Count > 0
+                ? entity.State.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase)
+                : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
+            LastUpdated = entity.LastUpdated
         };
     }
 
@@ -67,6 +74,14 @@ public class MapObjectDocumentMapper : IDocumentMapper<MapObject, MapObjectDocum
         mapObject.RotationYaw = document.RotationYaw;
         mapObject.IsActive = document.IsActive;
         mapObject.Tags = document.Tags.ToHashSet();
+        mapObject.State = document.State?.Count > 0
+            ? document.State.ToDictionary(kvp => kvp.Key, kvp => kvp.Value, StringComparer.OrdinalIgnoreCase)
+            : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        if (document.LastUpdated != default)
+        {
+            mapObject.LastUpdated = document.LastUpdated;
+        }
 
         // Deserialize components
         foreach (var componentData in document.Components)

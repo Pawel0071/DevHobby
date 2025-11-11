@@ -1,0 +1,22 @@
+{
+  "id": "d3426a73-7d62-4a62-9c56-5a9c9b5de4a1",
+  "name": "starter.decor.torch-east",
+  "displayName": "Plaza Torch (East)",
+  "location": {
+  "position": { "x": 22.0, "y": 14.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 0.0
+  },
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "zoneId": "starter.zone",
+  "isActive": true,
+  "rotationYaw": 0.0,
+  "tags": ["torch", "light", "campfire", "decor"],
+  "state": {
+    "textureKey": "campfire",
+    "intensity": "medium"
+  },
+  "lastUpdated": "2024-01-01T00:00:00Z"
+}

@@ -181,17 +181,32 @@ public class SessionServiceImpl : SessionService.SessionServiceBase
 		{
 			X = location.Position.X,
 			Y = location.Position.Y,
-			Z = location.Position.Z
+			Z = location.Position.Z,
+			WorldId = location.WorldId.HasValue ? location.WorldId.Value.ToString() : string.Empty,
+			MapId = location.MapId ?? string.Empty,
+			ZoneName = location.ZoneName ?? string.Empty,
+			Rotation = location.Rotation
 		};
 	}
 
 	private static RPG.Domain.Entities.Location FromProtoLocation(Protos.Location location)
 	{
-		return RPG.Domain.Entities.Location.Create(
+		var hasWorldId = Guid.TryParse(location.WorldId, out var parsedWorldId);
+		var worldId = hasWorldId ? parsedWorldId : Guid.Empty;
+		var mapId = location.MapId ?? string.Empty;
+		var zoneName = location.ZoneName ?? string.Empty;
+
+		var entityLocation = RPG.Domain.Entities.Location.Create(
 			(float)location.X,
 			(float)location.Y,
 			(float)location.Z,
-			Guid.Empty);
+			worldId,
+			mapId,
+			zoneName);
+
+		entityLocation.WorldId = hasWorldId ? parsedWorldId : null;
+		entityLocation.Rotation = location.Rotation;
+		return entityLocation;
 	}
 
 	private static string ResolvePeerAddress(ServerCallContext context)

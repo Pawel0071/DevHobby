@@ -1,0 +1,23 @@
+{
+  "id": "36b9991e-079f-4b25-bf64-99d8ef4f1f3d",
+  "name": "starter.decor.tree-oak-west",
+  "displayName": "Ancient Oak",
+  "location": {
+  "position": { "x": 8.0, "y": 24.0, "z": 0.0 },
+    "mapId": "starter.map",
+    "zoneName": "starter.zone",
+    "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+    "rotation": 45.0
+  },
+  "worldId": "c2bce5a0-5d6d-4eb5-8f5c-5aeb1b6f6b3d",
+  "zoneId": "starter.zone",
+  "isActive": true,
+  "rotationYaw": 45.0,
+  "tags": ["tree", "oak", "nature", "scenery"],
+  "state": {
+    "textureKey": "tree",
+    "variant": "oak",
+    "age": "old"
+  },
+  "lastUpdated": "2024-01-01T00:00:00Z"
+}

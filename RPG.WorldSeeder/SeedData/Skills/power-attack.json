@@ -1,0 +1,35 @@
+{
+  "id": "22f5a2be-62ee-4de3-840d-0a8d7e3c9c0f",
+  "name": "Power Attack",
+  "description": "A heavy overhead swing that pushes foes back.",
+  "iconId": "icon_skill_power_attack",
+  "tags": ["power-attack", "melee", "starter"],
+  "components": [
+    {
+      "type": "Damage",
+      "properties": {
+        "baseDamage": 34,
+        "minDamage": 30,
+        "maxDamage": 38,
+        "scalingFactor": 1.35,
+        "scalingStat": "strength",
+        "damageType": "physical",
+        "critMultiplier": 2.2
+      }
+    },
+    {
+      "type": "Cooldown",
+      "properties": {
+        "cooldownSeconds": 6,
+        "useGlobalCooldown": true,
+        "globalCooldownMs": 1500
+      }
+    },
+    {
+      "type": "Requirement",
+      "properties": {
+        "requiredLevel": 4
+      }
+    }
+  ]
+}

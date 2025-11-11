@@ -1,0 +1,9 @@
+{
+  "id": "5bd5f67f-e9cb-4a1e-aa59-2b8359f6b58f",
+  "typeCode": "trinket.totem",
+  "name": "Shamanic Charm Totem",
+  "rarity": "Rare",
+  "requiredLevel": 3,
+  "stackSize": 1,
+  "tags": ["trinket", "totem"]
+}
