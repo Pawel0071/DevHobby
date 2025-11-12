@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using RPG.Domain.Containers;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Enums;
-using RPG.Infrastructure.Common;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
-using RPG.Abstractions; // central tag->component map
+using RPG.Abstractions; 
 
 namespace RPG.Infrastructure.Mappers;
 
