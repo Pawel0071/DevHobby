@@ -4,7 +4,7 @@ using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Enums;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
-using RPG.Abstractions; 
+using RPG.Abstractions;
 
 namespace RPG.Infrastructure.Mappers;
 

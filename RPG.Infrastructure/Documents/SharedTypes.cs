@@ -3,14 +3,6 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace RPG.Infrastructure.Documents;
 
-/// <summary>
-///     Shared types and common classes used across multiple document models.
-///     Consolidated here to avoid duplication.
-/// </summary>
-/// <summary>
-///     Common location data used across multiple documents.
-///     Stores Vector3 position as separate X, Y, Z for MongoDB compatibility.
-/// </summary>
 public class LocationData
 {
     public float X { get; set; }
