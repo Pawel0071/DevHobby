@@ -51,9 +51,9 @@ internal sealed class FunctionalTestRunner
         using var scope = _serviceProvider.CreateScope();
         var services = scope.ServiceProvider;
 
-        var documentRepository = services.GetRequiredService<IDocumentRepository>();
-        var mongoRepository = services.GetRequiredService<IMongoDocumentRepository>();
-        var redisRepository = services.GetRequiredService<IRedisDocumentRepository>();
+        var documentRepository = services.GetRequiredService<IModelRepository>();
+        var mongoRepository = services.GetRequiredService<IMongoRepository>();
+        var redisRepository = services.GetRequiredService<IRedisRepository>();
     var warmUpStrategies = services.GetServices<WarmUpStrategy>();
         var warmUpLogger = services.GetRequiredService<ILogger<RedisWarmUpService>>();
 
@@ -97,7 +97,7 @@ internal sealed class FunctionalTestRunner
         _logger.Info("Redis warm-up successfully restored the item document to cache.");
 
         Console.WriteLine("\n🚀 Functional test summary");
-        Console.WriteLine(" - Infrastructure DocumentRepository upsert ✔");
+        Console.WriteLine(" - Infrastructure ModelRepository upsert ✔");
         Console.WriteLine(" - Persistence message handling to Mongo ✔");
         Console.WriteLine(" - Redis warm-up pipeline ✔\n");
 

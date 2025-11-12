@@ -12,19 +12,19 @@ using Xunit;
 
 namespace RPG.UnitTest.Infrastructure.Repositories.Orchestrators
 {
-    public class DocumentRepositoryHandlerTests
+    public class ModelRepositoryHandlerTests
     {
-        private readonly Mock<IMongoDocumentRepository> _mongoRepository = new();
-        private readonly Mock<IRedisDocumentRepository> _redisRepository = new();
+        private readonly Mock<IMongoRepository> _mongoRepository = new();
+        private readonly Mock<IRedisRepository> _redisRepository = new();
         private readonly Mock<IRabbitMqPublisher> _rabbitMqPublisher = new();
-        private readonly Mock<IDocumentMapper<TestEntity, TestDocument>> _mapper = new();
-        private readonly Mock<ILogger<DocumentRepositoryHandler<TestEntity, TestDocument>>> _logger = new();
-        private readonly DocumentRepositoryHandler<TestEntity, TestDocument> _handler;
+        private readonly Mock<IModelMapper<TestModel, TestDocument>> _mapper = new();
+        private readonly Mock<ILogger<ModelRepositoryHandler<TestModel, TestDocument>>> _logger = new();
+        private readonly ModelRepositoryHandler<TestModel, TestDocument> _handler;
         private readonly CancellationToken _cancellationToken = CancellationToken.None;
 
-        public DocumentRepositoryHandlerTests()
+        public ModelRepositoryHandlerTests()
         {
-            _handler = new DocumentRepositoryHandler<TestEntity, TestDocument>(
+            _handler = new ModelRepositoryHandler<TestModel, TestDocument>(
                 _mongoRepository.Object,
                 _redisRepository.Object,
                 _rabbitMqPublisher.Object,
@@ -35,26 +35,26 @@ namespace RPG.UnitTest.Infrastructure.Repositories.Orchestrators
         [Fact]
         public async Task UpsertAsync_ShouldCacheAndPublish()
         {
-            var entity = new TestEntity(Guid.NewGuid());
+            var entity = new TestModel(Guid.NewGuid());
             var document = new TestDocument { Id = entity.Id };
 
-            _mapper.Setup(m => m.ToDocument(entity)).Returns(document);
+            _mapper.Setup(m => m.ToPersistence(entity)).Returns(document);
 
             await _handler.UpsertAsync(entity, _cancellationToken);
 
             _redisRepository.Verify(r => r.UpsertAsync(document, _cancellationToken), Times.Once);
-            _rabbitMqPublisher.Verify(p => p.PublishAsync("testentity.upserted", document), Times.Once);
+            _rabbitMqPublisher.Verify(p => p.PublishAsync("testmodel.upserted", document), Times.Once);
             _logger.Verify(l => l.Info(It.Is<string>(msg => msg.Contains("upserted"))), Times.Once);
         }
 
         [Fact]
         public async Task UpsertAsync_WhenCacheFails_ShouldLogAndRethrow()
         {
-            var entity = new TestEntity(Guid.NewGuid());
+            var entity = new TestModel(Guid.NewGuid());
             var document = new TestDocument { Id = entity.Id };
             var exception = new InvalidOperationException("cache error");
 
-            _mapper.Setup(m => m.ToDocument(entity)).Returns(document);
+            _mapper.Setup(m => m.ToPersistence(entity)).Returns(document);
             _redisRepository
                 .Setup(r => r.UpsertAsync(document, _cancellationToken))
                 .ThrowsAsync(exception);
@@ -70,7 +70,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.Orchestrators
         {
             var id = Guid.NewGuid();
             var document = new TestDocument { Id = id };
-            var entity = new TestEntity(id);
+            var entity = new TestModel(id);
 
             _redisRepository.Setup(r => r.GetByIdAsync<TestDocument>(id, _cancellationToken)).ReturnsAsync(document);
             _mapper.Setup(m => m.ToDomain(document)).Returns(entity);
@@ -87,7 +87,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.Orchestrators
         {
             var id = Guid.NewGuid();
             var document = new TestDocument { Id = id };
-            var entity = new TestEntity(id);
+            var entity = new TestModel(id);
 
             _redisRepository.Setup(r => r.GetByIdAsync<TestDocument>(id, _cancellationToken)).ReturnsAsync((TestDocument?)null);
             _mongoRepository.Setup(m => m.GetByIdAsync<TestDocument>(id, _cancellationToken)).ReturnsAsync(document);
@@ -122,7 +122,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.Orchestrators
 
             _mongoRepository.Setup(m => m.GetAllAsync<TestDocument>(_cancellationToken)).ReturnsAsync(documents);
             _mapper.Setup(m => m.ToDomain(It.IsAny<TestDocument>()))
-                .Returns<TestDocument>(doc => new TestEntity(doc.Id));
+                .Returns<TestDocument>(doc => new TestModel(doc.Id));
 
             var result = await _handler.GetAllAsync(_cancellationToken);
 
@@ -140,7 +140,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.Orchestrators
 
             _mongoRepository.Setup(m => m.GetBatchAsync<TestDocument>(5, 10, _cancellationToken)).ReturnsAsync(documents);
             _mapper.Setup(m => m.ToDomain(It.IsAny<TestDocument>()))
-                .Returns<TestDocument>(doc => new TestEntity(doc.Id));
+                .Returns<TestDocument>(doc => new TestModel(doc.Id));
 
             var result = await _handler.GetBatchAsync(5, 10, _cancellationToken);
 
@@ -170,7 +170,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.Orchestrators
             var result = await _handler.DeleteAsync(id, _cancellationToken);
 
             result.Should().BeTrue();
-            _rabbitMqPublisher.Verify(p => p.PublishAsync("testentity.deleted", document), Times.Once);
+            _rabbitMqPublisher.Verify(p => p.PublishAsync("testmodel.deleted", document), Times.Once);
         }
 
         [Fact]
@@ -186,7 +186,7 @@ namespace RPG.UnitTest.Infrastructure.Repositories.Orchestrators
             var result = await _handler.DeleteAsync(id, _cancellationToken);
 
             result.Should().BeTrue();
-            _rabbitMqPublisher.Verify(p => p.PublishAsync("testentity.deleted", document), Times.Once);
+            _rabbitMqPublisher.Verify(p => p.PublishAsync("testmodel.deleted", document), Times.Once);
         }
 
         [Fact]
@@ -218,9 +218,9 @@ namespace RPG.UnitTest.Infrastructure.Repositories.Orchestrators
             _logger.Verify(l => l.Error(It.Is<string>(msg => msg.Contains("DeleteAsync")), exception), Times.Once);
         }
 
-        public record TestEntity(Guid Id) : IDomainEntity;
+        public record TestModel(Guid Id) : IDomainModel;
 
-        public class TestDocument : IMongoDocument
+        public class TestDocument : IPersistenceModel
         {
             public static string CollectionName => "test_documents";
             public Guid Id { get; set; }

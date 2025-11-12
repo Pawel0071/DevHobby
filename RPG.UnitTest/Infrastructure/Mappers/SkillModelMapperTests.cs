@@ -10,16 +10,16 @@ using RPG.Infrastructure.Mappers;
 namespace RPG.UnitTest.Infrastructure.Mappers;
 
 /// <summary>
-///     Tests for SkillDocumentMapper - Skill to/from SkillDocument conversion with all component types
+///     Tests for SkillModelMapper - Skill to/from SkillDocument conversion with all component types
 /// </summary>
-public class SkillDocumentMapperTests
+public class SkillModelMapperTests
 {
-    private readonly SkillDocumentMapper _mapper;
+    private readonly SkillModelMapper _mapper;
 
-    public SkillDocumentMapperTests()
+    public SkillModelMapperTests()
     {
-        var mockLogger = new Mock<ILogger<SkillDocumentMapper>>();
-        _mapper = new SkillDocumentMapper(mockLogger.Object);
+        var mockLogger = new Mock<ILogger<SkillModelMapper>>();
+        _mapper = new SkillModelMapper(mockLogger.Object);
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public class SkillDocumentMapperTests
     skill.Tags = new HashSet<string> { "fire", "damage", "ranged", "class-mage", "weapon-staff", "resource-mana" };
 
         // Act
-        var document = _mapper.ToDocument(skill);
+        var document = _mapper.ToPersistence(skill);
 
         // Assert
         document.Id.Should().Be(skill.Id);
@@ -62,7 +62,7 @@ public class SkillDocumentMapperTests
         skill.Components.Add(damageComponent);
 
         // Act
-        var document = _mapper.ToDocument(skill);
+        var document = _mapper.ToPersistence(skill);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -91,7 +91,7 @@ public class SkillDocumentMapperTests
         skill.Components.Add(healingComponent);
 
         // Act
-        var document = _mapper.ToDocument(skill);
+        var document = _mapper.ToPersistence(skill);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -116,7 +116,7 @@ public class SkillDocumentMapperTests
         skill.Components.Add(cooldownComponent);
 
         // Act
-        var document = _mapper.ToDocument(skill);
+        var document = _mapper.ToPersistence(skill);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -145,7 +145,7 @@ public class SkillDocumentMapperTests
         skill.Components.Add(castingComponent);
 
         // Act
-        var document = _mapper.ToDocument(skill);
+        var document = _mapper.ToPersistence(skill);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -165,7 +165,7 @@ public class SkillDocumentMapperTests
         skill.Components.Add(new CastingComponent { CastTimeMs = 2000, IsInterruptible = true });
 
         // Act
-        var document = _mapper.ToDocument(skill);
+        var document = _mapper.ToPersistence(skill);
 
         // Assert
         document.Components.Should().HaveCount(3);
@@ -411,7 +411,7 @@ public class SkillDocumentMapperTests
         skill.Components.Add(new CooldownComponent { CooldownSeconds = 15 });
 
         // Act
-        var document = _mapper.ToDocument(skill);
+        var document = _mapper.ToPersistence(skill);
         var roundTrippedSkill = _mapper.ToEntity(document);
 
         // Assert

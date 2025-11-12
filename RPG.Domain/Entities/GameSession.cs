@@ -8,7 +8,7 @@ namespace RPG.Domain.Entities;
 ///     Tracks player connection, character selection, and session state.
 ///     Pure data entity - logic handled by services.
 /// </summary>
-public class GameSession : IDomainEntity
+public class GameSession : IDomainModel
 {
     private GameSession()
     {

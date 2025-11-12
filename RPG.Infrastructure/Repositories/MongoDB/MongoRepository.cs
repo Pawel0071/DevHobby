@@ -11,15 +11,15 @@ namespace RPG.Infrastructure.Repositories.MongoDB;
 ///     INTERNAL IMPLEMENTATION: Uses MongoDB, but consumers don't know this.
 ///     Methods are generic, not the class itself.
 /// </summary>
-public class MongoDocumentRepository : IMongoDocumentRepository
+public class MongoRepository : IMongoRepository
 {
     private readonly IMongoDatabase _database;
-    private readonly ILogger<MongoDocumentRepository> _logger;
+    private readonly ILogger<MongoRepository> _logger;
     private readonly IActivityScope _activityScope;
 
-    public MongoDocumentRepository(
+    public MongoRepository(
         IMongoDatabase database,
-        ILogger<MongoDocumentRepository> logger,
+        ILogger<MongoRepository> logger,
         IActivityScope activityScope)
     {
         _database = database;
@@ -30,8 +30,8 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     /// <summary>
     ///     Insert or update a document in MongoDB
     /// </summary>
-    public async Task UpsertAsync<TDocument>(TDocument document, CancellationToken cancellationToken = default) 
-        where TDocument : class, IMongoDocument
+    public async Task UpsertAsync<TDocument>(TDocument document, CancellationToken cancellationToken = default)
+        where TDocument : class, IPersistenceModel
     {
         try
         {
@@ -65,8 +65,8 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     /// <summary>
     ///     Get a document by its ID
     /// </summary>
-    public async Task<TDocument?> GetByIdAsync<TDocument>(object id, CancellationToken cancellationToken = default) 
-        where TDocument : class, IMongoDocument
+    public async Task<TDocument?> GetByIdAsync<TDocument>(object id, CancellationToken cancellationToken = default)
+        where TDocument : class, IPersistenceModel
     {
         try
         {
@@ -101,8 +101,8 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     /// <summary>
     ///     Get all documents from the collection
     /// </summary>
-    public async Task<List<TDocument>> GetAllAsync<TDocument>(CancellationToken cancellationToken = default) 
-        where TDocument : class, IMongoDocument
+    public async Task<List<TDocument>> GetAllAsync<TDocument>(CancellationToken cancellationToken = default)
+        where TDocument : class, IPersistenceModel
     {
         try
         {
@@ -131,8 +131,8 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     /// <summary>
     ///     Get documents in batches (for large collections)
     /// </summary>
-    public async Task<List<TDocument>> GetBatchAsync<TDocument>(int skip, int limit, CancellationToken cancellationToken = default) 
-        where TDocument : class, IMongoDocument
+    public async Task<List<TDocument>> GetBatchAsync<TDocument>(int skip, int limit, CancellationToken cancellationToken = default)
+        where TDocument : class, IPersistenceModel
     {
         try
         {
@@ -168,8 +168,8 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     /// <summary>
     ///     Count total documents in the collection
     /// </summary>
-    public async Task<long> CountAsync<TDocument>(CancellationToken cancellationToken = default) 
-        where TDocument : class, IMongoDocument
+    public async Task<long> CountAsync<TDocument>(CancellationToken cancellationToken = default)
+        where TDocument : class, IPersistenceModel
     {
         try
         {
@@ -198,8 +198,8 @@ public class MongoDocumentRepository : IMongoDocumentRepository
     /// <summary>
     ///     Delete a document by its ID
     /// </summary>
-    public async Task<bool> DeleteAsync<TDocument>(object id, CancellationToken cancellationToken = default) 
-        where TDocument : class, IMongoDocument
+    public async Task<bool> DeleteAsync<TDocument>(object id, CancellationToken cancellationToken = default)
+        where TDocument : class, IPersistenceModel
     {
         try
         {

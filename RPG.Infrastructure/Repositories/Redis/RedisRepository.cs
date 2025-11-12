@@ -8,18 +8,18 @@ using StackExchange.Redis;
 namespace RPG.Infrastructure.Repositories.Redis;
 
 /// <summary>
-///     Redis document repository - identical interface to MongoDocumentRepository.
-///     Uses CollectionName from IMongoDocument to build Redis keys.
+///     Redis document repository - identical interface to MongoRepository.
+///     Uses CollectionName from IPersistenceModel to build Redis keys.
 /// </summary>
-public class RedisDocumentRepository : IRedisDocumentRepository
+public class RedisRepository : IRedisRepository
 {
-    private readonly ILogger<RedisDocumentRepository> _logger;
+    private readonly ILogger<RedisRepository> _logger;
     private readonly IDatabase _redisDatabase;
     private readonly IActivityScope _activityScope;
 
-    public RedisDocumentRepository(
+    public RedisRepository(
         IDatabase redisDatabase,
-        ILogger<RedisDocumentRepository> logger,
+        ILogger<RedisRepository> logger,
         IActivityScope activityScope)
     {
         _redisDatabase = redisDatabase;
@@ -30,7 +30,7 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     /// <summary>
     ///     Build Redis key for a document: CollectionName:Id
     /// </summary>
-    private string BuildKey<TDocument>(object id) where TDocument : class, IMongoDocument
+    private string BuildKey<TDocument>(object id) where TDocument : class, IPersistenceModel
     {
         return $"{TDocument.CollectionName}:{id}";
     }
@@ -38,7 +38,7 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     /// <summary>
     ///     Build Redis pattern for a collection: CollectionName:*
     /// </summary>
-    private string BuildPattern<TDocument>() where TDocument : class, IMongoDocument
+    private string BuildPattern<TDocument>() where TDocument : class, IPersistenceModel
     {
         return $"{TDocument.CollectionName}:*";
     }
@@ -46,8 +46,8 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     /// <summary>
     ///     Insert or update a document in Redis
     /// </summary>
-    public async Task UpsertAsync<TDocument>(TDocument document, CancellationToken cancellationToken = default) 
-        where TDocument : class, IMongoDocument
+    public async Task UpsertAsync<TDocument>(TDocument document, CancellationToken cancellationToken = default)
+        where TDocument : class, IPersistenceModel
     {
         try
         {
@@ -61,7 +61,7 @@ public class RedisDocumentRepository : IRedisDocumentRepository
 
             var key = BuildKey<TDocument>(document.Id);
             var json = JsonSerializer.Serialize(document);
-            
+
             var success = await _redisDatabase.StringSetAsync(key, json);
 
             if (success)
@@ -79,8 +79,8 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     /// <summary>
     ///     Get a document by its ID from Redis
     /// </summary>
-    public async Task<TDocument?> GetByIdAsync<TDocument>(object id, CancellationToken cancellationToken = default) 
-        where TDocument : class, IMongoDocument
+    public async Task<TDocument?> GetByIdAsync<TDocument>(object id, CancellationToken cancellationToken = default)
+        where TDocument : class, IPersistenceModel
     {
         try
         {
@@ -116,8 +116,8 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     /// <summary>
     ///     Get all documents of a specific type from Redis
     /// </summary>
-    public async Task<List<TDocument>> GetAllAsync<TDocument>(CancellationToken cancellationToken = default) 
-        where TDocument : class, IMongoDocument
+    public async Task<List<TDocument>> GetAllAsync<TDocument>(CancellationToken cancellationToken = default)
+        where TDocument : class, IPersistenceModel
     {
         try
         {
@@ -145,7 +145,7 @@ public class RedisDocumentRepository : IRedisDocumentRepository
             foreach (var value in values)
             {
                 if (!value.HasValue) continue;
-                
+
                 try
                 {
                     var document = JsonSerializer.Deserialize<TDocument>(value.ToString());
@@ -170,8 +170,8 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     /// <summary>
     ///     Get documents in batches (pagination)
     /// </summary>
-    public async Task<List<TDocument>> GetBatchAsync<TDocument>(int skip, int limit, CancellationToken cancellationToken = default) 
-        where TDocument : class, IMongoDocument
+    public async Task<List<TDocument>> GetBatchAsync<TDocument>(int skip, int limit, CancellationToken cancellationToken = default)
+        where TDocument : class, IPersistenceModel
     {
         try
         {
@@ -201,8 +201,8 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     /// <summary>
     ///     Count total documents of a specific type in Redis
     /// </summary>
-    public Task<long> CountAsync<TDocument>(CancellationToken cancellationToken = default) 
-        where TDocument : class, IMongoDocument
+    public Task<long> CountAsync<TDocument>(CancellationToken cancellationToken = default)
+        where TDocument : class, IPersistenceModel
     {
         try
         {
@@ -231,8 +231,8 @@ public class RedisDocumentRepository : IRedisDocumentRepository
     /// <summary>
     ///     Delete a document by its ID from Redis
     /// </summary>
-    public async Task<bool> DeleteAsync<TDocument>(object id, CancellationToken cancellationToken = default) 
-        where TDocument : class, IMongoDocument
+    public async Task<bool> DeleteAsync<TDocument>(object id, CancellationToken cancellationToken = default)
+        where TDocument : class, IPersistenceModel
     {
         try
         {

@@ -9,16 +9,16 @@ namespace RPG.Infrastructure.Mappers;
 /// <summary>
 ///     Mapper for converting between WorldState domain entity and WorldStateDocument
 /// </summary>
-public class WorldStateDocumentMapper : IDocumentMapper<WorldState, WorldStateDocument>
+public class WorldStateModelMapper : IModelMapper<WorldState, WorldStateDocument>
 {
-    private readonly ILogger<WorldStateDocumentMapper> _logger;
+    private readonly ILogger<WorldStateModelMapper> _logger;
 
-    public WorldStateDocumentMapper(ILogger<WorldStateDocumentMapper> logger)
+    public WorldStateModelMapper(ILogger<WorldStateModelMapper> logger)
     {
         _logger = logger;
     }
 
-    public WorldStateDocument ToDocument(WorldState entity)
+    public WorldStateDocument ToPersistence(WorldState entity)
     {
         _logger.Debug($"Converting WorldState to WorldStateDocument. Id={entity.Id}, WorldId={entity.WorldId}");
 

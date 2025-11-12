@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace RPG.Infrastructure.Interfaces
 {
-    public interface IDocumentRepositoryHandler<TEntity> where TEntity : class, IDomainEntity
+    public interface IModelRepositoryHandler<TEntity> where TEntity : class, IDomainModel
     {
-        Task UpsertAsync(TEntity entity, CancellationToken cancellationToken = default);
+        Task UpsertAsync(TEntity domainModel, CancellationToken cancellationToken = default);
         Task<TEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default);
         Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<List<TEntity>> GetBatchAsync(int skip, int limit, CancellationToken cancellationToken = default);

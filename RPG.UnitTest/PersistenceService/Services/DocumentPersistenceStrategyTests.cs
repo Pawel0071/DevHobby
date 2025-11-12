@@ -8,7 +8,7 @@ namespace RPG.UnitTest.PersistenceService.Services;
 
 public class DocumentPersistenceStrategyTests
 {
-    private readonly Mock<IMongoDocumentRepository> _repositoryMock = new();
+    private readonly Mock<IMongoRepository> _repositoryMock = new();
 
     [Fact]
     public async Task UpsertAsync_WithMatchingType_ForwardsToRepository()

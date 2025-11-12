@@ -92,8 +92,8 @@ internal interface IDocumentRepositoryScenario
 }
 
 internal sealed class DocumentRepositoryScenario<TEntity, TDocument> : IDocumentRepositoryScenario
-    where TEntity : class, IDomainEntity
-    where TDocument : class, IMongoDocument
+    where TEntity : class, IDomainModel
+    where TDocument : class, IPersistenceModel
 {
     private readonly Func<TEntity> _createEntity;
     private readonly Action<TEntity>? _mutateEntity;
@@ -124,9 +124,9 @@ internal sealed class DocumentRepositoryScenario<TEntity, TDocument> : IDocument
         using var scope = serviceProvider.CreateScope();
         var scopedProvider = scope.ServiceProvider;
 
-        var documentRepository = scopedProvider.GetRequiredService<IDocumentRepository>();
-        var mongoRepository = scopedProvider.GetRequiredService<IMongoDocumentRepository>();
-        var redisRepository = scopedProvider.GetRequiredService<IRedisDocumentRepository>();
+        var documentRepository = scopedProvider.GetRequiredService<IModelRepository>();
+        var mongoRepository = scopedProvider.GetRequiredService<IMongoRepository>();
+        var redisRepository = scopedProvider.GetRequiredService<IRedisRepository>();
 
         var entity = _createEntity();
         var entityId = entity.Id;

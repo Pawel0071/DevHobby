@@ -23,16 +23,16 @@ public class DocumentTypeResolverTests
         var serviceScopeMock = new Mock<IServiceScope>();
         var serviceScopeFactoryMock = new Mock<IServiceScopeFactory>();
 
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IDocumentMapper<Character, CharacterDocument>)))
-            .Returns(new Mock<IDocumentMapper<Character, CharacterDocument>>().Object);
-        
-        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IDocumentMapper<Item, ItemDocument>)))
-            .Returns(new Mock<IDocumentMapper<Item, ItemDocument>>().Object);
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IModelMapper<Character, CharacterDocument>)))
+            .Returns(new Mock<IModelMapper<Character, CharacterDocument>>().Object);
+
+        _serviceProviderMock.Setup(sp => sp.GetService(typeof(IModelMapper<Item, ItemDocument>)))
+            .Returns(new Mock<IModelMapper<Item, ItemDocument>>().Object);
 
         serviceScopeMock.Setup(s => s.ServiceProvider).Returns(_serviceProviderMock.Object);
         serviceScopeFactoryMock.Setup(s => s.CreateScope()).Returns(serviceScopeMock.Object);
         _serviceProviderMock.Setup(sp => sp.GetService(typeof(IServiceScopeFactory))).Returns(serviceScopeFactoryMock.Object);
-        
+
         _resolver = new DocumentTypeResolver(_serviceProviderMock.Object);
     }
 
@@ -45,7 +45,7 @@ public class DocumentTypeResolverTests
         // Assert
         documentType.Should().Be(typeof(CharacterDocument));
         mapper.Should().NotBeNull();
-        mapper.Should().BeAssignableTo<IDocumentMapper<Character, CharacterDocument>>();
+        mapper.Should().BeAssignableTo<IModelMapper<Character, CharacterDocument>>();
     }
 
     [Fact]
@@ -57,20 +57,20 @@ public class DocumentTypeResolverTests
         // Assert
         documentType.Should().Be(typeof(ItemDocument));
         mapper.Should().NotBeNull();
-        mapper.Should().BeAssignableTo<IDocumentMapper<Item, ItemDocument>>();
+        mapper.Should().BeAssignableTo<IModelMapper<Item, ItemDocument>>();
     }
 
     [Fact]
     public void GetMapping_ForNonExistentDocument_ThrowsException()
     {
         // Act & Assert
-        var act = () => _resolver.GetMapping<TestEntityWithoutDocument>();
+        var act = () => _resolver.GetMapping<TestModelWithoutDocument>();
 
         act.Should().Throw<InvalidOperationException>()
-            .WithMessage("No mapping registered for entity type TestEntityWithoutDocument");
+            .WithMessage("No mapping registered for entity type TestModelWithoutDocument");
     }
-    
-    private class TestEntityWithoutDocument : IDomainEntity
+
+    private class TestModelWithoutDocument : IDomainModel
     {
         public Guid Id { get; set; }
     }

@@ -44,8 +44,8 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         services.AddSingleton(_redisDatabase);
 
         // Register repositories
-        services.AddSingleton<IRedisDocumentRepository, RedisDocumentRepository>();
-        services.AddSingleton<IMongoDocumentRepository, MongoDocumentRepository>();
+        services.AddSingleton<IRedisRepository, RedisRepository>();
+        services.AddSingleton<IMongoRepository, MongoRepository>();
 
         _serviceProvider = services.BuildServiceProvider();
     }
@@ -65,7 +65,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         };
         await collection.InsertManyAsync(testDocuments);
 
-        var repository = _serviceProvider.GetRequiredService<IMongoDocumentRepository>();
+        var repository = _serviceProvider.GetRequiredService<IMongoRepository>();
 
         // Act
         var documents = await repository.GetAllAsync<CharacterDocument>();
@@ -95,7 +95,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
             });
         await collection.InsertManyAsync(testDocuments);
 
-        var repository = _serviceProvider.GetRequiredService<IMongoDocumentRepository>();
+        var repository = _serviceProvider.GetRequiredService<IMongoRepository>();
 
         // Act
         var batch1 = await repository.GetBatchAsync<ItemDocument>(0, 10); // skip=0, limit=10
@@ -124,7 +124,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         };
         await collection.InsertManyAsync(testDocuments);
 
-        var repository = _serviceProvider.GetRequiredService<IMongoDocumentRepository>();
+        var repository = _serviceProvider.GetRequiredService<IMongoRepository>();
 
         // Act
         var count = await repository.CountAsync<SkillDocument>();
@@ -137,7 +137,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task RedisDocumentWriter_ShouldWriteSingleDocument()
     {
         // Arrange
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
+        var writer = _serviceProvider.GetRequiredService<IRedisRepository>();
         var document = new CharacterDocument { Id = Guid.NewGuid(), Name = "TestCharacter", PlayerId = Guid.NewGuid(), SessionId = Guid.NewGuid(), Class = "Warrior", Level = 42, Experience = 0, ExperienceToNextLevel = 100, CurrentHealth = 100, MaxHealth = 100, CurrentResource = 50, MaxResource = 50 };
 
         // Act
@@ -160,7 +160,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task RedisDocumentWriter_ShouldWriteBatchDocuments()
     {
         // Arrange
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
+        var writer = _serviceProvider.GetRequiredService<IRedisRepository>();
         var documents = new List<ItemDocument>();
 
         for (var i = 0; i < 5; i++)
@@ -195,7 +195,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task RedisDocumentWriter_ShouldSetExpiryCorrectly()
     {
         // Arrange
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
+        var writer = _serviceProvider.GetRequiredService<IRedisRepository>();
         var document = new SkillDocument { Id = Guid.NewGuid(), Name = "TempData" };
         
         // Act
@@ -213,7 +213,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task RedisDocumentWriter_ShouldCheckExistence()
     {
         // Arrange
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
+        var writer = _serviceProvider.GetRequiredService<IRedisRepository>();
         var existingId = Guid.NewGuid();
         var nonExistingId = Guid.NewGuid();
 
@@ -234,7 +234,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
     public async Task RedisDocumentWriter_ShouldDeleteDocument()
     {
         // Arrange
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
+        var writer = _serviceProvider.GetRequiredService<IRedisRepository>();
         var documentId = Guid.NewGuid();
         var document = new CharacterDocument { Id = documentId, Name = "ToDelete", PlayerId = Guid.NewGuid(), SessionId = Guid.NewGuid(), Class = "Warrior", Level = 1, Experience = 0, ExperienceToNextLevel = 100, CurrentHealth = 100, MaxHealth = 100, CurrentResource = 50, MaxResource = 50 };
 
@@ -266,8 +266,8 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         };
         await collection.InsertManyAsync(testDocuments);
 
-        var repository = _serviceProvider.GetRequiredService<IMongoDocumentRepository>();
-        var writer = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
+        var repository = _serviceProvider.GetRequiredService<IMongoRepository>();
+        var writer = _serviceProvider.GetRequiredService<IRedisRepository>();
 
         // Act - Simulate what RedisWarmUpOrchestrator does
         var documents = await repository.GetAllAsync<CharacterDocument>();
@@ -300,8 +300,8 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         await FlushRedisAsync();
         await ClearMongoCollectionsAsync();
 
-        var redisRepo = _serviceProvider.GetRequiredService<IRedisDocumentRepository>();
-        var mongoRepo = _serviceProvider.GetRequiredService<IMongoDocumentRepository>();
+        var redisRepo = _serviceProvider.GetRequiredService<IRedisRepository>();
+        var mongoRepo = _serviceProvider.GetRequiredService<IMongoRepository>();
         var logger = _serviceProvider.GetRequiredService<Infrastructure.Interfaces.ILogger<RedisWarmUpService>>();
 
     var seededDocuments = new List<object>();
@@ -389,7 +389,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         }
     }
 
-    private async Task DeleteAllDocumentsAsync<TDocument>() where TDocument : class, IMongoDocument
+    private async Task DeleteAllDocumentsAsync<TDocument>() where TDocument : class, IPersistenceModel
     {
         var collection = _mongoDatabase.GetCollection<TDocument>(TDocument.CollectionName);
         await collection.DeleteManyAsync(FilterDefinition<TDocument>.Empty);
@@ -404,13 +404,13 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         await (Task)constructed.Invoke(this, new object[] { document })!;
     }
 
-    private async Task InsertTypedDocumentAsync<TDocument>(TDocument document) where TDocument : class, IMongoDocument
+    private async Task InsertTypedDocumentAsync<TDocument>(TDocument document) where TDocument : class, IPersistenceModel
     {
         var collection = _mongoDatabase.GetCollection<TDocument>(TDocument.CollectionName);
         await collection.InsertOneAsync(document);
     }
 
-    private async Task AssertRedisContainsDocumentAsync(IRedisDocumentRepository redisRepository, object document)
+    private async Task AssertRedisContainsDocumentAsync(IRedisRepository redisRepository, object document)
     {
         var genericMethod = typeof(RedisWarmUpIntegrationTests)
             .GetMethod(nameof(AssertRedisContainsTypedDocumentAsync), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
@@ -419,8 +419,8 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         await (Task)constructed.Invoke(this, new object[] { redisRepository, document })!;
     }
 
-    private async Task AssertRedisContainsTypedDocumentAsync<TDocument>(IRedisDocumentRepository redisRepository, TDocument document)
-        where TDocument : class, IMongoDocument
+    private async Task AssertRedisContainsTypedDocumentAsync<TDocument>(IRedisRepository redisRepository, TDocument document)
+        where TDocument : class, IPersistenceModel
     {
         var cached = await redisRepository.GetByIdAsync<TDocument>(document.Id);
         cached.Should().NotBeNull($"Document {typeof(TDocument).Name} with Id {document.Id} should be cached in Redis");

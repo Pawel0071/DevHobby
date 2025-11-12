@@ -24,7 +24,7 @@ foreach (var mapping in DocumentMappingRegistry.All)
 
     builder.Services.AddSingleton(typeof(RedisWarmUp.Services.IDocumentWarmUpStrategy), sp =>
     {
-        var repository = sp.GetRequiredService<IMongoDocumentRepository>();
+        var repository = sp.GetRequiredService<IMongoRepository>();
         return Activator.CreateInstance(strategyType, repository, collectionName)!;
     });
 }

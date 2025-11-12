@@ -52,7 +52,7 @@ public class MessageHandler
                 return;
             }
             
-            var document = (IMongoDocument?)JsonSerializer.Deserialize(message, documentType);
+            var document = (IPersistenceModel?)JsonSerializer.Deserialize(message, documentType);
 
             if (document == null)
             {
@@ -78,7 +78,7 @@ public class MessageHandler
 
     private async Task HandleDeleteAsync(
         IDocumentPersistenceStrategy strategy,
-        IMongoDocument document,
+        IPersistenceModel document,
         string collectionName,
         CancellationToken cancellationToken)
     {
@@ -89,7 +89,7 @@ public class MessageHandler
 
     private async Task HandleUpsertAsync(
         IDocumentPersistenceStrategy strategy,
-        IMongoDocument document,
+        IPersistenceModel document,
         string collectionName,
         CancellationToken cancellationToken)
     {

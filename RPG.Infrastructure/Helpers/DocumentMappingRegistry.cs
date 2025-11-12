@@ -28,55 +28,55 @@ public static class DocumentMappingRegistry
             CollectionName: CharacterDocument.CollectionName,
             EntityType: typeof(Character),
             DocumentType: typeof(CharacterDocument),
-            MapperServiceType: typeof(IDocumentMapper<Character, CharacterDocument>)),
+            MapperServiceType: typeof(IModelMapper<Character, CharacterDocument>)),
         new(
             EntityKey: "item",
             CollectionName: ItemDocument.CollectionName,
             EntityType: typeof(Item),
             DocumentType: typeof(ItemDocument),
-            MapperServiceType: typeof(IDocumentMapper<Item, ItemDocument>)),
+            MapperServiceType: typeof(IModelMapper<Item, ItemDocument>)),
         new(
             EntityKey: "skill",
             CollectionName: SkillDocument.CollectionName,
             EntityType: typeof(Skill),
             DocumentType: typeof(SkillDocument),
-            MapperServiceType: typeof(IDocumentMapper<Skill, SkillDocument>)),
+            MapperServiceType: typeof(IModelMapper<Skill, SkillDocument>)),
         new(
             EntityKey: "quest",
             CollectionName: QuestDocument.CollectionName,
             EntityType: typeof(Quest),
             DocumentType: typeof(QuestDocument),
-            MapperServiceType: typeof(IDocumentMapper<Quest, QuestDocument>)),
+            MapperServiceType: typeof(IModelMapper<Quest, QuestDocument>)),
         new(
             EntityKey: "npc",
             CollectionName: NpcDocument.CollectionName,
             EntityType: typeof(Npc),
             DocumentType: typeof(NpcDocument),
-            MapperServiceType: typeof(IDocumentMapper<Npc, NpcDocument>)),
+            MapperServiceType: typeof(IModelMapper<Npc, NpcDocument>)),
         new(
             EntityKey: "player",
             CollectionName: PlayerDocument.CollectionName,
             EntityType: typeof(Player),
             DocumentType: typeof(PlayerDocument),
-            MapperServiceType: typeof(IDocumentMapper<Player, PlayerDocument>)),
+            MapperServiceType: typeof(IModelMapper<Player, PlayerDocument>)),
         new(
             EntityKey: "gamesession",
             CollectionName: GameSessionDocument.CollectionName,
             EntityType: typeof(GameSession),
             DocumentType: typeof(GameSessionDocument),
-            MapperServiceType: typeof(IDocumentMapper<GameSession, GameSessionDocument>)),
+            MapperServiceType: typeof(IModelMapper<GameSession, GameSessionDocument>)),
         new(
             EntityKey: "mapobject",
             CollectionName: MapObjectDocument.CollectionName,
             EntityType: typeof(MapObject),
             DocumentType: typeof(MapObjectDocument),
-            MapperServiceType: typeof(IDocumentMapper<MapObject, MapObjectDocument>)),
+            MapperServiceType: typeof(IModelMapper<MapObject, MapObjectDocument>)),
         new(
             EntityKey: "worldstate",
             CollectionName: WorldStateDocument.CollectionName,
             EntityType: typeof(WorldState),
             DocumentType: typeof(WorldStateDocument),
-            MapperServiceType: typeof(IDocumentMapper<WorldState, WorldStateDocument>))
+            MapperServiceType: typeof(IModelMapper<WorldState, WorldStateDocument>))
     };
 
     public static IReadOnlyCollection<DocumentMappingDefinition> All => Definitions;

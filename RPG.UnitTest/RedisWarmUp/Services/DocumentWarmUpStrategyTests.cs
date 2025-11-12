@@ -13,20 +13,20 @@ namespace RPG.UnitTest.RedisWarmUp.Services;
 
 public class DocumentWarmUpStrategyTests
 {
-    private readonly Mock<IMongoDocumentRepository> _mongoRepositoryMock;
+    private readonly Mock<IMongoRepository> _mongoRepositoryMock;
     private readonly DocumentWarmUpStrategy<TestDocument> _strategy;
 
     public DocumentWarmUpStrategyTests()
     {
-        _mongoRepositoryMock = new Mock<IMongoDocumentRepository>();
+        _mongoRepositoryMock = new Mock<IMongoRepository>();
         _strategy = new DocumentWarmUpStrategy<TestDocument>(_mongoRepositoryMock.Object, "TestDocuments");
     }
 
-    private static Mock<IRedisDocumentRepository> CreateRedisRepositoryMock() => new();
+    private static Mock<IRedisRepository> CreateRedisRepositoryMock() => new();
 
     private static Mock<ILogger<RedisWarmUpService>> CreateLoggerMock() => new();
 
-    private class TestDocument : IMongoDocument
+    private class TestDocument : IPersistenceModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;

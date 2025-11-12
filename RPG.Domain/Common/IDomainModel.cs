@@ -3,7 +3,7 @@ namespace RPG.Domain.Common;
 /// <summary>
 ///     Base interface for all domain entities
 /// </summary>
-public interface IDomainEntity
+public interface IDomainModel
 {
     /// <summary>
     ///     Unique identifier of the entity

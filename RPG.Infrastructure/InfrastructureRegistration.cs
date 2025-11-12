@@ -100,7 +100,7 @@ public static class InfrastructureRegistration
         services.AddSingleton<IConnectionMultiplexer>(sp =>
             ConnectionMultiplexer.Connect(redisConn!));
         services.AddSingleton<IDatabase>(sp => sp.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
-        services.AddSingleton<IRedisDocumentRepository, RedisDocumentRepository>();
+        services.AddSingleton<IRedisRepository, RedisRepository>();
 
         // RabbitMQ
         if (rabbitConfig?.Host != null)
@@ -164,21 +164,21 @@ public static class InfrastructureRegistration
             return client.GetDatabase("rpg");
         });
 
-        services.AddSingleton<IMongoDocumentRepository, MongoDocumentRepository>();
-        services.AddSingleton<IDocumentRepository, DocumentRepository>();
+        services.AddSingleton<IMongoRepository, MongoRepository>();
+        services.AddSingleton<IModelRepository, ModelRepository>();
         services.AddSingleton<IDocumentTypeResolver, DocumentTypeResolver>();
 
         // Document mappers and supporting helpers
         services.AddSingleton<LocationMapper>();
-        services.AddSingleton<IDocumentMapper<Character, CharacterDocument>, CharacterDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<Item, ItemDocument>, ItemDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<Skill, SkillDocument>, SkillDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<Quest, QuestDocument>, QuestDocumentMapper>();
-    services.AddSingleton<IDocumentMapper<Npc, NpcDocument>, NpcDocumentMapper>();
-    services.AddSingleton<IDocumentMapper<GameSession, GameSessionDocument>, GameSessionDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<Player, PlayerDocument>, PlayerDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<MapObject, MapObjectDocument>, MapObjectDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<WorldState, WorldStateDocument>, WorldStateDocumentMapper>();
+        services.AddSingleton<IModelMapper<Character, CharacterDocument>, CharacterModelMapper>();
+        services.AddSingleton<IModelMapper<Item, ItemDocument>, ItemModelMapper>();
+        services.AddSingleton<IModelMapper<Skill, SkillDocument>, SkillModelMapper>();
+        services.AddSingleton<IModelMapper<Quest, QuestDocument>, QuestModelMapper>();
+    services.AddSingleton<IModelMapper<Npc, NpcDocument>, NpcModelMapper>();
+    services.AddSingleton<IModelMapper<GameSession, GameSessionDocument>, GameSessionModelMapper>();
+        services.AddSingleton<IModelMapper<Player, PlayerDocument>, PlayerModelMapper>();
+        services.AddSingleton<IModelMapper<MapObject, MapObjectDocument>, MapObjectModelMapper>();
+        services.AddSingleton<IModelMapper<WorldState, WorldStateDocument>, WorldStateModelMapper>();
 
         // Health Checks
         services.AddHealthChecks()

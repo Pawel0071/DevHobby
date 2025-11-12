@@ -16,7 +16,7 @@ namespace RPG.Infrastructure.Mappers;
 ///     Mapper for converting between Npc domain entity and NpcDocument.
 ///     Components are serialized to JSON for flexible storage.
 /// </summary>
-public class NpcDocumentMapper : IDocumentMapper<Npc, NpcDocument>
+public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
 {
     private static readonly StringComparer TagComparer = StringComparer.OrdinalIgnoreCase;
 
@@ -32,21 +32,21 @@ public class NpcDocumentMapper : IDocumentMapper<Npc, NpcDocument>
             [typeof(TrainerComponent)] = new[] { "npc:trainer", "trainer" }
         };
 
-    private readonly ILogger<NpcDocumentMapper> _logger;
+    private readonly ILogger<NpcModelMapper> _logger;
     private readonly LocationMapper _locationMapper;
-    private readonly IDocumentMapper<Skill, SkillDocument> _skillMapper;
+    private readonly IModelMapper<Skill, SkillDocument> _skillMapper;
 
-    public NpcDocumentMapper(
-        ILogger<NpcDocumentMapper> logger,
+    public NpcModelMapper(
+        ILogger<NpcModelMapper> logger,
         LocationMapper locationMapper,
-        IDocumentMapper<Skill, SkillDocument> skillMapper)
+        IModelMapper<Skill, SkillDocument> skillMapper)
     {
         _logger = logger;
         _locationMapper = locationMapper;
         _skillMapper = skillMapper;
     }
 
-    public NpcDocument ToDocument(Npc entity)
+    public NpcDocument ToPersistence(Npc entity)
     {
         _logger.Debug($"Converting Npc to NpcDocument. Id={entity.Id}, Name={entity.DisplayName}");
 
@@ -169,7 +169,7 @@ public class NpcDocumentMapper : IDocumentMapper<Npc, NpcDocument>
             TeachableSkills = trainer.TeachableSkills
                 .Select(kvp => new SkillAvailabilityEntry
                 {
-                    Skill = _skillMapper.ToDocument(kvp.Key),
+                    Skill = _skillMapper.ToPersistence(kvp.Key),
                     Availability = kvp.Value
                 })
                 .ToList()
@@ -193,7 +193,7 @@ public class NpcDocumentMapper : IDocumentMapper<Npc, NpcDocument>
             Skills = combat.Skills
                 .Select(kvp => new SkillAvailabilityEntry
                 {
-                    Skill = _skillMapper.ToDocument(kvp.Key),
+                    Skill = _skillMapper.ToPersistence(kvp.Key),
                     Availability = kvp.Value
                 })
                 .ToList()

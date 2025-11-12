@@ -14,22 +14,22 @@ using RPG.Infrastructure.Mappers;
 
 namespace RPG.UnitTest.Infrastructure.Mappers;
 
-public class ItemDocumentMapperTests
+public class ItemModelMapperTests
 {
-    private readonly Mock<ILogger<ItemDocumentMapper>> _mockLogger;
+    private readonly Mock<ILogger<ItemModelMapper>> _mockLogger;
 
-    public ItemDocumentMapperTests()
+    public ItemModelMapperTests()
     {
-        _mockLogger = new Mock<ILogger<ItemDocumentMapper>>();
+        _mockLogger = new Mock<ILogger<ItemModelMapper>>();
     }
 
-    private ItemDocumentMapper CreateMapper()
+    private ItemModelMapper CreateMapper()
     {
         var tagRegistryLogger = new Mock<ILogger<DictionaryRegistry<TagDefinition>>>();
         var tagRegistry = new DictionaryRegistry<TagDefinition>(tagRegistryLogger.Object);
         tagRegistry.Load(Array.Empty<TagDefinition>());
 
-        return new ItemDocumentMapper(
+        return new ItemModelMapper(
             _mockLogger.Object,
             tagRegistry);
     }
@@ -49,7 +49,7 @@ public class ItemDocumentMapperTests
         };
 
         // Act
-        var doc = mapper.ToDocument(item);
+        var doc = mapper.ToPersistence(item);
 
         // Assert
         doc.Id.Should().Be(item.Id);
@@ -82,7 +82,7 @@ public class ItemDocumentMapperTests
         item.Components.Add(statsComponent);
 
         // Act
-        var doc = mapper.ToDocument(item);
+        var doc = mapper.ToPersistence(item);
 
         // Assert
         doc.Modifiers.Should().NotBeNull();
@@ -103,7 +103,7 @@ public class ItemDocumentMapperTests
         item.Components.Add(socketComponent);
 
         // Act
-        var doc = mapper.ToDocument(item);
+        var doc = mapper.ToPersistence(item);
 
         // Assert
         doc.SocketNo.Should().Be(3);
@@ -180,7 +180,7 @@ public class ItemDocumentMapperTests
         };
 
         // Act
-        var doc = mapper.ToDocument(originalItem);
+        var doc = mapper.ToPersistence(originalItem);
         var resultItem = mapper.ToDomain(doc);
 
         // Assert
@@ -200,12 +200,12 @@ public class ItemDocumentMapperTests
         var item = new Item(Guid.NewGuid(), "item_skill") { Name = "Skill Item" };
         var skill1 = Guid.NewGuid();
         var skill2 = Guid.NewGuid();
-        
+
         var skillComponent = new SkillGrantComponent { SkillIds = new List<Guid> { skill1, skill2 } };
         item.Components.Add(skillComponent);
 
         // Act
-        var doc = mapper.ToDocument(item);
+        var doc = mapper.ToPersistence(item);
 
         // Assert
         doc.SkillIds.Should().NotBeNull();
@@ -222,12 +222,12 @@ public class ItemDocumentMapperTests
         var item = new Item(Guid.NewGuid(), "quest_item") { Name = "Quest Item" };
         var questId = Guid.NewGuid();
         var stepId = Guid.NewGuid();
-        
+
         var questComponent = new QuestItemComponent { QuestId = questId, StepId = stepId };
         item.Components.Add(questComponent);
 
         // Act
-        var doc = mapper.ToDocument(item);
+        var doc = mapper.ToPersistence(item);
 
         // Assert
         doc.QuestId.Should().Be(questId);
@@ -252,7 +252,7 @@ public class ItemDocumentMapperTests
         item.Components.Add(equippable);
 
         // Act
-        var doc = mapper.ToDocument(item);
+        var doc = mapper.ToPersistence(item);
 
         // Assert
     doc.EquipmentSlots.Should().NotBeNull().And.Contain(EquipmentSlot.Weapon1);
@@ -276,7 +276,7 @@ public class ItemDocumentMapperTests
         item.Components.Add(material);
 
         // Act
-        var doc = mapper.ToDocument(item);
+        var doc = mapper.ToPersistence(item);
 
         // Assert
         doc.UsedInItemIds.Should().NotBeNull().And.HaveCount(2);
@@ -290,7 +290,7 @@ public class ItemDocumentMapperTests
         // Arrange
         var mapper = CreateMapper();
         var item = new Item(Guid.NewGuid(), "legendary_weapon") { Name = "Ultimate Weapon" };
-        
+
         // Add all component types
         item.Components.Add(new StatsComponent
         {
@@ -313,7 +313,7 @@ public class ItemDocumentMapperTests
         item.Components.Add(new CraftMaterialComponent { UsedInItemIds = new List<string> { "legendary-recipe" } });
 
         // Act
-        var doc = mapper.ToDocument(item);
+        var doc = mapper.ToPersistence(item);
 
         // Assert
         doc.Modifiers.Should().NotBeNull().And.HaveCount(2);
@@ -335,7 +335,7 @@ public class ItemDocumentMapperTests
         var item = new Item(Guid.NewGuid(), "simple_item") { Name = "Simple Item" };
 
         // Act
-        var doc = mapper.ToDocument(item);
+        var doc = mapper.ToPersistence(item);
 
         // Assert
         doc.Should().NotBeNull();
@@ -437,7 +437,7 @@ public class ItemDocumentMapperTests
         };
 
         // Act
-        var component = ItemDocumentMapper.CreateComponent(typeof(StatsComponent), doc);
+        var component = ItemModelMapper.CreateComponent(typeof(StatsComponent), doc);
 
         // Assert
         component.Should().NotBeNull();
@@ -455,7 +455,7 @@ public class ItemDocumentMapperTests
         var doc = new ItemDocument { SocketNo = 4 };
 
         // Act
-        var component = ItemDocumentMapper.CreateComponent(typeof(SocketComponent), doc);
+        var component = ItemModelMapper.CreateComponent(typeof(SocketComponent), doc);
 
         // Assert
         component.Should().NotBeNull();
@@ -472,7 +472,7 @@ public class ItemDocumentMapperTests
         var doc = new ItemDocument { SkillIds = new List<Guid> { skill1, skill2 } };
 
         // Act
-        var component = ItemDocumentMapper.CreateComponent(typeof(SkillGrantComponent), doc);
+        var component = ItemModelMapper.CreateComponent(typeof(SkillGrantComponent), doc);
 
         // Assert
         component.Should().NotBeNull();
@@ -495,7 +495,7 @@ public class ItemDocumentMapperTests
         };
 
         // Act
-        var component = ItemDocumentMapper.CreateComponent(typeof(EquippableComponent), doc);
+        var component = ItemModelMapper.CreateComponent(typeof(EquippableComponent), doc);
 
         // Assert
         component.Should().NotBeNull();
@@ -514,7 +514,7 @@ public class ItemDocumentMapperTests
         var doc = new ItemDocument { UsedInItemIds = new List<string> { "recipe-1" } };
 
         // Act
-        var component = ItemDocumentMapper.CreateComponent(typeof(CraftMaterialComponent), doc);
+        var component = ItemModelMapper.CreateComponent(typeof(CraftMaterialComponent), doc);
 
         // Assert
         component.Should().NotBeNull();
@@ -532,7 +532,7 @@ public class ItemDocumentMapperTests
         var doc = new ItemDocument { QuestId = questId, StepId = stepId };
 
         // Act
-        var component = ItemDocumentMapper.CreateComponent(typeof(QuestItemComponent), doc);
+        var component = ItemModelMapper.CreateComponent(typeof(QuestItemComponent), doc);
 
         // Assert
         component.Should().NotBeNull();
@@ -549,12 +549,12 @@ public class ItemDocumentMapperTests
         var doc = new ItemDocument(); // Empty document
 
         // Act
-        var statsComp = ItemDocumentMapper.CreateComponent(typeof(StatsComponent), doc);
-        var socketComp = ItemDocumentMapper.CreateComponent(typeof(SocketComponent), doc);
-        var skillComp = ItemDocumentMapper.CreateComponent(typeof(SkillGrantComponent), doc);
-        var questComp = ItemDocumentMapper.CreateComponent(typeof(QuestItemComponent), doc);
-    var equipComp = ItemDocumentMapper.CreateComponent(typeof(EquippableComponent), doc);
-    var craftComp = ItemDocumentMapper.CreateComponent(typeof(CraftMaterialComponent), doc);
+        var statsComp = ItemModelMapper.CreateComponent(typeof(StatsComponent), doc);
+        var socketComp = ItemModelMapper.CreateComponent(typeof(SocketComponent), doc);
+        var skillComp = ItemModelMapper.CreateComponent(typeof(SkillGrantComponent), doc);
+        var questComp = ItemModelMapper.CreateComponent(typeof(QuestItemComponent), doc);
+    var equipComp = ItemModelMapper.CreateComponent(typeof(EquippableComponent), doc);
+    var craftComp = ItemModelMapper.CreateComponent(typeof(CraftMaterialComponent), doc);
 
         // Assert
         statsComp.Should().BeNull();
@@ -622,12 +622,12 @@ public class ItemDocumentMapperTests
     {
         // Arrange
         var mapper = CreateMapper();
-        
+
         // Act & Assert - Test all rarities
         foreach (ItemRarity rarity in Enum.GetValues(typeof(ItemRarity)))
         {
             var item = new Item(Guid.NewGuid(), "test") { Name = "Test", Rarity = rarity };
-            var doc = mapper.ToDocument(item);
+            var doc = mapper.ToPersistence(item);
             doc.Rarity.Should().Be(rarity);
         }
     }

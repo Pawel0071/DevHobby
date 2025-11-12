@@ -12,7 +12,7 @@ internal static class ContainerComponentMapper
 {
     public static ContainerComponentDto ToDto(
         ContainerComponent component,
-        IDocumentMapper<Item, ItemDocument> itemMapper)
+        IModelMapper<Item, ItemDocument> itemMapper)
     {
         return new ContainerComponentDto
         {
@@ -20,7 +20,7 @@ internal static class ContainerComponentMapper
             Items = component.Items
                 .Select(slot => new InventorySlotDto
                 {
-                    Item = slot.Item is null ? null : itemMapper.ToDocument(slot.Item),
+                    Item = slot.Item is null ? null : itemMapper.ToPersistence(slot.Item),
                     Quantity = slot.Quantity
                 })
                 .ToList()
@@ -29,7 +29,7 @@ internal static class ContainerComponentMapper
 
     public static ContainerComponent? FromDto(
         ContainerComponentDto? dto,
-        IDocumentMapper<Item, ItemDocument> itemMapper)
+        IModelMapper<Item, ItemDocument> itemMapper)
     {
         if (dto is null)
         {

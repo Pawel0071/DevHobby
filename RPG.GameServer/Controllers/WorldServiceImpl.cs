@@ -25,20 +25,20 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 		private readonly ICharacterStateBroadcaster _stateBroadcaster;
 		private readonly INpcAiService _npcAiService;
 		private readonly IWorldSessionManager _worldSessionManager;
-		private readonly IDocumentRepository _documentRepository;
+		private readonly IModelRepository _modelRepository;
 		private readonly RPG.Infrastructure.Interfaces.ILogger<WorldServiceImpl> _logger;
 
 	public WorldServiceImpl(
         ICharacterStateBroadcaster stateBroadcaster,
         INpcAiService npcAiService,
 			IWorldSessionManager worldSessionManager,
-	        IDocumentRepository documentRepository,
+	        IModelRepository modelRepository,
 			RPG.Infrastructure.Interfaces.ILogger<WorldServiceImpl> logger)
 	{
 			_stateBroadcaster = stateBroadcaster;
 			_npcAiService = npcAiService;
 			_worldSessionManager = worldSessionManager;
-			_documentRepository = documentRepository;
+			_modelRepository = modelRepository;
 			_logger = logger;
 	}
 
@@ -260,13 +260,13 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 		};
 
 		var characterTasks = world.Characters
-			.Select(id => _documentRepository.GetByIdAsync<Character>(id, cancellationToken))
+			.Select(id => _modelRepository.GetByIdAsync<Character>(id, cancellationToken))
 			.ToList();
 		var npcTasks = world.Npcs
-			.Select(id => _documentRepository.GetByIdAsync<Npc>(id, cancellationToken))
+			.Select(id => _modelRepository.GetByIdAsync<Npc>(id, cancellationToken))
 			.ToList();
 		var mapObjectTasks = world.MapObjects
-			.Select(id => _documentRepository.GetByIdAsync<MapObject>(id, cancellationToken))
+			.Select(id => _modelRepository.GetByIdAsync<MapObject>(id, cancellationToken))
 			.ToList();
 
 		var characters = await Task.WhenAll(characterTasks).ConfigureAwait(false);
@@ -295,10 +295,10 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 		};
 
 		var characterTasks = world.Characters
-			.Select(id => _documentRepository.GetByIdAsync<Character>(id, cancellationToken))
+			.Select(id => _modelRepository.GetByIdAsync<Character>(id, cancellationToken))
 			.ToList();
 		var npcTasks = world.Npcs
-			.Select(id => _documentRepository.GetByIdAsync<Npc>(id, cancellationToken))
+			.Select(id => _modelRepository.GetByIdAsync<Npc>(id, cancellationToken))
 			.ToList();
 
 		var characters = await Task.WhenAll(characterTasks).ConfigureAwait(false);

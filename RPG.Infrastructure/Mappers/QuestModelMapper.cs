@@ -10,18 +10,18 @@ namespace RPG.Infrastructure.Mappers;
 ///     Mapper for converting between Quest domain entity and QuestDocument
 ///     Components are serialized to JSON for flexible storage
 /// </summary>
-public class QuestDocumentMapper : IDocumentMapper<Quest, QuestDocument>
+public class QuestModelMapper : IModelMapper<Quest, QuestDocument>
 {
-    private readonly ILogger<QuestDocumentMapper> _logger;
+    private readonly ILogger<QuestModelMapper> _logger;
     private readonly LocationMapper _locationMapper;
 
-    public QuestDocumentMapper(ILogger<QuestDocumentMapper> logger, LocationMapper locationMapper)
+    public QuestModelMapper(ILogger<QuestModelMapper> logger, LocationMapper locationMapper)
     {
         _logger = logger;
         _locationMapper = locationMapper;
     }
 
-    public QuestDocument ToDocument(Quest entity)
+    public QuestDocument ToPersistence(Quest entity)
     {
         _logger.Debug($"Converting Quest to QuestDocument. Id={entity.Id}, Title={entity.Title}");
         return new QuestDocument
@@ -72,7 +72,7 @@ public class QuestDocumentMapper : IDocumentMapper<Quest, QuestDocument>
     }
 
     public Quest ToEntity(QuestDocument document) => ToDomain(document);
-    
+
     private IQuestComponent? DeserializeComponent(ComponentData componentData)
     {
         return componentData.Type switch

@@ -27,7 +27,7 @@ var builder = Host.CreateDefaultBuilder(args)
 
             services.AddSingleton(typeof(IDocumentPersistenceStrategy), sp =>
             {
-                var repository = sp.GetRequiredService<IMongoDocumentRepository>();
+                var repository = sp.GetRequiredService<IMongoRepository>();
                 return Activator.CreateInstance(strategyType, repository, collectionName)!;
             });
         }

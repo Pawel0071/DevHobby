@@ -7,16 +7,16 @@ namespace RPG.Infrastructure.Mappers;
 /// <summary>
 ///     Mapper for converting between Player domain entity and PlayerDocument
 /// </summary>
-public class PlayerDocumentMapper : IDocumentMapper<Player, PlayerDocument>
+public class PlayerModelMapper : IModelMapper<Player, PlayerDocument>
 {
-    private readonly ILogger<PlayerDocumentMapper> _logger;
+    private readonly ILogger<PlayerModelMapper> _logger;
 
-    public PlayerDocumentMapper(ILogger<PlayerDocumentMapper> logger)
+    public PlayerModelMapper(ILogger<PlayerModelMapper> logger)
     {
         _logger = logger;
     }
 
-    public PlayerDocument ToDocument(Player entity)
+    public PlayerDocument ToPersistence(Player entity)
     {
         _logger.Debug($"Converting Player to PlayerDocument. Id={entity.Id}, Username={entity.Username}");
         return new PlayerDocument

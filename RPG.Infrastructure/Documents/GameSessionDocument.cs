@@ -7,7 +7,7 @@ namespace RPG.Infrastructure.Documents;
 ///     MongoDB document representing a player game session.
 ///     Persists session lifecycle, activity, and connection metadata.
 /// </summary>
-public class GameSessionDocument : IMongoDocument
+public class GameSessionDocument : IPersistenceModel
 {
     public static string CollectionName => "GameSessions";
 

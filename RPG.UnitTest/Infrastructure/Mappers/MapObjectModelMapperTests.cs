@@ -16,20 +16,20 @@ using RPG.Domain.Entities.Items;
 namespace RPG.UnitTest.Infrastructure.Mappers;
 
 /// <summary>
-///     Tests for MapObjectDocumentMapper - MapObject to/from MapObjectDocument conversion with all component types
+///     Tests for MapObjectModelMapper - MapObject to/from MapObjectDocument conversion with all component types
 /// </summary>
-public class MapObjectDocumentMapperTests
+public class MapObjectModelMapperTests
 {
-    private readonly MapObjectDocumentMapper _mapper;
+    private readonly MapObjectModelMapper _mapper;
     private readonly LocationMapper _locationMapper;
 
-    public MapObjectDocumentMapperTests()
+    public MapObjectModelMapperTests()
     {
-        var mockMapperLogger = new Mock<ILogger<MapObjectDocumentMapper>>();
+        var mockMapperLogger = new Mock<ILogger<MapObjectModelMapper>>();
         var mockLocationMapperLogger = new Mock<ILogger<LocationMapper>>();
-        var mockItemMapper = new Mock<IDocumentMapper<Item, ItemDocument>>();
+        var mockItemMapper = new Mock<IModelMapper<Item, ItemDocument>>();
         _locationMapper = new LocationMapper(mockLocationMapperLogger.Object);
-        _mapper = new MapObjectDocumentMapper(mockMapperLogger.Object, _locationMapper, mockItemMapper.Object);
+        _mapper = new MapObjectModelMapper(mockMapperLogger.Object, _locationMapper, mockItemMapper.Object);
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public class MapObjectDocumentMapperTests
         var worldId = Guid.NewGuid();
         var zoneId = "zone_" + Guid.NewGuid().ToString().Substring(0, 8);
         var mapObject = MapObject.Create("treasure_chest_01", location, worldId, zoneId);
-        
+
         mapObject.DisplayName = "Ancient Treasure Chest";
         mapObject.Description = "A dusty old chest";
         mapObject.RotationYaw = 45.0f;
@@ -51,7 +51,7 @@ public class MapObjectDocumentMapperTests
     mapObject.State["lockState"] = "closed";
 
         // Act
-        var document = _mapper.ToDocument(mapObject);
+        var document = _mapper.ToPersistence(mapObject);
 
         // Assert
         document.Id.Should().Be(mapObject.Id);
@@ -74,7 +74,7 @@ public class MapObjectDocumentMapperTests
         // Arrange
         var location = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var mapObject = MapObject.Create("locked_door", location, Guid.NewGuid(), "zone_" + Guid.NewGuid().ToString().Substring(0, 8));
-        
+
         var lockableComponent = new LockableComponent
         {
             IsLocked = true,
@@ -85,7 +85,7 @@ public class MapObjectDocumentMapperTests
         mapObject.Components.Add(lockableComponent);
 
         // Act
-        var document = _mapper.ToDocument(mapObject);
+        var document = _mapper.ToPersistence(mapObject);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -101,7 +101,7 @@ public class MapObjectDocumentMapperTests
         // Arrange
         var location = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var mapObject = MapObject.Create("door", location, Guid.NewGuid(), "zone_" + Guid.NewGuid().ToString().Substring(0, 8));
-        
+
         var linkedDoorId = Guid.NewGuid();
         var doorComponent = new DoorComponent
         {
@@ -116,7 +116,7 @@ public class MapObjectDocumentMapperTests
         mapObject.Components.Add(doorComponent);
 
         // Act
-        var document = _mapper.ToDocument(mapObject);
+        var document = _mapper.ToPersistence(mapObject);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -132,7 +132,7 @@ public class MapObjectDocumentMapperTests
         // Arrange
         var location = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var mapObject = MapObject.Create("portal", location, Guid.NewGuid(), "zone_" + Guid.NewGuid().ToString().Substring(0, 8));
-        
+
         var destinationWorldId = Guid.NewGuid();
         var destinationLocation = Location.Create(new(500, 600, 700), destinationWorldId, "DestMap", "DestZone");
         var portalComponent = new PortalComponent
@@ -148,7 +148,7 @@ public class MapObjectDocumentMapperTests
         mapObject.Components.Add(portalComponent);
 
         // Act
-        var document = _mapper.ToDocument(mapObject);
+        var document = _mapper.ToPersistence(mapObject);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -163,7 +163,7 @@ public class MapObjectDocumentMapperTests
         // Arrange
         var location = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var mapObject = MapObject.Create("lever", location, Guid.NewGuid(), "zone_" + Guid.NewGuid().ToString().Substring(0, 8));
-        
+
         var interactionComponent = new InteractionComponent
         {
             IsInteractable = true,
@@ -177,7 +177,7 @@ public class MapObjectDocumentMapperTests
         mapObject.Components.Add(interactionComponent);
 
         // Act
-        var document = _mapper.ToDocument(mapObject);
+        var document = _mapper.ToPersistence(mapObject);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -193,13 +193,13 @@ public class MapObjectDocumentMapperTests
         // Arrange
         var location = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var mapObject = MapObject.Create("complex_object", location, Guid.NewGuid(), "zone_" + Guid.NewGuid().ToString().Substring(0, 8));
-        
+
         mapObject.Components.Add(new LockableComponent { IsLocked = true, LockpickDifficulty = 25 });
         mapObject.Components.Add(new DoorComponent { IsOpen = false, AutoClose = true });
         mapObject.Components.Add(new InteractionComponent { InteractionPrompt = "Examine" });
 
         // Act
-        var document = _mapper.ToDocument(mapObject);
+        var document = _mapper.ToPersistence(mapObject);
 
         // Assert
         document.Components.Should().HaveCount(3);
@@ -342,7 +342,7 @@ public class MapObjectDocumentMapperTests
         var destinationLocation = Location.Create(new(100, 200, 300), destinationWorldId, "Portal Map", "Portal Zone");
         var questId1 = Guid.NewGuid();
         var questId2 = Guid.NewGuid();
-        
+
         var portalComponent = new PortalComponent
         {
             DestinationWorldId = destinationWorldId,
@@ -476,7 +476,7 @@ public class MapObjectDocumentMapperTests
     mapObject.LastUpdated = expectedTimestamp;
 
         // Act
-        var document = _mapper.ToDocument(mapObject);
+        var document = _mapper.ToPersistence(mapObject);
         var roundTrippedObject = _mapper.ToEntity(document);
 
         // Assert

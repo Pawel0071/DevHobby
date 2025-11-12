@@ -6,7 +6,7 @@ namespace RPG.Domain.Entities;
 ///     Domain entity representing a player account.
 ///     Pure data entity - logic handled by services.
 /// </summary>
-public class Player : IDomainEntity
+public class Player : IDomainModel
 {
     private Player()
     {

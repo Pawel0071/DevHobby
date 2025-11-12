@@ -30,7 +30,7 @@ public class InfrastructureRegistrationTests
         services.AddInfrastructure(config);
 
         // Ensure some core infra services registered
-    services.Should().Contain(sd => sd.ServiceType == typeof(IRedisDocumentRepository));
+    services.Should().Contain(sd => sd.ServiceType == typeof(IRedisRepository));
     services.Should().Contain(sd => sd.ServiceType == typeof(IDictionaryRegistry<TagDefinition>));
     }
 

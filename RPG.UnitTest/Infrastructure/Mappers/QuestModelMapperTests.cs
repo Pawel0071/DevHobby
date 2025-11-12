@@ -11,18 +11,18 @@ using RPG.Infrastructure.Mappers;
 namespace RPG.UnitTest.Infrastructure.Mappers;
 
 /// <summary>
-///     Tests for QuestDocumentMapper - Quest to/from QuestDocument conversion with all component types
+///     Tests for QuestModelMapper - Quest to/from QuestDocument conversion with all component types
 /// </summary>
-public class QuestDocumentMapperTests
+public class QuestModelMapperTests
 {
-    private readonly QuestDocumentMapper _mapper;
+    private readonly QuestModelMapper _mapper;
     private readonly LocationMapper _locationMapper;
 
-    public QuestDocumentMapperTests()
+    public QuestModelMapperTests()
     {
-        var mockLogger = new Mock<ILogger<QuestDocumentMapper>>();
+        var mockLogger = new Mock<ILogger<QuestModelMapper>>();
         _locationMapper = new LocationMapper(new Mock<ILogger<LocationMapper>>().Object);
-        _mapper = new QuestDocumentMapper(mockLogger.Object, _locationMapper);
+        _mapper = new QuestModelMapper(mockLogger.Object, _locationMapper);
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public class QuestDocumentMapperTests
         quest.QuestGiverId = Guid.NewGuid();
 
         // Act
-        var document = _mapper.ToDocument(quest);
+        var document = _mapper.ToPersistence(quest);
 
         // Assert
         document.Id.Should().Be(quest.Id);
@@ -59,7 +59,7 @@ public class QuestDocumentMapperTests
         // Arrange
         var startLocation = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var quest = Quest.Create("Hunt Quest", "Kill stuff", "Hunter", startLocation, new HashSet<string>());
-        
+
         var killObjective = new KillObjectiveComponent
         {
             TargetNpcId = Guid.NewGuid(),
@@ -70,7 +70,7 @@ public class QuestDocumentMapperTests
         quest.Components.Add(killObjective);
 
         // Act
-        var document = _mapper.ToDocument(quest);
+        var document = _mapper.ToPersistence(quest);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -85,7 +85,7 @@ public class QuestDocumentMapperTests
         // Arrange
         var startLocation = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var quest = Quest.Create("Exploration Quest", "Explore", "Explorer", startLocation, new HashSet<string>());
-        
+
         var targetLocation = Location.Create(new(100, 200, 300), Guid.NewGuid(), "Cave", "DarkZone");
         var exploreObjective = new ExploreObjectiveComponent
         {
@@ -97,7 +97,7 @@ public class QuestDocumentMapperTests
         quest.Components.Add(exploreObjective);
 
         // Act
-        var document = _mapper.ToDocument(quest);
+        var document = _mapper.ToPersistence(quest);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -112,7 +112,7 @@ public class QuestDocumentMapperTests
         // Arrange
         var startLocation = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var quest = Quest.Create("Interaction Quest", "Interact", "NPC", startLocation, new HashSet<string>());
-        
+
         var interactObjective = new InteractObjectiveComponent
         {
             TargetObjectId = Guid.NewGuid(),
@@ -123,7 +123,7 @@ public class QuestDocumentMapperTests
         quest.Components.Add(interactObjective);
 
         // Act
-        var document = _mapper.ToDocument(quest);
+        var document = _mapper.ToPersistence(quest);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -138,7 +138,7 @@ public class QuestDocumentMapperTests
         // Arrange
         var startLocation = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var quest = Quest.Create("Reward Quest", "Get rewards", "Benefactor", startLocation, new HashSet<string>());
-        
+
         var rewards = new BasicRewardsComponent
         {
             ExperienceReward = 1000,
@@ -147,7 +147,7 @@ public class QuestDocumentMapperTests
         quest.Components.Add(rewards);
 
         // Act
-        var document = _mapper.ToDocument(quest);
+        var document = _mapper.ToPersistence(quest);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -162,12 +162,12 @@ public class QuestDocumentMapperTests
         // Arrange
         var startLocation = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var quest = Quest.Create("High Level Quest", "For experts", "Master", startLocation, new HashSet<string>());
-        
+
         var requirement = new LevelRequirementComponent { MinLevel = 50, MaxLevel = 60 };
         quest.Components.Add(requirement);
 
         // Act
-        var document = _mapper.ToDocument(quest);
+        var document = _mapper.ToPersistence(quest);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -182,7 +182,7 @@ public class QuestDocumentMapperTests
         // Arrange
         var startLocation = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var quest = Quest.Create("Timed Quest", "Hurry", "Timer", startLocation, new HashSet<string>());
-        
+
         var timeLimit = new TimeLimitComponent
         {
             TimeLimitMinutes = 30,
@@ -191,7 +191,7 @@ public class QuestDocumentMapperTests
         quest.Components.Add(timeLimit);
 
         // Act
-        var document = _mapper.ToDocument(quest);
+        var document = _mapper.ToPersistence(quest);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -205,7 +205,7 @@ public class QuestDocumentMapperTests
         // Arrange
         var startLocation = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var quest = Quest.Create("Daily Quest", "Repeatable", "QuestGiver", startLocation, new HashSet<string>());
-        
+
         var repeatable = new RepeatableQuestComponent
         {
             CooldownHours = 24,
@@ -214,7 +214,7 @@ public class QuestDocumentMapperTests
         quest.Components.Add(repeatable);
 
         // Act
-        var document = _mapper.ToDocument(quest);
+        var document = _mapper.ToPersistence(quest);
 
         // Assert
         document.Components.Should().HaveCount(1);
@@ -228,13 +228,13 @@ public class QuestDocumentMapperTests
         // Arrange
         var startLocation = Location.Create(new(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
         var quest = Quest.Create("Complex Quest", "Multi-part", "Quest Master", startLocation, new HashSet<string>());
-        
+
         quest.Components.Add(new KillObjectiveComponent { TargetNpcName = "Dragon", RequiredCount = 1 });
         quest.Components.Add(new BasicRewardsComponent { ExperienceReward = 5000, GoldReward = 100 });
         quest.Components.Add(new LevelRequirementComponent { MinLevel = 60 });
 
         // Act
-        var document = _mapper.ToDocument(quest);
+        var document = _mapper.ToPersistence(quest);
 
         // Assert
         document.Components.Should().HaveCount(3);
@@ -463,7 +463,7 @@ public class QuestDocumentMapperTests
         quest.Components.Add(new BasicRewardsComponent { ExperienceReward = 500, GoldReward = 25 });
 
         // Act
-        var document = _mapper.ToDocument(quest);
+        var document = _mapper.ToPersistence(quest);
         var roundTrippedQuest = _mapper.ToEntity(document);
 
         // Assert

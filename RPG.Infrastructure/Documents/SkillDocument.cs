@@ -7,7 +7,7 @@ namespace RPG.Infrastructure.Documents;
 ///     MongoDB document representing a character skill/ability.
 ///     Uses tags and components for flexible skill definition.
 /// </summary>
-public class SkillDocument : IMongoDocument
+public class SkillDocument : IPersistenceModel
 {
     public static string CollectionName => "Skills";
 

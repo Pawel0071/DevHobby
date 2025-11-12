@@ -8,7 +8,7 @@ namespace RPG.Domain.Entities.Quests;
 ///     Tags define quest type/difficulty (main, side, hard, etc.)
 ///     Components define objectives, requirements, and rewards.
 /// </summary>
-public class Quest : IDomainEntity
+public class Quest : IDomainModel
 {
     private Quest()
     {

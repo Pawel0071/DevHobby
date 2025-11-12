@@ -10,16 +10,16 @@ namespace RPG.Infrastructure.Mappers;
 ///     Mapper for converting between Skill domain entity and SkillDocument
 ///     Components are serialized to JSON for flexible storage
 /// </summary>
-public class SkillDocumentMapper : IDocumentMapper<Skill, SkillDocument>
+public class SkillModelMapper : IModelMapper<Skill, SkillDocument>
 {
-    private readonly ILogger<SkillDocumentMapper> _logger;
+    private readonly ILogger<SkillModelMapper> _logger;
 
-    public SkillDocumentMapper(ILogger<SkillDocumentMapper> logger)
+    public SkillModelMapper(ILogger<SkillModelMapper> logger)
     {
         _logger = logger;
     }
 
-    public SkillDocument ToDocument(Skill entity)
+    public SkillDocument ToPersistence(Skill entity)
     {
         _logger.Debug($"Converting Skill to SkillDocument. Id={entity.Id}, Name={entity.Name}");
         return new SkillDocument

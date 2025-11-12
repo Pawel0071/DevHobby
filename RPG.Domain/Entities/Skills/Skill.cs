@@ -8,7 +8,7 @@ namespace RPG.Domain.Entities.Skills;
 ///     Uses tags for categorization and components for effects and behaviors.
 ///     Pure data entity - logic handled by services.
 /// </summary>
-public class Skill : IDomainEntity
+public class Skill : IDomainModel
 {
     [JsonConstructor]
     public Skill()

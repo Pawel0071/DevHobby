@@ -99,14 +99,14 @@ public class NpcAiServiceTests
 
     private static (
         NpcAiService Service,
-        Mock<IDocumentRepository> DocumentRepository,
+        Mock<IModelRepository> DocumentRepository,
         Mock<IMovementService> Movement,
         Mock<ICharacterStateBroadcaster> Broadcaster,
         Mock<INpcCombatService> Combat,
         Mock<IRabbitMqPublisher> Publisher,
         Mock<ILogger<NpcAiService>> Logger) CreateService()
     {
-        var documentRepository = new Mock<IDocumentRepository>();
+        var documentRepository = new Mock<IModelRepository>();
         var movement = new Mock<IMovementService>();
         var broadcaster = new Mock<ICharacterStateBroadcaster>();
         var combat = new Mock<INpcCombatService>();

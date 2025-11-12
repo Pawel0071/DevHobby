@@ -10,11 +10,11 @@ namespace RedisWarmUp.Services;
 public class RedisWarmUpService
 {
     private readonly RPG.Infrastructure.Interfaces.ILogger<RedisWarmUpService> _logger;
-    private readonly IRedisDocumentRepository _redisRepository;
+    private readonly IRedisRepository _redisRepository;
     private readonly IEnumerable<IDocumentWarmUpStrategy> _warmUpStrategies;
 
     public RedisWarmUpService(
-        IRedisDocumentRepository redisRepository,
+        IRedisRepository redisRepository,
         IEnumerable<IDocumentWarmUpStrategy> warmUpStrategies, RPG.Infrastructure.Interfaces.ILogger<RedisWarmUpService> logger)
     {
         _redisRepository = redisRepository;

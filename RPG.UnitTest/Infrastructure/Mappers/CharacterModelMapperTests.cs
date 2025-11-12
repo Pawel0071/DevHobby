@@ -8,11 +8,11 @@ using RPG.Infrastructure.Mappers;
 namespace RPG.UnitTest.Infrastructure.Mappers;
 
 /// <summary>
-///     Tests for CharacterDocumentMapper - mapping between Character entity and CharacterDocument
+///     Tests for CharacterModelMapper - mapping between Character entity and CharacterDocument
 /// </summary>
-public class CharacterDocumentMapperTests
+public class CharacterModelMapperTests
 {
-    private readonly CharacterDocumentMapper _mapper = new(null);
+    private readonly CharacterModelMapper _mapper = new(null);
 
     [Fact]
     public void ToDocument_MapsBasicProperties()
@@ -28,7 +28,7 @@ public class CharacterDocumentMapperTests
         };
 
         // Act
-        var document = _mapper.ToDocument(character);
+        var document = _mapper.ToPersistence(character);
 
         // Assert
         document.Should().NotBeNull();
@@ -43,7 +43,7 @@ public class CharacterDocumentMapperTests
         // Arrange
         var sessionId = Guid.NewGuid();
         var playerId = Guid.NewGuid();
-        
+
         var character = new Character(sessionId, CharacterClass.Mage)
         {
             Id = Guid.NewGuid(),
@@ -52,7 +52,7 @@ public class CharacterDocumentMapperTests
         };
 
         // Act
-        var document = _mapper.ToDocument(character);
+        var document = _mapper.ToPersistence(character);
 
         // Assert
         document.SessionId.Should().Be(sessionId);
@@ -94,7 +94,7 @@ public class CharacterDocumentMapperTests
         };
 
         // Act - convert to document and back
-        var document = _mapper.ToDocument(originalCharacter);
+        var document = _mapper.ToPersistence(originalCharacter);
         var roundTrippedCharacter = _mapper.ToDomain(document);
 
         // Assert - basic properties should match
@@ -117,7 +117,7 @@ public class CharacterDocumentMapperTests
         };
 
         // Act
-        var document = _mapper.ToDocument(character);
+        var document = _mapper.ToPersistence(character);
 
         // Assert
         document.Should().NotBeNull();
@@ -136,7 +136,7 @@ public class CharacterDocumentMapperTests
         };
 
         // Act
-        var document = _mapper.ToDocument(character);
+        var document = _mapper.ToPersistence(character);
 
         // Assert
         document.Backpack.Should().NotBeNull();
@@ -162,7 +162,7 @@ public class CharacterDocumentMapperTests
     character.SetMovementState(true);
     character.SetRotationState(true);
 
-        var document = _mapper.ToDocument(character);
+        var document = _mapper.ToPersistence(character);
 
         document.Location.X.Should().Be(5f);
         document.Location.Y.Should().Be(1f);

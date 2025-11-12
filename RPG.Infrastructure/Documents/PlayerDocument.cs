@@ -7,7 +7,7 @@ namespace RPG.Infrastructure.Documents;
 ///     MongoDB document representing a player account.
 ///     Minimal version - stores only basic account information.
 /// </summary>
-public class PlayerDocument : IMongoDocument
+public class PlayerDocument : IPersistenceModel
 {
     public static string CollectionName => "Players";
 

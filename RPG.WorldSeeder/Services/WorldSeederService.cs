@@ -23,20 +23,20 @@ internal sealed class WorldSeederService
     };
 
     private readonly SeedDataLoader _seedDataLoader;
-    private readonly IDocumentRepository _documentRepository;
+    private readonly IModelRepository _modelRepository;
     private readonly IWorldStateService _worldStateService;
     private readonly IMongoDatabase _mongoDatabase;
     private readonly ILogger<WorldSeederService> _logger;
 
     public WorldSeederService(
         SeedDataLoader seedDataLoader,
-        IDocumentRepository documentRepository,
+        IModelRepository modelRepository,
         IWorldStateService worldStateService,
         IMongoDatabase mongoDatabase,
         ILogger<WorldSeederService> logger)
     {
         _seedDataLoader = seedDataLoader;
-        _documentRepository = documentRepository;
+        _modelRepository = modelRepository;
         _worldStateService = worldStateService;
         _mongoDatabase = mongoDatabase;
         _logger = logger;
@@ -56,7 +56,7 @@ internal sealed class WorldSeederService
         await SeedNpcsAsync(data.Npcs, cancellationToken).ConfigureAwait(false);
 
     var worldState = PrepareWorldState(data.WorldState, data.Npcs, data.MapObjects);
-        await _documentRepository.UpsertAsync(worldState, cancellationToken).ConfigureAwait(false);
+        await _modelRepository.UpsertAsync(worldState, cancellationToken).ConfigureAwait(false);
 
         _logger.Info(
             $"World seeding completed. Items: {data.Items.Count}, Skills: {data.Skills.Count}, NPCs: {data.Npcs.Count}, MapObjects: {data.MapObjects.Count}.");
@@ -67,7 +67,7 @@ internal sealed class WorldSeederService
         foreach (var item in items)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await _documentRepository.UpsertAsync(item, cancellationToken).ConfigureAwait(false);
+            await _modelRepository.UpsertAsync(item, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -76,7 +76,7 @@ internal sealed class WorldSeederService
         foreach (var skill in skills)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await _documentRepository.UpsertAsync(skill, cancellationToken).ConfigureAwait(false);
+            await _modelRepository.UpsertAsync(skill, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -85,7 +85,7 @@ internal sealed class WorldSeederService
         foreach (var mapObject in mapObjects)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await _documentRepository.UpsertAsync(mapObject, cancellationToken).ConfigureAwait(false);
+            await _modelRepository.UpsertAsync(mapObject, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -94,7 +94,7 @@ internal sealed class WorldSeederService
         foreach (var npc in npcs)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await _documentRepository.UpsertAsync(npc, cancellationToken).ConfigureAwait(false);
+            await _modelRepository.UpsertAsync(npc, cancellationToken).ConfigureAwait(false);
         }
     }
 

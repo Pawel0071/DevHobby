@@ -14,21 +14,21 @@ using Xunit;
 
 namespace RPG.UnitTest.Infrastructure.Repositories.MongoDB;
 
-public class MongoDocumentRepositoryTests
+public class MongoRepositoryTests
 {
     private readonly Mock<IMongoDatabase> _databaseMock = new();
-    private readonly Mock<ILogger<MongoDocumentRepository>> _loggerMock = new();
+    private readonly Mock<ILogger<MongoRepository>> _loggerMock = new();
     private readonly Mock<IActivityScope> _activityScopeMock = new();
     private readonly IDisposable _activityHandle = Mock.Of<IDisposable>();
 
-    public MongoDocumentRepositoryTests()
+    public MongoRepositoryTests()
     {
         _activityScopeMock
             .Setup(scope => scope.Start(It.IsAny<string>(), It.IsAny<IDictionary<string, object>>()))
             .Returns(_activityHandle);
     }
 
-    private MongoDocumentRepository CreateRepository() => new(_databaseMock.Object, _loggerMock.Object, _activityScopeMock.Object);
+    private MongoRepository CreateRepository() => new(_databaseMock.Object, _loggerMock.Object, _activityScopeMock.Object);
 
     private static Mock<IMongoCollection<TestDocument>> CreateCollectionMock() => new();
 
@@ -100,7 +100,7 @@ public class MongoDocumentRepositoryTests
         }
     }
 
-    public class TestDocument : IMongoDocument
+    public class TestDocument : IPersistenceModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;

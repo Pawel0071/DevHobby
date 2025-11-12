@@ -10,7 +10,7 @@ namespace RPG.Domain.Entities.MapObjects;
 ///     Uses tags for categorization and components for capabilities.
 ///     Pure data entity - logic handled by services.
 /// </summary>
-public class MapObject : IDomainEntity
+public class MapObject : IDomainModel
 {
     private MapObject()
     {

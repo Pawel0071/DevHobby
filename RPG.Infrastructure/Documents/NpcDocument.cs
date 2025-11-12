@@ -7,7 +7,7 @@ namespace RPG.Infrastructure.Documents;
 ///     MongoDB document representing a Non-Player Character (NPC).
 ///     Uses tags and components for flexible NPC behavior definition.
 /// </summary>
-public class NpcDocument : IMongoDocument
+public class NpcDocument : IPersistenceModel
 {
     public static string CollectionName => "Npcs";
 

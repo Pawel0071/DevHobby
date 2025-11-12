@@ -7,7 +7,7 @@ namespace RPG.Infrastructure.Documents;
 ///     MongoDB document representing a player character.
 ///     Stores character state, equipment, inventory, skills, and progress.
 /// </summary>
-public class CharacterDocument : IMongoDocument
+public class CharacterDocument : IPersistenceModel
 {
     public static string CollectionName => "Characters";
 

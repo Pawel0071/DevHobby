@@ -9,7 +9,7 @@ namespace RPG.Infrastructure.Documents;
 ///     MongoDB document representing an interactive object in the game world.
 ///     Uses tags and components (stored as JSON strings) for flexibility.
 /// </summary>
-public class MapObjectDocument : IMongoDocument
+public class MapObjectDocument : IPersistenceModel
 {
     public static string CollectionName => "MapObjects";
 

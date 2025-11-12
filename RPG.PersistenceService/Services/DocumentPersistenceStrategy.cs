@@ -6,18 +6,18 @@ namespace RPG.PersistenceService.Services;
 /// <summary>
 ///     Generic strategy implementation for persisting documents
 /// </summary>
-public class DocumentPersistenceStrategy<TDocument> : IDocumentPersistenceStrategy where TDocument : class, IMongoDocument
+public class DocumentPersistenceStrategy<TDocument> : IDocumentPersistenceStrategy where TDocument : class, IPersistenceModel
 {
-    private readonly IMongoDocumentRepository _repository;
+    private readonly IMongoRepository _repository;
     public string CollectionName { get; }
 
-    public DocumentPersistenceStrategy(IMongoDocumentRepository repository, string collectionName)
+    public DocumentPersistenceStrategy(IMongoRepository repository, string collectionName)
     {
         _repository = repository;
         CollectionName = collectionName;
     }
 
-    public async Task UpsertAsync(IMongoDocument document, CancellationToken cancellationToken)
+    public async Task UpsertAsync(IPersistenceModel document, CancellationToken cancellationToken)
     {
         if (document is TDocument typedDocument)
         {

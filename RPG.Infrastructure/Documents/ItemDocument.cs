@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace RPG.Infrastructure.Documents;
 
-public class ItemDocument : IMongoDocument
+public class ItemDocument : IPersistenceModel
 {
     public static string CollectionName => "Items";
     

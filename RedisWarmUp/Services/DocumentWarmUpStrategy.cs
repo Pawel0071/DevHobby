@@ -8,18 +8,18 @@ namespace RedisWarmUp.Services;
 ///     Generic strategy implementation for warming up documents of type TDocument
 /// </summary>
 public class DocumentWarmUpStrategy<TDocument> : IDocumentWarmUpStrategy
-    where TDocument : class, IMongoDocument
+    where TDocument : class, IPersistenceModel
 {
-    private readonly IMongoDocumentRepository _mongoRepository;
+    private readonly IMongoRepository _mongoRepository;
     public string CollectionName { get; }
 
-    public DocumentWarmUpStrategy(IMongoDocumentRepository mongoRepository, string collectionName)
+    public DocumentWarmUpStrategy(IMongoRepository mongoRepository, string collectionName)
     {
         _mongoRepository = mongoRepository;
         CollectionName = collectionName;
     }
 
-    public async Task<int> WarmUpAsync(IRedisDocumentRepository redisRepository,
+    public async Task<int> WarmUpAsync(IRedisRepository redisRepository,
         RPG.Infrastructure.Interfaces.ILogger<RedisWarmUpService> logger, CancellationToken cancellationToken = default)
     {
         logger.Info($"Loading collection: {CollectionName}");

@@ -13,7 +13,7 @@ namespace RPG.Domain.Entities.Npcs;
 ///     Tags define what the NPC is (friendly, hostile, merchant, etc.)
 ///     Components define what the NPC can do (combat, dialogue, trading, etc.)
 /// </summary>
-public class Npc : IDomainEntity
+public class Npc : IDomainModel
 {
     public static Npc Create(
         string name,

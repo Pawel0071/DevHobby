@@ -19,6 +19,6 @@ public interface IDocumentWarmUpStrategy
     /// <param name="logger">The logger for logging progress.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The number of documents processed.</returns>
-    Task<int> WarmUpAsync(IRedisDocumentRepository redisRepository,
+    Task<int> WarmUpAsync(IRedisRepository redisRepository,
         RPG.Infrastructure.Interfaces.ILogger<RedisWarmUpService> logger, CancellationToken cancellationToken = default);
 }

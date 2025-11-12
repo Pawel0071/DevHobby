@@ -8,16 +8,16 @@ using RPG.Infrastructure.Mappers;
 namespace RPG.UnitTest.Infrastructure.Mappers;
 
 /// <summary>
-///     Tests for PlayerDocumentMapper - Player to/from PlayerDocument conversion
+///     Tests for PlayerModelMapper - Player to/from PlayerDocument conversion
 /// </summary>
-public class PlayerDocumentMapperTests
+public class PlayerModelMapperTests
 {
-    private readonly PlayerDocumentMapper _mapper;
+    private readonly PlayerModelMapper _mapper;
 
-    public PlayerDocumentMapperTests()
+    public PlayerModelMapperTests()
     {
-        var mockLogger = new Mock<ILogger<PlayerDocumentMapper>>();
-        _mapper = new PlayerDocumentMapper(mockLogger.Object);
+        var mockLogger = new Mock<ILogger<PlayerModelMapper>>();
+        _mapper = new PlayerModelMapper(mockLogger.Object);
     }
 
     [Fact]
@@ -31,7 +31,7 @@ public class PlayerDocumentMapperTests
         player.BannedUntil = null;
 
         // Act
-        var document = _mapper.ToDocument(player);
+        var document = _mapper.ToPersistence(player);
 
         // Assert
         document.Id.Should().Be(player.Id);
@@ -54,7 +54,7 @@ public class PlayerDocumentMapperTests
         player.BannedUntil = banUntil;
 
         // Act
-        var document = _mapper.ToDocument(player);
+        var document = _mapper.ToPersistence(player);
 
         // Assert
         document.IsBanned.Should().BeTrue();
@@ -70,7 +70,7 @@ public class PlayerDocumentMapperTests
         player.LastLoginAt = DateTime.UtcNow.AddHours(-5);
 
         // Act
-        var document = _mapper.ToDocument(player);
+        var document = _mapper.ToPersistence(player);
 
         // Assert
         document.IsOnline.Should().BeFalse();
@@ -84,7 +84,7 @@ public class PlayerDocumentMapperTests
         var playerId = Guid.NewGuid();
         var createdAt = DateTime.UtcNow.AddMonths(-3);
         var lastLoginAt = DateTime.UtcNow.AddHours(-2);
-        
+
         var document = new PlayerDocument
         {
             Id = playerId,
@@ -170,7 +170,7 @@ public class PlayerDocumentMapperTests
         player.IsBanned = false;
 
         // Act
-        var document = _mapper.ToDocument(player);
+        var document = _mapper.ToPersistence(player);
         var roundTrippedPlayer = _mapper.ToEntity(document);
 
         // Assert
@@ -191,7 +191,7 @@ public class PlayerDocumentMapperTests
         player.BannedUntil = banUntil;
 
         // Act
-        var document = _mapper.ToDocument(player);
+        var document = _mapper.ToPersistence(player);
         var roundTrippedPlayer = _mapper.ToEntity(document);
 
         // Assert

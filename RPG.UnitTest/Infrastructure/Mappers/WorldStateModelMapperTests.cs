@@ -9,14 +9,14 @@ using Xunit;
 
 namespace RPG.UnitTest.Infrastructure.Mappers;
 
-public class WorldStateDocumentMapperTests
+public class WorldStateModelMapperTests
 {
-    private readonly Mock<ILogger<WorldStateDocumentMapper>> _logger = new();
-    private readonly WorldStateDocumentMapper _mapper;
+    private readonly Mock<ILogger<WorldStateModelMapper>> _logger = new();
+    private readonly WorldStateModelMapper _mapper;
 
-    public WorldStateDocumentMapperTests()
+    public WorldStateModelMapperTests()
     {
-        _mapper = new WorldStateDocumentMapper(_logger.Object);
+        _mapper = new WorldStateModelMapper(_logger.Object);
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class WorldStateDocumentMapperTests
             new[] { npcId },
             new[] { mapObjectId });
 
-        var document = _mapper.ToDocument(entity);
+        var document = _mapper.ToPersistence(entity);
 
         document.Id.Should().Be(expectedId);
         document.WorldId.Should().Be(worldId);

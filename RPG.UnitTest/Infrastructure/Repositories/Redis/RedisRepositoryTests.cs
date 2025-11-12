@@ -14,20 +14,20 @@ using Xunit;
 
 namespace RPG.UnitTest.Infrastructure;
 
-public class RedisDocumentRepositoryTests
+public class RedisRepositoryTests
 {
     private readonly Mock<IDatabase> _mockDatabase;
-    private readonly Mock<ILogger<RedisDocumentRepository>> _mockLogger;
-    private readonly RedisDocumentRepository _repository;
+    private readonly Mock<ILogger<RedisRepository>> _mockLogger;
+    private readonly RedisRepository _repository;
     private readonly Mock<IServer> _mockServer;
     private readonly Mock<IConnectionMultiplexer> _mockConnectionMultiplexer;
     private readonly Mock<IActivityScope> _activityScopeMock = new();
     private readonly IDisposable _activityHandle = Mock.Of<IDisposable>();
 
-    public RedisDocumentRepositoryTests()
+    public RedisRepositoryTests()
     {
         _mockDatabase = new Mock<IDatabase>();
-        _mockLogger = new Mock<ILogger<RedisDocumentRepository>>();
+        _mockLogger = new Mock<ILogger<RedisRepository>>();
         _mockServer = new Mock<IServer>();
         _mockConnectionMultiplexer = new Mock<IConnectionMultiplexer>();
 
@@ -40,10 +40,10 @@ public class RedisDocumentRepositoryTests
             .Setup(scope => scope.Start(It.IsAny<string>(), It.IsAny<IDictionary<string, object>>()))
             .Returns(_activityHandle);
 
-        _repository = new RedisDocumentRepository(_mockDatabase.Object, _mockLogger.Object, _activityScopeMock.Object);
+        _repository = new RedisRepository(_mockDatabase.Object, _mockLogger.Object, _activityScopeMock.Object);
     }
 
-    private class TestDocument : IMongoDocument
+    private class TestDocument : IPersistenceModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;

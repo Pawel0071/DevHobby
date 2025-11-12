@@ -49,15 +49,15 @@ var builder = Host.CreateDefaultBuilder(args)
             options.Address = new Uri(gameServerAddress);
         });
 
-        // Register document mappers for all entity/document pairs used by DocumentRepository.
-        services.AddSingleton<IDocumentMapper<Character, CharacterDocument>, CharacterDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<Item, ItemDocument>, ItemDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<Skill, SkillDocument>, SkillDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<Quest, QuestDocument>, QuestDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<Npc, NpcDocument>, NpcDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<Player, PlayerDocument>, PlayerDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<MapObject, MapObjectDocument>, MapObjectDocumentMapper>();
-        services.AddSingleton<IDocumentMapper<WorldState, WorldStateDocument>, WorldStateDocumentMapper>();
+        // Register document mappers for all entity/document pairs used by ModelRepository.
+        services.AddSingleton<IModelMapper<Character, CharacterDocument>, CharacterModelMapper>();
+        services.AddSingleton<IModelMapper<Item, ItemDocument>, ItemModelMapper>();
+        services.AddSingleton<IModelMapper<Skill, SkillDocument>, SkillModelMapper>();
+        services.AddSingleton<IModelMapper<Quest, QuestDocument>, QuestModelMapper>();
+        services.AddSingleton<IModelMapper<Npc, NpcDocument>, NpcModelMapper>();
+        services.AddSingleton<IModelMapper<Player, PlayerDocument>, PlayerModelMapper>();
+        services.AddSingleton<IModelMapper<MapObject, MapObjectDocument>, MapObjectModelMapper>();
+        services.AddSingleton<IModelMapper<WorldState, WorldStateDocument>, WorldStateModelMapper>();
 
         // Persistence strategies mirror the PersistenceService configuration but operate on the in-memory repositories.
         foreach (var mapping in DocumentMappingRegistry.All)
@@ -68,14 +68,14 @@ var builder = Host.CreateDefaultBuilder(args)
             var persistenceStrategyType = typeof(DocumentPersistenceStrategy<>).MakeGenericType(documentType);
             services.AddSingleton<IDocumentPersistenceStrategy>(sp =>
             {
-                var repository = sp.GetRequiredService<IMongoDocumentRepository>();
+                var repository = sp.GetRequiredService<IMongoRepository>();
                 return (IDocumentPersistenceStrategy)Activator.CreateInstance(persistenceStrategyType, repository, collectionName)!;
             });
 
             var warmUpStrategyType = typeof(DocumentWarmUpStrategy<>).MakeGenericType(documentType);
             services.AddSingleton<RedisWarmUp.Services.IDocumentWarmUpStrategy>(sp =>
             {
-                var repository = sp.GetRequiredService<IMongoDocumentRepository>();
+                var repository = sp.GetRequiredService<IMongoRepository>();
                 return (RedisWarmUp.Services.IDocumentWarmUpStrategy)Activator.CreateInstance(warmUpStrategyType, repository, collectionName)!;
             });
         }

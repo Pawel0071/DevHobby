@@ -9,15 +9,15 @@ namespace RPG.Infrastructure.Mappers;
 /// <summary>
 ///     Mapper for converting between Character domain entity and CharacterDocument
 /// </summary>
-public class CharacterDocumentMapper : IDocumentMapper<Character, CharacterDocument>
+public class CharacterModelMapper : IModelMapper<Character, CharacterDocument>
 {
-    private readonly IDocumentMapper<Item, ItemDocument>? _itemMapper;
-    private readonly ILogger<CharacterDocumentMapper>? _logger;
+    private readonly IModelMapper<Item, ItemDocument>? _itemMapper;
+    private readonly ILogger<CharacterModelMapper>? _logger;
     private readonly LocationMapper _locationMapper;
 
-    public CharacterDocumentMapper(
-        ILogger<CharacterDocumentMapper>? logger = null,
-        IDocumentMapper<Item, ItemDocument>? itemMapper = null,
+    public CharacterModelMapper(
+        ILogger<CharacterModelMapper>? logger = null,
+        IModelMapper<Item, ItemDocument>? itemMapper = null,
         LocationMapper? locationMapper = null)
     {
         _logger = logger;
@@ -25,7 +25,7 @@ public class CharacterDocumentMapper : IDocumentMapper<Character, CharacterDocum
         _locationMapper = locationMapper ?? new LocationMapper(new NoopLogger<LocationMapper>());
     }
 
-    public CharacterDocument ToDocument(Character entity)
+    public CharacterDocument ToPersistence(Character entity)
     {
         _logger?.Debug($"Converting Character to CharacterDocument. Id={entity.Id}, Name={entity.Name}");
 

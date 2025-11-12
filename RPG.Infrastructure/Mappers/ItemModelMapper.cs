@@ -15,20 +15,20 @@ namespace RPG.Infrastructure.Mappers;
 /// <summary>
 ///     Mapper for converting between Item domain entity and ItemDocument
 /// </summary>
-public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
+public class ItemModelMapper : IModelMapper<Item, ItemDocument>
 {
     private readonly IDictionaryRegistry<TagDefinition> _tagRegistry;
-    private readonly ILogger<ItemDocumentMapper> _logger;
+    private readonly ILogger<ItemModelMapper> _logger;
 
-    public ItemDocumentMapper(
-        ILogger<ItemDocumentMapper> logger,
+    public ItemModelMapper(
+        ILogger<ItemModelMapper> logger,
         IDictionaryRegistry<TagDefinition> tagRegistry)
     {
         _logger = logger;
         _tagRegistry = tagRegistry;
     }
 
-    public ItemDocument ToDocument(Item entity)
+    public ItemDocument ToPersistence(Item entity)
     {
         _logger.Debug($"Converting Item to ItemDocument. Id={entity.Id}, Type={entity.TypeCode}");
 
@@ -134,7 +134,7 @@ public class ItemDocumentMapper : IDocumentMapper<Item, ItemDocument>
     ///     Creates a component from ItemDocument based on component type.
     ///     Returns null if the document doesn't have required data for that component.
     ///     Example usage:
-    ///     var component = ItemDocumentMapper.CreateComponent(typeof(StatsComponent), doc);
+    ///     var component = ItemModelMapper.CreateComponent(typeof(StatsComponent), doc);
     ///     if (component != null) item.Components.Add(component);
     ///     Note: Not all tags require components - this method returns null if data is missing.
     /// </summary>

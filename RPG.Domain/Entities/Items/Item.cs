@@ -2,7 +2,7 @@ using RPG.Domain.Common;
 
 namespace RPG.Domain.Entities.Items;
 
-public class Item(Guid itemId, string typeCode) : IDomainEntity
+public class Item(Guid itemId, string typeCode) : IDomainModel
 {
     public Guid Id { get; init; } = itemId;
     public string Name { get; set; } = null!;

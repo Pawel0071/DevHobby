@@ -8,18 +8,18 @@ namespace RPG.Infrastructure.Mappers;
 /// <summary>
 ///     Mapper for converting between GameSession domain entity and GameSessionDocument.
 /// </summary>
-public sealed class GameSessionDocumentMapper : IDocumentMapper<GameSession, GameSessionDocument>
+public sealed class GameSessionModelMapper : IModelMapper<GameSession, GameSessionDocument>
 {
     private readonly LocationMapper _locationMapper;
-    private readonly ILogger<GameSessionDocumentMapper> _logger;
+    private readonly ILogger<GameSessionModelMapper> _logger;
 
-    public GameSessionDocumentMapper(LocationMapper locationMapper, ILogger<GameSessionDocumentMapper> logger)
+    public GameSessionModelMapper(LocationMapper locationMapper, ILogger<GameSessionModelMapper> logger)
     {
         _locationMapper = locationMapper;
         _logger = logger;
     }
 
-    public GameSessionDocument ToDocument(GameSession entity)
+    public GameSessionDocument ToPersistence(GameSession entity)
     {
         _logger.Debug($"Converting GameSession {entity.Id} to document representation.");
 

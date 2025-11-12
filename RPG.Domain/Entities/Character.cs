@@ -10,7 +10,7 @@ using RPG.Domain.Interfaces;
 
 namespace RPG.Domain.Entities;
 
-public sealed class Character : IDomainEntity, IItemContainer, IStats, ILevel, ISkillsContainer
+public sealed class Character : IDomainModel, IItemContainer, IStats, ILevel, ISkillsContainer
 {
     public Character(
         Guid sessionId,

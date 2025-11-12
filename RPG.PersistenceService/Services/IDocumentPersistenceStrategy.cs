@@ -8,6 +8,6 @@ namespace RPG.PersistenceService.Services;
 public interface IDocumentPersistenceStrategy
 {
     string CollectionName { get; }
-    Task UpsertAsync(IMongoDocument document, CancellationToken cancellationToken = default);
+    Task UpsertAsync(IPersistenceModel document, CancellationToken cancellationToken = default);
     Task DeleteAsync(string id, CancellationToken cancellationToken = default);
 }

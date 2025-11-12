@@ -48,7 +48,7 @@ public sealed class NpcAiService : INpcAiService
     private const float ThreatMovementBonus = 10f;
     private static readonly TimeSpan ThreatMemoryWindow = TimeSpan.FromSeconds(15);
 
-    private readonly IDocumentRepository _documentRepository;
+    private readonly IModelRepository _modelRepository;
     private readonly IMovementService _movementService;
     private readonly ICharacterStateBroadcaster _stateBroadcaster;
     private readonly INpcCombatService _combatService;
@@ -64,14 +64,14 @@ public sealed class NpcAiService : INpcAiService
     private IReadOnlyList<AiEvaluationResult> _lastEvaluations = Array.Empty<AiEvaluationResult>();
 
     public NpcAiService(
-        IDocumentRepository documentRepository,
+        IModelRepository modelRepository,
         IMovementService movementService,
         ICharacterStateBroadcaster stateBroadcaster,
         INpcCombatService combatService,
         IRabbitMqPublisher publisher,
         ILogger<NpcAiService> logger)
     {
-        _documentRepository = documentRepository;
+        _modelRepository = modelRepository;
         _movementService = movementService;
         _stateBroadcaster = stateBroadcaster;
         _combatService = combatService;
@@ -154,7 +154,7 @@ public sealed class NpcAiService : INpcAiService
             return;
         }
 
-        var npcs = await _documentRepository.GetAllAsync<Npc>(cancellationToken).ConfigureAwait(false);
+        var npcs = await _modelRepository.GetAllAsync<Npc>(cancellationToken).ConfigureAwait(false);
         foreach (var npc in npcs)
         {
             _npcs[npc.Id] = npc;

@@ -63,7 +63,7 @@ public class DocumentTypeMapperTests
         mapping.Should().NotBeNull();
         mapping!.EntityType.Should().Be(typeof(Character));
         mapping.DocumentType.Should().Be(typeof(CharacterDocument));
-        mapping.MapperServiceType.Should().Be(typeof(IDocumentMapper<Character, CharacterDocument>));
+        mapping.MapperServiceType.Should().Be(typeof(IModelMapper<Character, CharacterDocument>));
     }
 
     [Fact]

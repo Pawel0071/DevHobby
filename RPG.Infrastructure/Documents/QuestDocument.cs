@@ -7,7 +7,7 @@ namespace RPG.Infrastructure.Documents;
 ///     MongoDB document representing a quest.
 ///     Uses tags and components for flexible quest definition.
 /// </summary>
-public class QuestDocument : IMongoDocument
+public class QuestDocument : IPersistenceModel
 {
     public static string CollectionName => "Quests";
 

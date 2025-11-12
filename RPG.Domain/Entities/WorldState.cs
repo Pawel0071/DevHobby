@@ -8,7 +8,7 @@ namespace RPG.Domain.Entities;
 ///     Domain entity representing world state.
 ///     Pure data entity - logic handled by services.
 /// </summary>
-public class WorldState : IDomainEntity
+public class WorldState : IDomainModel
 {
     private WorldState()
     {

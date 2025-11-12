@@ -11,18 +11,18 @@ namespace RPG.Infrastructure.Repositories;
 
 public class CharacterRepository : DomainCharacterRepository, InfrastructureCharacterRepository
 {
-    private readonly IDocumentRepository _documentRepository;
+    private readonly IModelRepository _modelRepository;
     private readonly ILogger<CharacterRepository> _logger;
 
-    public CharacterRepository(IDocumentRepository documentRepository, ILogger<CharacterRepository> logger)
+    public CharacterRepository(IModelRepository modelRepository, ILogger<CharacterRepository> logger)
     {
-        _documentRepository = documentRepository;
+        _modelRepository = modelRepository;
         _logger = logger;
     }
 
     public async Task<Character> GetByIdAsync(Guid id)
     {
-        var character = await _documentRepository.GetByIdAsync<Character>(id);
+        var character = await _modelRepository.GetByIdAsync<Character>(id);
         if (character == null)
         {
             _logger.Warn($"Character {id} not found.");
@@ -34,7 +34,7 @@ public class CharacterRepository : DomainCharacterRepository, InfrastructureChar
 
     public async Task<Character> GetByNameAsync(string name)
     {
-        var characters = await _documentRepository.GetAllAsync<Character>();
+        var characters = await _modelRepository.GetAllAsync<Character>();
         var character = characters.FirstOrDefault(c => string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
         if (character == null)
         {
@@ -57,7 +57,7 @@ public class CharacterRepository : DomainCharacterRepository, InfrastructureChar
 
     public async Task<bool> DeleteAsync(Guid id)
     {
-        var removed = await _documentRepository.DeleteAsync<Character>(id);
+        var removed = await _modelRepository.DeleteAsync<Character>(id);
         if (!removed)
         {
             _logger.Warn($"Character {id} not found when attempting delete.");
@@ -70,10 +70,10 @@ public class CharacterRepository : DomainCharacterRepository, InfrastructureChar
     {
         if (Guid.TryParse(id, out var guid))
         {
-            return await _documentRepository.GetByIdAsync<Character>(guid);
+            return await _modelRepository.GetByIdAsync<Character>(guid);
         }
 
-        var characters = await _documentRepository.GetAllAsync<Character>();
+        var characters = await _modelRepository.GetAllAsync<Character>();
         return characters.FirstOrDefault(c => string.Equals(c.Name, id, StringComparison.OrdinalIgnoreCase));
     }
 
@@ -84,7 +84,7 @@ public class CharacterRepository : DomainCharacterRepository, InfrastructureChar
 
     private async Task<Character> UpsertAsync(Character character, string action)
     {
-        await _documentRepository.UpsertAsync(character);
+        await _modelRepository.UpsertAsync(character);
         _logger.Debug($"Character {character.Id} {action}.");
         return character;
     }

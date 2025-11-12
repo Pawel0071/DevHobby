@@ -25,11 +25,11 @@ public class WorldStateService : IWorldStateService
     private const string FriendlyTag = "friendly";
     private const string GuideTag = "guide";
 
-    private readonly IDocumentRepository _documentRepository;
+    private readonly IModelRepository _modelRepository;
 
-    public WorldStateService(IDocumentRepository documentRepository)
+    public WorldStateService(IModelRepository modelRepository)
     {
-        _documentRepository = documentRepository;
+        _modelRepository = modelRepository;
     }
 
     public void UpsertCharacter(WorldState world, Character character)
@@ -125,7 +125,7 @@ public class WorldStateService : IWorldStateService
 
         foreach (var mapObjectId in world.MapObjects)
         {
-            var mapObject = await _documentRepository.GetByIdAsync<MapObject>(mapObjectId, cancellationToken).ConfigureAwait(false);
+            var mapObject = await _modelRepository.GetByIdAsync<MapObject>(mapObjectId, cancellationToken).ConfigureAwait(false);
             if (mapObject is null)
             {
                 continue;
@@ -164,7 +164,7 @@ public class WorldStateService : IWorldStateService
 
         foreach (var npcId in world.Npcs)
         {
-            var npc = await _documentRepository.GetByIdAsync<Npc>(npcId, cancellationToken).ConfigureAwait(false);
+            var npc = await _modelRepository.GetByIdAsync<Npc>(npcId, cancellationToken).ConfigureAwait(false);
             if (npc is null)
             {
                 continue;

@@ -11,12 +11,12 @@ namespace RPG.GameServer.Controllers;
 public class SessionServiceImpl : SessionService.SessionServiceBase
 {
 	private static readonly ConcurrentDictionary<Guid, GameSession> Sessions = new();
-	private readonly IDocumentRepository _documentRepository;
+	private readonly IModelRepository _modelRepository;
 	private readonly Infrastructure.Interfaces.ILogger<SessionServiceImpl> _logger;
 
-	public SessionServiceImpl(IDocumentRepository documentRepository, Infrastructure.Interfaces.ILogger<SessionServiceImpl> logger)
+	public SessionServiceImpl(IModelRepository modelRepository, Infrastructure.Interfaces.ILogger<SessionServiceImpl> logger)
 	{
-		_documentRepository = documentRepository;
+		_modelRepository = modelRepository;
 		_logger = logger;
 	}
 
@@ -48,7 +48,7 @@ public class SessionServiceImpl : SessionService.SessionServiceBase
 
 		Sessions[sessionId] = session;
 
-		await _documentRepository.UpsertAsync(session, context.CancellationToken).ConfigureAwait(false);
+		await _modelRepository.UpsertAsync(session, context.CancellationToken).ConfigureAwait(false);
 
 		_logger.Info($"Created session {sessionId} for player {playerId} and character {characterId}.");
 
@@ -84,7 +84,7 @@ public class SessionServiceImpl : SessionService.SessionServiceBase
 		session.MarkEnded(now);
 		Sessions[sessionId] = session;
 
-		await _documentRepository.UpsertAsync(session, context.CancellationToken).ConfigureAwait(false);
+		await _modelRepository.UpsertAsync(session, context.CancellationToken).ConfigureAwait(false);
 
 		_logger.Info($"Ended session {sessionId} for player {session.PlayerId}.");
 
@@ -115,7 +115,7 @@ public class SessionServiceImpl : SessionService.SessionServiceBase
 		}
 
 		Sessions[sessionId] = session;
-		await _documentRepository.UpsertAsync(session, context.CancellationToken).ConfigureAwait(false);
+		await _modelRepository.UpsertAsync(session, context.CancellationToken).ConfigureAwait(false);
 
 		return new SessionReply { Session = ToProto(session) };
 	}
@@ -127,7 +127,7 @@ public class SessionServiceImpl : SessionService.SessionServiceBase
 			return cached;
 		}
 
-		var loaded = await _documentRepository.GetByIdAsync<GameSession>(sessionId, cancellationToken).ConfigureAwait(false);
+		var loaded = await _modelRepository.GetByIdAsync<GameSession>(sessionId, cancellationToken).ConfigureAwait(false);
 		if (loaded == null)
 		{
 			throw new RpcException(new Status(StatusCode.NotFound, "Session not found."));
@@ -148,7 +148,7 @@ public class SessionServiceImpl : SessionService.SessionServiceBase
 
 			existingSession.MarkEnded(timestamp);
 			Sessions[sessionId] = existingSession;
-			await _documentRepository.UpsertAsync(existingSession, cancellationToken).ConfigureAwait(false);
+			await _modelRepository.UpsertAsync(existingSession, cancellationToken).ConfigureAwait(false);
 
 			_logger.Info($"Ended previous session {sessionId} for character {characterId} before creating a new one.");
 		}

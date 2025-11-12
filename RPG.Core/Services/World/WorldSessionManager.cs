@@ -23,7 +23,7 @@ public class WorldSessionManager : IWorldSessionManager
     private const string DefaultZoneName = "starter.zone";
     private const string DefaultSpawnType = "player-default";
 
-    private readonly IDocumentRepository _documentRepository;
+    private readonly IModelRepository _modelRepository;
     private readonly ILogger<WorldSessionManager> _logger;
     private readonly IWorldStateService _worldStateService;
     private readonly ConcurrentDictionary<Guid, WorldState> _worldCache = new();
@@ -31,11 +31,11 @@ public class WorldSessionManager : IWorldSessionManager
     private readonly ConcurrentDictionary<Guid, SemaphoreSlim> _worldLocks = new();
 
     public WorldSessionManager(
-        IDocumentRepository documentRepository,
+        IModelRepository modelRepository,
         ILogger<WorldSessionManager> logger,
         IWorldStateService worldStateService)
     {
-        _documentRepository = documentRepository;
+        _modelRepository = modelRepository;
         _logger = logger;
         _worldStateService = worldStateService;
     }
@@ -88,8 +88,8 @@ public class WorldSessionManager : IWorldSessionManager
             worldLock.Release();
         }
 
-        await _documentRepository.UpsertAsync(character, cancellationToken).ConfigureAwait(false);
-        await _documentRepository.UpsertAsync(session, cancellationToken).ConfigureAwait(false);
+        await _modelRepository.UpsertAsync(character, cancellationToken).ConfigureAwait(false);
+        await _modelRepository.UpsertAsync(session, cancellationToken).ConfigureAwait(false);
         await PersistWorldAsync(world, cancellationToken).ConfigureAwait(false);
         var worldView = await GetWorldAsync(world.WorldId, cancellationToken).ConfigureAwait(false);
 
@@ -134,7 +134,7 @@ public class WorldSessionManager : IWorldSessionManager
             worldLock.Release();
         }
 
-        await _documentRepository.UpsertAsync(session, cancellationToken).ConfigureAwait(false);
+        await _modelRepository.UpsertAsync(session, cancellationToken).ConfigureAwait(false);
         await PersistWorldAsync(world, cancellationToken).ConfigureAwait(false);
         _logger.Info($"Session {sessionId} left world {world.WorldId}.");
     }
@@ -205,16 +205,16 @@ public class WorldSessionManager : IWorldSessionManager
 
         if (characterSnapshot != null)
         {
-            await _documentRepository.UpsertAsync(characterSnapshot, cancellationToken).ConfigureAwait(false);
+            await _modelRepository.UpsertAsync(characterSnapshot, cancellationToken).ConfigureAwait(false);
         }
 
-        await _documentRepository.UpsertAsync(session, cancellationToken).ConfigureAwait(false);
+        await _modelRepository.UpsertAsync(session, cancellationToken).ConfigureAwait(false);
         await PersistWorldAsync(world, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<GameSession> LoadSessionAsync(Guid sessionId, CancellationToken cancellationToken)
     {
-        var session = await _documentRepository.GetByIdAsync<GameSession>(sessionId, cancellationToken).ConfigureAwait(false);
+        var session = await _modelRepository.GetByIdAsync<GameSession>(sessionId, cancellationToken).ConfigureAwait(false);
         if (session == null)
         {
             throw new InvalidOperationException($"Session {sessionId} not found.");
@@ -225,7 +225,7 @@ public class WorldSessionManager : IWorldSessionManager
 
     private async Task<Character> LoadCharacterAsync(Guid characterId, CancellationToken cancellationToken)
     {
-        var character = await _documentRepository.GetByIdAsync<Character>(characterId, cancellationToken).ConfigureAwait(false);
+        var character = await _modelRepository.GetByIdAsync<Character>(characterId, cancellationToken).ConfigureAwait(false);
         if (character == null)
         {
             throw new InvalidOperationException($"Character {characterId} not found.");
@@ -236,13 +236,13 @@ public class WorldSessionManager : IWorldSessionManager
 
     private async Task<WorldState?> LoadWorldFromRepositoryAsync(Guid worldId, CancellationToken cancellationToken)
     {
-        var world = await _documentRepository.GetByIdAsync<WorldState>(worldId, cancellationToken).ConfigureAwait(false);
+        var world = await _modelRepository.GetByIdAsync<WorldState>(worldId, cancellationToken).ConfigureAwait(false);
         if (world != null)
         {
             return world;
         }
 
-        var worlds = await _documentRepository.GetAllAsync<WorldState>(cancellationToken).ConfigureAwait(false);
+        var worlds = await _modelRepository.GetAllAsync<WorldState>(cancellationToken).ConfigureAwait(false);
         return worlds.FirstOrDefault(w => w.WorldId == worldId);
     }
 
@@ -288,9 +288,9 @@ public class WorldSessionManager : IWorldSessionManager
         _worldStateService.UpsertMapObject(world, spawnPoint);
         _worldStateService.Touch(world, now);
 
-        await _documentRepository.UpsertAsync(guideNpc, cancellationToken).ConfigureAwait(false);
-        await _documentRepository.UpsertAsync(campfire, cancellationToken).ConfigureAwait(false);
-        await _documentRepository.UpsertAsync(spawnPoint, cancellationToken).ConfigureAwait(false);
+        await _modelRepository.UpsertAsync(guideNpc, cancellationToken).ConfigureAwait(false);
+        await _modelRepository.UpsertAsync(campfire, cancellationToken).ConfigureAwait(false);
+        await _modelRepository.UpsertAsync(spawnPoint, cancellationToken).ConfigureAwait(false);
         await PersistWorldAsync(world, cancellationToken).ConfigureAwait(false);
         return world;
     }
@@ -336,7 +336,7 @@ public class WorldSessionManager : IWorldSessionManager
     private async Task PersistWorldAsync(WorldState world, CancellationToken cancellationToken)
     {
         _worldStateService.Touch(world, DateTime.UtcNow);
-        await _documentRepository.UpsertAsync(world, cancellationToken).ConfigureAwait(false);
+        await _modelRepository.UpsertAsync(world, cancellationToken).ConfigureAwait(false);
         _worldCache[world.WorldId] = world;
     }
 }

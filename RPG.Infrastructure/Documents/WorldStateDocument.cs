@@ -9,7 +9,7 @@ namespace RPG.Infrastructure.Documents;
 ///     MongoDB document representing world state.
 ///     Minimal version - stores only basic world information.
 /// </summary>
-public class WorldStateDocument : IMongoDocument
+public class WorldStateDocument : IPersistenceModel
 {
     public static string CollectionName => "Worlds";
 

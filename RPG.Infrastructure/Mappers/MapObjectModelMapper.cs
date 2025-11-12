@@ -15,23 +15,23 @@ namespace RPG.Infrastructure.Mappers;
 ///     Mapper for converting between MapObject domain entity and MapObjectDocument
 ///     Components are serialized to JSON for flexible storage
 /// </summary>
-public class MapObjectDocumentMapper : IDocumentMapper<MapObject, MapObjectDocument>
+public class MapObjectModelMapper : IModelMapper<MapObject, MapObjectDocument>
 {
-    private readonly ILogger<MapObjectDocumentMapper> _logger;
+    private readonly ILogger<MapObjectModelMapper> _logger;
     private readonly LocationMapper _locationMapper;
-    private readonly IDocumentMapper<Item, ItemDocument> _itemMapper;
+    private readonly IModelMapper<Item, ItemDocument> _itemMapper;
 
-    public MapObjectDocumentMapper(
-        ILogger<MapObjectDocumentMapper> logger,
+    public MapObjectModelMapper(
+        ILogger<MapObjectModelMapper> logger,
         LocationMapper locationMapper,
-        IDocumentMapper<Item, ItemDocument> itemMapper)
+        IModelMapper<Item, ItemDocument> itemMapper)
     {
         _logger = logger;
         _locationMapper = locationMapper;
         _itemMapper = itemMapper;
     }
 
-    public MapObjectDocument ToDocument(MapObject entity)
+    public MapObjectDocument ToPersistence(MapObject entity)
     {
         _logger.Debug($"Converting MapObject to MapObjectDocument. Id={entity.Id}, Name={entity.Name}");
         return new MapObjectDocument
@@ -97,7 +97,7 @@ public class MapObjectDocumentMapper : IDocumentMapper<MapObject, MapObjectDocum
     }
 
     public MapObject ToEntity(MapObjectDocument document) => ToDomain(document);
-    
+
     private ComponentData SerializeComponent(IMapObjectComponent component)
     {
         var type = component.GetType();
@@ -146,7 +146,7 @@ public class MapObjectDocumentMapper : IDocumentMapper<MapObject, MapObjectDocum
             Items = component.Items
                 .Select(slot => new InventorySlotDto
                 {
-                    Item = slot.Item is null ? null : _itemMapper.ToDocument(slot.Item),
+                    Item = slot.Item is null ? null : _itemMapper.ToPersistence(slot.Item),
                     Quantity = slot.Quantity
                 })
                 .ToList()
