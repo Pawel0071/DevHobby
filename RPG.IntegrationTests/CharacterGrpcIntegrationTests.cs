@@ -43,7 +43,7 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
 
         var characterId = Guid.Parse(response.CharacterId);
         using var scope = factory.Services.CreateScope();
-    var repository = scope.ServiceProvider.GetRequiredService<IModelRepository>();
+        var repository = scope.ServiceProvider.GetRequiredService<IModelRepository>();
         var character = await repository.GetByIdAsync<RPG.Domain.Entities.Character>(characterId);
 
         character.Name.Should().Be("IntegrationHero");
