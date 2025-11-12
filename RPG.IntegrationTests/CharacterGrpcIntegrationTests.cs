@@ -3,7 +3,7 @@ using Grpc.Net.Client;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using RPG.Domain.Interfaces;
-using DomainCharacterRepository = RPG.Domain.Interfaces.ICharacterRepository;
+using RPG.Infrastructure.Interfaces;
 using RPG.GameServer.Protos;
 using CharacterServiceClient = RPG.GameServer.Protos.CharacterService.CharacterServiceClient;
 using ProtoCharacterClass = RPG.GameServer.Protos.CharacterClass;
@@ -43,8 +43,8 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
 
         var characterId = Guid.Parse(response.CharacterId);
         using var scope = factory.Services.CreateScope();
-    var repository = scope.ServiceProvider.GetRequiredService<DomainCharacterRepository>();
-        var character = await repository.GetByIdAsync(characterId);
+    var repository = scope.ServiceProvider.GetRequiredService<IModelRepository>();
+        var character = await repository.GetByIdAsync<RPG.Domain.Entities.Character>(characterId);
 
         character.Name.Should().Be("IntegrationHero");
         character.Level.Should().Be(3);
@@ -74,8 +74,8 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
 
         using (var scope = factory.Services.CreateScope())
         {
-            var repository = scope.ServiceProvider.GetRequiredService<DomainCharacterRepository>();
-            var character = await repository.GetByIdAsync(Guid.Parse(createReply.CharacterId));
+            var repository = scope.ServiceProvider.GetRequiredService<IModelRepository>();
+            var character = await repository.GetByIdAsync<RPG.Domain.Entities.Character>(Guid.Parse(createReply.CharacterId));
 
             character.IsMoving.Should().BeTrue();
             character.CurrentLocation.Position.Y.Should().BeGreaterThan(0f);
@@ -94,8 +94,8 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
 
         using (var scope = factory.Services.CreateScope())
         {
-            var repository = scope.ServiceProvider.GetRequiredService<DomainCharacterRepository>();
-            var character = await repository.GetByIdAsync(Guid.Parse(createReply.CharacterId));
+            var repository = scope.ServiceProvider.GetRequiredService<IModelRepository>();
+            var character = await repository.GetByIdAsync<RPG.Domain.Entities.Character>(Guid.Parse(createReply.CharacterId));
 
             character.IsRotating.Should().BeTrue();
             character.CurrentLocation.Rotation.Should().BeApproximately(90f, 0.01f);

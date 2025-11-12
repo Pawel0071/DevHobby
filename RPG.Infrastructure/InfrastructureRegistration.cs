@@ -31,8 +31,6 @@ using RPG.Domain.Entities.Skills;
 using RPG.Domain.Entities.Quests;
 using RPG.Domain.Entities.Npcs;
 using RPG.Domain.Entities.MapObjects;
-using DomainCharacterRepository = RPG.Domain.Interfaces.ICharacterRepository;
-using InfrastructureCharacterRepository = RPG.Infrastructure.Interfaces.ICharacterRepository;
 
 namespace RPG.Infrastructure;
 
@@ -144,10 +142,6 @@ public static class InfrastructureRegistration
             });
         }
 
-        // Domain repositories
-    services.AddScoped<DomainCharacterRepository, CharacterRepository>();
-    services.AddScoped<InfrastructureCharacterRepository, CharacterRepository>();
-
         // Dictionary Repositories - for loading definitions from MongoDB
         services.AddSingleton<IDictionaryRepository<TagDefinition>, DictionaryRepository<TagDefinition>>();
         services.AddSingleton<IDictionaryRepository<ErrorCodeDefinition>, DictionaryRepository<ErrorCodeDefinition>>();
@@ -174,8 +168,8 @@ public static class InfrastructureRegistration
         services.AddSingleton<IModelMapper<Item, ItemDocument>, ItemModelMapper>();
         services.AddSingleton<IModelMapper<Skill, SkillDocument>, SkillModelMapper>();
         services.AddSingleton<IModelMapper<Quest, QuestDocument>, QuestModelMapper>();
-    services.AddSingleton<IModelMapper<Npc, NpcDocument>, NpcModelMapper>();
-    services.AddSingleton<IModelMapper<GameSession, GameSessionDocument>, GameSessionModelMapper>();
+        services.AddSingleton<IModelMapper<Npc, NpcDocument>, NpcModelMapper>();
+        services.AddSingleton<IModelMapper<GameSession, GameSessionDocument>, GameSessionModelMapper>();
         services.AddSingleton<IModelMapper<Player, PlayerDocument>, PlayerModelMapper>();
         services.AddSingleton<IModelMapper<MapObject, MapObjectDocument>, MapObjectModelMapper>();
         services.AddSingleton<IModelMapper<WorldState, WorldStateDocument>, WorldStateModelMapper>();

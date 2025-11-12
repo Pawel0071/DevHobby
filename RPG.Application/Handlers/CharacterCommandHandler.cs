@@ -1,18 +1,15 @@
-using System;
 using System.Diagnostics;
 using System.Numerics;
-using System.Threading.Tasks;
 using RPG.Application.Commands;
 using RPG.Application.Events;
 using RPG.Application.Diagnostics;
 using RPG.Application.Interfaces;
 using RPG.Core.Interfaces;
 using RPG.Domain.Common;
-using RPG.Domain.Enums;
+using RPG.Domain.Entities;
 using RPG.Domain.Entities.Items.ItemComponent;
-using RPG.Domain.Interfaces;
+using RPG.Domain.Enums;
 using RPG.Infrastructure.Interfaces;
-using DomainCharacterRepository = RPG.Domain.Interfaces.ICharacterRepository;
 
 namespace RPG.Application.Handlers;
 
@@ -28,11 +25,12 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     ICommandHandler<StartMovementCommand>,
     ICommandHandler<StopMovementCommand>,
     ICommandHandler<StartRotationCommand>,
-    ICommandHandler<StopRotationCommand>
+    ICommandHandler<StopRotationCommand>,
+    ICommandHandler<CreateCharacterCommand>
 
 {
     private const float DefaultMovementDeltaSeconds = 0.1f;
-    private readonly DomainCharacterRepository _characterRepo;
+    private readonly IModelRepository _characterRepo;
     private readonly IEquipmentService _equipmentService;
     private readonly IGameEventDispatcher _eventDispatcher;
     private readonly IInventoryService _inventoryService;
@@ -41,7 +39,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     private readonly IDictionaryRegistry<TagDefinition> _tagRegistry;
 
     public CharacterCommandHandler(
-    DomainCharacterRepository characterRepo,
+        IModelRepository characterRepo,
         IInventoryService inventoryService,
         IEquipmentService equipmentService,
         IStatsService statsService,
@@ -58,12 +56,22 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         _tagRegistry = tagRegistry;
     }
 
+    private async Task<Character> GetCharacterOrThrow(Guid characterId)
+    {
+        var character = await _characterRepo.GetByIdAsync<Character>(characterId);
+        if (character is null)
+        {
+            throw new KeyNotFoundException($"Character {characterId} not found");
+        }
+        return character;
+    }
+
     public async Task<CommandResult> HandleAsync(StartMovementCommand command)
     {
         using var activity = StartCommandActivity("CharacterCommandHandler.StartMovement", command.CharacterId);
         activity?.SetTag("rpg.movement.direction", command.Direction);
 
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
 
         if (!TryGetDirectionVector(command.Direction, out var direction))
         {
@@ -81,7 +89,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
             return CommandResult.Fail(CommandError.InvalidOperation, moveResult.Message, moveResult);
         }
 
-        await _characterRepo.SaveAsync(character);
+        await _characterRepo.UpsertAsync(character);
         await _eventDispatcher.DispatchAsync(new CharacterMovedEvent(command.CharacterId, character.CurrentLocation));
 
         return CommandResult.Ok();
@@ -91,7 +99,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     {
         using var activity = StartCommandActivity("CharacterCommandHandler.StopMovement", command.CharacterId);
 
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
 
         var stopResult = _movementService.Stop(character);
         if (!stopResult.Success)
@@ -110,7 +118,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         using var activity = StartCommandActivity("CharacterCommandHandler.StartRotation", command.CharacterId);
         activity?.SetTag("rpg.movement.direction", command.Direction);
 
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
 
         if (!TryGetDirectionVector(command.Direction, out var direction))
         {
@@ -125,7 +133,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
         var rotation = rotationResult.Result;
 
-        await _characterRepo.SaveAsync(character);
+        await _characterRepo.UpsertAsync(character);
         await _eventDispatcher.DispatchAsync(new CharacterRotationStartedEvent(command.CharacterId, rotation, character.CurrentLocation));
 
         return CommandResult.Ok();
@@ -135,7 +143,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
     {
         using var activity = StartCommandActivity("CharacterCommandHandler.StopRotation", command.CharacterId);
 
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
 
         var stopRotationResult = _movementService.StopRotation(character);
         if (!stopRotationResult.Success)
@@ -151,7 +159,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(DropItemCommand command)
     {
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
         if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), command.Item).Result)
             return CommandResult.Fail(CommandError.ItemNotFound, "");
 
@@ -165,7 +173,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(EquipItemCommand command)
     {
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
 
         if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), command.Item).Result)
             return CommandResult.Fail(CommandError.ItemNotFound, "Przedmiot nie znajduje się w ekwipunku.");
@@ -195,7 +203,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(GainExperienceCommand command)
     {
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
         character.ExperienceToNextLevel -= command.Amount;
         if (character.ExperienceToNextLevel <= 0)
         {
@@ -213,7 +221,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(GetItemFromBankCommand command)
     {
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
         if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), command.Item).Result)
             return CommandResult.Fail(CommandError.ItemNotFound, "");
         if (_inventoryService.IsFull(character.GetBankStorageContainer()).Result)
@@ -233,7 +241,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(LevelUpCommand command)
     {
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
         character.Level++;
         // get data from static table
         return CommandResult.Ok();
@@ -241,7 +249,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(PickUpItemCommand command)
     {
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
 
         var result = _inventoryService.AddItem(character.GetBackpackInventoryContainer(), command.Item);
 
@@ -253,7 +261,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(PutItemToBankCommand command)
     {
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
         if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), command.Item).Result)
             return CommandResult.Fail(CommandError.ItemNotFound, "");
 
@@ -274,7 +282,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(UnequipItemCommand command)
     {
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
         var item = character.Equipments[command.Slot];
 
         if (_inventoryService.IsFull(character.GetBankStorageContainer()).Result)
@@ -299,7 +307,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
     public async Task<CommandResult> HandleAsync(UseItemCommand command)
     {
-        var character = await _characterRepo.GetByIdAsync(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId);
 
         const string ConsumableTag = "item:consumable";
         var hasConsumableTag = command.Item.Tags.Contains(ConsumableTag) || command.Item.Tags.Contains("consumable");
@@ -314,6 +322,67 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
             await _eventDispatcher.DispatchAsync(new ItemUsedEvent(command.CharacterId, command.Item));
         }
 
+        return CommandResult.Ok();
+    }
+
+    public async Task<CommandResult> HandleAsync(CreateCharacterCommand command)
+    {
+        var character = new Character(command.SessionId, command.CharacterClass)
+        {
+            Id = command.CharacterId,
+            Name = command.Name,
+            PlayerId = Guid.NewGuid(),
+            SessionId = command.SessionId,
+            Level = command.Level > 0 ? command.Level : 1,
+            Experience = 0,
+            ExperienceToNextLevel = 100,
+            CurrentHealth = command.MaxHealth,
+            MaxHealth = command.MaxHealth,
+            CurrentResource = command.MaxResource,
+            MaxResource = command.MaxResource
+        };
+
+        if (command.X.HasValue && command.Y.HasValue && command.Z.HasValue)
+        {
+            var location = Location.Create(
+                command.X.Value,
+                command.Y.Value,
+                command.Z.Value,
+                command.WorldId ?? Guid.NewGuid(),
+                command.MapId ?? string.Empty,
+                command.ZoneName ?? string.Empty);
+
+            location.WorldId = command.WorldId;
+            location.Rotation = command.Rotation ?? 0f;
+            character.SetCurrentLocation(location);
+        }
+
+        character.SetMovementState(command.IsMoving);
+        character.SetRotationState(command.IsRotating);
+
+        if (command.Stats is not null)
+        {
+            var s = command.Stats;
+
+            foreach (var kv in s.Stats)
+            {
+                var prop = kv.Key;
+                var val = kv.Value;
+                if (val > 0)
+                {
+                    character.BaseStats[prop] = val;
+                    character.ModifiedStats[prop] = val;
+                }
+            }
+        }
+
+        if (!character.ModifiedStats.TryGetValue(StatsProperty.MoveSpeed, out var moveSpeed) || moveSpeed <= 0)
+        {
+            character.BaseStats[StatsProperty.MoveSpeed] = 5;
+            character.ModifiedStats[StatsProperty.MoveSpeed] = 5;
+        }
+
+        await _characterRepo.UpsertAsync(character);
         return CommandResult.Ok();
     }
 

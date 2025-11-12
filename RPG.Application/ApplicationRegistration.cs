@@ -26,6 +26,7 @@ public static class ApplicationRegistration
         services.AddScoped<ICommandHandler<StopMovementCommand>, CharacterCommandHandler>();
         services.AddScoped<ICommandHandler<StartRotationCommand>, CharacterCommandHandler>();
         services.AddScoped<ICommandHandler<StopRotationCommand>, CharacterCommandHandler>();
+        services.AddScoped<ICommandHandler<CreateCharacterCommand>, CharacterCommandHandler>();
         services.AddSingleton<IGameEventDispatcher, GameEventDispatcher>();
         services.AddSingleton<INpcCombatEventDispatcher, NpcCombatEventDispatcher>();
 

@@ -3,6 +3,7 @@ using RPG.Application.Interfaces;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Entities.Skills;
 using RPG.Domain.Enums;
+using RPG.Domain.Interfaces;
 
 namespace RPG.Application.Commands;
 
@@ -65,3 +66,22 @@ public record LogoutCharacterCommand(Guid CharacterId): ICommand;
 public record SaveCharacterStateCommand(Guid CharacterId): ICommand;
 
 public record LoadCharacterStateCommand(Guid CharacterId): ICommand;
+
+public record CreateCharacterCommand(
+    Guid CharacterId,
+    Guid SessionId,
+    string Name,
+    CharacterClass CharacterClass,
+    int Level,
+    int MaxHealth,
+    int MaxResource,
+    float? X = null,
+    float? Y = null,
+    float? Z = null,
+    Guid? WorldId = null,
+    string? MapId = null,
+    string? ZoneName = null,
+    float? Rotation = null,
+    bool IsMoving = false,
+    bool IsRotating = false,
+    IStatsContainer? Stats = null) : ICommand;
