@@ -8,6 +8,7 @@ using FluentAssertions;
 using MongoDB.Driver;
 using Moq;
 using RPG.Domain.Common;
+using RPG.Domain.Common.Interfaces;
 using RPG.Domain.Enums;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Repositories.Orchestrators;
@@ -17,24 +18,30 @@ namespace RPG.UnitTest.Infrastructure.Repositories.MongoDB;
 
 public class DictionaryRepositoryTests
 {
+    public sealed class TestDefinition : IDictionaryEntry<TestDefinition>
+    {
+        public required string Code { get; init; }
+        public static IEnumerable<TestDefinition> Predefined => Array.Empty<TestDefinition>();
+    }
+
     private readonly Mock<IMongoDatabase> _mockDatabase = new();
-    private readonly Mock<IMongoCollection<TagDefinition>> _mockCollection = new();
-    private readonly Mock<ILogger<DictionaryRepository<TagDefinition>>> _mockLogger = new();
-    private readonly DictionaryRepository<TagDefinition> _repository;
+    private readonly Mock<IMongoCollection<TestDefinition>> _mockCollection = new();
+    private readonly Mock<ILogger<DictionaryRepository<TestDefinition>>> _mockLogger = new();
+    private readonly DictionaryRepository<TestDefinition> _repository;
 
     public DictionaryRepositoryTests()
     {
         _mockDatabase
-            .Setup(db => db.GetCollection<TagDefinition>(It.IsAny<string>(), null))
+            .Setup(db => db.GetCollection<TestDefinition>(It.IsAny<string>(), null))
             .Returns(_mockCollection.Object);
 
-        _repository = new DictionaryRepository<TagDefinition>(_mockDatabase.Object, _mockLogger.Object);
+        _repository = new DictionaryRepository<TestDefinition>(_mockDatabase.Object, _mockLogger.Object);
     }
 
     [Fact]
     public async Task GetAllAsync_WithEmptyCollection_ShouldReturnEmptyList()
     {
-        SetupFindForGetAll(Array.Empty<TagDefinition>());
+        SetupFindForGetAll(Array.Empty<TestDefinition>());
 
         var result = await _repository.GetAllAsync();
 
@@ -45,32 +52,28 @@ public class DictionaryRepositoryTests
     [Fact]
     public async Task GetAllAsync_WithMultipleItems_ShouldReturnResults()
     {
-        var tags = new[]
-        {
-            CreateDefinition("item:weapon"),
-            CreateDefinition("item:armor")
-        };
+        var tags = new[] { new TestDefinition { Code = "a" }, new TestDefinition { Code = "b" } };
 
         SetupFindForGetAll(tags);
 
         var result = await _repository.GetAllAsync();
 
         result.Should().HaveCount(2);
-        result.Should().Contain(t => t.Code == "item:weapon");
+        result.Should().Contain(t => t.Code == "a");
         _mockLogger.Verify(l => l.Info(It.Is<string>(s => s.Contains("Loaded 2"))), Times.Once);
     }
 
     [Fact]
     public async Task GetByCodeAsync_WithExistingCode_ShouldReturnEntry()
     {
-        var expected = CreateDefinition("item:consumable");
+        var expected = new TestDefinition { Code = "x" };
 
         SetupFindForGetByCode(expected);
 
-        var result = await _repository.GetByCodeAsync("item:consumable");
+        var result = await _repository.GetByCodeAsync("x");
 
         result.Should().NotBeNull();
-        result!.Code.Should().Be("item:consumable");
+        result!.Code.Should().Be("x");
     }
 
     [Fact]
@@ -87,55 +90,48 @@ public class DictionaryRepositoryTests
     [Fact]
     public async Task UpsertManyAsync_ShouldBulkWriteEntries()
     {
-        var tags = new[]
-        {
-            CreateDefinition("item:test-1"),
-            CreateDefinition("item:test-2")
-        };
+        var tags = new[] { new TestDefinition { Code = "a" }, new TestDefinition { Code = "b" } };
 
         _mockCollection
             .Setup(c => c.BulkWriteAsync(
-                It.IsAny<IEnumerable<WriteModel<TagDefinition>>>(),
+                It.IsAny<IEnumerable<WriteModel<TestDefinition>>>(),
                 null,
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync((BulkWriteResult<TagDefinition>)null!);
+            .ReturnsAsync((BulkWriteResult<TestDefinition>)null!);
 
         await _repository.UpsertManyAsync(tags, CancellationToken.None);
 
         _mockCollection.Verify(c => c.BulkWriteAsync(
-            It.Is<IEnumerable<WriteModel<TagDefinition>>>(models => models.Count() == 2),
+            It.Is<IEnumerable<WriteModel<TestDefinition>>>(models => models.Count() == 2),
             null,
             It.IsAny<CancellationToken>()), Times.Once);
     }
 
-    private void SetupFindForGetAll(IEnumerable<TagDefinition> items)
+    private void SetupFindForGetAll(IEnumerable<TestDefinition> items)
     {
-        var batches = items.Any()
-            ? new[] { items }
-            : Array.Empty<IEnumerable<TagDefinition>>();
-
-        var cursor = new TestAsyncCursor<TagDefinition>(batches);
+        var batches = items.Any() ? new[] { items } : Array.Empty<IEnumerable<TestDefinition>>();
+        var cursor = new TestAsyncCursor<TestDefinition>(batches);
 
         _mockCollection
             .Setup(c => c.FindAsync(
-                It.IsAny<FilterDefinition<TagDefinition>>(),
-                It.IsAny<FindOptions<TagDefinition, TagDefinition>>(),
+                It.IsAny<FilterDefinition<TestDefinition>>(),
+                It.IsAny<FindOptions<TestDefinition, TestDefinition>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(cursor);
     }
 
-    private void SetupFindForGetByCode(TagDefinition? result)
+    private void SetupFindForGetByCode(TestDefinition? result)
     {
         var batches = result is null
-            ? Array.Empty<IEnumerable<TagDefinition>>()
-            : new[] { new[] { result } as IEnumerable<TagDefinition> };
+            ? Array.Empty<IEnumerable<TestDefinition>>()
+            : new[] { new[] { result } as IEnumerable<TestDefinition> };
 
-        var cursor = new TestAsyncCursor<TagDefinition>(batches);
+        var cursor = new TestAsyncCursor<TestDefinition>(batches);
 
         _mockCollection
             .Setup(c => c.FindAsync(
-                It.IsAny<FilterDefinition<TagDefinition>>(),
-                It.IsAny<FindOptions<TagDefinition, TagDefinition>>(),
+                It.IsAny<FilterDefinition<TestDefinition>>(),
+                It.IsAny<FindOptions<TestDefinition, TestDefinition>>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(cursor);
     }
@@ -189,16 +185,5 @@ public class DictionaryRepositoryTests
             Current = _enumerator.Current ?? Enumerable.Empty<T>();
             return true;
         }
-    }
-
-    private static TagDefinition CreateDefinition(string code)
-    {
-        return new TagDefinition
-        {
-            Code = code,
-            Target = TagTarget.Item,
-            DisplayName = code,
-            Category = "Test"
-        };
     }
 }

@@ -9,6 +9,8 @@ using RPG.Domain.Entities.Skills;
 using RPG.Domain.Enums;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Abstractions;
+using RPG.Domain.Common;
 
 namespace RPG.Infrastructure.Mappers;
 
@@ -19,18 +21,6 @@ namespace RPG.Infrastructure.Mappers;
 public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
 {
     private static readonly StringComparer TagComparer = StringComparer.OrdinalIgnoreCase;
-
-    private static readonly IReadOnlyDictionary<Type, string[]> ComponentTagCorrelations =
-        new Dictionary<Type, string[]>
-        {
-            [typeof(CombatComponent)] = new[] { "npc:combat" },
-            [typeof(DialogueComponent)] = new[] { "npc:dialogue" },
-            [typeof(LootableComponent)] = new[] { "npc:lootable" },
-            [typeof(MerchantComponent)] = new[] { "npc:merchant", "merchant" },
-            [typeof(QuestGiverComponent)] = new[] { "npc:quest-giver", "questgiver" },
-            [typeof(RespawnComponent)] = new[] { "npc:respawn" },
-            [typeof(TrainerComponent)] = new[] { "npc:trainer", "trainer" }
-        };
 
     private readonly ILogger<NpcModelMapper> _logger;
     private readonly LocationMapper _locationMapper;
@@ -84,9 +74,8 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
         _logger.Debug($"Converting NpcDocument to Npc. Id={document.Id}, Name={document.DisplayName}");
 
         var tagSet = CreateTagSet(document.Tags);
-
         var spawnLocation = _locationMapper.ToEntity(document.SpawnLocation);
-    var npc = Npc.Create(document.Name, document.DisplayName, spawnLocation, document.WorldId, tagSet);
+        var npc = Npc.Create(document.Name, document.DisplayName, spawnLocation, document.WorldId, tagSet);
 
         // Preserve identity using reflection helpers similar to other mappers
         typeof(Npc).GetProperty("Id")!.SetValue(npc, document.Id);
@@ -130,6 +119,7 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
             }
         }
 
+        // Deserialize explicit components from document
         foreach (var componentData in document.Components)
         {
             var component = DeserializeComponent(componentData);
@@ -139,8 +129,16 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
             }
         }
 
-        EnsureComponentTags(npc);
+        // Auto-add required components based on tags if missing
+        var requiredTypes = TagComponentMap.GetRequiredComponentTypes(npc.Tags, TagTarget.Npc).ToList();
+        foreach (var type in requiredTypes)
+        {
+            if (npc.Components.Any(c => c.GetType() == type)) continue;
+            var empty = Activator.CreateInstance(type) as INpcComponent;
+            if (empty != null) npc.Components.Add(empty);
+        }
 
+        EnsureComponentTags(npc);
         return npc;
     }
 
@@ -483,41 +481,19 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
     {
         npc.Tags = CreateTagSet(npc.Tags);
 
-        foreach (var component in npc.Components)
+        // Add tags derived from component types via helper
+        var resolved = TagComponentHelper.ResolveComponentTags(npc.Components.Select(c => c.GetType()), TagTarget.Npc);
+        foreach (var tag in resolved)
         {
-            ApplyComponentTags(npc.Tags, component);
+            if (!string.IsNullOrWhiteSpace(tag)) npc.Tags.Add(tag.Trim());
         }
 
         npc.Tags.RemoveWhere(static tag => string.IsNullOrWhiteSpace(tag));
     }
 
-    private static void ApplyComponentTags(HashSet<string> tags, INpcComponent component)
-    {
-        var correlatedTags = ResolveComponentTags(component.GetType());
-        foreach (var correlated in correlatedTags)
-        {
-            if (!string.IsNullOrWhiteSpace(correlated))
-            {
-                tags.Add(correlated.Trim());
-            }
-        }
-    }
-
     private static IEnumerable<string> ResolveComponentTags(Type componentType)
     {
-        if (ComponentTagCorrelations.TryGetValue(componentType, out var direct))
-        {
-            return direct;
-        }
-
-        foreach (var pair in ComponentTagCorrelations)
-        {
-            if (pair.Key.IsAssignableFrom(componentType))
-            {
-                return pair.Value;
-            }
-        }
-
+        // Legacy method kept for backward compatibility (used nowhere now) -> return empty.
         return Array.Empty<string>();
     }
 

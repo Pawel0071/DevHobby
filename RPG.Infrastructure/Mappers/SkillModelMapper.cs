@@ -3,6 +3,8 @@ using RPG.Domain.Entities.Skills;
 using RPG.Domain.Entities.Skills.SkillComponents;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Domain.Enums; // for TagTarget
+using RPG.Abstractions; // tag component map + helper
 
 namespace RPG.Infrastructure.Mappers;
 
@@ -22,6 +24,9 @@ public class SkillModelMapper : IModelMapper<Skill, SkillDocument>
     public SkillDocument ToPersistence(Skill entity)
     {
         _logger.Debug($"Converting Skill to SkillDocument. Id={entity.Id}, Name={entity.Name}");
+        // synchronize tags from components before persisting (merge, don't override)
+        var derived = TagComponentHelper.ResolveComponentTags(entity.Components.Select(c => c.GetType()), TagTarget.Skill);
+        foreach (var t in derived) entity.Tags.Add(t);
         return new SkillDocument
         {
             Id = entity.Id,
@@ -53,6 +58,19 @@ public class SkillModelMapper : IModelMapper<Skill, SkillDocument>
             var component = DeserializeComponent(componentData);
             if (component != null) skill.Components.Add(component);
         }
+
+        // Auto-add missing components based on tags
+        var requiredTypes = TagComponentMap.GetRequiredComponentTypes(skill.Tags, TagTarget.Skill);
+        foreach (var type in requiredTypes)
+        {
+            if (skill.Components.Any(c => c.GetType() == type)) continue;
+            var empty = Activator.CreateInstance(type) as ISkillComponent;
+            if (empty != null) skill.Components.Add(empty);
+        }
+
+        // Ensure tags reflect present components (merge with existing document tags)
+        var resolved = TagComponentHelper.ResolveComponentTags(skill.Components.Select(c => c.GetType()), TagTarget.Skill);
+        foreach (var t in resolved) skill.Tags.Add(t);
 
         return skill;
     }

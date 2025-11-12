@@ -53,6 +53,30 @@ Sends an "equip" command to the application layer. Use `--help` on the command f
 dotnet run --project RPG.CLI -- equip --help
 ```
 
+### document-tests
+
+Executes CRUD verification scenarios for all configured document/entity mappings (Character, Item, Skill, Quest, Npc, Player, MapObject, WorldState, GameSession).
+
+Run all mappings:
+
+```bash
+dotnet run --project RPG.CLI -- document-tests
+```
+
+Run a single mapping (example: item):
+
+```bash
+dotnet run --project RPG.CLI -- document-tests --entity item
+```
+
+Exit codes:
+- 0: all selected scenarios passed
+- >0: number of failed scenarios (or a non-zero sentinel if a fatal error occurred)
+
+Prerequisites:
+- Infrastructure stack up (MongoDB, Redis, RabbitMQ)
+- Warm-up services not strictly required; the command will exercise repositories directly.
+
 ## Stopping services
 
 When finished, tear down the infrastructure stack to free resources:

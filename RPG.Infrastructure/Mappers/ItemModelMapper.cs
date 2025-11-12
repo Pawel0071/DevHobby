@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RPG.Domain.Common;
 using RPG.Domain.Containers;
 using RPG.Domain.Entities.Items;
 using RPG.Domain.Entities.Items.ItemComponent;
@@ -9,6 +8,7 @@ using RPG.Domain.Enums;
 using RPG.Infrastructure.Common;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Abstractions; // central tag->component map
 
 namespace RPG.Infrastructure.Mappers;
 
@@ -17,20 +17,21 @@ namespace RPG.Infrastructure.Mappers;
 /// </summary>
 public class ItemModelMapper : IModelMapper<Item, ItemDocument>
 {
-    private readonly IDictionaryRegistry<TagDefinition> _tagRegistry;
     private readonly ILogger<ItemModelMapper> _logger;
 
-    public ItemModelMapper(
-        ILogger<ItemModelMapper> logger,
-        IDictionaryRegistry<TagDefinition> tagRegistry)
+    public ItemModelMapper(ILogger<ItemModelMapper> logger)
     {
         _logger = logger;
-        _tagRegistry = tagRegistry;
     }
 
     public ItemDocument ToPersistence(Item entity)
     {
         _logger.Debug($"Converting Item to ItemDocument. Id={entity.Id}, Type={entity.TypeCode}");
+
+        // merge derived tags before persisting
+        var componentTypes = entity.Components.Select(c => c.GetType());
+        var derived = TagComponentHelper.ResolveComponentTags(componentTypes, TagTarget.Item);
+        foreach (var tag in derived) entity.Tags.Add(tag);
 
         var doc = new ItemDocument
         {
@@ -99,7 +100,8 @@ public class ItemModelMapper : IModelMapper<Item, ItemDocument>
         var requiredComponents = new HashSet<Type>();
         if (item.Tags.Count > 0)
         {
-            foreach (var type in _tagRegistry.GetRequiredComponents(item.Tags, TagTarget.Item))
+            // Centralized resolution from TagDefinition via TagComponentMap
+            foreach (var type in TagComponentMap.GetRequiredComponentTypes(item.Tags, TagTarget.Item))
             {
                 requiredComponents.Add(type);
             }
@@ -125,6 +127,10 @@ public class ItemModelMapper : IModelMapper<Item, ItemDocument>
                 item.Components.Add(component);
             }
         }
+
+        // merge derived tags from present components
+        var tagsFromComponents = TagComponentHelper.ResolveComponentTags(item.Components.Select(c => c.GetType()), TagTarget.Item);
+        foreach (var tag in tagsFromComponents) item.Tags.Add(tag);
 
         _logger.Debug($"Item domain entity created. Id={item.Id}, Components={item.Components.Count}");
         return item;

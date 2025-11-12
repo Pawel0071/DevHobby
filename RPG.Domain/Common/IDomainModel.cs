@@ -1,12 +1,13 @@
 namespace RPG.Domain.Common;
 
 /// <summary>
-///     Base interface for all domain entities
+///     Bazowy kontrakt dla encji domenowych. Zapewnia niezmienność tożsamości oraz neutralność względem mechanizmów serializacji.
+///     Implementacje nie powinny zawierać bezpośrednich atrybutów (np. Bson/Json) – mapowanie realizuje warstwa infrastruktury.
 /// </summary>
 public interface IDomainModel
 {
     /// <summary>
-    ///     Unique identifier of the entity
+    ///     Unikalny identyfikator encji domenowej (GUID). Ustalany przy tworzeniu / hydracji.
     /// </summary>
     Guid Id { get; }
 }

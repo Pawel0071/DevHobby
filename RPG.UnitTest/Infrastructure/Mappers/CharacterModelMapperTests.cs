@@ -1,8 +1,10 @@
 using System.Numerics;
 using FluentAssertions;
+using Moq;
 using RPG.Domain.Entities;
 using RPG.Domain.Enums;
 using RPG.Infrastructure.Documents;
+using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Mappers;
 
 namespace RPG.UnitTest.Infrastructure.Mappers;
@@ -12,7 +14,14 @@ namespace RPG.UnitTest.Infrastructure.Mappers;
 /// </summary>
 public class CharacterModelMapperTests
 {
-    private readonly CharacterModelMapper _mapper = new(null);
+    private readonly CharacterModelMapper _mapper;
+
+    public CharacterModelMapperTests()
+    {
+        var logger = new Mock<ILogger<CharacterModelMapper>>();
+        var locationLogger = new Mock<ILogger<LocationMapper>>();
+        _mapper = new CharacterModelMapper(logger.Object, new LocationMapper(locationLogger.Object));
+    }
 
     [Fact]
     public void ToDocument_MapsBasicProperties()
@@ -213,4 +222,3 @@ public class CharacterModelMapperTests
         character.IsRotating.Should().BeFalse();
     }
 }
-

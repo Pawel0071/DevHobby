@@ -8,6 +8,9 @@ using RPG.Domain.Entities.MapObjects.MapObjectComponents;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Mappers.Common;
+using RPG.Domain.Enums; // TagTarget
+using RPG.Abstractions; // TagComponentMap (global tag->component map)
+using RPG.Domain.Common; // TagDefinition access
 
 namespace RPG.Infrastructure.Mappers;
 
@@ -34,6 +37,9 @@ public class MapObjectModelMapper : IModelMapper<MapObject, MapObjectDocument>
     public MapObjectDocument ToPersistence(MapObject entity)
     {
         _logger.Debug($"Converting MapObject to MapObjectDocument. Id={entity.Id}, Name={entity.Name}");
+        // Merge derived tags
+        var derived = ResolveComponentTags(entity.Components.Select(c => c.GetType()), TagTarget.MapObject);
+        foreach (var t in derived) entity.Tags.Add(t);
         return new MapObjectDocument
         {
             Id = entity.Id,
@@ -93,6 +99,19 @@ public class MapObjectModelMapper : IModelMapper<MapObject, MapObjectDocument>
             }
         }
 
+        // Auto-add missing components based on tags
+        var requiredTypes = TagComponentMap.GetRequiredComponentTypes(mapObject.Tags, TagTarget.MapObject);
+        foreach (var type in requiredTypes)
+        {
+            if (mapObject.Components.Any(c => c.GetType() == type)) continue;
+            var empty = Activator.CreateInstance(type) as IMapObjectComponent;
+            if (empty != null) mapObject.Components.Add(empty);
+        }
+
+        // Merge derived tags
+        var derived = ResolveComponentTags(mapObject.Components.Select(c => c.GetType()), TagTarget.MapObject);
+        foreach (var t in derived) mapObject.Tags.Add(t);
+
         return mapObject;
     }
 
@@ -138,24 +157,28 @@ public class MapObjectModelMapper : IModelMapper<MapObject, MapObjectDocument>
         }
     }
 
-    private ContainerComponentDto ToContainerDto(ContainerComponent component)
-    {
-        return new ContainerComponentDto
-        {
-            Capacity = component.GetContainer().Capacity,
-            Items = component.Items
-                .Select(slot => new InventorySlotDto
-                {
-                    Item = slot.Item is null ? null : _itemMapper.ToPersistence(slot.Item),
-                    Quantity = slot.Quantity
-                })
-                .ToList()
-        };
-    }
-
     private ContainerComponent? DeserializeContainerComponent(string data)
     {
         var dto = JsonSerializer.Deserialize<ContainerComponentDto>(data);
         return ContainerComponentMapper.FromDto(dto, _itemMapper);
+    }
+
+    private static IEnumerable<string> ResolveComponentTags(IEnumerable<Type> componentTypes, TagTarget target)
+    {
+        var codes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var type in componentTypes)
+        {
+            foreach (var def in TagDefinition.Predefined.Where(d => d.Target == target && d.ComponentType != null))
+            {
+                var t = def.ResolveComponentType();
+                if (t != null && t.IsAssignableFrom(type))
+                {
+                    codes.Add(def.Code);
+                    var colon = def.Code.IndexOf(':');
+                    if (colon > 0) codes.Add(def.Code[(colon + 1)..]);
+                }
+            }
+        }
+        return codes;
     }
 }

@@ -186,6 +186,9 @@ public static class InfrastructureRegistration
             .AddCheck<RedisHealthCheck>("redis")
             .AddCheck<RabbitMqHealthCheck>("rabbitmq");
 
+        // Dictionary warmup hosted service - ensures dictionaries are loaded once per host startup
+        services.AddHostedService<DictionaryWarmupService>();
+
         return services;
     }
 }

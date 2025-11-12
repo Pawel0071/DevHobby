@@ -12,7 +12,7 @@ using RPG.Domain.Enums;
 
 namespace RPG.Domain.Common;
 
-public sealed class TagDefinition : IDictionaryEntry<TagDefinition>
+public sealed class TagDefinition : IDictionaryEntry<TagDefinition>, IStaticDictionaryDefinition
 {
     private static readonly TagDefinition[] BuiltInDefinitions = BuildDefinitions();
 

@@ -30,6 +30,14 @@ public class DictionaryRepository<T> : IDictionaryRepository<T> where T : IDicti
 
     public async Task<IReadOnlyCollection<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
+        // handle static dictionaries in-memory
+        if (typeof(IStaticDictionaryDefinition).IsAssignableFrom(typeof(T)))
+        {
+            var predefined = T.Predefined.ToList();
+            _logger.Debug($"Using in-memory predefined entries for {typeof(T).Name}: {predefined.Count}");
+            return predefined.AsReadOnly();
+        }
+
         try
         {
             _logger.Debug($"Loading all {typeof(T).Name} from MongoDB collection: {GetCollectionName()}");
@@ -50,8 +58,12 @@ public class DictionaryRepository<T> : IDictionaryRepository<T> where T : IDicti
 
     public async Task UpsertManyAsync(IEnumerable<T> entries, CancellationToken cancellationToken = default)
     {
-        if (entries is null)
+        if (entries is null) return;
+
+        // skip Mongo upserts for static dictionaries
+        if (typeof(IStaticDictionaryDefinition).IsAssignableFrom(typeof(T)))
         {
+            _logger.Debug($"Skipping Mongo upsert for static dictionary {typeof(T).Name}");
             return;
         }
 

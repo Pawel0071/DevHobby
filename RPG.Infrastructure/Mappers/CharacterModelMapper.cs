@@ -3,6 +3,7 @@ using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Logger; // SerilogWrapper
 
 namespace RPG.Infrastructure.Mappers;
 
@@ -11,23 +12,20 @@ namespace RPG.Infrastructure.Mappers;
 /// </summary>
 public class CharacterModelMapper : IModelMapper<Character, CharacterDocument>
 {
-    private readonly IModelMapper<Item, ItemDocument>? _itemMapper;
-    private readonly ILogger<CharacterModelMapper>? _logger;
+    private readonly ILogger<CharacterModelMapper> _logger;
     private readonly LocationMapper _locationMapper;
 
     public CharacterModelMapper(
-        ILogger<CharacterModelMapper>? logger = null,
-        IModelMapper<Item, ItemDocument>? itemMapper = null,
+        ILogger<CharacterModelMapper> logger,
         LocationMapper? locationMapper = null)
     {
         _logger = logger;
-        _itemMapper = itemMapper;
-        _locationMapper = locationMapper ?? new LocationMapper(new NoopLogger<LocationMapper>());
+        _locationMapper = locationMapper ?? new LocationMapper(new SerilogWrapper<LocationMapper>());
     }
 
     public CharacterDocument ToPersistence(Character entity)
     {
-        _logger?.Debug($"Converting Character to CharacterDocument. Id={entity.Id}, Name={entity.Name}");
+        _logger.Debug($"Converting Character to CharacterDocument. Id={entity.Id}, Name={entity.Name}");
 
         var doc = new CharacterDocument
         {
@@ -90,19 +88,19 @@ public class CharacterModelMapper : IModelMapper<Character, CharacterDocument>
             kvp => kvp.Value
         );
 
-        _logger?.Debug(
+        _logger.Debug(
             $"CharacterDocument created. Id={doc.Id}, Equipment count={doc.Equipment.Count}, Backpack slots={doc.Backpack.Count}");
         return doc;
     }
 
     public Character ToDomain(CharacterDocument document)
     {
-        _logger?.Debug($"Converting CharacterDocument to Character. Id={document.Id}, Name={document.Name}");
+        _logger.Debug($"Converting CharacterDocument to Character. Id={document.Id}, Name={document.Name}");
 
         // Parse CharacterClass enum
         if (!Enum.TryParse<CharacterClass>(document.Class, out var characterClass))
         {
-            _logger?.Warn($"Invalid CharacterClass '{document.Class}' in document. Defaulting to Warrior.");
+            _logger.Warn($"Invalid CharacterClass '{document.Class}' in document. Defaulting to Warrior.");
             characterClass = CharacterClass.Warrior;
         }
 
@@ -134,14 +132,14 @@ public class CharacterModelMapper : IModelMapper<Character, CharacterDocument>
             if (Enum.TryParse<StatsProperty>(stat.Key, out var statProperty))
                 character.BaseStats[statProperty] = stat.Value;
             else
-                _logger?.Warn($"Invalid StatsProperty '{stat.Key}' in BaseStats. Skipping.");
+                _logger.Warn($"Invalid StatsProperty '{stat.Key}' in BaseStats. Skipping.");
 
         // Map ModifiedStats
         foreach (var stat in document.ModifiedStats)
             if (Enum.TryParse<StatsProperty>(stat.Key, out var statProperty))
                 character.ModifiedStats[statProperty] = stat.Value;
             else
-                _logger?.Warn($"Invalid StatsProperty '{stat.Key}' in ModifiedStats. Skipping.");
+                _logger.Warn($"Invalid StatsProperty '{stat.Key}' in ModifiedStats. Skipping.");
 
         // Map Equipment - Note: This requires loading actual Item entities from repository
         // For now, we just store the structure. Items should be loaded separately.
@@ -149,12 +147,12 @@ public class CharacterModelMapper : IModelMapper<Character, CharacterDocument>
             if (Enum.TryParse<EquipmentSlot>(equip.Key, out var slot))
                 // Equipment items need to be resolved from item repository
                 // This is typically done by the service layer after mapping
-                _logger?.Debug($"Equipment slot {slot} has item {equip.Value}. Item needs to be loaded separately.");
+                _logger.Debug($"Equipment slot {slot} has item {equip.Value}. Item needs to be loaded separately.");
             else
-                _logger?.Warn($"Invalid EquipmentSlot '{equip.Key}' in Equipment. Skipping.");
+                _logger.Warn($"Invalid EquipmentSlot '{equip.Key}' in Equipment. Skipping.");
 
         // Map Inventory - Similar to equipment, actual Item entities need to be loaded
-        _logger?.Debug(
+        _logger.Debug(
             $"Character has {document.Backpack.Count} backpack slots and {document.Bank.Count} bank slots. Items need to be loaded separately.");
 
         // Map Skills - Skill entities need to be loaded from repository
@@ -162,40 +160,21 @@ public class CharacterModelMapper : IModelMapper<Character, CharacterDocument>
         foreach (var skill in document.Skills)
             if (Enum.TryParse<SkillAvailability>(skill.Value, out var availability))
             {
-                _logger?.Debug(
+                _logger.Debug(
                     $"Skill {skill.Key} has availability {availability}. Skill entity needs to be loaded separately.");
             }
             else
             {
-                _logger?.Warn($"Invalid SkillAvailability '{skill.Value}' for skill {skill.Key}. Skipping.");
+                _logger.Warn($"Invalid SkillAvailability '{skill.Value}' for skill {skill.Key}. Skipping.");
             }
 
         // Map ActiveSkills - Skill entities need to be loaded from repository
         foreach (var activeSkill in document.ActiveSkills)
-            _logger?.Debug(
+            _logger.Debug(
                 $"Active skill {activeSkill.Key} activated at {activeSkill.Value}. Skill entity needs to be loaded separately.");
         // Skill entities need to be resolved from skill repository
-        _logger?.Debug(
+        _logger.Debug(
             $"Character domain entity created. Id={character.Id}, Document has {document.Skills.Count} skills, {document.ActiveSkills.Count} active skills");
         return character;
-    }
-
-    private sealed class NoopLogger<T> : ILogger<T>
-    {
-        public void Info(string message)
-        {
-        }
-
-        public void Warn(string message)
-        {
-        }
-
-        public void Error(string message, Exception? ex = null)
-        {
-        }
-
-        public void Debug(string message)
-        {
-        }
     }
 }

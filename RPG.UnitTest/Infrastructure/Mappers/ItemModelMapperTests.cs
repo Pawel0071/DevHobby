@@ -25,13 +25,7 @@ public class ItemModelMapperTests
 
     private ItemModelMapper CreateMapper()
     {
-        var tagRegistryLogger = new Mock<ILogger<DictionaryRegistry<TagDefinition>>>();
-        var tagRegistry = new DictionaryRegistry<TagDefinition>(tagRegistryLogger.Object);
-        tagRegistry.Load(Array.Empty<TagDefinition>());
-
-        return new ItemModelMapper(
-            _mockLogger.Object,
-            tagRegistry);
+        return new ItemModelMapper(_mockLogger.Object);
     }
 
     [Fact]

@@ -17,7 +17,8 @@ public class WorldStateDocument : IPersistenceModel
     [BsonRepresentation(BsonType.String)]
     public Guid Id { get; set; }
 
-    [BsonRepresentation(BsonType.String)] public Guid WorldId { get; set; }
+    [BsonRepresentation(BsonType.String)]
+    public Guid WorldId { get; set; }
 
     public string WorldName { get; set; } = string.Empty;
     public DateTime LastUpdated { get; set; }

@@ -3,6 +3,8 @@ using RPG.Domain.Entities.Quests;
 using RPG.Domain.Entities.Quests.QuestComponents;
 using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Domain.Enums; // TagTarget
+using RPG.Abstractions; // TagComponentMap + TagComponentHelper
 
 namespace RPG.Infrastructure.Mappers;
 
@@ -24,6 +26,9 @@ public class QuestModelMapper : IModelMapper<Quest, QuestDocument>
     public QuestDocument ToPersistence(Quest entity)
     {
         _logger.Debug($"Converting Quest to QuestDocument. Id={entity.Id}, Title={entity.Title}");
+        // synchronize tags from components before persisting (merge)
+        var derived = TagComponentHelper.ResolveComponentTags(entity.Components.Select(c => c.GetType()), TagTarget.Quest);
+        foreach (var t in derived) entity.Tags.Add(t);
         return new QuestDocument
         {
             Id = entity.Id,
@@ -67,6 +72,19 @@ public class QuestModelMapper : IModelMapper<Quest, QuestDocument>
             var component = DeserializeComponent(componentData);
             if (component != null) quest.Components.Add(component);
         }
+
+        // Auto-add missing components based on tags
+        var requiredTypes = TagComponentMap.GetRequiredComponentTypes(quest.Tags, TagTarget.Quest);
+        foreach (var type in requiredTypes)
+        {
+            if (quest.Components.Any(c => c.GetType() == type)) continue;
+            var empty = Activator.CreateInstance(type) as IQuestComponent;
+            if (empty != null) quest.Components.Add(empty);
+        }
+
+        // Ensure tags reflect present components (merge)
+        var resolved = TagComponentHelper.ResolveComponentTags(quest.Components.Select(c => c.GetType()), TagTarget.Quest);
+        foreach (var t in resolved) quest.Tags.Add(t);
 
         return quest;
     }
