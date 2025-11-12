@@ -1,17 +1,13 @@
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace RPG.Infrastructure.Documents;
 
-/// <summary>
-///     Interface for MongoDB documents that defines collection name
-/// </summary>
 public interface IPersistenceModel
 {
-    /// <summary>
-    ///     MongoDB collection name for this document type
-    /// </summary>
+    [BsonId]
+    [BsonRepresentation(BsonType.String)]
     static abstract string CollectionName { get; }
 
-    /// <summary>
-    ///     Document unique identifier
-    /// </summary>
     Guid Id { get; set; }
 }
