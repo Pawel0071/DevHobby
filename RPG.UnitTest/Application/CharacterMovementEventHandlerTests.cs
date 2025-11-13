@@ -26,7 +26,8 @@ public class CharacterMovementEventHandlerTests
     {
         var location = Location.Create(new Vector3(2, 0, 1), Guid.NewGuid());
         location.Rotation = 45f;
-        var gameEvent = new CharacterMovedEvent(Guid.NewGuid(), location);
+        var meta = new EventMetadata(Guid.NewGuid(), Guid.NewGuid(), null, 1, DateTime.UtcNow);
+        var gameEvent = new CharacterMovedEvent(meta, Guid.NewGuid(), location);
 
         await _handler.HandleAsync(gameEvent, CancellationToken.None);
 
@@ -44,7 +45,8 @@ public class CharacterMovementEventHandlerTests
     public async Task HandleAsync_StopMoveEvent_ShouldBroadcastStoppedState()
     {
         var location = Location.Create(Vector3.Zero, Guid.NewGuid());
-        var gameEvent = new CharacterMovementStoppedEvent(Guid.NewGuid(), location);
+        var meta2 = new EventMetadata(Guid.NewGuid(), Guid.NewGuid(), null, 2, DateTime.UtcNow);
+        var gameEvent = new CharacterMovementStoppedEvent(meta2, Guid.NewGuid(), location);
 
         await _handler.HandleAsync(gameEvent, CancellationToken.None);
 
@@ -61,7 +63,8 @@ public class CharacterMovementEventHandlerTests
     public async Task HandleAsync_StartRotation_ShouldBroadcastRotatingState()
     {
         var location = Location.Create(Vector3.Zero, Guid.NewGuid());
-        var gameEvent = new CharacterRotationStartedEvent(Guid.NewGuid(), 120f, location);
+        var meta3 = new EventMetadata(Guid.NewGuid(), Guid.NewGuid(), null, 3, DateTime.UtcNow);
+        var gameEvent = new CharacterRotationStartedEvent(meta3, Guid.NewGuid(), 120f, location);
 
         await _handler.HandleAsync(gameEvent, CancellationToken.None);
 
@@ -78,7 +81,8 @@ public class CharacterMovementEventHandlerTests
     public async Task HandleAsync_StopRotation_ShouldBroadcastIdleRotationState()
     {
         var location = Location.Create(Vector3.Zero, Guid.NewGuid());
-        var gameEvent = new CharacterRotationStoppedEvent(Guid.NewGuid(), 30f, location);
+        var meta4 = new EventMetadata(Guid.NewGuid(), Guid.NewGuid(), null, 4, DateTime.UtcNow);
+        var gameEvent = new CharacterRotationStoppedEvent(meta4, Guid.NewGuid(), 30f, location);
 
         await _handler.HandleAsync(gameEvent, CancellationToken.None);
 

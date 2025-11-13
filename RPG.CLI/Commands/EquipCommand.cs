@@ -20,20 +20,18 @@ public class EquipCommand
     {
         var characterOption = new Option<Guid>("--character", "ID postaci") { IsRequired = true };
         var slotOption = new Option<EquipmentSlot>("--slot", "Slot ekwipunku") { IsRequired = true };
-        var itemNameOption = new Option<string>("--item-name", "Nazwa przedmiotu") { IsRequired = true };
+        var itemIdOption = new Option<Guid>("--item-id", "ID przedmiotu") { IsRequired = true };
 
-        var cmd = new Command("equip", "Wyposaża przedmiot") { characterOption, slotOption, itemNameOption };
+        var cmd = new Command("equip", "Wyposaża przedmiot") { characterOption, slotOption, itemIdOption };
 
-        cmd.SetHandler(async (characterId, slot, itemName) =>
+        cmd.SetHandler(async (characterId, slot, itemId) =>
             {
                 using var scope = _provider.CreateScope();
                 var handler = scope.ServiceProvider.GetRequiredService<ICommandHandler<EquipItemCommand>>();
-
-                var item = new Item(Guid.NewGuid(), itemName.ToLowerInvariant()) { Name = itemName };
-                var command = new EquipItemCommand(characterId, slot, item);
+                var command = new EquipItemCommand(characterId, slot, itemId);
                 await handler.HandleAsync(command);
             },
-            characterOption, slotOption, itemNameOption);
+            characterOption, slotOption, itemIdOption);
 
         return cmd;
     }

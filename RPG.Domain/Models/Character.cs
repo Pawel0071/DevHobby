@@ -26,9 +26,9 @@ public sealed class Character : IDomainModel, IItemContainer, IStats, ILevel, IS
         BankStorageContainer = new InventoryContainer(20);
         BackpackInventoryContainer = new InventoryContainer(20);
         CurrentLocation = new Location();
-    Level = 1;
-    StatusEffects = new HashSet<string>();
-    LastUpdated = DateTime.UtcNow;
+        Level = 1;
+        StatusEffects = new HashSet<string>();
+        LastUpdated = DateTime.UtcNow;
     }
 
     public required Guid Id { get; init; }

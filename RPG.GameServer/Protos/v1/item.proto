@@ -1,0 +1,38 @@
+syntax = "proto3";
+option csharp_namespace = "RPG.GameServer.QueryProtos";
+
+package rpg.query.v1;
+
+import "common.proto";
+
+service ItemQuery {
+  rpc GetItem(ItemGetByIdRequest) returns (ItemSingleReply);
+  rpc ListItems(ItemListRequest) returns (ItemListReply);
+  rpc GetItemsByIds(ItemGetByIdsRequest) returns (ItemListReply);
+}
+
+message ItemGetByIdRequest { string id = 1; }
+message ItemListRequest {}
+message ItemGetByIdsRequest { repeated string ids = 1; }
+
+message ItemSingleReply { Item item = 1; }
+message ItemListReply { repeated Item items = 1; }
+
+message Item {
+  string id = 1;
+  string name = 2;
+  string type_code = 3;
+  int32 required_level = 4;
+  int32 stack_size = 5;
+  repeated string tags = 6;
+  map<string, int32> modifiers = 7;
+  int32 socket_no = 8;
+  repeated string skill_ids = 9;
+  string quest_id = 10;
+  string step_id = 11;
+  repeated string equipment_slots = 12;
+  bool is_two_handed = 13;
+  bool supports_dual_wield = 14;
+  bool is_unique_equip = 15;
+  repeated string used_in_item_ids = 16;
+}

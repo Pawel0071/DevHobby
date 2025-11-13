@@ -2,7 +2,9 @@ using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RPG.Application.Diagnostics;
+using RPG.Abstractions.Interfaces;
 using RPG.Application.Interfaces;
+using IGameEventDispatcher = RPG.Abstractions.Interfaces.IGameEventDispatcher;
 
 namespace RPG.Application.Dispatchers;
 
@@ -17,7 +19,7 @@ public class GameEventDispatcher : IGameEventDispatcher
         _logger = logger;
     }
 
-    public async Task DispatchAsync<TEvent>(TEvent gameEvent, CancellationToken cancellationToken = default)
+    public async Task DispatchAsync<TEvent>(TEvent gameEvent, CancellationToken cancellationToken) where TEvent : IGameEvent
     {
         if (gameEvent == null)
         {

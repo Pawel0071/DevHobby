@@ -71,14 +71,9 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
 
         startMove.Success.Should().BeTrue();
 
-        using (var scope = factory.Services.CreateScope())
-        {
-            var repository = scope.ServiceProvider.GetRequiredService<IModelRepository>();
-            var character = await repository.GetByIdAsync<Character>(Guid.Parse(createReply.CharacterId));
-
-            character?.IsMoving.Should().BeTrue();
-            character?.CurrentLocation.Position.Y.Should().BeGreaterThan(0f);
-        }
+        // Retry polling until IsMoving = true or timeout
+        await AssertWithRetryAsync(factory, Guid.Parse(createReply.CharacterId), c => c.IsMoving, "IsMoving should be true after StartMovement");
+        await AssertWithRetryAsync(factory, Guid.Parse(createReply.CharacterId), c => c.CurrentLocation.Position.Y > 0f, "Y position should increase after movement");
 
         var stopMove = await client.StopMovementAsync(new CharacterIdRequest { CharacterId = createReply.CharacterId });
         stopMove.Success.Should().BeTrue();
@@ -91,14 +86,8 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
 
         startRotation.Success.Should().BeTrue();
 
-        using (var scope = factory.Services.CreateScope())
-        {
-            var repository = scope.ServiceProvider.GetRequiredService<IModelRepository>();
-            var character = await repository.GetByIdAsync<Character>(Guid.Parse(createReply.CharacterId));
-
-            character?.IsRotating.Should().BeTrue();
-            character?.CurrentLocation.Rotation.Should().BeApproximately(90f, 0.01f);
-        }
+        await AssertWithRetryAsync(factory, Guid.Parse(createReply.CharacterId), c => c.IsRotating, "IsRotating should be true after StartRotation");
+        await AssertWithRetryAsync(factory, Guid.Parse(createReply.CharacterId), c => Math.Abs(c.CurrentLocation.Rotation - 90f) < 0.01f, "Rotation should approach 90 degrees");
 
         var stopRotation = await client.StopRotationAsync(new CharacterIdRequest { CharacterId = createReply.CharacterId });
         stopRotation.Success.Should().BeTrue();
@@ -146,5 +135,22 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
                 }
             }
         };
+    }
+
+    private static async Task AssertWithRetryAsync(GameServerFactory factory, Guid characterId, Func<Character, bool> predicate, string message, int maxAttempts = 100, int delayMs = 50)
+    {
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            using var scope = factory.Services.CreateScope();
+            var repo = scope.ServiceProvider.GetRequiredService<IModelRepository>();
+            var c = await repo.GetByIdAsync<Character>(characterId);
+            if (c != null && predicate(c)) return;
+            await Task.Delay(delayMs);
+        }
+        using var finalScope = factory.Services.CreateScope();
+        var finalRepo = finalScope.ServiceProvider.GetRequiredService<IModelRepository>();
+        var finalCharacter = await finalRepo.GetByIdAsync<Character>(characterId);
+        finalCharacter.Should().NotBeNull(message);
+        predicate(finalCharacter!).Should().BeTrue(message);
     }
 }

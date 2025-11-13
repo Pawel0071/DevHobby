@@ -1,21 +1,18 @@
-using System;
 using System.Numerics;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
+using RPG.Abstractions.Interfaces;
 using RPG.Application.Commands;
 using RPG.Application.Events;
 using RPG.Application.Handlers;
+using RPG.Application.Infrastructure;
 using RPG.Application.Interfaces;
 using RPG.Core.Interfaces;
 using RPG.Core.Services.MovementService;
 using RPG.Domain.Common;
 using RPG.Domain.Enums;
-using RPG.Domain.Interfaces;
 using RPG.Domain.Models;
 using RPG.Infrastructure.Interfaces;
-using Xunit;
 
 namespace RPG.UnitTest.Application;
 
@@ -23,41 +20,39 @@ public class CharacterCommandHandlerMovementTests
 {
     private readonly Mock<IModelRepository> _characterRepository = new();
     private readonly Mock<IGameEventDispatcher> _eventDispatcher = new();
-    private readonly MovementService _movementService;
-    private readonly CharacterCommandHandler _handler;
+    private readonly CommandHandler _handler;
+    private readonly IEventSequenceStore _sequenceStore = new InMemoryEventSequenceStore();
+    private readonly Mock<IRequestEventQueue> _requestQueue = new();
+    private readonly Mock<IRequestedEventInlineDispatcher> _inlineDispatcher = new();
 
     public CharacterCommandHandlerMovementTests()
     {
-        var inventoryService = new Mock<IInventoryService>();
-        var statsService = new Mock<IStatsService>();
-        var movementLogger = new Mock<ILogger<MovementService>>();
-        _movementService = new MovementService(movementLogger.Object);
+        _inlineDispatcher
+            .Setup(d => d.TryHandleAsync(It.IsAny<IGameEventWithMetadata>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
 
-        _handler = new CharacterCommandHandler(
-            _characterRepository.Object,
-            inventoryService.Object,
-            Mock.Of<IEquipmentService>(),
-            statsService.Object,
-            _movementService,
-            _eventDispatcher.Object,
-            Mock.Of<IDictionaryRegistry<TagDefinition>>());
+        _handler = new CommandHandler(
+            _requestQueue.Object,
+            new DeterministicEventIdProvider(),
+            _sequenceStore,
+            _inlineDispatcher.Object);
 
         _eventDispatcher
-            .Setup(d => d.DispatchAsync(It.IsAny<CharacterMovedEvent>(), It.IsAny<CancellationToken>()))
+            .Setup(d => d.DispatchAsync(It.IsAny<MovementStartRequestedEvent>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
         _eventDispatcher
-            .Setup(d => d.DispatchAsync(It.IsAny<CharacterMovementStoppedEvent>(), It.IsAny<CancellationToken>()))
+            .Setup(d => d.DispatchAsync(It.IsAny<MovementStopRequestedEvent>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
         _eventDispatcher
-            .Setup(d => d.DispatchAsync(It.IsAny<CharacterRotationStartedEvent>(), It.IsAny<CancellationToken>()))
+            .Setup(d => d.DispatchAsync(It.IsAny<RotationStartRequestedEvent>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
         _eventDispatcher
-            .Setup(d => d.DispatchAsync(It.IsAny<CharacterRotationStoppedEvent>(), It.IsAny<CancellationToken>()))
+            .Setup(d => d.DispatchAsync(It.IsAny<RotationStopRequestedEvent>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
     }
 
     [Fact]
-    public async Task HandleAsync_StartMovement_ShouldMoveCharacterAndDispatchEvent()
+    public async Task HandleAsync_StartMovement_ShouldPublishRequestedEvent()
     {
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
@@ -68,21 +63,13 @@ public class CharacterCommandHandlerMovementTests
         character.ModifiedStats[StatsProperty.MoveSpeed] = 5;
 
         _characterRepository.Setup(repo => repo.GetByIdAsync<Character>(character.Id, It.IsAny<CancellationToken>())).ReturnsAsync(character);
-        // removed repo upsert verification to decouple test from persistence layer
-        // _characterRepository.Setup(repo => repo.UpsertAsync(character)).Returns(Task.CompletedTask).Verifiable();
 
         var command = new StartMovementCommand(character.Id, 1);
 
         var result = await _handler.HandleAsync(command);
 
         result.Success.Should().BeTrue();
-        character.CurrentLocation.Position.Y.Should().BeApproximately(0.5f, 0.0001f);
-        // _characterRepository.Verify(repo => repo.UpsertAsync(character), Times.Once);
-        _eventDispatcher.Verify(
-            dispatcher => dispatcher.DispatchAsync(It.Is<CharacterMovedEvent>(e =>
-                e.CharacterId == character.Id &&
-                e.Location == character.CurrentLocation), It.IsAny<CancellationToken>()),
-            Times.Once);
+        _requestQueue.Verify(q => q.Enqueue(It.Is<MovementStartRequestedEvent>(e => e.CharacterId == character.Id && e.Direction == 1)), Times.Once);
     }
 
     [Fact]
@@ -103,13 +90,12 @@ public class CharacterCommandHandlerMovementTests
         var result = await _handler.HandleAsync(command);
 
         result.Success.Should().BeFalse();
-        // _characterRepository.Verify(repo => repo.UpsertAsync(It.IsAny<Character>()), Times.Never);
-        _eventDispatcher.Verify(dispatcher => dispatcher.DispatchAsync(It.IsAny<CharacterMovedEvent>(), It.IsAny<CancellationToken>()), Times.Never);
+        _eventDispatcher.Verify(dispatcher => dispatcher.DispatchAsync(It.IsAny<MovementStartRequestedEvent>(), It.IsAny<CancellationToken>()), Times.Never);
         character.CurrentLocation.Position.Should().Be(Vector3.Zero);
     }
 
     [Fact]
-    public async Task HandleAsync_StopMovement_ShouldDispatchEvent()
+    public async Task HandleAsync_StopMovement_ShouldPublishRequestedEvent()
     {
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
@@ -126,14 +112,11 @@ public class CharacterCommandHandlerMovementTests
         var result = await _handler.HandleAsync(command);
 
         result.Success.Should().BeTrue();
-        _eventDispatcher.Verify(dispatcher => dispatcher.DispatchAsync(It.Is<CharacterMovementStoppedEvent>(e =>
-            e.CharacterId == character.Id &&
-            ReferenceEquals(e.Location, location)), It.IsAny<CancellationToken>()), Times.Once);
-        // _characterRepository.Verify(repo => repo.UpsertAsync(It.IsAny<Character>()), Times.Never);
+        _requestQueue.Verify(q => q.Enqueue(It.Is<MovementStopRequestedEvent>(e => e.CharacterId == character.Id)), Times.Once);
     }
 
     [Fact]
-    public async Task HandleAsync_StartRotation_ShouldPersistRotationAndDispatchEvent()
+    public async Task HandleAsync_StartRotation_ShouldPublishRequestedEvent()
     {
         var character = new Character(Guid.NewGuid(), CharacterClass.Mage)
         {
@@ -144,19 +127,13 @@ public class CharacterCommandHandlerMovementTests
         character.SetCurrentLocation(location);
 
         _characterRepository.Setup(repo => repo.GetByIdAsync<Character>(character.Id, It.IsAny<CancellationToken>())).ReturnsAsync(character);
-        // _characterRepository.Setup(repo => repo.UpsertAsync(character)).Returns(Task.CompletedTask).Verifiable();
 
         var command = new StartRotationCommand(character.Id, 3);
 
         var result = await _handler.HandleAsync(command);
 
         result.Success.Should().BeTrue();
-        character.CurrentLocation.Rotation.Should().BeApproximately(90f, 0.0001f);
-        // _characterRepository.Verify(repo => repo.UpsertAsync(character), Times.Once);
-        _eventDispatcher.Verify(dispatcher => dispatcher.DispatchAsync(It.Is<CharacterRotationStartedEvent>(e =>
-            e.CharacterId == character.Id &&
-            Math.Abs(e.Rotation - character.CurrentLocation.Rotation) < 0.0001f &&
-            ReferenceEquals(e.Location, location)), It.IsAny<CancellationToken>()), Times.Once);
+        _requestQueue.Verify(q => q.Enqueue(It.Is<RotationStartRequestedEvent>(e => e.CharacterId == character.Id && e.Direction == 3)), Times.Once);
     }
 
     [Fact]
@@ -176,12 +153,11 @@ public class CharacterCommandHandlerMovementTests
         var result = await _handler.HandleAsync(command);
 
         result.Success.Should().BeFalse();
-        // _characterRepository.Verify(repo => repo.UpsertAsync(It.IsAny<Character>()), Times.Never);
-        _eventDispatcher.Verify(dispatcher => dispatcher.DispatchAsync(It.IsAny<CharacterRotationStartedEvent>(), It.IsAny<CancellationToken>()), Times.Never);
+        _eventDispatcher.Verify(dispatcher => dispatcher.DispatchAsync(It.IsAny<RotationStartRequestedEvent>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
-    public async Task HandleAsync_StopRotation_ShouldDispatchEvent()
+    public async Task HandleAsync_StopRotation_ShouldPublishRequestedEvent()
     {
         var character = new Character(Guid.NewGuid(), CharacterClass.Mage)
         {
@@ -199,10 +175,6 @@ public class CharacterCommandHandlerMovementTests
         var result = await _handler.HandleAsync(command);
 
         result.Success.Should().BeTrue();
-        _eventDispatcher.Verify(dispatcher => dispatcher.DispatchAsync(It.Is<CharacterRotationStoppedEvent>(e =>
-            e.CharacterId == character.Id &&
-            Math.Abs(e.Rotation - 135f) < 0.0001f &&
-            ReferenceEquals(e.Location, location)), It.IsAny<CancellationToken>()), Times.Once);
-        // _characterRepository.Verify(repo => repo.UpsertAsync(It.IsAny<Character>()), Times.Never);
+        _requestQueue.Verify(q => q.Enqueue(It.Is<RotationStopRequestedEvent>(e => e.CharacterId == character.Id)), Times.Once);
     }
 }

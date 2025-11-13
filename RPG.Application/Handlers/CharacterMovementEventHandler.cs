@@ -21,7 +21,7 @@ public class CharacterMovementEventHandler :
         _stateBroadcaster = stateBroadcaster;
     }
 
-    public Task HandleAsync(CharacterMovedEvent gameEvent, CancellationToken cancellationToken = default)
+    public Task HandleAsync(CharacterMovedEvent gameEvent, CancellationToken cancellationToken)
     {
         using var activity = ApplicationDiagnostics.ActivitySource.StartActivity("CharacterMovementEventHandler.CharacterMoved");
         activity?.SetTag("rpg.event.type", nameof(CharacterMovedEvent));
@@ -38,7 +38,7 @@ public class CharacterMovementEventHandler :
         return _stateBroadcaster.BroadcastAsync(update, cancellationToken);
     }
 
-    public Task HandleAsync(CharacterMovementStoppedEvent gameEvent, CancellationToken cancellationToken = default)
+    public Task HandleAsync(CharacterMovementStoppedEvent gameEvent, CancellationToken cancellationToken)
     {
         using var activity = ApplicationDiagnostics.ActivitySource.StartActivity("CharacterMovementEventHandler.CharacterMovementStopped");
         activity?.SetTag("rpg.event.type", nameof(CharacterMovementStoppedEvent));
@@ -55,7 +55,7 @@ public class CharacterMovementEventHandler :
         return _stateBroadcaster.BroadcastAsync(update, cancellationToken);
     }
 
-    public Task HandleAsync(CharacterRotationStartedEvent gameEvent, CancellationToken cancellationToken = default)
+    public Task HandleAsync(CharacterRotationStartedEvent gameEvent, CancellationToken cancellationToken)
     {
         using var activity = ApplicationDiagnostics.ActivitySource.StartActivity("CharacterMovementEventHandler.CharacterRotationStarted");
         activity?.SetTag("rpg.event.type", nameof(CharacterRotationStartedEvent));
@@ -72,7 +72,7 @@ public class CharacterMovementEventHandler :
         return _stateBroadcaster.BroadcastAsync(update, cancellationToken);
     }
 
-    public Task HandleAsync(CharacterRotationStoppedEvent gameEvent, CancellationToken cancellationToken = default)
+    public Task HandleAsync(CharacterRotationStoppedEvent gameEvent, CancellationToken cancellationToken)
     {
         using var activity = ApplicationDiagnostics.ActivitySource.StartActivity("CharacterMovementEventHandler.CharacterRotationStopped");
         activity?.SetTag("rpg.event.type", nameof(CharacterRotationStoppedEvent));

@@ -1,0 +1,108 @@
+syntax = "proto3";
+import "character.proto";
+
+option csharp_namespace = "RPG.GameServer.Protos";
+
+package rpg;
+
+service WorldService {
+  rpc GetWorldState (WorldRequest) returns (WorldReply);
+  rpc JoinWorld (JoinWorldRequest) returns (JoinWorldReply);
+  rpc LeaveWorld (WorldMembershipRequest) returns (WorldReply);
+  rpc StreamWorldState (WorldStreamRequest) returns (stream WorldUpdate);
+  rpc GetWorldSnapshot (WorldSnapshotRequest) returns (WorldSnapshotReply);
+}
+
+message WorldState {
+  repeated PlayerCharacter visibleCharacters = 1;
+  repeated PlayerCharacter visibleNPCs = 2;
+  int64 timestamp = 3;
+}
+
+message WorldRequest {
+  string characterId = 1;
+  Location location = 2;
+}
+
+message WorldReply {
+  WorldState state = 1;
+}
+
+message JoinWorldRequest {
+  string sessionId = 1;
+  string preferredWorldId = 2;
+}
+
+message JoinWorldReply {
+  WorldSnapshot snapshot = 1;
+  Location spawnLocation = 2;
+}
+
+message WorldMembershipRequest {
+  string sessionId = 1;
+}
+
+message WorldSnapshotRequest {
+  string worldId = 1;
+  string sessionId = 2;
+}
+
+message WorldSnapshotReply {
+  WorldSnapshot snapshot = 1;
+}
+
+message WorldStreamRequest {
+  string sessionId = 1;
+  string worldId = 2;
+  int32 intervalMilliseconds = 3;
+}
+
+message WorldUpdate {
+  WorldSnapshot snapshot = 1;
+}
+
+message WorldSnapshot {
+  WorldMetadata metadata = 1;
+  repeated WorldCharacter characters = 2;
+  repeated WorldNpc npcs = 3;
+  repeated WorldMapObject mapObjects = 4;
+  int64 lastUpdated = 5;
+}
+
+message WorldMetadata {
+  string worldId = 1;
+  string worldName = 2;
+}
+
+message WorldCharacter {
+  string characterId = 1;
+  string sessionId = 2;
+  string displayName = 3;
+  Location location = 4;
+  bool isOnline = 5;
+  bool isInCombat = 6;
+  repeated string statusEffects = 7;
+  int64 lastUpdated = 8;
+}
+
+message WorldNpc {
+  string npcId = 1;
+  string name = 2;
+  Location location = 3;
+  bool isAlive = 4;
+  int64 lastUpdated = 5;
+  int64 respawnAt = 6;
+  repeated string tags = 7;
+}
+
+message WorldMapObject {
+  string mapObjectId = 1;
+  string name = 2;
+  string displayName = 3;
+  Location location = 4;
+  bool isActive = 5;
+  repeated string tags = 6;
+  map<string, string> state = 7;
+  int64 lastUpdated = 8;
+}
+

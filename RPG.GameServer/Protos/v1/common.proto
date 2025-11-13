@@ -1,0 +1,9 @@
+syntax = "proto3";
+option csharp_namespace = "RPG.GameServer.QueryProtos";
+package rpg.query.v1;
+
+// Shared messages for query protos to avoid duplicate C# type generation.
+message Location { float x = 1; float y = 2; float z = 3; string world_id = 4; string map_id = 5; string zone_name = 6; float rotation = 7; }
+message Component { string type = 1; string data = 2; }
+message InventorySlot { string item_id = 1; int32 quantity = 2; }
+

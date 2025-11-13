@@ -11,10 +11,16 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' "/>
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' "/>
   <ItemGroup>
-  <Protobuf Include="Protos\character.proto" GrpcServices="Server,Client" ProtoRoot="Protos" />
-    <Protobuf Include="Protos\session.proto" GrpcServices="Server,Client" ProtoRoot="Protos" />
-    <Protobuf Include="Protos\world.proto" GrpcServices="Server,Client" ProtoRoot="Protos" />
-    <Protobuf Include="Protos\interaction.proto" GrpcServices="Server" ProtoRoot="Protos" />
+    <Protobuf Include="Protos\v1\character.proto" GrpcServices="Server,Client" ProtoRoot="Protos\v1" />
+    <Protobuf Include="Protos\v1\session.proto" GrpcServices="Server,Client" ProtoRoot="Protos\v1" />
+    <Protobuf Include="Protos\v1\world.proto" GrpcServices="Server,Client" ProtoRoot="Protos\v1" />
+    <Protobuf Include="Protos\v1\interaction.proto" GrpcServices="Server" ProtoRoot="Protos\v1" />
+    <Protobuf Include="Protos\v1\item.proto" GrpcServices="Server,Client" ProtoRoot="Protos\v1" />
+    <Protobuf Include="Protos\v1\skill.proto" GrpcServices="Server,Client" ProtoRoot="Protos\v1" />
+    <Protobuf Include="Protos\v1\npc.proto" GrpcServices="Server,Client" ProtoRoot="Protos\v1" />
+    <Protobuf Include="Protos\v1\mapobject.proto" GrpcServices="Server,Client" ProtoRoot="Protos\v1" />
+    <Protobuf Include="Protos\v1\quest.proto" GrpcServices="Server,Client" ProtoRoot="Protos\v1" />
+    <Protobuf Include="Protos\v1\common.proto" GrpcServices="None" ProtoRoot="Protos\v1" />
   </ItemGroup>
 
   <ItemGroup>

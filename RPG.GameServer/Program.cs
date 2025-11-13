@@ -63,13 +63,17 @@ builder.Services.AddScoped<IGameEventHandler<CharacterRotationStoppedEvent>>(sp 
 builder.Services.AddSingleton<INpcAiService, NpcAiService>();
 builder.Services.AddHostedService<NpcAiHostedService>();
 builder.Services.AddSingleton<INpcCombatService, NpcCombatService>();
-builder.Services.AddControllers();
 
 // Serwisy gRPC
 builder.Services.AddScoped<CharacterServiceImpl>();
 builder.Services.AddScoped<SessionServiceImpl>();
 builder.Services.AddScoped<InteractionServiceImpl>();
 builder.Services.AddScoped<WorldServiceImpl>();
+builder.Services.AddScoped<ItemQueryServiceImpl>();
+builder.Services.AddScoped<SkillQueryServiceImpl>();
+builder.Services.AddScoped<NpcQueryServiceImpl>();
+builder.Services.AddScoped<MapObjectQueryServiceImpl>();
+builder.Services.AddScoped<QuestQueryServiceImpl>();
 
 var app = builder.Build();
 
@@ -94,10 +98,14 @@ app.MapGrpcService<CharacterServiceImpl>();
 app.MapGrpcService<SessionServiceImpl>();
 app.MapGrpcService<InteractionServiceImpl>();
 app.MapGrpcService<WorldServiceImpl>();
+app.MapGrpcService<ItemQueryServiceImpl>();
+app.MapGrpcService<SkillQueryServiceImpl>();
+app.MapGrpcService<NpcQueryServiceImpl>();
+app.MapGrpcService<MapObjectQueryServiceImpl>();
+app.MapGrpcService<QuestQueryServiceImpl>();
 
 app.MapGet("/", () =>
     "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
-app.MapControllers();
 app.MapGet("/ping", () => Results.Ok("pong"));
 
 app.Run();

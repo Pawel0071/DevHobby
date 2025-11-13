@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RPG.Application.Commands;
 using RPG.Application.Interfaces;
 using RPG.Application.Diagnostics;
+using RPG.Abstractions.Interfaces;
 using System.Diagnostics;
 
 namespace RPG.Application.Infrastructure;
@@ -20,6 +21,13 @@ public class CommandBus(IServiceProvider serviceProvider) : ICommandBus
         var handler = scope.ServiceProvider.GetService<ICommandHandler<TCommand>>();
         if (handler is null)
             throw new InvalidOperationException($"No handler registered for command type {typeof(TCommand).Name}");
+
+        var correlationId = Guid.NewGuid();
+        var occurredAt = DateTime.UtcNow;
+        if (command is IMetadataCommand metaCmd)
+        {
+            metaCmd.Metadata = new CommandMetadata(Guid.NewGuid(), correlationId, null, occurredAt);
+        }
 
         try
         {

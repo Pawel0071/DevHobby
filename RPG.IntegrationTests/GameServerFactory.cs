@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using RabbitMQ.Client;
 using RPG.Infrastructure.Configuration;
@@ -15,6 +14,7 @@ using RPG.Infrastructure.Repositories.RabbitMQ;
 using RPG.Infrastructure.Interfaces;
 using StackExchange.Redis;
 using RPG.GameServer;
+using Grpc.Net.Client;
 
 namespace RPG.IntegrationTests;
 
@@ -32,7 +32,7 @@ public sealed class GameServerFactory : WebApplicationFactory<IntegrationEntryPo
         var redisConnection = NormalizeRedisConnection(_fixture.RedisConnectionString);
         var rabbitSettings = ParseRabbitSettings(_fixture.RabbitConnectionString);
 
-        builder.ConfigureAppConfiguration((context, configBuilder) =>
+        builder.ConfigureAppConfiguration((_, configBuilder) =>
         {
             var overrides = new Dictionary<string, string>
             {
@@ -49,7 +49,7 @@ public sealed class GameServerFactory : WebApplicationFactory<IntegrationEntryPo
             configBuilder.AddInMemoryCollection(overrides!);
         });
 
-        builder.ConfigureServices((context, services) =>
+        builder.ConfigureServices((_, services) =>
         {
             OverrideInfrastructureConnections(services);
         });
@@ -157,5 +157,12 @@ public sealed class GameServerFactory : WebApplicationFactory<IntegrationEntryPo
         }
 
         return (uri.Host, uri.Port.ToString(), username, password, virtualHost);
+    }
+
+    public GrpcChannel CreateGrpcChannel()
+    {
+        var baseAddress = Server.BaseAddress ?? new Uri("http://localhost");
+        var handler = Server.CreateHandler();
+        return GrpcChannel.ForAddress(baseAddress, new GrpcChannelOptions { HttpHandler = handler });
     }
 }

@@ -18,18 +18,24 @@ namespace RPG.Core.Services.NpcServices;
 /// </summary>
 public class NpcCombatService : INpcCombatService
 {
-    private readonly INpcCombatEventDispatcher _eventDispatcher;
+    private readonly IGameEventDispatcher _eventDispatcher;
     private readonly IRabbitMqPublisher _publisher;
     private readonly ILogger<NpcCombatService> _logger;
+    private readonly IEventIdProvider _eventIdProvider;
+    private readonly IEventSequenceStore _sequenceStore;
 
     public NpcCombatService(
-        INpcCombatEventDispatcher eventDispatcher,
+        IGameEventDispatcher eventDispatcher,
         IRabbitMqPublisher publisher,
-        ILogger<NpcCombatService> logger)
+        ILogger<NpcCombatService> logger,
+        IEventIdProvider eventIdProvider,
+        IEventSequenceStore sequenceStore)
     {
         _eventDispatcher = eventDispatcher;
         _publisher = publisher;
         _logger = logger;
+        _eventIdProvider = eventIdProvider;
+        _sequenceStore = sequenceStore;
     }
 
     public async Task HandleSkillUsageAsync(
@@ -52,14 +58,16 @@ public class NpcCombatService : INpcCombatService
         var location = CloneLocation(npc.CurrentLocation);
 
 
-        var combatEvent = new NpcSkillUsedEvent(
-            npc.Id,
+        var correlationId = Guid.NewGuid();
+        var sequence = _sequenceStore.NextSequence(correlationId);
+        var tempEvent = new NpcSkillUsedEvent(new EventMetadata(Guid.Empty, correlationId, null, sequence, occurrence), npc.Id,
             string.IsNullOrWhiteSpace(npc.DisplayName) ? npc.Name : npc.DisplayName,
             skill.Id,
             string.IsNullOrWhiteSpace(skill.Name) ? skill.Id.ToString("N") : skill.Name,
             targetCharacterId,
-            location,
-            occurrence);
+            location);
+        var eventId = _eventIdProvider.Generate(tempEvent, occurrence, sequence, correlationId);
+        var combatEvent = tempEvent with { Meta = tempEvent.Meta with { EventId = eventId } };
 
         await _eventDispatcher.DispatchAsync(combatEvent, cancellationToken).ConfigureAwait(false);
 

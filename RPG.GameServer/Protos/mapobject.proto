@@ -1,0 +1,78 @@
+syntax = "proto3";
+option csharp_namespace = "RPG.GameServer.QueryProtos";
+
+package rpg.query;
+
+service MapObjectQuery {
+  rpc GetMapObject(MapObjectGetByIdRequest) returns (MapObjectSingleReply);
+  rpc ListMapObjects(MapObjectListRequest) returns (MapObjectListReply);
+  rpc GetMapObjectsByIds(MapObjectGetByIdsRequest) returns (MapObjectListReply);
+}
+
+message MapObjectGetByIdRequest { string id = 1; }
+message MapObjectListRequest {}
+message MapObjectGetByIdsRequest { repeated string ids = 1; }
+
+message MapObjectSingleReply { MapObject mo = 1; }
+message MapObjectListReply { repeated MapObject mos = 1; }
+
+message MapObject {
+  string id = 1;
+  string name = 2;
+  string display_name = 3;
+  string description = 4;
+  string type_code = 5;
+  Location location = 6;
+  float rotation_yaw = 7;
+  string world_id = 8;
+  string zone_id = 9;
+  bool is_active = 10;
+  repeated string tags = 11;
+  map<string,string> state = 12;
+  int64 last_updated_unix_ms = 13;
+  repeated Component components = 14;
+  ContainerComponentTyped container = 15; // optional
+  LockableComponentTyped lockable = 16;   // optional
+  DoorComponentTyped door = 17;           // optional
+}
+
+message Location {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  string world_id = 4;
+  string map_id = 5;
+  string zone_name = 6;
+  float rotation = 7;
+}
+
+message Component {
+  string type = 1;
+  string data = 2; // json
+}
+
+message InventorySlot {
+  string item_id = 1; // guid or empty
+  int32 quantity = 2;
+}
+
+message ContainerComponentTyped {
+  repeated InventorySlot items = 1;
+}
+
+message LockableComponentTyped {
+  bool is_locked = 1;
+  string required_key_item_id = 2;
+  int32 lockpick_difficulty = 3;
+  bool can_be_lockpicked = 4;
+}
+
+message DoorComponentTyped {
+  bool is_open = 1;
+  string linked_door_id = 2;
+  string open_animation = 3;
+  string close_animation = 4;
+  float open_angle = 5;
+  bool auto_close = 6;
+  int32 auto_close_delay_seconds = 7;
+}

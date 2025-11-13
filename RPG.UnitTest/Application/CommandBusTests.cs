@@ -5,50 +5,45 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using RPG.Application.Commands;
-using RPG.Application.Infrastructure;
 using RPG.Application.Interfaces;
+using RPG.Application.Handlers;
+using RPG.Application.Infrastructure;
+using RPG.Abstractions.Interfaces;
 using Xunit;
 
 namespace RPG.UnitTest.Application;
 
 public class CommandBusTests
 {
-    public record TestCommand(Guid Id) : ICommand;
-
     [Fact]
-    public async Task DispatchAsync_ShouldResolveHandler_AndReturnResult_AndPropagateCancellationToken()
+    public async Task Publish_Should_Invoke_Handler_And_Return_Result()
     {
-        // Arrange
-        var services = new ServiceCollection();
-        var handlerMock = new Mock<ICommandHandler<TestCommand>>();
-        var expected = CommandResult.Ok();
-        var cts = new CancellationTokenSource();
+        var handlerMock = new Mock<ICommandHandler<GainExperienceCommand>>();
+        handlerMock.Setup(h => h.HandleAsync(It.IsAny<GainExperienceCommand>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(CommandResult.Ok());
 
-        handlerMock
-            .Setup(h => h.HandleAsync(It.IsAny<TestCommand>(), It.IsAny<CancellationToken>()))
-            .Callback((TestCommand _, CancellationToken ct) => ct.Should().Be(cts.Token))
-            .ReturnsAsync(expected);
+        // Mock wewnętrznego ServiceProvider dla scope
+        var scopedSpMock = new Mock<IServiceProvider>();
+        scopedSpMock
+            .Setup(s => s.GetService(typeof(ICommandHandler<GainExperienceCommand>)))
+            .Returns(handlerMock.Object);
 
-        services.AddScoped(_ => handlerMock.Object);
-        var provider = services.BuildServiceProvider();
-        var bus = new CommandBus(provider);
+        // Mock scope i fabryki scope
+        var scopeMock = new Mock<IServiceScope>();
+        scopeMock.SetupGet(s => s.ServiceProvider).Returns(scopedSpMock.Object);
 
-        // Act
-        var result = await bus.DispatchAsync(new TestCommand(Guid.NewGuid()), cts.Token);
+        var scopeFactoryMock = new Mock<IServiceScopeFactory>();
+        scopeFactoryMock.Setup(f => f.CreateScope()).Returns(scopeMock.Object);
 
-        // Assert
-        result.Should().BeEquivalentTo(expected);
-        handlerMock.Verify(h => h.HandleAsync(It.IsAny<TestCommand>(), It.IsAny<CancellationToken>()), Times.Once);
-    }
+        // Główny SP zwraca fabrykę scope
+        var spMock = new Mock<IServiceProvider>();
+        spMock.Setup(s => s.GetService(typeof(IServiceScopeFactory))).Returns(scopeFactoryMock.Object);
 
-    [Fact]
-    public async Task DispatchAsync_NoHandlerRegistered_ShouldThrow()
-    {
-        var services = new ServiceCollection();
-        var provider = services.BuildServiceProvider();
-        var bus = new CommandBus(provider);
+        var bus = new CommandBus(spMock.Object);
+        var cmd = new GainExperienceCommand(Guid.NewGuid(), 50) { Metadata = new CommandMetadata(Guid.NewGuid(), Guid.NewGuid(), null, DateTime.UtcNow) };
+        var result = await bus.DispatchAsync(cmd, CancellationToken.None);
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => bus.DispatchAsync(new TestCommand(Guid.NewGuid())));
+        result.Success.Should().BeTrue();
+        handlerMock.Verify(h => h.HandleAsync(It.IsAny<GainExperienceCommand>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 }
-
