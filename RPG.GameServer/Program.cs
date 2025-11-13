@@ -1,10 +1,10 @@
 using System.IO;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using RPG.Abstractions;
 using RPG.Abstractions.Interfaces;
 using RPG.Application;
 using RPG.Application.Broadcasters;
 using RPG.Core;
-using RPG.GameServer.Controlers;
 using RPG.GameServer.Controllers;
 using RPG.Core.Interfaces.NpcServices;
 using RPG.Core.Services.NpcServices;
@@ -66,6 +66,19 @@ var app = builder.Build();
 
 // Prometheus metrics endpoint
 app.MapPrometheusScrapingEndpoint();
+
+// Health checks for Kubernetes/Docker
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    // Liveness: nie uruchamiamy żadnych zarejestrowanych checków – sprawdza tylko czy proces i pipeline żyją
+    Predicate = _ => false
+});
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    // Readiness: uruchamia wszystkie zarejestrowane checki (Mongo, Redis, RabbitMQ, itp.)
+    Predicate = _ => true
+});
 
 // Mapowanie gRPC
 app.MapGrpcService<CharacterServiceImpl>();

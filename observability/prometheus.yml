@@ -6,17 +6,17 @@ scrape_configs:
   # Prometheus itself
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ['prometheus:9090']
 
-  # .NET Applications (gdy dodasz /metrics endpoint)
+  # .NET Applications (MapPrometheusScrapingEndpoint exposes /metrics on app port)
   - job_name: 'gameserver'
     static_configs:
-      - targets: ['gameserver:5000']  # Dodaj gdy będzie GameServer w compose
+      - targets: ['rpg_gameserver:8080']
     metrics_path: '/metrics'
 
   - job_name: 'persistence_service'
     static_configs:
-      - targets: ['persistence.service:80']
+      - targets: ['persistence_service:80']
     metrics_path: '/metrics'
 
   - job_name: 'circuitbreaker'
@@ -36,4 +36,4 @@ scrape_configs:
   - job_name: 'rabbitmq'
     metrics_path: '/metrics'
     static_configs:
-      - targets: ['rabbitmq:15692']  # RabbitMQ Prometheus plugin port
+      - targets: ['rabbitmq:15692']

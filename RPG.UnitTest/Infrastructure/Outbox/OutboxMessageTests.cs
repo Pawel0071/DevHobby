@@ -14,7 +14,6 @@ public class OutboxMessageTests
 
         message.Id.Should().NotBe(Guid.Empty);
         message.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
-        message.Sent.Should().BeFalse();
         message.RetryCount.Should().Be(0);
         message.LastRetryAt.Should().BeNull();
     }

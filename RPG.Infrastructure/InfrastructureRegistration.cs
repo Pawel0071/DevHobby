@@ -31,6 +31,7 @@ using RPG.Domain.Models.Skills;
 using RPG.Infrastructure.Models;
 using Serilog;
 using StackExchange.Redis;
+using RPG.Infrastructure.Outbox;
 
 namespace RPG.Infrastructure;
 
@@ -175,13 +176,25 @@ public static class InfrastructureRegistration
         services.AddSingleton<IModelMapper<WorldState, WorldStateDocument>, WorldStateModelMapper>();
 
         // Health Checks
-        services.AddHealthChecks()
+        var healthChecks = services.AddHealthChecks()
             .AddCheck<MongoHealthCheck>("mongo")
             .AddCheck<RedisHealthCheck>("redis")
             .AddCheck<RabbitMqHealthCheck>("rabbitmq");
 
         // Dictionary warmup hosted service - ensures dictionaries are loaded once per host startup
         services.AddHostedService<DictionaryWarmupService>();
+        var outboxEnabled = config.GetValue<bool?>("Outbox:Enabled") ?? true;
+        var outboxRole = config["Outbox:Role"]?.ToLowerInvariant() ?? "producer"; // producer | processor
+        if (outboxEnabled)
+        {
+            services.AddSingleton<IOutboxQueueWriter, RedisOutboxQueueWriter>();
+            if (outboxRole == "processor")
+            {
+                services.AddSingleton<IOutboxCircuitBreakerState, OutboxCircuitBreakerState>();
+                services.AddHostedService<OutboxDispatcher>();
+                healthChecks.AddCheck<OutboxBreakerHealthCheck>("outboxBreaker");
+            }
+        }
 
         return services;
     }

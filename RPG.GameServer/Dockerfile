@@ -38,4 +38,8 @@ RUN dotnet publish "RPG.GameServer.csproj" -c $BUILD_CONFIGURATION -o /app/publi
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+# Install curl for container-level healthchecks
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 ENTRYPOINT ["dotnet", "RPG.GameServer.dll"]

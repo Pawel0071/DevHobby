@@ -1,10 +1,7 @@
 using RPG.Domain.Common;
 using RPG.Infrastructure.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using RPG.Infrastructure.Models;
+using RPG.Infrastructure.Repositories.RabbitMQ; // dla rozpoznania NullRabbitMqPublisher
 
 namespace RPG.Infrastructure.Repositories.Orchestrators
 {
@@ -15,6 +12,7 @@ namespace RPG.Infrastructure.Repositories.Orchestrators
         private readonly IMongoRepository _mongoRepository;
         private readonly IRedisRepository _redisRepository;
         private readonly IRabbitMqPublisher _rabbitMqPublisher;
+        private readonly IOutboxQueueWriter? _outboxQueueWriter; // opcjonalny
         private readonly IModelMapper<TDomainModel, TPersistenceModel> _mapper;
         private readonly ILogger<ModelRepositoryHandler<TDomainModel, TPersistenceModel>> _logger;
 
@@ -32,6 +30,21 @@ namespace RPG.Infrastructure.Repositories.Orchestrators
             _logger = logger;
         }
 
+        // Konstruktor DI z outbox fallback (nie usuwa starego, by nie psuć istniejących testów które mogą go używać)
+        public ModelRepositoryHandler(
+            IMongoRepository mongoRepository,
+            IRedisRepository redisRepository,
+            IRabbitMqPublisher rabbitMqPublisher,
+            IOutboxQueueWriter outboxQueueWriter,
+            IModelMapper<TDomainModel, TPersistenceModel> mapper,
+            ILogger<ModelRepositoryHandler<TDomainModel, TPersistenceModel>> logger)
+            : this(mongoRepository, redisRepository, rabbitMqPublisher, mapper, logger)
+        {
+            _outboxQueueWriter = outboxQueueWriter;
+        }
+
+        private bool RabbitUnavailable => _rabbitMqPublisher is NullRabbitMqPublisher;
+
         public async Task UpsertAsync(TDomainModel domainModel, CancellationToken cancellationToken = default)
         {
             try
@@ -41,8 +54,10 @@ namespace RPG.Infrastructure.Repositories.Orchestrators
                 _logger.Debug($"Upserted document {persistenceModel.Id} to Redis for domainModel {typeof(TDomainModel).Name}.");
 
                 var routingKey = $"{typeof(TDomainModel).Name.ToLower()}.upserted";
-                await _rabbitMqPublisher.PublishAsync(routingKey, persistenceModel);
-                _logger.Info($"Published 'upserted' event for domainModel {typeof(TDomainModel).Name} with Id {domainModel.Id}.");
+                if (await TryPublishOrEnqueueAsync(routingKey, persistenceModel, cancellationToken))
+                {
+                    // publish/enqueue handled
+                }
             }
             catch (Exception ex)
             {
@@ -143,15 +158,52 @@ namespace RPG.Infrastructure.Repositories.Orchestrators
                 _logger.Debug($"Deleted document {id} from Redis for entity {typeof(TDomainModel).Name}.");
 
                 var routingKey = $"{typeof(TDomainModel).Name.ToLower()}.deleted";
-                await _rabbitMqPublisher.PublishAsync(routingKey, document);
-                _logger.Info($"Published 'deleted' event for entity {typeof(TDomainModel).Name} with Id {id}.");
-
+                await TryPublishOrEnqueueAsync(routingKey, document, cancellationToken);
                 return true;
             }
             catch (Exception ex)
             {
                 _logger.Error($"An error occurred during DeleteAsync for entity {typeof(TDomainModel).Name} with Id {id}.", ex);
                 throw;
+            }
+        }
+
+        private async Task<bool> TryPublishOrEnqueueAsync(string routingKey, object payload, CancellationToken ct)
+        {
+            // Jeśli RabbitMQ nie skonfigurowany -> tylko Outbox
+            if (RabbitUnavailable)
+            {
+                if (_outboxQueueWriter != null)
+                {
+                    await _outboxQueueWriter.EnqueueAsync(routingKey, payload, ct);
+                    _logger.Info($"Enqueued '{routingKey}' to Outbox (RabbitMQ unavailable).");
+                    return true;
+                }
+                _logger.Warn($"RabbitMQ unavailable AND OutboxQueueWriter missing. Event '{routingKey}' dropped.");
+                return true; // nie próbujemy dalej
+            }
+
+            try
+            {
+                // Próba publish
+                var publishMethod = typeof(IRabbitMqPublisher)
+                    .GetMethod("PublishAsync")!
+                    .MakeGenericMethod(payload.GetType());
+                await (Task)publishMethod.Invoke(_rabbitMqPublisher, new[] { routingKey, payload })!;
+                _logger.Info($"Published '{routingKey}' event.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn($"Publish failed for '{routingKey}', fallback to Outbox.");
+                if (_outboxQueueWriter != null)
+                {
+                    await _outboxQueueWriter.EnqueueAsync(routingKey, payload, ct);
+                    _logger.Info($"Enqueued '{routingKey}' to Outbox after failure.");
+                    return true;
+                }
+                _logger.Error($"Failed publishing '{routingKey}' and no Outbox fallback configured.", ex);
+                return false; // sygnalizuje brak obsługi
             }
         }
     }

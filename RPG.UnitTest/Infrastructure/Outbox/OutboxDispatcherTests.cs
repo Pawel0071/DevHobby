@@ -1,24 +1,44 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
-using MongoDB.Bson;
-using MongoDB.Driver;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Outbox;
+using StackExchange.Redis;
 using Xunit;
 
 namespace RPG.UnitTest.Infrastructure.Outbox;
 
 public class OutboxDispatcherTests
 {
-    private readonly Mock<IMongoCollection<OutboxMessage>> _collection = new();
+    private readonly Mock<IConnectionMultiplexer> _multiplexer = new();
+    private readonly Mock<IDatabase> _database = new();
     private readonly Mock<IRabbitMqPublisher> _publisher = new();
     private readonly Mock<ILogger<OutboxDispatcher>> _logger = new();
+
+    public OutboxDispatcherTests()
+    {
+        _multiplexer.Setup(m => m.GetDatabase(It.IsAny<int>(), It.IsAny<object>()))
+            .Returns(_database.Object);
+    }
+
+    private sealed class TestBreakerState : IOutboxCircuitBreakerState
+    {
+        public string State { get; private set; } = "Closed";
+        public DateTime ChangedAtUtc { get; private set; } = DateTime.UtcNow;
+        public int RecentErrorCount { get; private set; }
+        public void SetState(string state, DateTime changedAtUtc)
+        {
+            State = state;
+            ChangedAtUtc = changedAtUtc;
+        }
+        public void SetRecentErrorCount(int count) => RecentErrorCount = count;
+    }
+
+    private OutboxDispatcher CreateDispatcher() => new(_multiplexer.Object, _publisher.Object, _logger.Object, new TestBreakerState());
 
     [Fact]
     public async Task ExecuteAsync_WhenCancelledInitially_ShouldLogStop()
@@ -26,7 +46,7 @@ public class OutboxDispatcherTests
         using var cts = new CancellationTokenSource();
         cts.Cancel();
 
-        var dispatcher = new OutboxDispatcher(_collection.Object, _publisher.Object, _logger.Object);
+        var dispatcher = CreateDispatcher();
         var execute = typeof(OutboxDispatcher).GetMethod("ExecuteAsync", BindingFlags.Instance | BindingFlags.NonPublic);
         execute.Should().NotBeNull();
 
@@ -38,64 +58,42 @@ public class OutboxDispatcherTests
     }
 
     [Fact]
-    public async Task ProcessMessage_WhenPublishSucceeds_ShouldMarkAsSent()
+    public async Task Publish_SingleMessage_Success_ShouldNotRetry()
     {
-        var message = new OutboxMessage { Topic = "quests.updated", Payload = "{}" };
+        var dispatcher = CreateDispatcher();
+        var msg = new OutboxMessage { Topic = "quests.updated", Payload = "{}" };
+        _publisher.Setup(p => p.PublishAsync(msg.Topic, msg.Payload)).Returns(Task.CompletedTask);
 
-        _publisher.Setup(p => p.PublishAsync(message.Topic, message.Payload))
-            .Returns(Task.CompletedTask);
-
-        _collection.Setup(c => c.UpdateOneAsync(
-                It.IsAny<FilterDefinition<OutboxMessage>>(),
-                It.IsAny<UpdateDefinition<OutboxMessage>>(),
-                null,
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<UpdateResult>());
-
-        var dispatcher = new OutboxDispatcher(_collection.Object, _publisher.Object, _logger.Object);
-        var process = typeof(OutboxDispatcher).GetMethod("ProcessMessage", BindingFlags.Instance | BindingFlags.NonPublic);
-        process.Should().NotBeNull();
-
-        var task = (Task)process!.Invoke(dispatcher, new object[] { message, CancellationToken.None })!;
-        await task;
-
-        _publisher.Verify(p => p.PublishAsync(message.Topic, message.Payload), Times.Once);
-        _collection.Verify(c => c.UpdateOneAsync(
-            It.IsAny<FilterDefinition<OutboxMessage>>(),
-            It.IsAny<UpdateDefinition<OutboxMessage>>(),
-            null,
-            It.IsAny<CancellationToken>()), Times.Once);
-        _logger.Verify(l => l.Info(It.Is<string>(msg => msg.Contains("dispatched successfully"))), Times.Once);
+        // invoke private TryPublishAsync
+        var method = typeof(OutboxDispatcher).GetMethod("TryPublishAsync", BindingFlags.Instance | BindingFlags.NonPublic);
+        method.Should().NotBeNull();
+        var resultTask = (Task<bool>)method!.Invoke(dispatcher, new object[] { msg, CancellationToken.None })!;
+        var success = await resultTask;
+        success.Should().BeTrue();
+        _publisher.Verify(p => p.PublishAsync(msg.Topic, msg.Payload), Times.Once);
+        _database.Verify(db => db.ListLeftPushAsync("outbox:retry", It.IsAny<RedisValue>(), It.IsAny<When>(), It.IsAny<CommandFlags>()), Times.Never);
     }
 
     [Fact]
-    public async Task ProcessMessage_WhenPublishFails_ShouldIncrementRetryCount()
+    public async Task Publish_Failure_ShouldEnqueueRetry()
     {
-        var message = new OutboxMessage { Topic = "quests.failed", Payload = "{}" };
-        var exception = new InvalidOperationException("broken channel");
+        var dispatcher = CreateDispatcher();
+        var msg = new OutboxMessage { Topic = "quests.failed", Payload = "{}" };
+        _publisher.Setup(p => p.PublishAsync(msg.Topic, msg.Payload)).ThrowsAsync(new InvalidOperationException("broker down"));
 
-        _publisher.Setup(p => p.PublishAsync(message.Topic, message.Payload))
-            .ThrowsAsync(exception);
+        var tryPublish = typeof(OutboxDispatcher).GetMethod("TryPublishAsync", BindingFlags.Instance | BindingFlags.NonPublic);
+        var handleFailure = typeof(OutboxDispatcher).GetMethod("HandlePublishFailureAsync", BindingFlags.Instance | BindingFlags.NonPublic);
+        tryPublish.Should().NotBeNull();
+        handleFailure.Should().NotBeNull();
 
-        _collection.Setup(c => c.UpdateOneAsync(
-                It.IsAny<FilterDefinition<OutboxMessage>>(),
-                It.IsAny<UpdateDefinition<OutboxMessage>>(),
-                null,
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Mock.Of<UpdateResult>());
+        var success = await (Task<bool>)tryPublish!.Invoke(dispatcher, new object[] { msg, CancellationToken.None })!;
+        success.Should().BeFalse();
 
-        var dispatcher = new OutboxDispatcher(_collection.Object, _publisher.Object, _logger.Object);
-        var process = typeof(OutboxDispatcher).GetMethod("ProcessMessage", BindingFlags.Instance | BindingFlags.NonPublic);
-        process.Should().NotBeNull();
+        _database.Setup(db => db.ListLeftPushAsync("outbox:retry", It.IsAny<RedisValue>(), It.IsAny<When>(), It.IsAny<CommandFlags>()))
+            .ReturnsAsync(1);
 
-        var task = (Task)process!.Invoke(dispatcher, new object[] { message, CancellationToken.None })!;
-        await task;
+        await (Task)handleFailure!.Invoke(dispatcher, new object[] { msg, CancellationToken.None })!;
 
-        _collection.Verify(c => c.UpdateOneAsync(
-            It.IsAny<FilterDefinition<OutboxMessage>>(),
-            It.IsAny<UpdateDefinition<OutboxMessage>>(),
-            null,
-            It.IsAny<CancellationToken>()), Times.Once);
-        _logger.Verify(l => l.Error(It.Is<string>(msg => msg.Contains("Failed to dispatch")), exception), Times.Once);
+        _database.Verify(db => db.ListLeftPushAsync("outbox:retry", It.IsAny<RedisValue>(), It.IsAny<When>(), It.IsAny<CommandFlags>()), Times.Once);
     }
 }

@@ -182,7 +182,7 @@ services:
     container_name: circuitbreaker
     build:
       context: .
-      dockerfile: CricuitBraker/Dockerfile
+      dockerfile: RPG.CircuitBreaker/Dockerfile
     environment:
       ConnectionStrings__Mongo: "mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb?authSource=admin"
       ConnectionStrings__Redis: "redis:6379"
@@ -193,7 +193,10 @@ services:
       RabbitMQ__VirtualHost: rpg_vhost
       RabbitMQ__ExchangeName: rpg_exchange
       RabbitMQ__ExchangeType: topic
+      Outbox__Enabled: "true"
+      Outbox__Role: "Processor"
       ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://0.0.0.0:80"
     depends_on:
       redis:
         condition: service_healthy
@@ -204,6 +207,12 @@ services:
     networks:
       - backend
     restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   rpg.gameserver:
     image: rpg.gameserver
@@ -215,6 +224,10 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
+      ConnectionStrings__Mongo: "mongodb://mongo_user:mongo_pass@mongodb:27017/rpgdb?authSource=admin"
+      ConnectionStrings__Redis: "redis:6379"
+      Outbox__Enabled: "true"
+      Outbox__Role: "Producer"
     ports:
       - "5124:8080"
       - "5125:8081"
@@ -225,6 +238,12 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     networks:
       - backend
     restart: on-failure
@@ -245,7 +264,10 @@ services:
       RabbitMQ__VirtualHost: rpg_vhost
       RabbitMQ__ExchangeName: rpg_exchange
       RabbitMQ__ExchangeType: topic
+      Outbox__Enabled: "true"
+      Outbox__Role: "Producer"
       ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: "http://0.0.0.0:80"
     depends_on:
       redis:
         condition: service_healthy
@@ -256,6 +278,12 @@ services:
     networks:
       - backend
     restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
 volumes:
   mongodb_data:
