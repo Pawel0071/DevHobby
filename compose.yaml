@@ -285,6 +285,34 @@ services:
       retries: 5
       start_period: 20s
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.47.2
+    container_name: cadvisor
+    ports:
+      - "8088:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - backend
+    restart: unless-stopped
+    privileged: true
+
+  node_exporter:
+    image: prom/node-exporter:latest
+    container_name: node_exporter
+    command:
+      - '--path.rootfs=/host'
+    ports:
+      - '9100:9100'
+    volumes:
+      - '/:/host:ro'
+    networks:
+      - backend
+    restart: unless-stopped
+
 volumes:
   mongodb_data:
     driver: local

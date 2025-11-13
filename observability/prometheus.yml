@@ -37,3 +37,12 @@ scrape_configs:
     metrics_path: '/metrics'
     static_configs:
       - targets: ['rabbitmq:15692']
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  # Optional Node Exporter (jeśli dodasz kontener)
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node_exporter:9100']

@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using RPG.Application.Diagnostics;
 using RPG.Application.Interfaces;
 
 namespace RPG.Application.Dispatchers;
@@ -22,6 +24,10 @@ public class GameEventDispatcher : IGameEventDispatcher
             _logger.LogWarning("Skipping null game event of type {EventType}", typeof(TEvent).Name);
             return;
         }
+
+        using var activity = ApplicationDiagnostics.ActivitySource.StartActivity("GameEventDispatcher.Dispatch");
+        activity?.SetTag("rpg.event.type", typeof(TEvent).Name);
+        ApplicationDiagnostics.CountEvent(typeof(TEvent).Name);
 
         using var scope = _serviceProvider.CreateScope();
         var handlers = scope.ServiceProvider.GetServices<IGameEventHandler<TEvent>>();

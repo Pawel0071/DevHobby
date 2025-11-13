@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using RPG.Abstractions.Interfaces;
+using RPG.Application.Diagnostics;
 using RPG.Application.Events;
 using RPG.Application.Interfaces;
 using RPG.Domain.Models;
@@ -21,6 +23,10 @@ public class CharacterMovementEventHandler :
 
     public Task HandleAsync(CharacterMovedEvent gameEvent, CancellationToken cancellationToken = default)
     {
+        using var activity = ApplicationDiagnostics.ActivitySource.StartActivity("CharacterMovementEventHandler.CharacterMoved");
+        activity?.SetTag("rpg.event.type", nameof(CharacterMovedEvent));
+        activity?.SetTag("rpg.character.id", gameEvent.CharacterId);
+
         var update = new CharacterStateUpdate(
             gameEvent.CharacterId,
             gameEvent.Location,
@@ -34,6 +40,10 @@ public class CharacterMovementEventHandler :
 
     public Task HandleAsync(CharacterMovementStoppedEvent gameEvent, CancellationToken cancellationToken = default)
     {
+        using var activity = ApplicationDiagnostics.ActivitySource.StartActivity("CharacterMovementEventHandler.CharacterMovementStopped");
+        activity?.SetTag("rpg.event.type", nameof(CharacterMovementStoppedEvent));
+        activity?.SetTag("rpg.character.id", gameEvent.CharacterId);
+
         var update = new CharacterStateUpdate(
             gameEvent.CharacterId,
             gameEvent.Location,
@@ -47,6 +57,10 @@ public class CharacterMovementEventHandler :
 
     public Task HandleAsync(CharacterRotationStartedEvent gameEvent, CancellationToken cancellationToken = default)
     {
+        using var activity = ApplicationDiagnostics.ActivitySource.StartActivity("CharacterMovementEventHandler.CharacterRotationStarted");
+        activity?.SetTag("rpg.event.type", nameof(CharacterRotationStartedEvent));
+        activity?.SetTag("rpg.character.id", gameEvent.CharacterId);
+
         var update = new CharacterStateUpdate(
             gameEvent.CharacterId,
             gameEvent.Location,
@@ -60,6 +74,10 @@ public class CharacterMovementEventHandler :
 
     public Task HandleAsync(CharacterRotationStoppedEvent gameEvent, CancellationToken cancellationToken = default)
     {
+        using var activity = ApplicationDiagnostics.ActivitySource.StartActivity("CharacterMovementEventHandler.CharacterRotationStopped");
+        activity?.SetTag("rpg.event.type", nameof(CharacterRotationStoppedEvent));
+        activity?.SetTag("rpg.character.id", gameEvent.CharacterId);
+
         var update = new CharacterStateUpdate(
             gameEvent.CharacterId,
             gameEvent.Location,

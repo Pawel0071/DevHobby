@@ -32,6 +32,7 @@ using RPG.Infrastructure.Models;
 using Serilog;
 using StackExchange.Redis;
 using RPG.Infrastructure.Outbox;
+using Serilog.Sinks.Grafana.Loki;
 
 namespace RPG.Infrastructure;
 
@@ -51,22 +52,30 @@ public static class InfrastructureRegistration
             ?? config.GetValue<string>("ApplicationName")
             ?? AppDomain.CurrentDomain.FriendlyName;
 
-        // Logger - Konfiguracja Seriloga
+        // OpenTelemetry - konfiguracja identyfikatorów usługi do wzbogacenia logów
+        var otlpEndpoint = config.GetValue<string>("OpenTelemetry:OtlpEndpoint");
+        var serviceName = config.GetValue<string>("OpenTelemetry:ServiceName")
+              ?? clientProvidedName
+              ?? "RPG.GameServer";
+        var serviceVersion = config.GetValue<string>("OpenTelemetry:ServiceVersion") ?? "1.0.0";
+
+        // Logger - Konfiguracja Seriloga (z wzbogaceniem o trace/span id)
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(config)
             .Enrich.FromLogContext()
+            .Enrich.WithProperty("ServiceName", serviceName)
+            .Enrich.With(new ActivityEnricher())
+            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [traceId={TraceId} spanId={SpanId}] {Message:lj}{NewLine}{Exception}")
+            .WriteTo.GrafanaLoki(
+                config.GetValue<string>("Loki:Url") ?? "http://loki:3100",
+                labels: [new LokiLabel { Key = "service", Value = serviceName }]
+            )
             .CreateLogger();
 
         services.AddSingleton(typeof(ILogger<>), typeof(SerilogWrapper<>));
         services.AddSingleton<IActivityScope, OpenTelemetryActivityScope>();
 
         // OpenTelemetry - Telemetria wspólna dla usług infrastruktury
-        var otlpEndpoint = config.GetValue<string>("OpenTelemetry:OtlpEndpoint");
-    var serviceName = config.GetValue<string>("OpenTelemetry:ServiceName")
-              ?? clientProvidedName
-              ?? "RPG.GameServer";
-        var serviceVersion = config.GetValue<string>("OpenTelemetry:ServiceVersion") ?? "1.0.0";
-
         services.AddOpenTelemetry()
             .ConfigureResource(resource => resource.AddService(serviceName, serviceVersion: serviceVersion))
             .WithTracing(tracing =>
@@ -93,6 +102,7 @@ public static class InfrastructureRegistration
             .WithMetrics(metrics => metrics
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
+                .AddMeter("RPG.Application", "RPG.Outbox")
                 .AddPrometheusExporter());
 
         // Redis

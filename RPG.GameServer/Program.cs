@@ -1,6 +1,5 @@
-using System.IO;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using RPG.Abstractions;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using RPG.Abstractions.Interfaces;
 using RPG.Application;
 using RPG.Application.Broadcasters;
@@ -41,6 +40,15 @@ foreach (var candidate in infrastructureCandidates)
 
 // gRPC
 builder.Services.AddGrpc();
+builder.Services.AddHealthChecks();
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(8080, o =>
+    {
+        o.Protocols = HttpProtocols.Http1AndHttp2; // pozwala curl (HTTP/1.1) oraz gRPC (HTTP/2)
+    });
+});
 
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.ApplicationName);
 builder.Services.AddCore(builder.Configuration);
@@ -55,6 +63,7 @@ builder.Services.AddScoped<IGameEventHandler<CharacterRotationStoppedEvent>>(sp 
 builder.Services.AddSingleton<INpcAiService, NpcAiService>();
 builder.Services.AddHostedService<NpcAiHostedService>();
 builder.Services.AddSingleton<INpcCombatService, NpcCombatService>();
+builder.Services.AddControllers();
 
 // Serwisy gRPC
 builder.Services.AddScoped<CharacterServiceImpl>();
@@ -88,6 +97,8 @@ app.MapGrpcService<WorldServiceImpl>();
 
 app.MapGet("/", () =>
     "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+app.MapControllers();
+app.MapGet("/ping", () => Results.Ok("pong"));
 
 app.Run();
 

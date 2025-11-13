@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RPG.Abstractions.Interfaces;
 using RPG.Application.Commands;
+using RPG.Application.Diagnostics;
 using RPG.Application.Dispatchers;
 using RPG.Application.Events;
 using RPG.Application.Handlers;
@@ -13,6 +14,10 @@ public static class ApplicationRegistration
 {
     public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration config)
     {
+        // Init diagnostics service label
+        var serviceName = config.GetValue<string>("OpenTelemetry:ServiceName") ?? "RPG";
+        ApplicationDiagnostics.Init(serviceName);
+
         services.AddScoped<ICommandHandler<EquipItemCommand>, CharacterCommandHandler>();
         services.AddScoped<ICommandHandler<UnequipItemCommand>, CharacterCommandHandler>();
         services.AddScoped<ICommandHandler<PutItemToBankCommand>, CharacterCommandHandler>();
@@ -29,6 +34,7 @@ public static class ApplicationRegistration
         services.AddScoped<ICommandHandler<CreateCharacterCommand>, CharacterCommandHandler>();
         services.AddSingleton<IGameEventDispatcher, GameEventDispatcher>();
         services.AddSingleton<INpcCombatEventDispatcher, NpcCombatEventDispatcher>();
+        services.AddScoped<ICommandBus, RPG.Application.Infrastructure.CommandBus>();
 
         return services;
     }

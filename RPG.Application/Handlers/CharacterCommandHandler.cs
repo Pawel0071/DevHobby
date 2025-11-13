@@ -56,9 +56,9 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         _tagRegistry = tagRegistry;
     }
 
-    private async Task<Character> GetCharacterOrThrow(Guid characterId)
+    private async Task<Character> GetCharacterOrThrow(Guid characterId, CancellationToken ct = default)
     {
-        var character = await _characterRepo.GetByIdAsync<Character>(characterId);
+        var character = await _characterRepo.GetByIdAsync<Character>(characterId, ct);
         if (character is null)
         {
             throw new KeyNotFoundException($"Character {characterId} not found");
@@ -66,21 +66,21 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         return character;
     }
 
-    private async Task<CommandResult> PersistIfOk(CommandResult result, Character character)
+    private async Task<CommandResult> PersistIfOk(CommandResult result, Character character, CancellationToken ct = default)
     {
         if (result.Success)
         {
-            await _characterRepo.UpsertAsync(character);
+            await _characterRepo.UpsertAsync(character, ct);
         }
         return result;
     }
 
-    public async Task<CommandResult> HandleAsync(StartMovementCommand command)
+    public async Task<CommandResult> HandleAsync(StartMovementCommand command, CancellationToken cancellationToken = default)
     {
         using var activity = StartCommandActivity("CharacterCommandHandler.StartMovement", command.CharacterId);
         activity?.SetTag("rpg.movement.direction", command.Direction);
 
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
 
         if (!TryGetDirectionVector(command.Direction, out var direction))
         {
@@ -98,16 +98,16 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
             return CommandResult.Fail(CommandError.InvalidOperation, moveResult.Message, moveResult);
         }
 
-        await _eventDispatcher.DispatchAsync(new CharacterMovedEvent(command.CharacterId, character.CurrentLocation));
+        await _eventDispatcher.DispatchAsync(new CharacterMovedEvent(command.CharacterId, character.CurrentLocation), cancellationToken);
 
-        return await PersistIfOk(CommandResult.Ok(), character);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(StopMovementCommand command)
+    public async Task<CommandResult> HandleAsync(StopMovementCommand command, CancellationToken cancellationToken = default)
     {
         using var activity = StartCommandActivity("CharacterCommandHandler.StopMovement", command.CharacterId);
 
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
 
         var stopResult = _movementService.Stop(character);
         if (!stopResult.Success)
@@ -116,17 +116,17 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         }
 
         var location = stopResult.Result ?? character.CurrentLocation;
-        await _eventDispatcher.DispatchAsync(new CharacterMovementStoppedEvent(command.CharacterId, location));
+        await _eventDispatcher.DispatchAsync(new CharacterMovementStoppedEvent(command.CharacterId, location), cancellationToken);
 
-        return await PersistIfOk(CommandResult.Ok(), character);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(StartRotationCommand command)
+    public async Task<CommandResult> HandleAsync(StartRotationCommand command, CancellationToken cancellationToken = default)
     {
         using var activity = StartCommandActivity("CharacterCommandHandler.StartRotation", command.CharacterId);
         activity?.SetTag("rpg.movement.direction", command.Direction);
 
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
 
         if (!TryGetDirectionVector(command.Direction, out var direction))
         {
@@ -141,16 +141,16 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
         var rotation = rotationResult.Result;
 
-        await _eventDispatcher.DispatchAsync(new CharacterRotationStartedEvent(command.CharacterId, rotation, character.CurrentLocation));
+        await _eventDispatcher.DispatchAsync(new CharacterRotationStartedEvent(command.CharacterId, rotation, character.CurrentLocation), cancellationToken);
 
-        return await PersistIfOk(CommandResult.Ok(), character);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(StopRotationCommand command)
+    public async Task<CommandResult> HandleAsync(StopRotationCommand command, CancellationToken cancellationToken = default)
     {
         using var activity = StartCommandActivity("CharacterCommandHandler.StopRotation", command.CharacterId);
 
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
 
         var stopRotationResult = _movementService.StopRotation(character);
         if (!stopRotationResult.Success)
@@ -159,28 +159,28 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         }
 
         var rotation = stopRotationResult.Result;
-        await _eventDispatcher.DispatchAsync(new CharacterRotationStoppedEvent(command.CharacterId, rotation, character.CurrentLocation));
+        await _eventDispatcher.DispatchAsync(new CharacterRotationStoppedEvent(command.CharacterId, rotation, character.CurrentLocation), cancellationToken);
 
-        return await PersistIfOk(CommandResult.Ok(), character);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(DropItemCommand command)
+    public async Task<CommandResult> HandleAsync(DropItemCommand command, CancellationToken cancellationToken = default)
     {
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
         if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), command.Item).Result)
             return CommandResult.Fail(CommandError.ItemNotFound, "");
 
         var result = _inventoryService.RemoveItem(character.GetBackpackInventoryContainer(), command.Item);
 
         if (result.Success)
-            await _eventDispatcher.DispatchAsync(new ItemDroppedEvent(command.CharacterId, command.Item));
+            await _eventDispatcher.DispatchAsync(new ItemDroppedEvent(command.CharacterId, command.Item), cancellationToken);
 
-        return await PersistIfOk(CommandResult.Ok(), character);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(EquipItemCommand command)
+    public async Task<CommandResult> HandleAsync(EquipItemCommand command, CancellationToken cancellationToken = default)
     {
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
 
         if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), command.Item).Result)
             return CommandResult.Fail(CommandError.ItemNotFound, "Przedmiot nie znajduje się w ekwipunku.");
@@ -197,7 +197,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         if (!equipResult.Success)
             return CommandResult.Fail(CommandError.InvalidOperation, equipResult.Message, equipResult);
 
-        await _eventDispatcher.DispatchAsync(new ItemEquippedEvent(command.CharacterId, command.Slot, command.Item));
+        await _eventDispatcher.DispatchAsync(new ItemEquippedEvent(command.CharacterId, command.Slot, command.Item), cancellationToken);
         var statsContainer = command.Item.GetComponent<StatsComponent>()?.Stats;
         if (statsContainer == null)
             return CommandResult.Fail(CommandError.ItemNotHaveStatsDef, equipResult.Message, equipResult);
@@ -205,90 +205,90 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
         _statsService.ModifyStats(character, statsContainer);
 
-        return await PersistIfOk(CommandResult.Ok(), character);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(GainExperienceCommand command)
+    public async Task<CommandResult> HandleAsync(GainExperienceCommand command, CancellationToken cancellationToken = default)
     {
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
         character.ExperienceToNextLevel -= command.Amount;
         if (character.ExperienceToNextLevel <= 0)
         {
-            var levelUpResult = await HandleAsync(new LevelUpCommand(command.CharacterId));
+            var levelUpResult = await HandleAsync(new LevelUpCommand(command.CharacterId), cancellationToken);
             var newAmount = -character.ExperienceToNextLevel;
             character.Experience = newAmount;
             return await PersistIfOk(!levelUpResult.Success
                 ? CommandResult.Ok()
-                : CommandResult.Fail(CommandError.InvalidOperation, ""), character);
+                : CommandResult.Fail(CommandError.InvalidOperation, ""), character, cancellationToken);
         }
 
         character.Experience += command.Amount;
-        return await PersistIfOk(CommandResult.Ok(), character);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(GetItemFromBankCommand command)
+    public async Task<CommandResult> HandleAsync(GetItemFromBankCommand command, CancellationToken cancellationToken = default)
     {
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
         if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), command.Item).Result)
             return CommandResult.Fail(CommandError.ItemNotFound, "");
         if (_inventoryService.IsFull(character.GetBankStorageContainer()).Result)
         {
-            await _eventDispatcher.DispatchAsync(new InventoryFullEvent(command.CharacterId, command.Item));
+            await _eventDispatcher.DispatchAsync(new InventoryFullEvent(command.CharacterId, command.Item), cancellationToken);
             return CommandResult.Fail(CommandError.InventoryFull, "");
         }
 
         _inventoryService.RemoveItem(character.GetBankStorageContainer(), command.Item);
         var addResult = _inventoryService.AddItem(character.GetBackpackInventoryContainer(), command.Item);
         if (addResult.Success)
-            await _eventDispatcher.DispatchAsync(new ItemGottenFromBankEvent(command.CharacterId, command.Item));
+            await _eventDispatcher.DispatchAsync(new ItemGottenFromBankEvent(command.CharacterId, command.Item), cancellationToken);
 
-        return await PersistIfOk(CommandResult.Ok(), character);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(LevelUpCommand command)
+    public async Task<CommandResult> HandleAsync(LevelUpCommand command, CancellationToken cancellationToken = default)
     {
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
         character.Level++;
         // TODO: Uzupełnić logikę skalowania statystyk na poziom.
-        return await PersistIfOk(CommandResult.Ok(), character);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(PickUpItemCommand command)
+    public async Task<CommandResult> HandleAsync(PickUpItemCommand command, CancellationToken cancellationToken = default)
     {
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
         var addResult = _inventoryService.AddItem(character.GetBackpackInventoryContainer(), command.Item);
         if (addResult.Success)
-            await _eventDispatcher.DispatchAsync(new ItemPickupEvent(command.CharacterId, command.Item));
-        return await PersistIfOk(CommandResult.Ok(), character);
+            await _eventDispatcher.DispatchAsync(new ItemPickupEvent(command.CharacterId, command.Item), cancellationToken);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(PutItemToBankCommand command)
+    public async Task<CommandResult> HandleAsync(PutItemToBankCommand command, CancellationToken cancellationToken = default)
     {
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
         if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), command.Item).Result)
             return CommandResult.Fail(CommandError.ItemNotFound, "");
         if (_inventoryService.IsFull(character.GetBankStorageContainer()).Result)
         {
-            await _eventDispatcher.DispatchAsync(new InventoryFullEvent(command.CharacterId, command.Item));
+            await _eventDispatcher.DispatchAsync(new InventoryFullEvent(command.CharacterId, command.Item), cancellationToken);
             return CommandResult.Fail(CommandError.InventoryFull, "");
         }
         _inventoryService.RemoveItem(character.GetBackpackInventoryContainer(), command.Item);
         var addResult = _inventoryService.AddItem(character.GetBankStorageContainer(), command.Item);
         if (addResult.Success)
-            await _eventDispatcher.DispatchAsync(new ItemPutToBankEvent(command.CharacterId, command.Item));
-        return await PersistIfOk(CommandResult.Ok(), character);
+            await _eventDispatcher.DispatchAsync(new ItemPutToBankEvent(command.CharacterId, command.Item), cancellationToken);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(UnequipItemCommand command)
+    public async Task<CommandResult> HandleAsync(UnequipItemCommand command, CancellationToken cancellationToken = default)
     {
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
         var item = character.Equipments[command.Slot];
         if (item is null)
             return CommandResult.Fail(CommandError.ItemNotFound, "Brak przedmiotu w slocie.");
 
         if (_inventoryService.IsFull(character.GetBackpackInventoryContainer()).Result)
         {
-            await _eventDispatcher.DispatchAsync(new InventoryFullEvent(command.CharacterId, item));
+            await _eventDispatcher.DispatchAsync(new InventoryFullEvent(command.CharacterId, item), cancellationToken);
             return CommandResult.Fail(CommandError.InventoryFull, "");
         }
 
@@ -296,16 +296,16 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
         if (!result.Success)
             return CommandResult.Fail(CommandError.InvalidOperation, result.Message, result);
 
-        await _eventDispatcher.DispatchAsync(new ItemUnequippedEvent(command.CharacterId, command.Slot, item));
+        await _eventDispatcher.DispatchAsync(new ItemUnequippedEvent(command.CharacterId, command.Slot, item), cancellationToken);
         var statsContainer = item.GetComponent<StatsComponent>()?.Stats;
         if (statsContainer != null)
             _statsService.UnModifyStats(character, statsContainer);
-        return await PersistIfOk(CommandResult.Ok(), character);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(UseItemCommand command)
+    public async Task<CommandResult> HandleAsync(UseItemCommand command, CancellationToken cancellationToken = default)
     {
-        var character = await GetCharacterOrThrow(command.CharacterId);
+        var character = await GetCharacterOrThrow(command.CharacterId, cancellationToken);
         const string ConsumableTag = "item:consumable";
         var hasConsumableTag = command.Item.Tags.Contains(ConsumableTag) || command.Item.Tags.Contains("consumable");
         if (!hasConsumableTag || !_tagRegistry.IsValid(ConsumableTag))
@@ -313,11 +313,11 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
 
         var removeResult = _inventoryService.RemoveItem(character.GetBackpackInventoryContainer(), command.Item);
         if (removeResult.Success)
-            await _eventDispatcher.DispatchAsync(new ItemUsedEvent(command.CharacterId, command.Item));
-        return await PersistIfOk(CommandResult.Ok(), character);
+            await _eventDispatcher.DispatchAsync(new ItemUsedEvent(command.CharacterId, command.Item), cancellationToken);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
-    public async Task<CommandResult> HandleAsync(CreateCharacterCommand command)
+    public async Task<CommandResult> HandleAsync(CreateCharacterCommand command, CancellationToken cancellationToken = default)
     {
         var character = new Character(command.SessionId, command.CharacterClass)
         {
@@ -366,7 +366,7 @@ public class CharacterCommandHandler : ICommandHandler<EquipItemCommand>,
             character.BaseStats[StatsProperty.MoveSpeed] = 5;
             character.ModifiedStats[StatsProperty.MoveSpeed] = 5;
         }
-        return await PersistIfOk(CommandResult.Ok(), character);
+        return await PersistIfOk(CommandResult.Ok(), character, cancellationToken);
     }
 
     private static bool TryGetDirectionVector(int direction, out Vector3 vector)
