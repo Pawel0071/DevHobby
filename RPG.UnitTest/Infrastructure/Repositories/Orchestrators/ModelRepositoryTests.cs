@@ -2,7 +2,6 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using RPG.Domain.Common;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Helpers;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Repositories.Orchestrators;
@@ -10,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using RPG.Infrastructure.Models;
 using Xunit;
 
 namespace RPG.UnitTest.Infrastructure.Repositories.Orchestrators

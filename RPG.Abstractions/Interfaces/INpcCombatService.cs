@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using RPG.Domain.Entities.Npcs;
-using RPG.Domain.Entities.Skills;
+using RPG.Domain.Models.Npcs;
+using RPG.Domain.Models.Skills;
 
 namespace RPG.Abstractions.Interfaces;
 

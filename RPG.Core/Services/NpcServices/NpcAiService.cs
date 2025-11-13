@@ -10,13 +10,13 @@ using RPG.AI.Models;
 using RPG.Core.Interfaces;
 using RPG.Core.Interfaces.NpcServices;
 using RPG.Abstractions.Interfaces;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Items;
-using RPG.Domain.Entities.Npcs;
-using RPG.Domain.Entities.Npcs.NpcComponents;
-using RPG.Domain.Entities.Skills;
 using RPG.Domain.Enums;
 using RPG.Domain.Models;
+using RPG.Domain.Models.Interaction;
+using RPG.Domain.Models.Items;
+using RPG.Domain.Models.Npcs;
+using RPG.Domain.Models.Npcs.NpcComponents;
+using RPG.Domain.Models.Skills;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Core.Services.NpcServices;

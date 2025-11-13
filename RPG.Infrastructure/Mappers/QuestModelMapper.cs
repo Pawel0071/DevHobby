@@ -1,10 +1,12 @@
 using System.Text.Json;
-using RPG.Domain.Entities.Quests;
-using RPG.Domain.Entities.Quests.QuestComponents;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Domain.Enums; // TagTarget
-using RPG.Abstractions; // TagComponentMap + TagComponentHelper
+using RPG.Abstractions;
+using RPG.Domain.Models.Quests;
+using RPG.Domain.Models.Quests.QuestComponents;
+using RPG.Infrastructure.Models;
+
+// TagComponentMap + TagComponentHelper
 
 namespace RPG.Infrastructure.Mappers;
 

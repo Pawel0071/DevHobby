@@ -1,6 +1,6 @@
-using RPG.Domain.Entities;
-using RPG.Infrastructure.Documents;
+using RPG.Domain.Models;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 
 namespace RPG.Infrastructure.Mappers;
 

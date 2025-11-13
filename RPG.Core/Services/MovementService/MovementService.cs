@@ -4,9 +4,9 @@ using RPG.Core.Common;
 using RPG.Core.Diagnostics;
 using RPG.Core.Interfaces;
 using RPG.Domain.Common;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Npcs;
 using RPG.Domain.Enums;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Npcs;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Core.Services.MovementService;

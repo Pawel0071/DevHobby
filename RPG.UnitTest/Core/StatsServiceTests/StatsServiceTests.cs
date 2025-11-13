@@ -4,8 +4,8 @@ using Moq;
 using RPG.Core.Interfaces;
 using RPG.Core.Services.StatsService;
 using RPG.Domain.Containers;
-using RPG.Domain.Entities;
 using RPG.Domain.Enums;
+using RPG.Domain.Models;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.UnitTest.Core.StatsServiceTests;

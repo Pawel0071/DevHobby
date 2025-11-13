@@ -4,13 +4,13 @@ using System.Linq;
 using RPG.Core.Common;
 using RPG.Core.Interfaces;
 using RPG.Domain.Common;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Items;
-using RPG.Domain.Entities.Items.ItemComponent;
-using RPG.Domain.Entities.Skills;
-using RPG.Domain.Entities.Skills.SkillComponents;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Items;
+using RPG.Domain.Models.Items.ItemComponent;
+using RPG.Domain.Models.Skills;
+using RPG.Domain.Models.Skills.SkillComponents;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Core.Services.SkillService;

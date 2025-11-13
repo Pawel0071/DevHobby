@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
-using RPG.Domain.Entities;
-using RPG.Infrastructure.Documents;
+using RPG.Domain.Models;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 
 namespace RPG.Infrastructure.Mappers;
 
@@ -24,8 +24,7 @@ public class WorldStateModelMapper : IModelMapper<WorldState, WorldStateDocument
 
         return new WorldStateDocument
         {
-            Id = entity.Id,
-            WorldId = entity.WorldId,
+            Id = entity.WorldId,
             WorldName = entity.WorldName,
             LastUpdated = entity.LastUpdated,
             Characters = entity.Characters.ToList(),
@@ -36,11 +35,11 @@ public class WorldStateModelMapper : IModelMapper<WorldState, WorldStateDocument
 
     public WorldState ToDomain(WorldStateDocument document)
     {
-        _logger.Debug($"Converting WorldStateDocument to WorldState. Id={document.Id}, WorldId={document.WorldId}");
+        _logger.Debug($"Converting WorldStateDocument to WorldState. Id={document.Id}");
 
         return WorldState.Hydrate(
+            document.Id, // use document.Id as WorldId-like domain id
             document.Id,
-            document.WorldId,
             document.WorldName,
             document.LastUpdated,
             document.Characters ?? Enumerable.Empty<Guid>(),

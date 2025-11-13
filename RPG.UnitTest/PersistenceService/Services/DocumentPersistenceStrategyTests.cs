@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Moq;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 using RPG.PersistenceService.Services;
 
 namespace RPG.UnitTest.PersistenceService.Services;

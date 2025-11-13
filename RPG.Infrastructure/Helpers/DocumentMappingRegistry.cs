@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Items;
-using RPG.Domain.Entities.MapObjects;
-using RPG.Domain.Entities.Npcs;
-using RPG.Domain.Entities.Quests;
-using RPG.Domain.Entities.Skills;
-using RPG.Infrastructure.Documents;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Items;
+using RPG.Domain.Models.MapObjects;
+using RPG.Domain.Models.Npcs;
+using RPG.Domain.Models.Quests;
+using RPG.Domain.Models.Skills;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 
 namespace RPG.Infrastructure.Helpers;
 

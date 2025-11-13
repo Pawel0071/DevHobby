@@ -1,6 +1,6 @@
-using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
+using RPG.Domain.Models.Items;
 
 namespace RPG.Domain.Containers;
 

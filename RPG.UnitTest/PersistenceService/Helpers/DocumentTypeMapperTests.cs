@@ -1,7 +1,7 @@
 using FluentAssertions;
-using RPG.Domain.Entities;
-using RPG.Infrastructure.Documents;
+using RPG.Domain.Models;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 using RPG.PersistenceService.Helpers;
 
 namespace RPG.UnitTest.PersistenceService.Helpers;

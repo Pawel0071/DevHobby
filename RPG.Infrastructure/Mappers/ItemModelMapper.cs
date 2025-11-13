@@ -1,10 +1,10 @@
 using RPG.Domain.Containers;
-using RPG.Domain.Entities.Items;
-using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Enums;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Abstractions;
+using RPG.Domain.Models.Items;
+using RPG.Domain.Models.Items.ItemComponent;
+using RPG.Infrastructure.Models;
 
 namespace RPG.Infrastructure.Mappers;
 

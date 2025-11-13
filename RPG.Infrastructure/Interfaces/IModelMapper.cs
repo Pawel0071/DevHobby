@@ -1,5 +1,5 @@
 using RPG.Domain.Common;
-using RPG.Infrastructure.Documents;
+using RPG.Infrastructure.Models;
 
 namespace RPG.Infrastructure.Interfaces;
 

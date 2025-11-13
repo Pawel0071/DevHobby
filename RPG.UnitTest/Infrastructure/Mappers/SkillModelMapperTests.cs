@@ -1,11 +1,11 @@
 using System.Text.Json;
 using FluentAssertions;
 using Moq;
-using RPG.Domain.Entities.Skills;
-using RPG.Domain.Entities.Skills.SkillComponents;
-using RPG.Infrastructure.Documents;
+using RPG.Domain.Models.Skills;
+using RPG.Domain.Models.Skills.SkillComponents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Mappers;
+using RPG.Infrastructure.Models;
 
 namespace RPG.UnitTest.Infrastructure.Mappers;
 

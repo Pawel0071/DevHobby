@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using RPG.Abstractions.Interfaces;
-using RPG.Domain.Entities;
 using RPG.Domain.Models;
+using RPG.Domain.Models.Interaction;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Application.Broadcasters;

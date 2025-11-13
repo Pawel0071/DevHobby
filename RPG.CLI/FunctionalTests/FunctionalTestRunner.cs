@@ -1,13 +1,12 @@
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
-using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Helpers;
 using RPG.Infrastructure.Interfaces;
 using RPG.PersistenceService.Services;
 using RedisWarmUp.Services;
-
+using RPG.Domain.Models.Items;
+using RPG.Infrastructure.Models;
 using WarmUpStrategy = RedisWarmUp.Services.IDocumentWarmUpStrategy;
 
 namespace RPG.CLI.FunctionalTests;

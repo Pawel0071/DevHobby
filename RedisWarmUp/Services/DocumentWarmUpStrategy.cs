@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 
 namespace RedisWarmUp.Services;
 

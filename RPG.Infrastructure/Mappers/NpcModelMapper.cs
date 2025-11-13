@@ -2,15 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Npcs;
-using RPG.Domain.Entities.Npcs.NpcComponents;
-using RPG.Domain.Entities.Skills;
 using RPG.Domain.Enums;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Abstractions;
 using RPG.Domain.Common;
+using RPG.Domain.Models.Npcs;
+using RPG.Domain.Models.Npcs.NpcComponents;
+using RPG.Domain.Models.Skills;
+using RPG.Infrastructure.Models;
 
 namespace RPG.Infrastructure.Mappers;
 

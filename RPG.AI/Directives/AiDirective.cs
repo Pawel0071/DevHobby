@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Skills;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Skills;
 
 namespace RPG.AI.Directives;
 

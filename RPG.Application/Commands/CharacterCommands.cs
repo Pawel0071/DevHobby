@@ -1,9 +1,9 @@
 using System.Numerics;
 using RPG.Application.Interfaces;
-using RPG.Domain.Entities.Items;
-using RPG.Domain.Entities.Skills;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
+using RPG.Domain.Models.Items;
+using RPG.Domain.Models.Skills;
 
 namespace RPG.Application.Commands;
 

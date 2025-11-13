@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RPG.Domain.Common;
 using RPG.Infrastructure;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Repositories.RabbitMQ;
 

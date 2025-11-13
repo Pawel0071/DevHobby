@@ -1,10 +1,12 @@
 using System.Text.Json;
-using RPG.Domain.Entities.Skills;
-using RPG.Domain.Entities.Skills.SkillComponents;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Domain.Enums; // for TagTarget
-using RPG.Abstractions; // tag component map + helper
+using RPG.Abstractions;
+using RPG.Domain.Models.Skills;
+using RPG.Domain.Models.Skills.SkillComponents;
+using RPG.Infrastructure.Models;
+
+// tag component map + helper
 
 namespace RPG.Infrastructure.Mappers;
 

@@ -1,6 +1,6 @@
 using System.Text.Json;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 using RPG.PersistenceService.Helpers;
 using RPG.PersistenceService.Services;
 

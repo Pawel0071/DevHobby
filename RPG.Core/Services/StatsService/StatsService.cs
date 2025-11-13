@@ -1,8 +1,8 @@
 using RPG.Core.Interfaces;
 using RPG.Domain.Containers;
-using RPG.Domain.Entities;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
+using RPG.Domain.Models;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Core.Services.StatsService;

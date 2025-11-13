@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using RPG.Domain.Entities;
+using RPG.Domain.Models;
 
 namespace RPG.Core.Interfaces;
 

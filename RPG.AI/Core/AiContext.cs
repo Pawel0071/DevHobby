@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using RPG.AI.Directives;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Npcs;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Npcs;
 
 namespace RPG.AI.Core;
 

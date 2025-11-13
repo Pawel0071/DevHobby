@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using RedisWarmUp.Services;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 using Xunit;
 
 namespace RPG.UnitTest.RedisWarmUp.Services;

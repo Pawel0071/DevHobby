@@ -1,5 +1,5 @@
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 
 namespace RPG.PersistenceService.Services;
 

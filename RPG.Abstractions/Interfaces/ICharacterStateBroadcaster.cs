@@ -1,4 +1,5 @@
 using RPG.Domain.Models;
+using RPG.Domain.Models.Interaction;
 
 namespace RPG.Abstractions.Interfaces;
 

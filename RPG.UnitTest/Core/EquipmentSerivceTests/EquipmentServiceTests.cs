@@ -5,10 +5,10 @@ using RPG.Core.Common;
 using RPG.Core.Interfaces;
 using RPG.Core.Services.EquipmentService;
 using RPG.Domain.Common;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Items;
-using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Enums;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Items;
+using RPG.Domain.Models.Items.ItemComponent;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.UnitTest.Core.EquipmentSerivceTests;

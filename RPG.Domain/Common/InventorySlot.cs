@@ -1,4 +1,4 @@
-using RPG.Domain.Entities.Items;
+using RPG.Domain.Models.Items;
 
 namespace RPG.Domain.Common;
 

@@ -1,5 +1,5 @@
-using RPG.Domain.Entities.Skills;
 using RPG.Domain.Enums;
+using RPG.Domain.Models.Skills;
 
 namespace RPG.Domain.Interfaces;
 

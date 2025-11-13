@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using RPG.AI.Models;
 using RPG.Domain.Models;
+using RPG.Domain.Models.Interaction;
 
 namespace RPG.Core.Interfaces.NpcServices;
 

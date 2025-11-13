@@ -1,5 +1,4 @@
 using RPG.Infrastructure;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Helpers;
 using RedisWarmUp.Services;

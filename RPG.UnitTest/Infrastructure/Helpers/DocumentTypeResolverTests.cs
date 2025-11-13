@@ -2,12 +2,12 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using RPG.Domain.Common;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Items;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Helpers;
 using RPG.Infrastructure.Interfaces;
 using System;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Items;
+using RPG.Infrastructure.Models;
 using Xunit;
 
 namespace RPG.UnitTest.Infrastructure.Helpers;

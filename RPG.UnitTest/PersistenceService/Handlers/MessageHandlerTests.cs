@@ -1,8 +1,8 @@
 using System.Text.Json;
 using FluentAssertions;
 using Moq;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 using RPG.PersistenceService.Handlers;
 using RPG.PersistenceService.Services;
 using MessageLogger = RPG.Infrastructure.Interfaces.ILogger<RPG.PersistenceService.Handlers.MessageHandler>;

@@ -1,4 +1,4 @@
-using RPG.Infrastructure.Documents;
+using RPG.Infrastructure.Models;
 
 namespace RPG.PersistenceService.Services;
 

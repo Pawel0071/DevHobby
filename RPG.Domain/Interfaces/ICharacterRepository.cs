@@ -1,4 +1,4 @@
-using RPG.Domain.Entities;
+using RPG.Domain.Models;
 
 namespace RPG.Domain.Interfaces;
 

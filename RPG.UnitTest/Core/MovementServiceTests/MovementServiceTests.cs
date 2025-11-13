@@ -3,9 +3,9 @@ using FluentAssertions;
 using Moq;
 using RPG.Core.Services.MovementService;
 using RPG.Domain.Common;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Npcs;
 using RPG.Domain.Enums;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Npcs;
 using RPG.Infrastructure.Interfaces;
 using Xunit;
 

@@ -1,7 +1,7 @@
 using RPG.Core.Common;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Items;
-using RPG.Domain.Entities.Skills;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Items;
+using RPG.Domain.Models.Skills;
 
 namespace RPG.Core.Interfaces;
 

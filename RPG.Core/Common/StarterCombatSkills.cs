@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RPG.Domain.Entities.Skills;
-using RPG.Domain.Entities.Skills.SkillComponents;
+using RPG.Domain.Models.Skills;
+using RPG.Domain.Models.Skills.SkillComponents;
 
 namespace RPG.Core.Common;
 

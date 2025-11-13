@@ -9,13 +9,14 @@ using RPG.Abstractions.Interfaces;
 using RPG.Application.Events;
 using RPG.Core.Interfaces;
 using RPG.Core.Interfaces.NpcServices;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.MapObjects;
-using RPG.Domain.Entities.Npcs;
 using RPG.Domain.Models;
+using RPG.Domain.Models.Interaction;
+using RPG.Domain.Models.MapObjects;
+using RPG.Domain.Models.Npcs;
 using RPG.GameServer.Protos;
 using RPG.Infrastructure.Interfaces;
-using DomainWorldState = RPG.Domain.Entities.WorldState;
+using DomainWorldState = RPG.Domain.Models.WorldState;
+using Location = RPG.Domain.Models.Location;
 using ProtoWorldState = RPG.GameServer.Protos.WorldState;
 
 namespace RPG.GameServer.Controllers;
@@ -385,7 +386,7 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 		return proto;
 	}
 
-	private static Protos.Location ToProtoLocation(RPG.Domain.Entities.Location location)
+	private static Protos.Location ToProtoLocation(Location location)
 	{
 		return new Protos.Location
 		{

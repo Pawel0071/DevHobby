@@ -4,16 +4,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using RPG.Domain.Entities.Items;
-using RPG.Domain.Entities.Quests;
-using RPG.Domain.Entities.Skills;
 using RPG.Domain.Enums;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Helpers;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Repositories.MongoDB;
 using RPG.Infrastructure.Repositories.Redis;
 using RedisWarmUp.Services;
+using RPG.Domain.Models.Items;
+using RPG.Infrastructure.Models;
 using StackExchange.Redis;
 
 namespace RPG.IntegrationTests;
@@ -197,7 +195,7 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
         // Arrange
         var writer = _serviceProvider.GetRequiredService<IRedisRepository>();
         var document = new SkillDocument { Id = Guid.NewGuid(), Name = "TempData" };
-        
+
         // Act
         await writer.UpsertAsync(document);
         var redisKey = $"{SkillDocument.CollectionName}:{document.Id}";
@@ -569,7 +567,6 @@ public class RedisWarmUpIntegrationTests : IClassFixture<TestContainersFixture>
             return new WorldStateDocument
             {
                 Id = Guid.NewGuid(),
-                WorldId = Guid.NewGuid(),
                 WorldName = "WarmUpWorld",
                 LastUpdated = DateTime.UtcNow
             };

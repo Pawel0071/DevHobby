@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using MongoDB.Driver;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 using RPG.Infrastructure.Repositories.MongoDB;
 using Xunit;
 

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using RPG.Domain.Common.Interfaces;
-using RPG.Domain.Entities.Items.ItemComponent;
-using RPG.Domain.Entities.MapObjects.MapObjectComponents;
-using RPG.Domain.Entities.Npcs.NpcComponents;
-using RPG.Domain.Entities.Quests.QuestComponents;
-using RPG.Domain.Entities.Skills.SkillComponents;
 using RPG.Domain.Enums;
+using RPG.Domain.Models.Items.ItemComponent;
+using RPG.Domain.Models.MapObjects.MapObjectComponents;
+using RPG.Domain.Models.Npcs.NpcComponents;
+using RPG.Domain.Models.Quests.QuestComponents;
+using RPG.Domain.Models.Skills.SkillComponents;
 
 namespace RPG.Domain.Common;
 

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using RPG.AI.Core;
 using RPG.AI.Directives;
 using RPG.AI.Utility;
-using RPG.Domain.Entities.Npcs;
+using RPG.Domain.Models.Npcs;
 
 namespace RPG.AI.Models;
 

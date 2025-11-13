@@ -1,9 +1,10 @@
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
-using RPG.Infrastructure.Documents;
+using RPG.Domain.Models;
 using RPG.Infrastructure.Interfaces;
-using RPG.Infrastructure.Logger; // SerilogWrapper
+using RPG.Infrastructure.Logger;
+using RPG.Infrastructure.Models;
+
+// SerilogWrapper
 
 namespace RPG.Infrastructure.Mappers;
 

@@ -6,9 +6,9 @@ using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using RPG.Core.Interfaces;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.MapObjects;
-using RPG.Domain.Entities.Npcs;
+using RPG.Domain.Models;
+using RPG.Domain.Models.MapObjects;
+using RPG.Domain.Models.Npcs;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Core.Services.World;

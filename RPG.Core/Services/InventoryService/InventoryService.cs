@@ -1,8 +1,8 @@
 using RPG.Core.Common;
 using RPG.Core.Interfaces;
 using RPG.Domain.Common;
-using RPG.Domain.Entities.Items;
 using RPG.Domain.Interfaces;
+using RPG.Domain.Models.Items;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Core.Services.InventoryService;

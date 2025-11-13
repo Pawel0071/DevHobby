@@ -58,7 +58,7 @@
 
   <ItemGroup>
     <Folder Include="Application\"/>
-    <Folder Include="Inrastructure\"/>
+    <Folder Include="DTO\" />
     <Folder Include="Middleware\"/>
     <Folder Include="Services\"/>
   </ItemGroup>

@@ -6,9 +6,9 @@ using RPG.Application.Diagnostics;
 using RPG.Application.Interfaces;
 using RPG.Core.Interfaces;
 using RPG.Domain.Common;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Enums;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Items.ItemComponent;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Application.Handlers;

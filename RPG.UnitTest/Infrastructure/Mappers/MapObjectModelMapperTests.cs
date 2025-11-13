@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text.Json;
 using FluentAssertions;
 using Moq;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.MapObjects;
-using RPG.Domain.Entities.MapObjects.MapObjectComponents;
-using RPG.Infrastructure.Documents;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Items;
+using RPG.Domain.Models.MapObjects;
+using RPG.Domain.Models.MapObjects.MapObjectComponents;
 using RPG.Infrastructure.Mappers;
 using Xunit;
 using RPG.Infrastructure.Interfaces;
-using RPG.Domain.Entities.Items;
+using RPG.Infrastructure.Models;
 
 namespace RPG.UnitTest.Infrastructure.Mappers;
 

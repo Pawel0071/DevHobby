@@ -4,13 +4,13 @@ using FluentAssertions;
 using Moq;
 using RPG.Domain.Common;
 using RPG.Domain.Containers;
-using RPG.Domain.Entities.Items;
-using RPG.Domain.Entities.Items.ItemComponent;
 using RPG.Domain.Enums;
+using RPG.Domain.Models.Items;
+using RPG.Domain.Models.Items.ItemComponent;
 using RPG.Infrastructure.Common;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Mappers;
+using RPG.Infrastructure.Models;
 
 namespace RPG.UnitTest.Infrastructure.Mappers;
 

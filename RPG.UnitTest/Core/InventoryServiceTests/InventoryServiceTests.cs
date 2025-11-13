@@ -2,8 +2,8 @@ using FluentAssertions;
 using Moq;
 using RPG.Core.Services.InventoryService;
 using RPG.Domain.Common;
-using RPG.Domain.Entities.Items;
 using RPG.Domain.Interfaces;
+using RPG.Domain.Models.Items;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.UnitTest.Core.InventoryServiceTests;

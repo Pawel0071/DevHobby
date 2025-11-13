@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using RPG.AI.Utility.Actions;
-using RPG.Domain.Entities.Npcs.NpcComponents;
-using RPG.Domain.Entities.Skills;
+using RPG.Domain.Models.Npcs.NpcComponents;
+using RPG.Domain.Models.Skills;
 
 namespace RPG.AI.Utility;
 

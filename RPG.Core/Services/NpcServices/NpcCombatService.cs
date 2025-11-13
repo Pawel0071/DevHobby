@@ -3,10 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using RPG.Abstractions.Interfaces;
 using RPG.Abstractions.SharedModel;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Npcs;
-using RPG.Domain.Entities.Skills;
 using RPG.Domain.Models;
+using RPG.Domain.Models.Interaction;
+using RPG.Domain.Models.Npcs;
+using RPG.Domain.Models.Skills;
 using RPG.Infrastructure.Interfaces;
 
 

@@ -2,8 +2,8 @@ using System.CommandLine;
 using Microsoft.Extensions.DependencyInjection;
 using RPG.Application.Commands;
 using RPG.Application.Interfaces;
-using RPG.Domain.Entities.Items;
 using RPG.Domain.Enums;
+using RPG.Domain.Models.Items;
 
 namespace RPG.CLI.Commands;
 

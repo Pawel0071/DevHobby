@@ -1,8 +1,7 @@
 using FluentAssertions;
 using Grpc.Net.Client;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using RPG.Domain.Interfaces;
+using RPG.Domain.Models;
 using RPG.Infrastructure.Interfaces;
 using RPG.GameServer.Protos;
 using CharacterServiceClient = RPG.GameServer.Protos.CharacterService.CharacterServiceClient;
@@ -44,11 +43,11 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
         var characterId = Guid.Parse(response.CharacterId);
         using var scope = factory.Services.CreateScope();
         var repository = scope.ServiceProvider.GetRequiredService<IModelRepository>();
-        var character = await repository.GetByIdAsync<RPG.Domain.Entities.Character>(characterId);
+        var character = await repository.GetByIdAsync<Character>(characterId);
 
-        character.Name.Should().Be("IntegrationHero");
-        character.Level.Should().Be(3);
-        character.CurrentLocation.Position.X.Should().BeGreaterThanOrEqualTo(0);
+        character?.Name.Should().Be("IntegrationHero");
+        character?.Level.Should().Be(3);
+        character?.CurrentLocation.Position.X.Should().BeGreaterThanOrEqualTo(0);
     }
 
     [Fact]
@@ -75,10 +74,10 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
         using (var scope = factory.Services.CreateScope())
         {
             var repository = scope.ServiceProvider.GetRequiredService<IModelRepository>();
-            var character = await repository.GetByIdAsync<RPG.Domain.Entities.Character>(Guid.Parse(createReply.CharacterId));
+            var character = await repository.GetByIdAsync<Character>(Guid.Parse(createReply.CharacterId));
 
-            character.IsMoving.Should().BeTrue();
-            character.CurrentLocation.Position.Y.Should().BeGreaterThan(0f);
+            character?.IsMoving.Should().BeTrue();
+            character?.CurrentLocation.Position.Y.Should().BeGreaterThan(0f);
         }
 
         var stopMove = await client.StopMovementAsync(new CharacterIdRequest { CharacterId = createReply.CharacterId });
@@ -95,10 +94,10 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
         using (var scope = factory.Services.CreateScope())
         {
             var repository = scope.ServiceProvider.GetRequiredService<IModelRepository>();
-            var character = await repository.GetByIdAsync<RPG.Domain.Entities.Character>(Guid.Parse(createReply.CharacterId));
+            var character = await repository.GetByIdAsync<Character>(Guid.Parse(createReply.CharacterId));
 
-            character.IsRotating.Should().BeTrue();
-            character.CurrentLocation.Rotation.Should().BeApproximately(90f, 0.01f);
+            character?.IsRotating.Should().BeTrue();
+            character?.CurrentLocation.Rotation.Should().BeApproximately(90f, 0.01f);
         }
 
         var stopRotation = await client.StopRotationAsync(new CharacterIdRequest { CharacterId = createReply.CharacterId });

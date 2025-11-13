@@ -1,6 +1,6 @@
 using System;
 using FluentAssertions;
-using RPG.Infrastructure.Documents;
+using RPG.Infrastructure.Models;
 using Xunit;
 
 namespace RPG.UnitTest.Infrastructure.Documents;

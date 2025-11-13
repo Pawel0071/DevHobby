@@ -1,11 +1,11 @@
 using System.Numerics;
 using FluentAssertions;
 using Moq;
-using RPG.Domain.Entities;
 using RPG.Domain.Enums;
-using RPG.Infrastructure.Documents;
+using RPG.Domain.Models;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Mappers;
+using RPG.Infrastructure.Models;
 
 namespace RPG.UnitTest.Infrastructure.Mappers;
 

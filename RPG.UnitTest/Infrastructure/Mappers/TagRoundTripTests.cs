@@ -1,11 +1,12 @@
 using FluentAssertions;
 using Moq;
-using RPG.Domain.Entities.Skills;
-using RPG.Domain.Entities.Skills.SkillComponents;
-using RPG.Domain.Entities.Quests;
-using RPG.Domain.Entities.Quests.QuestComponents;
-using RPG.Domain.Entities.MapObjects;
-using RPG.Domain.Entities.MapObjects.MapObjectComponents;
+using RPG.Domain.Models;
+using RPG.Domain.Models.MapObjects;
+using RPG.Domain.Models.MapObjects.MapObjectComponents;
+using RPG.Domain.Models.Quests;
+using RPG.Domain.Models.Quests.QuestComponents;
+using RPG.Domain.Models.Skills;
+using RPG.Domain.Models.Skills.SkillComponents;
 using RPG.Infrastructure.Mappers;
 using RPG.Infrastructure.Interfaces;
 
@@ -36,7 +37,7 @@ public class TagRoundTripTests
         var locationLogger = new Mock<ILogger<LocationMapper>>();
         var questMapper = new QuestModelMapper(logger.Object, new LocationMapper(locationLogger.Object));
 
-        var quest = Quest.Create("Collect Herbs", "Gather 5 herbs", "NPC", new RPG.Domain.Entities.Location(), new System.Collections.Generic.HashSet<string>());
+        var quest = Quest.Create("Collect Herbs", "Gather 5 herbs", "NPC", new Location(), new System.Collections.Generic.HashSet<string>());
         quest.Components.Add(new CollectObjectiveComponent());
         quest.Components.Add(new BasicRewardsComponent());
 
@@ -54,7 +55,7 @@ public class TagRoundTripTests
         var itemLogger = new Mock<ILogger<ItemModelMapper>>();
         var mapper = new MapObjectModelMapper(logger.Object, new LocationMapper(locationLogger.Object), new ItemModelMapper(itemLogger.Object));
 
-        var mapObject = MapObject.Create("Chest", new RPG.Domain.Entities.Location(), Guid.NewGuid(), "");
+        var mapObject = MapObject.Create("Chest", new Location(), Guid.NewGuid(), "");
         mapObject.Components.Add(new ContainerComponent());
         mapObject.Components.Add(new LockableComponent());
 

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using MongoDB.Driver;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 
 namespace RPG.Infrastructure.Repositories.MongoDB;
 

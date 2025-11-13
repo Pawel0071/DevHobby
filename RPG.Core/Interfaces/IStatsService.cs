@@ -1,6 +1,6 @@
 using RPG.Core.Services.StatsService;
-using RPG.Domain.Entities;
 using RPG.Domain.Interfaces;
+using RPG.Domain.Models;
 
 namespace RPG.Core.Interfaces;
 

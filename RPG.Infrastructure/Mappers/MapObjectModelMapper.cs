@@ -2,15 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using RPG.Domain.Entities.Items;
-using RPG.Domain.Entities.MapObjects;
-using RPG.Domain.Entities.MapObjects.MapObjectComponents;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Mappers.Common;
 using RPG.Domain.Enums; // TagTarget
 using RPG.Abstractions; // TagComponentMap (global tag->component map)
-using RPG.Domain.Common; // TagDefinition access
+using RPG.Domain.Common;
+using RPG.Domain.Models.Items;
+using RPG.Domain.Models.MapObjects;
+using RPG.Domain.Models.MapObjects.MapObjectComponents;
+using RPG.Infrastructure.Models;
+
+// TagDefinition access
 
 namespace RPG.Infrastructure.Mappers;
 

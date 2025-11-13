@@ -1,9 +1,9 @@
 using System.Linq;
 using RPG.Domain.Common;
-using RPG.Domain.Entities.Items;
-using RPG.Domain.Entities.MapObjects.MapObjectComponents;
-using RPG.Infrastructure.Documents;
+using RPG.Domain.Models.Items;
+using RPG.Domain.Models.MapObjects.MapObjectComponents;
 using RPG.Infrastructure.Interfaces;
+using RPG.Infrastructure.Models;
 using DomainInventorySlot = RPG.Domain.Common.InventorySlot;
 
 namespace RPG.Infrastructure.Mappers.Common;

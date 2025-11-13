@@ -2,6 +2,7 @@ using RPG.Abstractions.Interfaces;
 using RPG.Application.Events;
 using RPG.Application.Interfaces;
 using RPG.Domain.Models;
+using RPG.Domain.Models.Interaction;
 
 namespace RPG.Application.Handlers;
 

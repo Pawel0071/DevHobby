@@ -6,8 +6,8 @@ using System.Threading;
 using RPG.AI.Core;
 using RPG.AI.Directives;
 using RPG.AI.Utility.Considerations;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Skills;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Skills;
 
 namespace RPG.AI.Utility.Actions;
 

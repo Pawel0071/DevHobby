@@ -1,10 +1,11 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using Grpc.Core;
-using RPG.Domain.Entities;
 using RPG.Domain.Enums;
+using RPG.Domain.Models;
 using RPG.GameServer.Protos;
 using RPG.Infrastructure.Interfaces;
+using Location = RPG.Domain.Models.Location;
 
 namespace RPG.GameServer.Controllers;
 
@@ -175,7 +176,7 @@ public class SessionServiceImpl : SessionService.SessionServiceBase
 		return message;
 	}
 
-	private static Protos.Location ToProtoLocation(RPG.Domain.Entities.Location location)
+	private static Protos.Location ToProtoLocation(Location location)
 	{
 		return new Protos.Location
 		{
@@ -189,14 +190,14 @@ public class SessionServiceImpl : SessionService.SessionServiceBase
 		};
 	}
 
-	private static RPG.Domain.Entities.Location FromProtoLocation(Protos.Location location)
+	private static Location FromProtoLocation(Protos.Location location)
 	{
 		var hasWorldId = Guid.TryParse(location.WorldId, out var parsedWorldId);
 		var worldId = hasWorldId ? parsedWorldId : Guid.Empty;
 		var mapId = location.MapId ?? string.Empty;
 		var zoneName = location.ZoneName ?? string.Empty;
 
-		var entityLocation = RPG.Domain.Entities.Location.Create(
+		var entityLocation = Location.Create(
 			(float)location.X,
 			(float)location.Y,
 			(float)location.Z,

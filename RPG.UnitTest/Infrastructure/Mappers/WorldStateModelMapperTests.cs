@@ -1,10 +1,10 @@
 using System;
 using FluentAssertions;
 using Moq;
-using RPG.Domain.Entities;
-using RPG.Infrastructure.Documents;
+using RPG.Domain.Models;
 using RPG.Infrastructure.Interfaces;
 using RPG.Infrastructure.Mappers;
+using RPG.Infrastructure.Models;
 using Xunit;
 
 namespace RPG.UnitTest.Infrastructure.Mappers;
@@ -41,8 +41,7 @@ public class WorldStateModelMapperTests
 
         var document = _mapper.ToPersistence(entity);
 
-        document.Id.Should().Be(expectedId);
-        document.WorldId.Should().Be(worldId);
+        document.Id.Should().Be(worldId); // dokument Id teraz reprezentuje WorldId
         document.WorldName.Should().Be("Eora");
         document.LastUpdated.Should().Be(entity.LastUpdated);
         document.Characters.Should().ContainSingle(id => id == heroId);
@@ -62,8 +61,7 @@ public class WorldStateModelMapperTests
 
         var document = new WorldStateDocument
         {
-            Id = Guid.NewGuid(),
-            WorldId = worldId,
+            Id = worldId,
             WorldName = "Eora",
             LastUpdated = timestamp,
             Characters = new List<Guid> { characterId },
@@ -74,7 +72,7 @@ public class WorldStateModelMapperTests
         var entity = _mapper.ToEntity(document);
 
         entity.Id.Should().Be(document.Id);
-        entity.WorldId.Should().Be(document.WorldId);
+        entity.WorldId.Should().Be(document.Id); // WorldId = Id
         entity.WorldName.Should().Be("Eora");
         entity.LastUpdated.Should().Be(document.LastUpdated);
         entity.Characters.Should().ContainSingle(id => id == characterId);

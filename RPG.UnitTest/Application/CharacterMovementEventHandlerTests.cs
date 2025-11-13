@@ -3,8 +3,8 @@ using Moq;
 using RPG.Abstractions.Interfaces;
 using RPG.Application.Events;
 using RPG.Application.Handlers;
-using RPG.Domain.Entities;
 using RPG.Domain.Models;
+using RPG.Domain.Models.Interaction;
 
 namespace RPG.UnitTest.Application;
 

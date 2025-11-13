@@ -1,7 +1,7 @@
 using System.Numerics;
 using RPG.Core.Common;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Npcs;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Npcs;
 
 namespace RPG.Core.Interfaces;
 

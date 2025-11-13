@@ -1,8 +1,8 @@
 using RPG.Core.Common;
 using RPG.Core.Interfaces;
 using RPG.Domain.Common;
-using RPG.Domain.Entities;
 using RPG.Domain.Interfaces;
+using RPG.Domain.Models;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Core.Services.LevelService;

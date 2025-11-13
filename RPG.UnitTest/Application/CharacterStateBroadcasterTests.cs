@@ -2,8 +2,8 @@ using System.Numerics;
 using FluentAssertions;
 using Moq;
 using RPG.Application.Broadcasters;
-using RPG.Domain.Entities;
 using RPG.Domain.Models;
+using RPG.Domain.Models.Interaction;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.UnitTest.Application;

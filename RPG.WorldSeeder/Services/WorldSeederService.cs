@@ -1,10 +1,10 @@
 using MongoDB.Driver;
 using RPG.Core.Interfaces;
-using RPG.Domain.Entities;
-using RPG.Domain.Entities.Items;
-using RPG.Domain.Entities.MapObjects;
-using RPG.Domain.Entities.Npcs;
-using RPG.Domain.Entities.Skills;
+using RPG.Domain.Models;
+using RPG.Domain.Models.Items;
+using RPG.Domain.Models.MapObjects;
+using RPG.Domain.Models.Npcs;
+using RPG.Domain.Models.Skills;
 using RPG.Infrastructure.Helpers;
 using RPG.Infrastructure.Interfaces;
 using RPG.WorldSeeder.Seeders;
@@ -100,7 +100,7 @@ internal sealed class WorldSeederService
 
     private WorldState PrepareWorldState(WorldState worldState, IReadOnlyList<Npc> npcs, IReadOnlyList<MapObject> mapObjects)
     {
-        typeof(WorldState).GetProperty("Id")?.SetValue(worldState, worldState.WorldId);
+        // worldState.Id już reprezentuje WorldId; refleksyjne nadpisanie nie jest potrzebne
 
         worldState.Characters.Clear();
         worldState.Npcs.Clear();

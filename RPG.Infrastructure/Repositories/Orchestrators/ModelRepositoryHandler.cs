@@ -1,10 +1,10 @@
 using RPG.Domain.Common;
-using RPG.Infrastructure.Documents;
 using RPG.Infrastructure.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using RPG.Infrastructure.Models;
 
 namespace RPG.Infrastructure.Repositories.Orchestrators
 {

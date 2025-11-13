@@ -11,9 +11,9 @@ using RPG.Application.Interfaces;
 using RPG.Core.Interfaces;
 using RPG.Core.Services.MovementService;
 using RPG.Domain.Common;
-using RPG.Domain.Entities;
 using RPG.Domain.Enums;
 using RPG.Domain.Interfaces;
+using RPG.Domain.Models;
 using RPG.Infrastructure.Interfaces;
 using Xunit;
 

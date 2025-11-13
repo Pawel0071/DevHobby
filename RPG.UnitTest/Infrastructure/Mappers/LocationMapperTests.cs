@@ -2,9 +2,9 @@ using System.Numerics;
 using FluentAssertions;
 using RPG.Infrastructure.Interfaces;
 using Moq;
-using RPG.Domain.Entities;
-using RPG.Infrastructure.Documents;
+using RPG.Domain.Models;
 using RPG.Infrastructure.Mappers;
+using RPG.Infrastructure.Models;
 using Xunit;
 
 namespace RPG.UnitTest.Infrastructure.Mappers;

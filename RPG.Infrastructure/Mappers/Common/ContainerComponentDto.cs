@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using RPG.Infrastructure.Documents;
 
 namespace RPG.Infrastructure.Mappers.Common;
 
