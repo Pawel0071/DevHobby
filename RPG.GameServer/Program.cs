@@ -3,14 +3,14 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using RPG.Abstractions.Interfaces;
 using RPG.Application;
 using RPG.Application.Broadcasters;
+using RPG.Application.Validators;
 using RPG.Core;
 using RPG.GameServer.Controllers;
 using RPG.Core.Interfaces.NpcServices;
 using RPG.Core.Services.NpcServices;
 using RPG.Infrastructure;
-using RPG.Application.Events;
-using RPG.Application.Handlers;
-using RPG.Application.Interfaces;
+using RPG.GameServer.Services;
+using RPG.GameServer.Mappers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +39,10 @@ foreach (var candidate in infrastructureCandidates)
 }
 
 // gRPC
-builder.Services.AddGrpc();
+builder.Services.AddGrpc(options =>
+{
+    options.Interceptors.Add<SessionValidationInterceptor>();
+});
 builder.Services.AddHealthChecks();
 
 builder.WebHost.ConfigureKestrel(options =>
@@ -54,12 +57,12 @@ builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.Ap
 builder.Services.AddCore(builder.Configuration);
 builder.Services.AddApplication(builder.Configuration);
 
-builder.Services.AddSingleton<ICharacterStateBroadcaster, CharacterStateBroadcaster>();
-builder.Services.AddScoped<CharacterMovementEventHandler>();
-builder.Services.AddScoped<IGameEventHandler<CharacterMovedEvent>>(sp => sp.GetRequiredService<CharacterMovementEventHandler>());
-builder.Services.AddScoped<IGameEventHandler<CharacterMovementStoppedEvent>>(sp => sp.GetRequiredService<CharacterMovementEventHandler>());
-builder.Services.AddScoped<IGameEventHandler<CharacterRotationStartedEvent>>(sp => sp.GetRequiredService<CharacterMovementEventHandler>());
-builder.Services.AddScoped<IGameEventHandler<CharacterRotationStoppedEvent>>(sp => sp.GetRequiredService<CharacterMovementEventHandler>());
+// Proto mappers
+builder.Services.AddProtoMappers();
+
+builder.Services.AddSingleton<GameDeltaBuffer>();
+// GameStateBroadcastAdapter przejmuje rolę IGameStateBroadcaster i publikuje delty do bufora
+builder.Services.AddSingleton<IGameStateBroadcaster, GameStateBroadcastAdapter>();
 builder.Services.AddSingleton<INpcAiService, NpcAiService>();
 builder.Services.AddHostedService<NpcAiHostedService>();
 builder.Services.AddSingleton<INpcCombatService, NpcCombatService>();
@@ -67,7 +70,6 @@ builder.Services.AddSingleton<INpcCombatService, NpcCombatService>();
 // Serwisy gRPC
 builder.Services.AddScoped<CharacterServiceImpl>();
 builder.Services.AddScoped<SessionServiceImpl>();
-builder.Services.AddScoped<InteractionServiceImpl>();
 builder.Services.AddScoped<WorldServiceImpl>();
 builder.Services.AddScoped<ItemQueryServiceImpl>();
 builder.Services.AddScoped<SkillQueryServiceImpl>();
@@ -96,7 +98,6 @@ app.MapHealthChecks("/health/ready", new HealthCheckOptions
 // Mapowanie gRPC
 app.MapGrpcService<CharacterServiceImpl>();
 app.MapGrpcService<SessionServiceImpl>();
-app.MapGrpcService<InteractionServiceImpl>();
 app.MapGrpcService<WorldServiceImpl>();
 app.MapGrpcService<ItemQueryServiceImpl>();
 app.MapGrpcService<SkillQueryServiceImpl>();

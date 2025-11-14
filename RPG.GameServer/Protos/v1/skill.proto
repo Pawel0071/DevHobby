@@ -15,7 +15,8 @@ message SkillListReply { repeated Skill skills = 1; }
 message Skill {
   string id = 1;
   string name = 2;
-  repeated string tags = 3;
+  string description = 3;
+  repeated string tags = 4;
 }
 
 message SkillGetByIdRequest { string id = 1; }

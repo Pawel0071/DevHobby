@@ -1,12 +1,6 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Grpc.Net.Client;
 using Microsoft.Extensions.DependencyInjection;
-using RPG.GameServer;
 using RPG.GameServer.QueryProtos;
 using RPG.Infrastructure.Interfaces;
-using Xunit;
 using FluentAssertions;
 using System.Numerics;
 
@@ -44,9 +38,12 @@ public class MapObjectQuestGrpcIntegrationTests : IClassFixture<TestContainersFi
             var doc = mapperMo.ToPersistence(mo);
             await mongo.UpsertAsync(doc);
         }
-        // ...existing code...
-        var client = new MapObjectQuery.MapObjectQueryClient(CreateChannel(factory));
-        var single = await client.GetMapObjectAsync(new MapObjectGetByIdRequest { Id = mo.Id.ToString() });
+
+        var auth = await factory.CreateAuthenticatedChannelAsync("mapobject-query-tester");
+        using var channel = auth.Channel;
+        var sessionHeaders = auth.Headers;
+        var client = new MapObjectQuery.MapObjectQueryClient(channel);
+        var single = await client.GetMapObjectAsync(new MapObjectGetByIdRequest { Id = mo.Id.ToString() }, sessionHeaders);
         single?.Mo.Should().NotBeNull();
         single!.Mo.Id.Should().Be(mo.Id.ToString());
         single.Mo.Container.Should().NotBeNull();
@@ -54,10 +51,10 @@ public class MapObjectQuestGrpcIntegrationTests : IClassFixture<TestContainersFi
         single.Mo.Door.Should().NotBeNull();
         single.Mo.Components.Count.Should().BeGreaterOrEqualTo(3); // JSON components as well
 
-        var list = await client.ListMapObjectsAsync(new MapObjectListRequest());
+        var list = await client.ListMapObjectsAsync(new MapObjectListRequest(), sessionHeaders);
         list.Mos.Count.Should().BeGreaterOrEqualTo(1);
 
-        var many = await client.GetMapObjectsByIdsAsync(new MapObjectGetByIdsRequest { Ids = { mo.Id.ToString() } });
+        var many = await client.GetMapObjectsByIdsAsync(new MapObjectGetByIdsRequest { Ids = { mo.Id.ToString() } }, sessionHeaders);
         many.Mos.Should().ContainSingle();
     }
 
@@ -84,24 +81,22 @@ public class MapObjectQuestGrpcIntegrationTests : IClassFixture<TestContainersFi
             var docQ = mapperQ.ToPersistence(q);
             await mongoQ.UpsertAsync(docQ);
         }
-        // ...existing code...
-        var client = new QuestQuery.QuestQueryClient(CreateChannel(factory));
-        var single = await client.GetQuestAsync(new QuestGetByIdRequest { Id = q.Id.ToString() });
+
+        var auth = await factory.CreateAuthenticatedChannelAsync("quest-query-tester");
+        using var channel = auth.Channel;
+        var sessionHeaders = auth.Headers;
+        var client = new QuestQuery.QuestQueryClient(channel);
+        var single = await client.GetQuestAsync(new QuestGetByIdRequest { Id = q.Id.ToString() }, sessionHeaders);
         single?.Quest.Should().NotBeNull();
         single!.Quest.Id.Should().Be(q.Id.ToString());
         single.Quest.LevelRequirement.Should().NotBeNull();
         single.Quest.ItemRewards.Should().NotBeNull();
         single.Quest.Components.Count.Should().BeGreaterOrEqualTo(2); // JSON components as well
 
-        var list = await client.ListQuestsAsync(new QuestListRequest());
+        var list = await client.ListQuestsAsync(new QuestListRequest(), sessionHeaders);
         list.Quests.Count.Should().BeGreaterOrEqualTo(1);
 
-        var many = await client.GetQuestsByIdsAsync(new QuestGetByIdsRequest { Ids = { q.Id.ToString() } });
+        var many = await client.GetQuestsByIdsAsync(new QuestGetByIdsRequest { Ids = { q.Id.ToString() } }, sessionHeaders);
         many.Quests.Should().ContainSingle();
-    }
-
-    private static GrpcChannel CreateChannel(GameServerFactory factory)
-    {
-        return GrpcChannel.ForAddress(factory.Server.BaseAddress, new GrpcChannelOptions { HttpClient = factory.CreateDefaultClient() });
     }
 }

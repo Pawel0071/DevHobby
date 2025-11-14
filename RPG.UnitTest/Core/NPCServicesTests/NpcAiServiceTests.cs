@@ -104,7 +104,8 @@ public class NpcAiServiceTests
         Mock<ICharacterStateBroadcaster> Broadcaster,
         Mock<INpcCombatService> Combat,
         Mock<IRabbitMqPublisher> Publisher,
-        Mock<ILogger<NpcAiService>> Logger) CreateService()
+        Mock<ILogger<NpcAiService>> Logger,
+        Mock<IGameStateBroadcaster> StateBroadcaster) CreateService()
     {
         var documentRepository = new Mock<IModelRepository>();
         var movement = new Mock<IMovementService>();
@@ -112,6 +113,7 @@ public class NpcAiServiceTests
         var combat = new Mock<INpcCombatService>();
         var publisher = new Mock<IRabbitMqPublisher>();
         var logger = new Mock<ILogger<NpcAiService>>();
+        var stateBroadcaster = new Mock<IGameStateBroadcaster>();
 
         broadcaster.Setup(b => b.GetSnapshots()).Returns(Array.Empty<CharacterStateSnapshot>());
 
@@ -126,9 +128,10 @@ public class NpcAiServiceTests
             broadcaster.Object,
             combat.Object,
             publisher.Object,
-            logger.Object);
+            logger.Object,
+            stateBroadcaster.Object);
 
-        return (service, documentRepository, movement, broadcaster, combat, publisher, logger);
+        return (service, documentRepository, movement, broadcaster, combat, publisher, logger, stateBroadcaster);
     }
 
     private static Task<IReadOnlyList<string>> InvokeExecuteDirectivesAsync(

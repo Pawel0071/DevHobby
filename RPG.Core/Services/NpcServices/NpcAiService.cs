@@ -10,6 +10,7 @@ using RPG.AI.Models;
 using RPG.Core.Interfaces;
 using RPG.Core.Interfaces.NpcServices;
 using RPG.Abstractions.Interfaces;
+using RPG.Abstractions.SharedModel;
 using RPG.Domain.Enums;
 using RPG.Domain.Models;
 using RPG.Domain.Models.Interaction;
@@ -62,6 +63,7 @@ public sealed class NpcAiService : INpcAiService
     private readonly ConcurrentDictionary<Guid, Dictionary<Guid, ThreatEntry>> _threatTables = new();
     private readonly SemaphoreSlim _tickGate = new(1, 1);
     private IReadOnlyList<AiEvaluationResult> _lastEvaluations = Array.Empty<AiEvaluationResult>();
+    private readonly IGameStateBroadcaster _gameStateBroadcaster;
 
     public NpcAiService(
         IModelRepository modelRepository,
@@ -69,7 +71,8 @@ public sealed class NpcAiService : INpcAiService
         ICharacterStateBroadcaster stateBroadcaster,
         INpcCombatService combatService,
         IRabbitMqPublisher publisher,
-        ILogger<NpcAiService> logger)
+        ILogger<NpcAiService> logger,
+        IGameStateBroadcaster gameStateBroadcaster)
     {
         _modelRepository = modelRepository;
         _movementService = movementService;
@@ -78,6 +81,7 @@ public sealed class NpcAiService : INpcAiService
         _publisher = publisher;
         _logger = logger;
         _settings = UtilityAgentSettings.Default;
+        _gameStateBroadcaster = gameStateBroadcaster;
     }
 
     public async Task<IReadOnlyList<AiEvaluationResult>> TickAsync(CancellationToken cancellationToken = default)
@@ -103,6 +107,25 @@ public sealed class NpcAiService : INpcAiService
 
                 UpdateNpcSnapshot(npc);
                 _npcs[npc.Id] = npc;
+
+                // Broadcast delty ruchu NPC – tylko ID i aktualna lokalizacja
+                if (npc.CurrentLocation != null)
+                {
+                    var delta = new GameDeltaUpdate
+                    {
+                        WorldId = npc.WorldId,
+                        NpcChanges = new[]
+                        {
+                            new NpcDelta
+                            {
+                                NpcId = npc.Id,
+                                Location = npc.CurrentLocation,
+                                IsAlive = npc.IsAlive
+                            }
+                        }
+                    };
+                    await _gameStateBroadcaster.BroadcastDeltaAsync(delta, cancellationToken).ConfigureAwait(false);
+                }
 
                 evaluations.Add(new AiEvaluationResult(npc, agent, context, decision, directives, executionLog));
             }

@@ -33,19 +33,19 @@ public class Npc : IDomainModel
         };
     }
 
-    private Npc()
+    public Npc()
     {
         Name = string.Empty;
         DisplayName = string.Empty;
         Description = string.Empty;
         SpawnLocation = new Location();
         CurrentLocation = new Location();
-    Tags = new HashSet<string>();
-    Components = new List<INpcComponent>();
-    BaseStatsContainer = new StatsContainer();
-    ModifiedStatsContainer = new StatsContainer();
-    LastUpdated = DateTime.UtcNow;
-    IsAlive = true;
+        Tags = new HashSet<string>();
+        Components = new List<INpcComponent>();
+        BaseStatsContainer = new StatsContainer();
+        ModifiedStatsContainer = new StatsContainer();
+        LastUpdated = DateTime.UtcNow;
+        IsAlive = true;
     }
 
     public Guid Id { get; private set; }

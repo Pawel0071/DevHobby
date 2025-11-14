@@ -15,6 +15,8 @@ using RPG.Infrastructure.Interfaces;
 using StackExchange.Redis;
 using RPG.GameServer;
 using Grpc.Net.Client;
+using Grpc.Core;
+using RPG.GameServer.Protos;
 
 namespace RPG.IntegrationTests;
 
@@ -164,5 +166,96 @@ public sealed class GameServerFactory : WebApplicationFactory<IntegrationEntryPo
         var baseAddress = Server.BaseAddress ?? new Uri("http://localhost");
         var handler = Server.CreateHandler();
         return GrpcChannel.ForAddress(baseAddress, new GrpcChannelOptions { HttpHandler = handler });
+    }
+
+    public async Task<(GrpcChannel Channel, Metadata Headers)> CreateAuthenticatedChannelAsync(
+        string characterName,
+        CancellationToken cancellationToken = default)
+    {
+        var channel = CreateGrpcChannel();
+        try
+        {
+            var headers = await CreateSessionHeadersAsync(channel, characterName, cancellationToken);
+            return (channel, headers);
+        }
+        catch
+        {
+            channel.Dispose();
+            throw;
+        }
+    }
+
+    private static async Task<Metadata> CreateSessionHeadersAsync(
+        GrpcChannel channel,
+        string characterName,
+        CancellationToken cancellationToken)
+    {
+        var characterClient = new CharacterService.CharacterServiceClient(channel);
+        var sessionClient = new SessionService.SessionServiceClient(channel);
+
+        var characterReply = await characterClient.CreateCharacterAsync(
+            BuildCharacterRequest(characterName),
+            cancellationToken: cancellationToken);
+
+        var sessionReply = await sessionClient.CreateSessionAsync(new CreateSessionRequest
+        {
+            CharacterId = characterReply.CharacterId,
+            PlayerId = Guid.NewGuid().ToString()
+        }, cancellationToken: cancellationToken);
+
+        return new Metadata
+        {
+            { "x-session-id", sessionReply.Session.Id }
+        };
+    }
+
+    private static CharacterRequest BuildCharacterRequest(string name)
+    {
+        return new CharacterRequest
+        {
+            Character = new PlayerCharacter
+            {
+                CharacterClass = CharacterClass.Warrior,
+                SessionId = Guid.NewGuid().ToString(),
+                BaseCharacter = new BaseCharacter
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = name,
+                    Level = 5,
+                    MaxHealth = 150,
+                    CurrentHealth = 150,
+                    MaxMana = 80,
+                    CurrentMana = 80,
+                    Rotation = 0f,
+                    Position = new Location
+                    {
+                        X = 0,
+                        Y = 0,
+                        Z = 0,
+                        WorldId = Guid.NewGuid().ToString(),
+                        MapId = "integration-map",
+                        ZoneName = "integration-zone",
+                        Rotation = 0f
+                    },
+                    Stats = new Stats
+                    {
+                        Strength = 10,
+                        Vitality = 10,
+                        Intelligence = 5,
+                        Wisdom = 4,
+                        Dexterity = 6,
+                        Agility = 6,
+                        MagicResist = 2,
+                        NatureResist = 2,
+                        MisticResist = 2,
+                        Armor = 5,
+                        CritChance = 1,
+                        HitChance = 90,
+                        AttackSpeed = 1,
+                        MoveSpeed = 5
+                    }
+                }
+            }
+        };
     }
 }

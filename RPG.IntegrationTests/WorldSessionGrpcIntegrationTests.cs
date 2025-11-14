@@ -1,9 +1,6 @@
-using System;
-using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
+using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.DependencyInjection;
 using RPG.GameServer.Protos;
@@ -52,10 +49,15 @@ public class WorldSessionGrpcIntegrationTests : IClassFixture<TestContainersFixt
             PlayerId = Guid.NewGuid().ToString()
         });
 
+        var sessionHeaders = new Metadata
+        {
+            { "x-session-id", sessionReply.Session.Id }
+        };
+
         var joinReply = await worldClient.JoinWorldAsync(new JoinWorldRequest
         {
             SessionId = sessionReply.Session.Id
-        });
+        }, sessionHeaders);
 
         joinReply.SpawnLocation.Should().NotBeNull();
         joinReply.SpawnLocation.WorldId.Should().Be(StarterWorldId);

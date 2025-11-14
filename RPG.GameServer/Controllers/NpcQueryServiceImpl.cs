@@ -1,19 +1,30 @@
 using Grpc.Core;
 using RPG.GameServer.QueryProtos;
+using RPG.GameServer.Mappers;
 using RPG.Application.Interfaces;
 using RPG.Application.Queries;
+using DomainNpc = RPG.Domain.Models.Npcs.Npc;
 
 namespace RPG.GameServer.Controllers;
 
-public class NpcQueryServiceImpl(IQueryBus queryBus) : NpcQuery.NpcQueryBase
+public class NpcQueryServiceImpl : NpcQuery.NpcQueryBase
 {
+    private readonly IQueryBus _queryBus;
+    private readonly NpcProtoMapper _mapper;
+
+    public NpcQueryServiceImpl(IQueryBus queryBus, NpcProtoMapper mapper)
+    {
+        _queryBus = queryBus;
+        _mapper = mapper;
+    }
+
     public override async Task<NpcSingleReply> GetNpc(NpcGetByIdRequest request, ServerCallContext context)
     {
         if (!Guid.TryParse(request.Id, out var id)) throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid Id"));
         try
         {
-            var dto = await queryBus.ExecuteAsync<GetNpcQuery, NpcReadDto>(new GetNpcQuery(id), context.CancellationToken);
-            return new NpcSingleReply { Npc = Map(dto) };
+            var npc = await _queryBus.ExecuteAsync<GetNpcQuery, DomainNpc>(new GetNpcQuery(id), context.CancellationToken);
+            return new NpcSingleReply { Npc = _mapper.ToProto(npc) };
         }
         catch (KeyNotFoundException)
         {
@@ -23,9 +34,9 @@ public class NpcQueryServiceImpl(IQueryBus queryBus) : NpcQuery.NpcQueryBase
 
     public override async Task<NpcListReply> ListNpcs(NpcListRequest request, ServerCallContext context)
     {
-        var list = await queryBus.ExecuteAsync<GetNpcsQuery, IReadOnlyList<NpcReadDto>>(new GetNpcsQuery(), context.CancellationToken);
+        var list = await _queryBus.ExecuteAsync<GetNpcsQuery, IReadOnlyList<DomainNpc>>(new GetNpcsQuery(), context.CancellationToken);
         var reply = new NpcListReply();
-        reply.Npcs.AddRange(list.Select(Map));
+        reply.Npcs.AddRange(list.Select(_mapper.ToProto));
         return reply;
     }
 
@@ -36,26 +47,9 @@ public class NpcQueryServiceImpl(IQueryBus queryBus) : NpcQuery.NpcQueryBase
             .Where(g => g.HasValue)
             .Select(g => g!.Value)
             .ToArray();
-        var list = await queryBus.ExecuteAsync<GetNpcsByIdsQuery, IReadOnlyList<NpcReadDto>>(new GetNpcsByIdsQuery(ids), context.CancellationToken);
+        var list = await _queryBus.ExecuteAsync<GetNpcsByIdsQuery, IReadOnlyList<DomainNpc>>(new GetNpcsByIdsQuery(ids), context.CancellationToken);
         var reply = new NpcListReply();
-        reply.Npcs.AddRange(list.Select(Map));
+        reply.Npcs.AddRange(list.Select(_mapper.ToProto));
         return reply;
-    }
-
-    private static Npc Map(NpcReadDto dto)
-    {
-        var msg = new Npc
-        {
-            Id = dto.Id.ToString(),
-            Name = dto.Name,
-            Level = dto.Level,
-            IsMoving = dto.IsMoving,
-            X = dto.CurrentLocation.X,
-            Y = dto.CurrentLocation.Y,
-            Z = dto.CurrentLocation.Z,
-            Rotation = dto.CurrentLocation.Rotation
-        };
-        msg.Tags.AddRange(dto.Tags);
-        return msg;
     }
 }

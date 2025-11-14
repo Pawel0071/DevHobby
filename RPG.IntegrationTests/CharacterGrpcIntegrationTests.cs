@@ -60,36 +60,50 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
 
         using var channel = CreateGrpcChannel(factory);
         var client = new CharacterServiceClient(channel);
+        var sessionClient = new SessionService.SessionServiceClient(channel);
 
         var createReply = await client.CreateCharacterAsync(BuildCharacterRequest("MovementHero"));
+        var characterId = createReply.CharacterId;
+
+        // Create session before movement commands
+        var sessionReply = await sessionClient.CreateSessionAsync(new CreateSessionRequest
+        {
+            CharacterId = characterId,
+            PlayerId = Guid.NewGuid().ToString()
+        });
+
+        var headers = new Grpc.Core.Metadata
+        {
+            { "x-session-id", sessionReply.Session.Id }
+        };
 
         var startMove = await client.StartMovementAsync(new MovementCommandRequest
         {
-            CharacterId = createReply.CharacterId,
+            CharacterId = characterId,
             Direction = 1
-        });
+        }, headers);
 
         startMove.Success.Should().BeTrue();
 
         // Retry polling until IsMoving = true or timeout
-        await AssertWithRetryAsync(factory, Guid.Parse(createReply.CharacterId), c => c.IsMoving, "IsMoving should be true after StartMovement");
-        await AssertWithRetryAsync(factory, Guid.Parse(createReply.CharacterId), c => c.CurrentLocation.Position.Y > 0f, "Y position should increase after movement");
+        await AssertWithRetryAsync(factory, Guid.Parse(characterId), c => c.IsMoving, "IsMoving should be true after StartMovement");
+        await AssertWithRetryAsync(factory, Guid.Parse(characterId), c => c.CurrentLocation.Position.Y > 0f, "Y position should increase after movement");
 
-        var stopMove = await client.StopMovementAsync(new CharacterIdRequest { CharacterId = createReply.CharacterId });
+        var stopMove = await client.StopMovementAsync(new CharacterIdRequest { CharacterId = characterId }, headers);
         stopMove.Success.Should().BeTrue();
 
         var startRotation = await client.StartRotationAsync(new MovementCommandRequest
         {
-            CharacterId = createReply.CharacterId,
+            CharacterId = characterId,
             Direction = 3
-        });
+        }, headers);
 
         startRotation.Success.Should().BeTrue();
 
-        await AssertWithRetryAsync(factory, Guid.Parse(createReply.CharacterId), c => c.IsRotating, "IsRotating should be true after StartRotation");
-        await AssertWithRetryAsync(factory, Guid.Parse(createReply.CharacterId), c => Math.Abs(c.CurrentLocation.Rotation - 90f) < 0.01f, "Rotation should approach 90 degrees");
+        await AssertWithRetryAsync(factory, Guid.Parse(characterId), c => c.IsRotating, "IsRotating should be true after StartRotation");
+        await AssertWithRetryAsync(factory, Guid.Parse(characterId), c => Math.Abs(c.CurrentLocation.Rotation - 90f) < 0.01f, "Rotation should approach 90 degrees");
 
-        var stopRotation = await client.StopRotationAsync(new CharacterIdRequest { CharacterId = createReply.CharacterId });
+        var stopRotation = await client.StopRotationAsync(new CharacterIdRequest { CharacterId = characterId }, headers);
         stopRotation.Success.Should().BeTrue();
     }
 

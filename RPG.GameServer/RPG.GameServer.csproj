@@ -62,10 +62,4 @@
     <ProjectReference Include="..\RPG.AI\RPG.AI.csproj"/>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DTO\" />
-    <Folder Include="Middleware\"/>
-    <Folder Include="Services\"/>
-  </ItemGroup>
-
 </Project>

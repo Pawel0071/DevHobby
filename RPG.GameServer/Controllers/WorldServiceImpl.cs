@@ -7,6 +7,7 @@ using RPG.Domain.Models.Interaction;
 using RPG.Domain.Models.MapObjects;
 using RPG.Domain.Models.Npcs;
 using RPG.GameServer.Protos;
+using RPG.GameServer.Services;
 using RPG.Infrastructure.Interfaces;
 using DomainWorldState = RPG.Domain.Models.WorldState;
 using Location = RPG.Domain.Models.Location;
@@ -21,18 +22,21 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 		private readonly IWorldSessionManager _worldSessionManager;
 		private readonly IModelRepository _modelRepository;
 		private readonly RPG.Infrastructure.Interfaces.ILogger<WorldServiceImpl> _logger;
+        private readonly GameDeltaBuffer _deltaBuffer;
 
 	public WorldServiceImpl(
         ICharacterStateBroadcaster stateBroadcaster,
         INpcAiService npcAiService,
 			IWorldSessionManager worldSessionManager,
 	        IModelRepository modelRepository,
+            GameDeltaBuffer deltaBuffer,
 			RPG.Infrastructure.Interfaces.ILogger<WorldServiceImpl> logger)
 	{
 			_stateBroadcaster = stateBroadcaster;
 			_npcAiService = npcAiService;
 			_worldSessionManager = worldSessionManager;
 			_modelRepository = modelRepository;
+            _deltaBuffer = deltaBuffer;
 			_logger = logger;
 	}
 
@@ -174,9 +178,13 @@ public class WorldServiceImpl : WorldService.WorldServiceBase
 			while (!context.CancellationToken.IsCancellationRequested)
 			{
 				var world = await _worldSessionManager.GetWorldAsync(resolvedWorldId, context.CancellationToken).ConfigureAwait(false);
+				var snapshot = await ToSnapshotAsync(world, context.CancellationToken).ConfigureAwait(false);
+                var delta = _deltaBuffer.DequeueAggregated(resolvedWorldId);
+
 				var update = new WorldUpdate
 				{
-					Snapshot = await ToSnapshotAsync(world, context.CancellationToken).ConfigureAwait(false)
+					Snapshot = snapshot,
+                    Delta = delta
 				};
 
 				await responseStream.WriteAsync(update).ConfigureAwait(false);

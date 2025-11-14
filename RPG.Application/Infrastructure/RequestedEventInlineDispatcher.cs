@@ -12,24 +12,13 @@ public interface IRequestedEventInlineDispatcher
 
 public sealed class RequestedEventInlineDispatcher : IRequestedEventInlineDispatcher
 {
-    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IRequestedEventOrchestrator _orchestrator;
 
-    public RequestedEventInlineDispatcher(IServiceScopeFactory scopeFactory)
+    public RequestedEventInlineDispatcher(IRequestedEventOrchestrator orchestrator)
     {
-        _scopeFactory = scopeFactory;
+        _orchestrator = orchestrator;
     }
 
-    public async Task<bool> TryHandleAsync(IGameEventWithMetadata evt, CancellationToken ct)
-    {
-        using var scope = _scopeFactory.CreateScope();
-        var handlers = scope.ServiceProvider.GetRequiredService<IEnumerable<IRequestedEventHandler>>();
-        foreach (var h in handlers)
-        {
-            if (!h.CanHandle(evt)) continue;
-            await h.HandleAsync(evt, ct);
-            return true;
-        }
-        return false;
-    }
+    public Task<bool> TryHandleAsync(IGameEventWithMetadata evt, CancellationToken ct)
+        => _orchestrator.TryHandleAsync(evt, ct);
 }
-

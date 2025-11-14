@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RPG.Abstractions.Interfaces;
 using RPG.Application.Infrastructure;
-using RPG.Application.Interfaces;
 using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Application.Hosted;
@@ -14,16 +14,16 @@ namespace RPG.Application.Hosted;
 public sealed class RequestedEventsHostedService : BackgroundService
 {
     private readonly IRequestEventQueue _requestQueue;
-    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IRequestedEventOrchestrator _orchestrator;
     private readonly ILogger<RequestedEventsHostedService> _logger;
 
     public RequestedEventsHostedService(
         IRequestEventQueue requestQueue,
-        IServiceScopeFactory scopeFactory,
+        IRequestedEventOrchestrator orchestrator,
         ILogger<RequestedEventsHostedService> logger)
     {
         _requestQueue = requestQueue;
-        _scopeFactory = scopeFactory;
+        _orchestrator = orchestrator;
         _logger = logger;
     }
 
@@ -36,19 +36,17 @@ public sealed class RequestedEventsHostedService : BackgroundService
             {
                 if (_requestQueue.TryDequeue(out var evt))
                 {
-                    using var scope = _scopeFactory.CreateScope();
-                    var handlers = scope.ServiceProvider.GetRequiredService<IEnumerable<IRequestedEventHandler>>();
-                    var matched = false;
-                    foreach (var h in handlers)
+                    if (evt is IGameEventWithMetadata metaEvt)
                     {
-                        if (!h.CanHandle(evt)) continue;
-                        matched = true;
-                        await h.HandleAsync(evt, stoppingToken);
-                        break;
+                        var handled = await _orchestrator.TryHandleAsync(metaEvt, stoppingToken);
+                        if (!handled)
+                        {
+                            _logger.Warn($"No IRequestedEventHandler matched event type: {evt.GetType().Name}");
+                        }
                     }
-                    if (!matched)
+                    else
                     {
-                        _logger.Warn($"No IRequestedEventHandler matched event type: {evt.GetType().Name}");
+                        _logger.Warn($"Dequeued event without metadata: {evt.GetType().Name}");
                     }
                 }
                 else

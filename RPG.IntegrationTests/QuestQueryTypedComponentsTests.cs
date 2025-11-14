@@ -1,11 +1,9 @@
-using System;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using FluentAssertions;
+using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.Extensions.DependencyInjection;
-using RPG.GameServer;
+using RPG.Application.Managers;
 using RPG.GameServer.QueryProtos;
 using RPG.Infrastructure.Interfaces;
 using System.Numerics;
@@ -48,8 +46,8 @@ public class QuestQueryTypedComponentsTests : IClassFixture<TestContainersFixtur
         quest.Components.Add(new RPG.Domain.Models.Quests.QuestComponents.TimeLimitComponent { TimeLimitMinutes = 60 });
         await repo.UpsertAsync(quest);
 
-        var client = new QuestQuery.QuestQueryClient(CreateChannel(factory));
-        var reply = await client.GetQuestAsync(new QuestGetByIdRequest { Id = quest.Id.ToString() });
+        var (client, headers) = await CreateQuestQueryClientWithSessionAsync(factory);
+        var reply = await client.GetQuestAsync(new QuestGetByIdRequest { Id = quest.Id.ToString() }, headers);
         reply.Quest.Should().NotBeNull();
         var q = reply.Quest;
         q.LevelRequirement.Should().NotBeNull();
@@ -76,8 +74,8 @@ public class QuestQueryTypedComponentsTests : IClassFixture<TestContainersFixtur
         quest.Components.Add(new RPG.Domain.Models.Quests.QuestComponents.LevelRequirementComponent { MinLevel = 5 });
         await repo.UpsertAsync(quest);
 
-        var client = new QuestQuery.QuestQueryClient(CreateChannel(factory));
-        var reply = await client.GetQuestAsync(new QuestGetByIdRequest { Id = quest.Id.ToString() });
+        var (client, headers) = await CreateQuestQueryClientWithSessionAsync(factory);
+        var reply = await client.GetQuestAsync(new QuestGetByIdRequest { Id = quest.Id.ToString() }, headers);
         reply.Quest.Should().NotBeNull();
 
         var json = JsonSerializer.Serialize(reply.Quest, new JsonSerializerOptions { WriteIndented = true });
@@ -114,8 +112,8 @@ public class QuestQueryTypedComponentsTests : IClassFixture<TestContainersFixtur
         quest.Components.Add(new RPG.Domain.Models.Quests.QuestComponents.TimeLimitComponent { TimeLimitMinutes = 60 });
         await repo.UpsertAsync(quest);
 
-        var client = new QuestQuery.QuestQueryClient(CreateChannel(factory));
-        var reply = await client.GetQuestAsync(new QuestGetByIdRequest { Id = quest.Id.ToString() });
+        var (client, headers) = await CreateQuestQueryClientWithSessionAsync(factory);
+        var reply = await client.GetQuestAsync(new QuestGetByIdRequest { Id = quest.Id.ToString() }, headers);
 
         var raw = JsonSerializer.Serialize(reply.Quest, new JsonSerializerOptions { WriteIndented = true });
 
@@ -144,5 +142,22 @@ public class QuestQueryTypedComponentsTests : IClassFixture<TestContainersFixtur
     private static GrpcChannel CreateChannel(GameServerFactory factory)
     {
         return GrpcChannel.ForAddress(factory.Server.BaseAddress, new GrpcChannelOptions { HttpClient = factory.CreateDefaultClient() });
+    }
+
+    private static async Task<(QuestQuery.QuestQueryClient Client, Metadata Headers)> CreateQuestQueryClientWithSessionAsync(GameServerFactory factory, CancellationToken cancellationToken = default)
+    {
+        var channel = CreateChannel(factory);
+        var client = new QuestQuery.QuestQueryClient(channel);
+
+        using var scope = factory.Services.CreateScope();
+        var sessionManager = scope.ServiceProvider.GetRequiredService<ISessionManager>();
+        var session = await sessionManager.CreateAsync(Guid.NewGuid(), Guid.NewGuid(), "127.0.0.1", "integration", "test-client", cancellationToken);
+
+        var headers = new Metadata
+        {
+            { "x-session-id", session.Id.ToString() }
+        };
+
+        return (client, headers);
     }
 }

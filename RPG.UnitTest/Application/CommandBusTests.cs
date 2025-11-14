@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using RPG.Application.Commands;
 using RPG.Application.Interfaces;
-using RPG.Application.Handlers;
 using RPG.Application.Infrastructure;
 using RPG.Abstractions.Interfaces;
 using Xunit;

@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RPG.Application;
-using RPG.Application.Handlers;
 using RPG.CLI.Commands;
 using RPG.CLI.FunctionalTests;
 using RPG.CLI.Scenarios;

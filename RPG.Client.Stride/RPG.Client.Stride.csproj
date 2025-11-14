@@ -8,20 +8,14 @@
 
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.56.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.25.3" />
-    <PackageReference Include="Grpc.Tools" Version="2.56.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.30.2" />
+    <PackageReference Include="Grpc.Tools" Version="2.71.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
     <PackageReference Include="Myra" Version="1.5.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="../RPG.GameServer/Protos/character.proto" GrpcServices="Client" ProtoRoot="../RPG.GameServer/Protos" />
-    <Protobuf Include="../RPG.GameServer/Protos/session.proto" GrpcServices="Client" ProtoRoot="../RPG.GameServer/Protos" />
-    <Protobuf Include="../RPG.GameServer/Protos/world.proto" GrpcServices="Client" ProtoRoot="../RPG.GameServer/Protos" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,5 +28,9 @@
     <Content Include="Assets/**/*.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RPG.GameServer\RPG.GameServer.csproj" />
   </ItemGroup>
 </Project>

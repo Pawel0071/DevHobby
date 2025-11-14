@@ -74,7 +74,7 @@ public class ProtoFieldNumberTests
             }
             diff.Add("Captured fields line-by-line:");
             foreach (var c in current) diff.Add($"{c.Key} => {c.Value}");
-            Assert.True(false, string.Join("\n", diff));
+            Assert.Fail(string.Join("\n", diff));
         }
     }
 }

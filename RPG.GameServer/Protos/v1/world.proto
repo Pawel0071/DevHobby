@@ -59,6 +59,7 @@ message WorldStreamRequest {
 
 message WorldUpdate {
   WorldSnapshot snapshot = 1;
+  WorldDelta delta = 2;
 }
 
 message WorldSnapshot {
@@ -106,3 +107,25 @@ message WorldMapObject {
   int64 lastUpdated = 8;
 }
 
+// Delta messages for incremental updates
+message WorldDelta {
+  repeated WorldCharacterDelta characters = 1;
+  repeated WorldNpcDelta npcs = 2;
+  repeated WorldMapObjectDelta mapObjects = 3;
+}
+
+message WorldCharacterDelta {
+  string characterId = 1;
+  Location location = 2;
+}
+
+message WorldNpcDelta {
+  string npcId = 1;
+  Location location = 2;
+}
+
+message WorldMapObjectDelta {
+  string mapObjectId = 1;
+  Location location = 2;
+  bool isActive = 3;
+}

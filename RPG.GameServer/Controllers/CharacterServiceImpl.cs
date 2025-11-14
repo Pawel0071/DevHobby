@@ -3,7 +3,6 @@ using RPG.Application.Commands;
 using RPG.Application.Infrastructure;
 using RPG.Application.Interfaces;
 using RPG.GameServer.Protos;
-using RPG.Infrastructure.Interfaces;
 using RPG.GameServer.Mappers;
 
 namespace RPG.GameServer.Controllers;
@@ -16,6 +15,7 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
     private readonly ICommandHandler<StartRotationCommand> _startRotationHandler;
     private readonly ICommandHandler<StopRotationCommand> _stopRotationHandler;
     private readonly Infrastructure.Interfaces.ILogger<CharacterServiceImpl> _logger;
+    private readonly CharacterProtoMapper _mapper;
 
     public CharacterServiceImpl(
         ICommandHandler<CreateCharacterCommand> createCharacterHandler,
@@ -23,7 +23,8 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
         ICommandHandler<StopMovementCommand> stopMovementHandler,
         ICommandHandler<StartRotationCommand> startRotationHandler,
         ICommandHandler<StopRotationCommand> stopRotationHandler,
-        Infrastructure.Interfaces.ILogger<CharacterServiceImpl> logger)
+        Infrastructure.Interfaces.ILogger<CharacterServiceImpl> logger,
+        CharacterProtoMapper mapper)
     {
         _createCharacterHandler = createCharacterHandler;
         _startMovementHandler = startMovementHandler;
@@ -31,6 +32,7 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
         _startRotationHandler = startRotationHandler;
         _stopRotationHandler = stopRotationHandler;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public override async Task<CharacterIdReply> CreateCharacter(CharacterRequest request, ServerCallContext context)
@@ -38,7 +40,7 @@ public class CharacterServiceImpl : CharacterService.CharacterServiceBase
         if (request?.Character?.BaseCharacter == null)
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Character payload is required."));
 
-        var character = request.ToDomainCharacter();
+        var character = _mapper.ToDomain(request);
         var cmd = new CreateCharacterCommand(character);
         var result = await _createCharacterHandler.HandleAsync(cmd, context.CancellationToken);
         if (!result.Success)
