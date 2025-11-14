@@ -9,17 +9,26 @@ namespace RPG.Infrastructure.Common;
 public class DictionaryWarmupService(IServiceProvider provider, ILogger<DictionaryWarmupService> logger)
     : IHostedService
 {
+    private static int _logGuard; // 0 = not logged, 1 = logged
+
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         using var scope = provider.CreateScope();
         var sp = scope.ServiceProvider;
 
-        logger.Info("Starting dictionary warmup...");
+        var firstLog = System.Threading.Interlocked.Exchange(ref _logGuard, 1) == 0;
+        if (firstLog)
+            logger.Info("Starting dictionary warmup...");
+        else
+            logger.Debug("Starting dictionary warmup (another host instance)...");
 
         await Load<TagDefinition>(sp, cancellationToken);
         await Load<ErrorCodeDefinition>(sp, cancellationToken);
 
-        logger.Info("Dictionary warmup completed.");
+        if (firstLog)
+            logger.Info("Dictionary warmup completed.");
+        else
+            logger.Debug("Dictionary warmup completed (another host instance).");
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
@@ -29,7 +38,7 @@ public class DictionaryWarmupService(IServiceProvider provider, ILogger<Dictiona
     {
         var registry = sp.GetRequiredService<IDictionaryRegistry<T>>();
 
-        var isStatic = typeof(IStaticDictionaryDefinition).IsAssignableFrom(typeof(T)) && typeof(T) != typeof(ErrorCodeDefinition);
+        var isStatic = typeof(IStaticDictionaryDefinition).IsAssignableFrom(typeof(T));
         if (isStatic)
         {
             registry.Load(T.Predefined.ToList());

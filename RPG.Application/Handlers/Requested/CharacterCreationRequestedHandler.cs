@@ -4,6 +4,7 @@ using RPG.Application.Events;
 using RPG.Application.Interfaces;
 using RPG.Infrastructure.Interfaces;
 using RPG.Domain.Enums;
+using RPG.Domain.Models.Skills;
 
 namespace RPG.Application.Handlers.Requested;
 
