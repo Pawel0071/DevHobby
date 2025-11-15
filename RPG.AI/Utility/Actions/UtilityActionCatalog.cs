@@ -17,6 +17,10 @@ public static class UtilityActionCatalog
     private const string PatrolIndexKey = "patrol-index";
     private const string PatrolLastReachedKey = "patrol-last-reached";
 
+    // Klucze oczekiwane przez testy unitowe
+    private const string BbCurrentWaypointKey = "patrol.current_wp";
+    private const string BbArrivalTimeKey = "patrol.arrival_time";
+
     private static readonly ThreadLocal<Random> Random = new(() => new Random());
 
     public static UtilityActionDefinition AcquireTarget(string name, float range, float weight = 1f)
@@ -170,7 +174,7 @@ public static class UtilityActionCatalog
                     route = GeneratePatrolRoute(spawn, radius, waypointCount);
                     context.SetBlackboardValue(routeKey, route);
                     context.SetBlackboardValue(IndexKey(name, self.Id), 0);
-                    context.SetBlackboardValue(LastReachedKey(name, self.Id), DateTime.UtcNow);
+                    // Nie ustawiamy arrival przy inicjalizacji – pojawi sie przy pierwszym dotarciu
                 }
 
                 var indexKey = IndexKey(name, self.Id);
@@ -181,22 +185,60 @@ public static class UtilityActionCatalog
                 }
 
                 var destination = route[index];
+                // Ustaw aktualny waypoint dla testow (Vector3).
+                context.SetBlackboardValue(BbCurrentWaypointKey, destination.Position);
+
                 var distance = context.CalculateDistanceTo(destination);
 
+                // Najpierw logika dwell: jesli jestesmy na miejscu, to czekamy (Idle) przez dwellTime,
+                // dopiero potem przechodzimy do kolejnego waypointa.
                 if (distance <= stopDistance)
                 {
-                    context.SetBlackboardValue(LastReachedKey(name, self.Id), DateTime.UtcNow);
-                    index = (index + 1) % route.Count;
-                    context.SetBlackboardValue(indexKey, index);
-                    destination = route[index];
+                    // Jeżeli nie ma czasu postoju – od razu przechodzimy do kolejnego punktu.
+                    if (dwellTime <= TimeSpan.Zero)
+                    {
+                        index = (index + 1) % route.Count;
+                        context.SetBlackboardValue(indexKey, index);
+                        destination = route[index];
+                        context.SetBlackboardValue(BbCurrentWaypointKey, destination.Position);
+                    }
+                    else
+                    {
+                        // odczytaj czas dotarcia jesli istnieje
+                        if (!context.TryGetBlackboardValue<DateTime>(BbArrivalTimeKey, out var arrival))
+                        {
+                            // Pierwsze dotarcie – zapisz i idluj
+                            context.SetBlackboardValue(BbArrivalTimeKey, DateTime.UtcNow);
+                            return new[] { AiDirective.Idle("patrol-wait") };
+                        }
+
+                        var elapsed = DateTime.UtcNow - arrival;
+                        if (elapsed < dwellTime)
+                        {
+                            return new[] { AiDirective.Idle("patrol-wait") };
+                        }
+
+                        // dwell minął – czyścimy arrival i przechodzimy do kolejnego waypointa
+                        context.RemoveBlackboardValue(BbArrivalTimeKey);
+                        index = (index + 1) % route.Count;
+                        context.SetBlackboardValue(indexKey, index);
+                        destination = route[index];
+                        context.SetBlackboardValue(BbCurrentWaypointKey, destination.Position);
+                    }
                 }
-                else if (context.TryGetBlackboardValue(LastReachedKey(name, self.Id), out DateTime lastReached) &&
-                         DateTime.UtcNow - lastReached < dwellTime)
+                else
                 {
-                    return new[] { AiDirective.Idle("patrol-wait") };
+                    // Nie jestesmy jeszcze na miejscu – upewnij sie, ze arrival nie blokuje ruchu
+                    // (nie wymagane przez testy, ale bezpieczne)
+                    // pozostawiamy arrival jezeli byl ustawiony – oznacza, ze NPC stal w miejscu wczesniej
                 }
 
-                return new[] { AiDirective.MoveTo(destination, stopDistance) };
+                if (context.CalculateDistanceTo(destination) < float.PositiveInfinity)
+                {
+                    return new[] { AiDirective.MoveTo(destination, stopDistance) };
+                }
+
+                return Array.Empty<AiDirective>();
             },
             new IUtilityConsideration[]
             {

@@ -126,11 +126,11 @@ public sealed record AiDirective(
             Metadata: metadata);
     }
 
-    private static Location CloneLocation(Location location)
+    private static Location? CloneLocation(Location? location)
     {
         if (location == null)
         {
-            return new Location();
+            return null;
         }
 
         return new Location

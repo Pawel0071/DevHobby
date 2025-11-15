@@ -3,6 +3,14 @@ docker compose up --build
 
 DevHobby is a multi-service RPG platform built with .NET 8. The solution contains a gRPC game server, domain/application layers, background workers, infrastructure plumbing, a CLI toolkit, automated tests, and a lightweight semi-graphical desktop client that talks to the live server.
 
+> TL;DR to boot everything locally:
+>
+> ```bash
+> docker compose up --build
+> dotnet build DevHobby.sln
+> dotnet run --project RPG.GameServer/RPG.GameServer.csproj
+> ```
+
 ## Table of Contents
 - Architecture
 - Prerequisites
@@ -21,15 +29,56 @@ DevHobby is a multi-service RPG platform built with .NET 8. The solution contai
 
 - `RPG.Core/` – shared domain entities, interfaces, diagnostics, and cross-cutting services
 - `RPG.Domain/` – domain logic (aggregates, value objects, enums)
+  - `Models/Npcs/NpcComponents/AiComponent.cs` – AI behavior profile configuration (patrol, aggro, detection ranges)
 - `RPG.Application/` – application services, command handlers, diagnostics
-- `RPG.Infrastructure/` – MongoDB/Redis/RabbitMQ integration, DI setup, outbox, health checks
+  - `Events/NpcEvents.cs` – NPC AI requested events (move, skill, engage, idle, return to spawn)
+  - `Events/Handlers/NpcRequestedHandlers.cs` – handlers for NPC AI events that update repository & broadcast deltas
+- `RPG.Application/Infrastructure/RequestedEventOrchestrator.cs` – single dispatcher that matches each `*RequestedEvent` to a dedicated `IRequestedEventHandler`
+- `RPG.Application/Managers/SessionManager.cs` – authoritative session store used by the GameServer for Create/Heartbeat/End validation
+- `RPG.AI/` – Utility AI system for NPCs
+  - `Core/AiContext.cs` – runtime snapshot for AI decisions (health, threat, blackboard, directives)
+  - `Utility/Actions/UtilityActionCatalog.cs` – pre-built AI behaviors (Patrol, Attack, Flee, etc.)
+  - `Utility/UtilityAgent.cs` – decision engine that evaluates actions based on context
+- `RPG.Core/Services/NpcServices/NpcAiService.cs` – NPC AI tick loop that:
+  1. Builds AiContext from NPC state + nearby players
+  2. Runs UtilityAgent.Decide() to get AI directives
+  3. Converts directives to *RequestedEvents (NpcMoveRequested, NpcIdleRequested, etc.)
+  4. Enqueues events to RequestedEventQueue for chronological processing
+- `RPG.Infrastructure/` – MongoDB/Redis/RabbitMQ integration, DI setup, outbox, health checks, GameDelta persistence helpers
 - `RPG.GameServer/` – ASP.NET Core gRPC host exposing the RPG services
+  - `Controllers/*ServiceImpl.cs` map Proto → Domain → Command/Query buses (no business logic inside controllers)
+  - `Mappers/*ProtoMapper.cs` mirror `RPG.Infrastructure.Mappers` to include every domain component/tag in proto responses
+  - `Services/GameStateBroadcastAdapter` + `GameDeltaBuffer` push world-state deltas to connected sessions
 - `RPG.PersistenceService/` – background worker for persistence/outbox dispatching
 - `RedisWormUp/`, `CricuitBraker/` – auxiliary workers (cache warm-up, circuit breaker)
 - `RPG.CLI/` – command-line entry point (functional scenarios, gRPC helpers)
 - `RPG.IntegrationTests/`, `RPG.UnitTest/` – automated test suites
 - `RPG.DesktopClient/` – semi-graphical console client for quick gameplay smoke tests
 - `observability/` – Grafana/Tempo/Prometheus/Loki provisioning
+
+### NPC AI → Event Flow
+
+```
+NpcAiService.TickAsync()
+  ↓
+1. Build AiContext (from Npc + nearby players)
+  ↓
+2. UtilityAgent.Decide(context) → AiDirective[]
+  ↓
+3. Convert directives to *RequestedEvents:
+   - AiDirectiveType.MoveToLocation → NpcMoveRequestedEvent
+   - AiDirectiveType.Idle → NpcIdleRequestedEvent
+   - AiDirectiveType.UseSkill → NpcSkillUseRequestedEvent
+  ↓
+4. Enqueue to RequestedEventQueue
+  ↓
+5. GameEventDispatcher processes events chronologically:
+   - NpcMovementRequestedHandler updates Npc.CurrentLocation
+   - Persists to MongoDB
+   - Broadcasts NpcDelta to all clients via GameStateBroadcaster
+```
+
+This ensures AI decisions are processed in the same event pipeline as player commands, maintaining consistent game state.
 
 Root-level files of note:
 - `DevHobby.sln` – Visual Studio / dotnet solution
@@ -81,19 +130,41 @@ kill <gameserver-pid>
 - Observability dashboards become available once `docker compose up` completes (Grafana default credentials: `admin / 2019Venza`).
 
 ## Testing
-- Unit tests live in `RPG.UnitTest/` (organised by module).
-- Run all unit tests: `dotnet test RPG.UnitTest/RPG.UnitTest.csproj`
-- Integration tests (`RPG.IntegrationTests/`) use Testcontainers for Mongo, Redis, RabbitMQ.
-- CLI document scenarios (full CRUD path through Mongo/Redis): `dotnet run --project RPG.CLI -- document-tests`
 
-## Observability Stack
-- Compose provisions Prometheus, Loki, Tempo, Grafana.
-- Dashboard provisioning file: `observability/grafana/provisioning/dashboards/devhobby-observability-overview.json`.
-- Key panels:
-  - Recent gRPC activities: `RPG.GameServer`
-  - New panels for `RPG.Application` and `RPG.Core` ActivitySource traces
-  - MongoDB, Redis, RabbitMQ health/metrics
-- Activity sources are emitted from both Application and Core layers (movement handlers, services).
+| Scope | Command | Notes |
+| --- | --- | --- |
+| Solution build | `dotnet build DevHobby.sln` | Fails fast on API/contract breakages |
+| Unit tests | `dotnet test RPG.UnitTest/RPG.UnitTest.csproj` | Covers CommandBus, requested handlers, GameDeltaBuffer, infrastructure adapters |
+| Integration tests | `dotnet test RPG.IntegrationTests/RPG.IntegrationTests.csproj` | Spins Mongo/Redis/RabbitMQ/Testcontainers; includes gRPC session handshake helpers |
+| CLI smoke | `dotnet run --project RPG.CLI -- document-tests` | Exercises persistence round-trips |
+
+> **Session-aware tests** – Integration specs use shared helpers to call `SessionService.CreateSession` and attach the returned session id in gRPC metadata. When writing new tests that hit the GameServer, follow the same pattern to avoid `Unauthenticated` failures.
+
+After code changes involving requested handlers or broadcasters, run unit + integration suites to confirm ordering guarantees and delta serialization.
+
+## Observability Stack & Health Probes
+
+- Compose provisions Prometheus, Loki, Tempo, Grafana (see `observability/` provisioning files).
+- Activity sources:
+  - `RPG.Application.Commands.CommandBus` emits spans for every command (`command.name`, `service`, `traceId`, `spanId`).
+  - Requested handlers and core services add nested spans so Tempo can show end-to-end traces.
+- Serilog enrichment automatically attaches `traceId/spanId` to console, file, and Loki sinks.
+- Dashboards:
+  - Per-service boards (GameServer, PersistenceService, CircuitBreaker) covering CPU/mem (cAdvisor), request rates, commands/events per minute, health history.
+  - Latest Logs panels use the provisioned Loki datasource.
+- Health endpoints exposed by `RPG.GameServer`:
+  - `/health/live` – process is running
+  - `/health/ready` – Mongo/Redis/RabbitMQ connectivity
+  - `/metrics` – Prometheus scrape (ASP.NET + custom meters)
+  - `/ping` – lightweight readiness probe for local smoke tests
+
+Example checks:
+
+```bash
+curl http://localhost:5124/health/live
+curl http://localhost:5124/health/ready
+curl http://localhost:5124/ping
+```
 
 ## gRPC & Protobuf
 - Proto definitions: `RPG.GameServer/Protos/*.proto`
@@ -130,6 +201,7 @@ When modifying shared entities in `RPG.Core`:
 3. Confirm downstream services compile (GameServer, CLI, workers).
 
 ## Troubleshooting
+- Missing session metadata → call `SessionService.CreateSession`, store the GUID, and send it as `x-session-id` header for every gRPC call (CLI/Desktop already do this).
 - Missing project references → verify `DevHobby.sln` entries and `ProjectReference` nodes.
 - Docker compose issues → ensure Dockerfile paths exist, ports 27017/6379/5672/15672 are free.
 - gRPC connection failures from clients → confirm `RPG.GameServer` is running and reachable (`http://localhost:5124`).
@@ -140,4 +212,3 @@ When modifying shared entities in `RPG.Core`:
 
 Questions or ideas for additional documentation (environment variables, seed data, advanced observability) are welcome—feel free to open an issue or PR.
 📝 **Szczegółowa dokumentacja zmian w Infrastructure:** zobacz `INFRASTRUCTURE_CHANGES.md`
-

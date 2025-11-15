@@ -64,6 +64,8 @@ public sealed class NpcAiService : INpcAiService
     private readonly SemaphoreSlim _tickGate = new(1, 1);
     private IReadOnlyList<AiEvaluationResult> _lastEvaluations = Array.Empty<AiEvaluationResult>();
     private readonly IGameStateBroadcaster _gameStateBroadcaster;
+    private readonly IBehaviorRegistry _behaviorRegistry;
+    private readonly IAiDirectiveEventAdapter _aiDirectiveAdapter;
 
     public NpcAiService(
         IModelRepository modelRepository,
@@ -72,7 +74,9 @@ public sealed class NpcAiService : INpcAiService
         INpcCombatService combatService,
         IRabbitMqPublisher publisher,
         ILogger<NpcAiService> logger,
-        IGameStateBroadcaster gameStateBroadcaster)
+        IGameStateBroadcaster gameStateBroadcaster,
+        IBehaviorRegistry behaviorRegistry,
+        IAiDirectiveEventAdapter aiDirectiveAdapter)
     {
         _modelRepository = modelRepository;
         _movementService = movementService;
@@ -82,6 +86,8 @@ public sealed class NpcAiService : INpcAiService
         _logger = logger;
         _settings = UtilityAgentSettings.Default;
         _gameStateBroadcaster = gameStateBroadcaster;
+        _behaviorRegistry = behaviorRegistry;
+        _aiDirectiveAdapter = aiDirectiveAdapter ?? throw new ArgumentNullException(nameof(aiDirectiveAdapter));
     }
 
     public async Task<IReadOnlyList<AiEvaluationResult>> TickAsync(CancellationToken cancellationToken = default)
@@ -92,23 +98,30 @@ public sealed class NpcAiService : INpcAiService
             await EnsureNpcCacheAsync(cancellationToken).ConfigureAwait(false);
 
             var players = GetActivePlayers();
-            var playerLookup = players.ToDictionary(p => p.Id, p => p);
-
             var evaluations = new List<AiEvaluationResult>(_npcs.Count);
+
             foreach (var npc in _npcs.Values)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var context = PrepareContext(npc, players);
-                var agent = _agents.GetOrAdd(npc.Id, _ => CreateAgentFor(npc));
+                var agent = _behaviorRegistry.GetOrCreateAgent(npc);
                 var decision = agent.Decide(context);
-                var directives = context.Directives.ToArray();
-                var executionLog = await ExecuteDirectivesAsync(npc, context, directives, playerLookup, cancellationToken).ConfigureAwait(false);
+
+                // Publikuj dyrektywy jako requested events przez adapter
+                var sequence = new AiDirectiveSequence(context.Directives.ToArray());
+                var publishResult = await _aiDirectiveAdapter
+                    .PublishSequenceAsync(npc, sequence, context, DirectivePublishOptions.Default, cancellationToken)
+                    .ConfigureAwait(false);
+
+                var executionLog = publishResult.Succeeded
+                    ? context.Directives.Select(d => $"published:{d.Type}").ToList()
+                    : new List<string> { $"publish-failed:{publishResult.FailureReason}" };
 
                 UpdateNpcSnapshot(npc);
                 _npcs[npc.Id] = npc;
 
-                // Broadcast delty ruchu NPC – tylko ID i aktualna lokalizacja
+                // Delta broadcast (lokacja, stan itp.)
                 if (npc.CurrentLocation != null)
                 {
                     var delta = new GameDeltaUpdate
@@ -127,7 +140,7 @@ public sealed class NpcAiService : INpcAiService
                     await _gameStateBroadcaster.BroadcastDeltaAsync(delta, cancellationToken).ConfigureAwait(false);
                 }
 
-                evaluations.Add(new AiEvaluationResult(npc, agent, context, decision, directives, executionLog));
+                evaluations.Add(new AiEvaluationResult(npc, agent, context, decision, context.Directives.ToArray(), executionLog));
             }
 
             _lastEvaluations = evaluations.ToArray();
@@ -135,7 +148,7 @@ public sealed class NpcAiService : INpcAiService
         }
         catch (Exception ex)
         {
-            _logger.Error( "NPC AI tick failed.", ex);
+            _logger.Error("NPC AI tick failed.", ex);
             throw;
         }
         finally
@@ -374,52 +387,6 @@ public sealed class NpcAiService : INpcAiService
         }
     }
 
-    private UtilityAgent CreateAgentFor(Npc npc)
-    {
-        var combat = npc.Components.OfType<CombatComponent>().FirstOrDefault();
-        var dialogue = npc.Components.OfType<DialogueComponent>().FirstOrDefault();
-        var merchant = npc.Components.OfType<MerchantComponent>().FirstOrDefault();
-        var questGiver = npc.Components.OfType<QuestGiverComponent>().FirstOrDefault();
-        var script = ResolveBehaviorScript(npc, combat);
-        var skills = BuildSkillLookup(combat);
-
-        try
-        {
-            var agent = UtilityAgentFactory.GetByName(script, skills, _settings, dialogue, merchant, questGiver);
-            if (agent != null)
-            {
-                return agent;
-            }
-        }
-        catch (ArgumentException ex)
-        {
-            _logger.Error($"Failed to create utility agent for NPC {npc.Id} using script '{script}'.", ex);
-        }
-
-        if (combat != null && skills.Values.FirstOrDefault() is { } primarySkill)
-        {
-            _logger.Info($"Falling back to basic combat utility agent for NPC {npc.Id}");
-            return new UtilityAgent("fallback-combat")
-                .Register(UtilityActionCatalog.UseSkill(
-                    "fallback-attack",
-                    primarySkill,
-                    _settings.MeleeRange,
-                    _settings.MeleeMaxRange,
-                    _settings.BasicAttackCooldown,
-                    weight: 4f))
-                .Register(UtilityActionCatalog.FollowTarget(
-                    "fallback-follow",
-                    _settings.MeleeRange,
-                    _settings.MeleeStopDistance,
-                    _settings.ChaseRange,
-                    weight: 2f))
-                .Register(UtilityActionCatalog.Idle("fallback-idle", _settings.IdleAnimation, weight: 0.3f));
-        }
-
-        _logger.Info($"Using idle fallback utility agent for NPC {npc.Id}");
-        return new UtilityAgent("fallback-idle")
-            .Register(UtilityActionCatalog.Idle("idle", _settings.IdleAnimation, weight: 1f));
-    }
 
     private static IDictionary<string, Skill> BuildSkillLookup(CombatComponent? combat)
     {
@@ -557,7 +524,7 @@ public sealed class NpcAiService : INpcAiService
             switch (directive.Type)
             {
                 case AiDirectiveType.MoveToLocation:
-                    ExecuteMoveTo(npc, directive, log);
+                    await ExecuteMoveToAsync(npc, context, directive, log, cancellationToken).ConfigureAwait(false);
                     break;
 
                 case AiDirectiveType.FollowTarget:
@@ -610,6 +577,21 @@ public sealed class NpcAiService : INpcAiService
         return log;
     }
 
+    private async Task ExecuteMoveToAsync(Npc npc, AiContext context, AiDirective directive, ICollection<string> log, CancellationToken cancellationToken)
+    {
+        // delegujemy ruch do adaptera eventów, żeby zachować kolejkę RequestedEvent
+        var published = await _aiDirectiveAdapter.PublishAsync(npc, directive, context, cancellationToken).ConfigureAwait(false);
+        if (published)
+        {
+            log.Add("Requesting move towards destination (via event adapter).");
+        }
+        else
+        {
+            log.Add("MoveTo directive was not published by AI adapter.");
+        }
+    }
+
+    // poprzednia, bezpośrednia implementacja ruchu pozostaje na razie nieużywana
     private void ExecuteMoveTo(Npc npc, AiDirective directive, ICollection<string> log)
     {
         if (directive.Destination?.Position is not { } destination)

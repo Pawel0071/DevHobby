@@ -55,26 +55,7 @@ public class ProtoFieldNumberTests
             [19] = "time_limit"
         };
 
-        // Porównanie – jeśli się różni wypisz różnice dla diagnostyki.
-        try
-        {
-            current.Should().BeEquivalentTo(expected);
-        }
-        catch (Exception)
-        {
-            var diff = new List<string>();
-            foreach (var kv in expected)
-            {
-                if (!current.TryGetValue(kv.Key, out var found)) diff.Add($"Missing field number {kv.Key} expected '{kv.Value}'");
-                else if (found != kv.Value) diff.Add($"Field {kv.Key} name mismatch expected '{kv.Value}' got '{found}'");
-            }
-            foreach (var kv in current)
-            {
-                if (!expected.ContainsKey(kv.Key)) diff.Add($"Unexpected field number {kv.Key} name '{kv.Value}'");
-            }
-            diff.Add("Captured fields line-by-line:");
-            foreach (var c in current) diff.Add($"{c.Key} => {c.Value}");
-            Assert.Fail(string.Join("\n", diff));
-        }
+        // Proste porównanie słowników – FA wypisze różnice w komunikacie błędu.
+        current.Should().BeEquivalentTo(expected, "pole numery i nazwy w Quest muszą pozostać niezmienione (wire contract)");
     }
 }

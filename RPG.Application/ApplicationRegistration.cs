@@ -13,6 +13,8 @@ using RPG.Application.Queries;
 using RPG.Infrastructure.Interfaces;
 using RPG.Application.Hosted;
 using RPG.Application.Managers;
+using RPG.Application.Events.Adapters;
+using RPG.Core.Interfaces.NpcServices;
 
 namespace RPG.Application;
 
@@ -51,6 +53,10 @@ public static class ApplicationRegistration
         services.AddSingleton<ICharacterStateBroadcaster, CharacterStateBroadcaster>();
         services.AddSingleton<IWorldStateBroadcaster, WorldStateBroadcaster>();
         services.AddSingleton<IGameStateBroadcaster, GameStateBroadcaster>();
+
+        // Adapter for Core NPC AI to publish requested events via Application
+        services.AddSingleton<INpcRequestedOperations, NpcRequestedOperationsAdapter>();
+        services.AddSingleton<IAiDirectiveEventAdapter, AiDirectiveEventAdapter>();
 
         return services;
     }

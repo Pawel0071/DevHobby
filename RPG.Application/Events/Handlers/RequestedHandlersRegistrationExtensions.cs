@@ -12,10 +12,16 @@ public static class RequestedHandlersRegistrationExtensions
     /// </summary>
     public static IServiceCollection AddRequestedEventHandlers(this IServiceCollection services)
     {
+        // Character handlers
         services.AddScoped<IRequestedEventHandler, MovementRequestedHandler>();
         services.AddScoped<IRequestedEventHandler, EquipmentInventoryRequestedHandler>();
         services.AddScoped<IRequestedEventHandler, CharacterCreationRequestedHandler>();
+
+        // NPC AI handlers
+        services.AddScoped<IRequestedEventHandler, NpcMovementRequestedHandler>();
+        services.AddScoped<IRequestedEventHandler, NpcIdleRequestedHandler>();
+        services.AddScoped<IRequestedEventHandler, NpcReturnToSpawnRequestedHandler>();
+
         return services;
     }
 }
-

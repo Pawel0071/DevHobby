@@ -19,7 +19,7 @@ public sealed class AiContext
         set
         {
             _target = value;
-            DistanceToTarget = value is null ? float.PositiveInfinity : CalculateDistanceTo(value!);
+            DistanceToTarget = value is null ? float.PositiveInfinity : CalculateDistanceTo(value);
         }
     }
 
@@ -45,18 +45,39 @@ public sealed class AiContext
 
     public Dictionary<Guid, ThreatInfo> ThreatTable { get; } = new();
 
-    public void Reset()
+    public void Reset(AiContextResetOptions options = AiContextResetOptions.None)
     {
         Target = null;
         NearbyPlayers.Clear();
         NearbyNpcs.Clear();
-        Blackboard.Clear();
-        Directives.Clear();
-        SkillCooldowns.Clear();
-        ThreatTable.Clear();
+
+        if (!options.HasFlag(AiContextResetOptions.PreserveBlackboard))
+        {
+            Blackboard.Clear();
+        }
+
+        if (!options.HasFlag(AiContextResetOptions.PreserveDirectives))
+        {
+            Directives.Clear();
+        }
+
+        if (!options.HasFlag(AiContextResetOptions.PreserveSkillCooldowns))
+        {
+            SkillCooldowns.Clear();
+        }
+
+        if (!options.HasFlag(AiContextResetOptions.PreserveThreatTable))
+        {
+            ThreatTable.Clear();
+        }
+
         IsInCombat = false;
         CombatStartTime = null;
         DistanceToTarget = float.PositiveInfinity;
+        CurrentHealth = 0;
+        MaxHealth = 0;
+        CurrentMana = 0;
+        MaxMana = 0;
     }
 
     public void SetBlackboardValue(string key, object value)
@@ -93,23 +114,31 @@ public sealed class AiContext
 
     public float CalculateDistanceTo(Character character)
     {
-        if (Self?.CurrentLocation?.Position is not { } npcPosition)
+        if (!TryGetPosition(Self?.CurrentLocation, out var npcPosition))
         {
             return float.PositiveInfinity;
         }
 
-        var targetPosition = character?.CurrentLocation?.Position ?? Vector3.Zero;
+        if (!TryGetPosition(character?.CurrentLocation, out var targetPosition))
+        {
+            return float.PositiveInfinity;
+        }
+
         return Vector3.Distance(npcPosition, targetPosition);
     }
 
     public float CalculateDistanceTo(Location? location)
     {
-        if (Self?.CurrentLocation?.Position is not { } npcPosition)
+        if (!TryGetPosition(Self?.CurrentLocation, out var npcPosition))
         {
             return float.PositiveInfinity;
         }
 
-        var destination = location?.Position ?? Vector3.Zero;
+        if (!TryGetPosition(location, out var destination))
+        {
+            return float.PositiveInfinity;
+        }
+
         return Vector3.Distance(npcPosition, destination);
     }
 
@@ -121,11 +150,33 @@ public sealed class AiContext
             return DistanceToTarget;
         }
 
-    DistanceToTarget = CalculateDistanceTo(Target!);
+        DistanceToTarget = CalculateDistanceTo(Target);
         return DistanceToTarget;
     }
 
+    private static bool TryGetPosition(Location? location, out Vector3 position)
+    {
+        if (location is null)
+        {
+            position = default;
+            return false;
+        }
+
+        position = location.Position;
+        return true;
+    }
+
     private Character? _target;
+}
+
+[Flags]
+public enum AiContextResetOptions
+{
+    None = 0,
+    PreserveBlackboard = 1,
+    PreserveDirectives = 1 << 1,
+    PreserveSkillCooldowns = 1 << 2,
+    PreserveThreatTable = 1 << 3
 }
 
 public sealed record ThreatInfo(Guid CharacterId, float Score, float Distance, DateTime LastSeenUtc);

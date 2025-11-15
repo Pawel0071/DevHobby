@@ -5,8 +5,11 @@ using Moq;
 using RPG.Abstractions.Interfaces;
 using RPG.AI.Core;
 using RPG.AI.Directives;
+using RPG.AI.Utility;
+using RPG.AI.Utility.Actions;
 using RPG.Core.Common;
 using RPG.Core.Interfaces;
+using RPG.Core.Interfaces.NpcServices;
 using RPG.Core.Services.NpcServices;
 using RPG.Domain.Enums;
 using RPG.Domain.Models;
@@ -87,14 +90,14 @@ public class NpcAiServiceTests
 
         var log = await InvokeExecuteDirectivesAsync(service, npc, context, new[] { directive }, new Dictionary<Guid, Character>(), CancellationToken.None);
 
-        mocks.Movement.Verify(m => m.Move(
-            npc,
-            It.IsAny<Vector3>(),
-            It.Is<float>(delta => Math.Abs(delta - 1f) < 0.001f),
-            It.IsAny<float?>(),
-            It.IsAny<bool>()), Times.Once);
+        mocks.AiAdapter.Verify(a => a.PublishAsync(
+                It.Is<Npc>(n => n.Id == npc.Id),
+                It.Is<AiDirective>(d => d.Type == AiDirectiveType.MoveToLocation && d.Destination != null && d.Destination.Position == destination.Position),
+                It.IsAny<AiContext>(),
+                It.IsAny<CancellationToken>()),
+            Times.AtLeastOnce);
 
-        log.Should().Contain(entry => entry.StartsWith("Moving towards destination", StringComparison.Ordinal));
+        log.Should().Contain(entry => entry.StartsWith("Requesting move towards destination", StringComparison.Ordinal));
     }
 
     private static (
@@ -105,7 +108,9 @@ public class NpcAiServiceTests
         Mock<INpcCombatService> Combat,
         Mock<IRabbitMqPublisher> Publisher,
         Mock<ILogger<NpcAiService>> Logger,
-        Mock<IGameStateBroadcaster> StateBroadcaster) CreateService()
+        Mock<IGameStateBroadcaster> StateBroadcaster,
+        Mock<IBehaviorRegistry> BehaviorRegistry,
+        Mock<IAiDirectiveEventAdapter> AiAdapter) CreateService()
     {
         var documentRepository = new Mock<IModelRepository>();
         var movement = new Mock<IMovementService>();
@@ -114,6 +119,10 @@ public class NpcAiServiceTests
         var publisher = new Mock<IRabbitMqPublisher>();
         var logger = new Mock<ILogger<NpcAiService>>();
         var stateBroadcaster = new Mock<IGameStateBroadcaster>();
+        var aiAdapter = new Mock<IAiDirectiveEventAdapter>();
+        var behaviorRegistry = new Mock<IBehaviorRegistry>();
+        behaviorRegistry.Setup(r => r.GetOrCreateAgent(It.IsAny<Npc>()))
+            .Returns(() => new UtilityAgent("test-agent").Register(UtilityActionCatalog.Idle("idle")));
 
         broadcaster.Setup(b => b.GetSnapshots()).Returns(Array.Empty<CharacterStateSnapshot>());
 
@@ -122,6 +131,9 @@ public class NpcAiServiceTests
         movement.Setup(m => m.Stop(It.IsAny<Npc>()))
             .Returns((Npc npc) => ServiceResult<Location>.Ok(npc.CurrentLocation));
 
+        aiAdapter.Setup(a => a.PublishAsync(It.IsAny<Npc>(), It.IsAny<AiDirective>(), It.IsAny<AiContext>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+
         var service = new NpcAiService(
             documentRepository.Object,
             movement.Object,
@@ -129,9 +141,11 @@ public class NpcAiServiceTests
             combat.Object,
             publisher.Object,
             logger.Object,
-            stateBroadcaster.Object);
+            stateBroadcaster.Object,
+            behaviorRegistry.Object,
+            aiAdapter.Object);
 
-        return (service, documentRepository, movement, broadcaster, combat, publisher, logger, stateBroadcaster);
+        return (service, documentRepository, movement, broadcaster, combat, publisher, logger, stateBroadcaster, behaviorRegistry, aiAdapter);
     }
 
     private static Task<IReadOnlyList<string>> InvokeExecuteDirectivesAsync(
@@ -169,7 +183,7 @@ public class NpcAiServiceTests
             LeashRange = 45f
         };
 
-        var skill = Skill.Create("Slash", "Basic attack");
+        var skill = RPG.Domain.Models.Skills.Skill.Create("Slash", "Basic attack");
         skill.Tags.Add("basic-attack");
         combat.GetSkillsContainer().LearnSkill(skill);
 

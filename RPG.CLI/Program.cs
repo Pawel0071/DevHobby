@@ -119,6 +119,8 @@ finally
     await host.StopAsync();
 }
 
+return;
+
 static void LogEndpointConfiguration(RPG.Infrastructure.Interfaces.ILogger<Program> logger, IConfiguration configuration)
 {
     var mongo = RedactCredentials(configuration.GetConnectionString("Mongo"));
