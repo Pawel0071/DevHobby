@@ -1,6 +1,5 @@
 // filepath: /Volumes/Data/Repositories/DevHobby/RPG.Application/Events/Adapters/NpcRequestedOperationsAdapter.cs
 
-using System.Numerics;
 using RPG.Abstractions.Interfaces;
 using RPG.Domain.Models;
 using RPG.Application.Infrastructure;
@@ -51,7 +50,7 @@ public sealed class NpcRequestedOperationsAdapter : INpcRequestedOperations
     }
 
     public Task RequestMoveAsync(Guid npcId, Location destination, float speed = 1.0f, CancellationToken ct = default)
-        => PublishAsync(meta => new NpcMoveRequestedEvent(meta, npcId, destination, speed), ct);
+        => PublishAsync(meta => new NpcMovementStartRequestedEvent(meta, npcId, destination, speed), ct);
 
     public Task RequestIdleAsync(Guid npcId, float durationSeconds = 0f, CancellationToken ct = default)
         => PublishAsync(meta => new NpcIdleRequestedEvent(meta, npcId, durationSeconds), ct);
@@ -63,9 +62,7 @@ public sealed class NpcRequestedOperationsAdapter : INpcRequestedOperations
         => PublishAsync(meta => new NpcSkillUseRequestedEvent(meta, npcId, skillId, targetId), ct);
 
     public Task RequestFollowAsync(Guid npcId, Guid targetId, float desiredRange, float stopDistance, float? maxRange, CancellationToken ct = default)
-        => PublishAsync(meta => new NpcMoveRequestedEvent(meta, npcId,
-            new Location { Position = Vector3.Zero, WorldId = Guid.Empty },
-            1.0f), ct); // emit move requested; właściwy handler wykorzysta metadata (brak dedykowanego eventu follow)
+        => PublishAsync(meta => new NpcFollowTargetRequestedEvent(meta, npcId, targetId, desiredRange, stopDistance, maxRange), ct);
 
     public Task RequestEngageAsync(Guid npcId, Guid targetCharacterId, CancellationToken ct = default)
         => PublishAsync(meta => new NpcEngageTargetRequestedEvent(meta, npcId, targetCharacterId), ct);

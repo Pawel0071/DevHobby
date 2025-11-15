@@ -2,6 +2,7 @@ using RPG.Abstractions.Interfaces;
 using RPG.Application.Interfaces;
 using RPG.Infrastructure.Interfaces;
 using RPG.Domain.Enums;
+using RPG.Domain.Models;
 
 namespace RPG.Application.Events.Handlers;
 
@@ -13,7 +14,10 @@ public sealed class CharacterCreationRequestedHandler : IRequestedEventHandler
     private readonly IGameEventDispatcher _dispatcher;
     private readonly ILogger<CharacterCreationRequestedHandler> _logger;
 
-    public CharacterCreationRequestedHandler(IModelRepository repository, IGameEventDispatcher dispatcher, ILogger<CharacterCreationRequestedHandler> logger)
+    public CharacterCreationRequestedHandler(
+        IModelRepository repository,
+        IGameEventDispatcher dispatcher,
+        ILogger<CharacterCreationRequestedHandler> logger)
     {
         _repository = repository;
         _dispatcher = dispatcher;

@@ -39,7 +39,7 @@ public class CommandBusTests
         spMock.Setup(s => s.GetService(typeof(IServiceScopeFactory))).Returns(scopeFactoryMock.Object);
 
         var bus = new CommandBus(spMock.Object);
-        var cmd = new GainExperienceCommand(Guid.NewGuid(), 50) { Metadata = new CommandMetadata(Guid.NewGuid(), Guid.NewGuid(), null, DateTime.UtcNow) };
+        var cmd = new GainExperienceCommand(Guid.NewGuid(), 50, "test") { Metadata = new CommandMetadata(Guid.NewGuid(), Guid.NewGuid(), null, DateTime.UtcNow) };
         var result = await bus.DispatchAsync(cmd, CancellationToken.None);
 
         result.Success.Should().BeTrue();

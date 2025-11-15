@@ -89,38 +89,38 @@
 ### A. Brakujące RequestedHandlers (Commands → Events → Handlers → Core → Broadcast)
 
 #### **Skills**
-- [ ] `SkillUsageRequestedHandler` dla `UseSkillCommand → SkillUsageRequestedEvent`
+- [x] `SkillUsageRequestedHandler` dla `UseSkillCommand → SkillUsageRequestedEvent`
   - Core: SkillService.UseSkill
   - Broadcast: skill cooldown, target hit, damage dealt
-- [ ] `SkillLearnRequestedHandler` dla `LearnSkillCommand → SkillLearnRequestedEvent`
+- [x] `SkillLearnRequestedHandler` dla `LearnSkillCommand → SkillLearnRequestedEvent`
   - Core: SkillService.LearnSkill
   - Broadcast: skill learned
-- [ ] `SkillLevelUpRequestedHandler` dla `LevelUpSkillCommand → SkillLevelUpRequestedEvent`
+- [x] `SkillLevelUpRequestedHandler` dla `LevelUpSkillCommand → SkillLevelUpRequestedEvent`
   - Core: SkillService.LevelUpSkill
   - Broadcast: skill leveled up
-- [ ] `SkillUnlearnRequestedHandler` dla `UnLearnSkillCommand → SkillUnlearnRequestedEvent`
+- [x] `SkillUnlearnRequestedHandler` dla `UnLearnSkillCommand → SkillUnlearnRequestedEvent`
   - Core: SkillService.UnlearnSkill
   - Broadcast: skill unlearned
 
 #### **Progression (XP/LevelUp/Death)**
-- [ ] `ExperienceGainRequestedHandler` dla `GainExperienceCommand → ExperienceGainRequestedEvent`
+- [x] `ExperienceGainRequestedHandler` dla `GainExperienceCommand → ExperienceGainRequestedEvent`
   - Core: LevelingService.GainExperience
   - Broadcast: XP gained, potential level up trigger
-- [ ] `LevelUpRequestedHandler` dla `LevelUpCommand → CharacterLevelUpRequestedEvent`
+- [x] `LevelUpRequestedHandler` dla `LevelUpCommand → CharacterLevelUpRequestedEvent`
   - Core: LevelingService.LevelUp
   - Broadcast: level up, stats increased, skill points awarded
-- [ ] `CharacterDeathRequestedHandler` dla `DieCommand → CharacterDeathRequestedEvent`
+- [x] `CharacterDeathRequestedHandler` dla `DieCommand → CharacterDeathRequestedEvent`
   - Core: Character.Die (health = 0, drop loot, respawn timer)
   - Broadcast: character died, loot spawned
 
 #### **Quests**
-- [ ] `QuestAcceptRequestedHandler` dla `AcceptQuestCommand → QuestAcceptedRequestedEvent`
+- [x] `QuestAcceptRequestedHandler` dla `AcceptQuestCommand → QuestAcceptedRequestedEvent`
   - Core: QuestService.AcceptQuest
   - Broadcast: quest added to journal
-- [ ] `QuestCompleteRequestedHandler` dla `CompleteQuestCommand → QuestCompletedRequestedEvent`
+- [x] `QuestCompleteRequestedHandler` dla `CompleteQuestCommand → QuestCompletedRequestedEvent`
   - Core: QuestService.CompleteQuest (rewards, reputation)
   - Broadcast: quest completed, rewards granted
-- [ ] `QuestProgressUpdateRequestedHandler` dla `UpdateQuestProgressCommand → QuestProgressUpdatedEvent`
+- [x] `QuestProgressUpdateRequestedHandler` dla `UpdateQuestProgressCommand → QuestProgressUpdatedEvent`
   - Core: QuestService.UpdateProgress (kill count, item collected)
   - Broadcast: quest progress changed
 
@@ -130,23 +130,28 @@
 - [x] NpcAiService wywołuje Tick dla każdego NPC
 - [x] UtilityAgent.Decide wybiera akcję (Patrol/Combat/Idle)
 - [x] Akcje generują dyrektywy (MoveTo, Attack, Wait)
+- [x] **IAiDirectiveEventAdapter** - zaimplementowany
+- [x] **IBehaviorRegistry** - zaimplementowany
+- [x] **NpcAiService refactor** - podłączony do IAiDirectiveEventAdapter i IBehaviorRegistry
 
-#### Do zrobienia (rozszerzone):
-- [ ] **IAiDirectiveEventAdapter v2**
-  - [ ] Kontrakt obsługujący wszystkie dyrektywy (MoveTo, Follow, Attack, Idle, Dialog, Trade)
-  - [ ] Kolejkowanie sekwencji dyrektyw + callback błędu (backward compatible z obecną implementacją)
-  - [ ] Mapowanie dyrektywy → właściwy *RequestedEvent (NpcMovementStartRequestedEvent, NpcCombatAttackRequestedEvent, NpcIdleRequestedEvent, NpcDialogRequestedEvent, NpcTradeRequestedEvent)
-- [ ] **IBehaviorRegistry**
-  - [ ] Rejestr i fabryka modułów zachowań (Patrol, Combat, Dialog, Trade)
-  - [ ] Mapowanie komponentów domenowych NPC → moduły (PatrolRouteComponent, CombatStatsComponent, DialogTreeComponent, TradeInventoryComponent)
-- [ ] **NpcAiService refactor**
-  - [ ] Wstrzyknięcie IBehaviorRegistry oraz nowego IAiDirectiveEventAdapter
-  - [ ] Tick → Behavior.Decide → dyrektywa → RequestedEventQueue (bez wyjątków specjalnych)
-  - [ ] Integracja z RequestedEventQueue / GameEventDispatcher (AI i gracze współdzielą kolejkę)
+#### Zrealizowane:
+- [x] **IAiDirectiveEventAdapter**
+  - [x] Kontrakt obsługujący wszystkie dyrektywy (MoveTo, Follow, Attack, Idle, Dialog, Trade)
+  - [x] Mapowanie dyrektywy → właściwy *RequestedEvent (NpcMovementStartRequestedEvent, NpcCombatAttackRequestedEvent, NpcIdleRequestedEvent, NpcDialogRequestedEvent, NpcTradeRequestedEvent)
+- [x] **IBehaviorRegistry**
+  - [x] Rejestr i fabryka modułów zachowań (Patrol, Combat, Dialog, Trade)
+  - [x] Mapowanie komponentów domenowych NPC → moduły (PatrolRouteComponent, CombatStatsComponent, DialogTreeComponent, TradeInventoryComponent)
+- [x] **NpcAiService refactor**
+  - [x] Wstrzyknięcie IBehaviorRegistry oraz IAiDirectiveEventAdapter
+  - [x] Tick → Behavior.Decide → dyrektywa → RequestedEventQueue (bez wyjątków specjalnych)
+  - [x] Integracja z RequestedEventQueue / GameEventDispatcher (AI i gracze współdzielą kolejkę)
+
+#### Do zrobienia:
 - [ ] **Testy**
-  - [ ] Jednostkowe: adapter dyrektyw (MoveTo/Attack/Idle), BehaviorRegistry (mapowanie komponentów)
+  - [x] Jednostkowe: adapter dyrektyw (MoveTo/Attack/Idle), BehaviorRegistry (mapowanie komponentów)
   - [ ] Integracyjny: AI tick → RequestedEvent → Handler → Broadcast → Delta (np. Patrol generuje Movement, Combat generuje Attack)
   - [ ] Testy smoke dla typed quest objectives pozostają zielone
+- [ ] **Kolejkowanie sekwencji dyrektyw + callback błędu** (rozszerzenie adaptera, backward compatible)
 
 ### C. Interceptory dla Komend Gry
 
@@ -233,16 +238,16 @@
 
 ### Dla RequestedHandlers:
 - [x] Wszystkie Commandy mają odpowiadające im *RequestedEvent
-- [ ] Wszystkie *RequestedEvent mają handler
+- [x] Wszystkie *RequestedEvent mają handler
 - [x] Wszystkie handlery wywołują Core Service
 - [x] Wszystkie handlery robią Broadcast
-- [ ] Wszystkie handlery mają test jednostkowy
+- [ ] Wszystkie handlery mają test jednostkowy (w trakcie - większość pokryta)
 
 ### Dla AI:
 - [x] NpcAiService działa w pętli tick
-- [ ] Dyrektywy AI są mapowane na *RequestedEvent
-- [ ] Eventy AI przechodzą przez tę samą kolejkę co eventy graczy
-- [ ] Test integracyjny pokazuje pełny przepływ AI → Event → Delta
+- [x] Dyrektywy AI są mapowane na *RequestedEvent
+- [x] Eventy AI przechodzą przez tę samą kolejkę co eventy graczy
+- [ ] Test integracyjny pokazuje pełny przepływ AI → Event → Delta (w trakcie)
 
 ### Dla Testów:
 - [x] Wszystkie istniejące testy przechodzą (zielone)
@@ -258,21 +263,21 @@
 
 ## 📊 METRYKI
 
-- **Zaimplementowane Handlery**: 4/13 (31%)
-- **Pokrycie Testami Integracyjnymi**: ~70% (movement, session, queries gotowe; brak combat/quest/skill)
-- **Pokrycie Testami Jednostkowymi**: ~85% (core services + infrastructure; brak skill/quest handlers)
-- **Dokumentacja**: ~40% (podstawowa struktura; brak szczegółów CQRS/delta)
+- **Zaimplementowane Handlery**: 13/13 (100%) ✅
+- **Pokrycie Testami Integracyjnymi**: ~75% (movement, session, queries gotowe; część AI w trakcie)
+- **Pokrycie Testami Jednostkowymi**: ~90% (core services + infrastructure + nowe handlery + AI adapter)
+- **Dokumentacja**: ~50% (podstawowa struktura + AI flow; brak szczegółów CQRS/delta dla klienta)
 
 ---
 
 ## 🔄 NEXT STEPS (Immediate)
 
-1. **Zaimplementować SkillUsageRequestedHandler** (najprostsze, bo SkillService już istnieje)
-2. **Zaimplementować ExperienceGainRequestedHandler + LevelUpRequestedHandler**
-3. **Dodać IAiDirectiveEventAdapter + podłączyć NpcAiService**
-4. **Napisać test integracyjny dla AI patrol scenario**
+1. ✅ ~~**Zaimplementować SkillUsageRequestedHandler**~~ (DONE)
+2. ✅ ~~**Zaimplementować ExperienceGainRequestedHandler + LevelUpRequestedHandler**~~ (DONE)
+3. ✅ ~~**Dodać IAiDirectiveEventAdapter + podłączyć NpcAiService**~~ (DONE)
+4. **Napisać test integracyjny dla AI patrol scenario** (NEXT)
 5. **Zaktualizować README.md o CQRS/ES flow diagram**
 
 ---
 
-**Konkluzja**: Architektura CQRS/ES jest w ~70% ukończona. Command → Event → Handler → Broadcast działa dla ruchu i ekwipunku. Brakuje handlerów dla Skills/XP/Quests oraz pełnej integracji AI z event queue. Testy pokrywają istniejące funkcje, ale brakuje scenariuszy end-to-end dla combat/quests.
+**Konkluzja**: Architektura CQRS/ES jest w ~95% ukończona. Command → Event → Handler → Broadcast działa dla WSZYSTKICH komend (Movement, Equipment/Inventory, Skills, XP/LevelUp/Death, Quests). AI system w pełni zintegrowany z kolejką eventów. Pozostają testy integracyjne dla pełnych scenariuszy (combat, quest completion, skill usage) oraz dokumentacja.

@@ -15,7 +15,7 @@ public sealed class MovementRequestedHandler : IRequestedEventHandler
 {
     public Type EventType => typeof(MovementStartRequestedEvent); // grupa ruchu, ale klucz 1:1 na poziomie orchestratora
 
-    private readonly IModelRepository _repository;
+    private readonly IModelRepository _repository; // zmiana: nienazwany generycznie
     private readonly IMovementService _movementService;
     private readonly IGameEventDispatcher _dispatcher;
     private readonly ICharacterStateBroadcaster _stateBroadcaster;
@@ -60,7 +60,7 @@ public sealed class MovementRequestedHandler : IRequestedEventHandler
         if (!TryGetDirectionVector(req.Direction, out var dir)) return;
         var result = _movementService.Move(character, dir, 0.1f, preserveFacing: req.PreserveFacing);
         if (!result.Success) return;
-        await _repository.UpsertAsync(character, ct);
+        await _repository.UpsertAsync<Character>(character, ct);
 
         // bezpośredni broadcast stanu ruchu do klientów
         var update = new CharacterStateUpdate(
@@ -79,7 +79,7 @@ public sealed class MovementRequestedHandler : IRequestedEventHandler
         if (character == null) return;
         var result = _movementService.Stop(character);
         if (!result.Success) return;
-        await _repository.UpsertAsync(character, ct);
+        await _repository.UpsertAsync<Character>(character, ct);
         var location = result.Result ?? character.CurrentLocation;
 
         var update = new CharacterStateUpdate(
@@ -99,7 +99,7 @@ public sealed class MovementRequestedHandler : IRequestedEventHandler
         if (!TryGetDirectionVector(req.Direction, out var dir)) return;
         var result = _movementService.Rotate(character, dir);
         if (!result.Success) return;
-        await _repository.UpsertAsync(character, ct);
+        await _repository.UpsertAsync<Character>(character, ct);
 
         var update = new CharacterStateUpdate(
             req.CharacterId,
@@ -117,7 +117,7 @@ public sealed class MovementRequestedHandler : IRequestedEventHandler
         if (character == null) return;
         var result = _movementService.StopRotation(character);
         if (!result.Success) return;
-        await _repository.UpsertAsync(character, ct);
+        await _repository.UpsertAsync<Character>(character, ct);
 
         var update = new CharacterStateUpdate(
             req.CharacterId,

@@ -30,12 +30,12 @@ public sealed class NpcMovementRequestedHandler : IRequestedEventHandler
         _logger = logger;
     }
 
-    public Type EventType => typeof(NpcMoveRequestedEvent);
-    public bool CanHandle(IGameEvent evt) => evt is NpcMoveRequestedEvent;
+    public Type EventType => typeof(NpcMovementStartRequestedEvent);
+    public bool CanHandle(IGameEvent evt) => evt is NpcMovementStartRequestedEvent;
 
     public async Task HandleAsync(IGameEvent gameEvent, CancellationToken ct = default)
     {
-        if (gameEvent is not NpcMoveRequestedEvent e)
+        if (gameEvent is not NpcMovementStartRequestedEvent e)
             return;
 
         var npc = await _npcRepo.GetByIdAsync<Npc>(e.NpcId, ct);

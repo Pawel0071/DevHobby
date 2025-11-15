@@ -3,6 +3,7 @@ using System.Numerics;
 using RPG.Abstractions.Interfaces;
 using RPG.Application.Diagnostics;
 using RPG.Application.Events;
+using RPG.Application.Events.RequestedEvents;
 using RPG.Application.Infrastructure;
 using RPG.Application.Interfaces;
 
@@ -25,8 +26,11 @@ public class CommandHandler : ICommandHandler<EquipItemCommand>,
     ICommandHandler<UseSkillCommand>,
     ICommandHandler<LearnSkillCommand>,
     ICommandHandler<LevelUpSkillCommand>,
-    ICommandHandler<UnLearnSkillCommand>,
-    ICommandHandler<DieCommand>
+    ICommandHandler<UnlearnSkillCommand>,
+    ICommandHandler<DieCommand>,
+    ICommandHandler<AcceptQuestCommand>,
+    ICommandHandler<CompleteQuestCommand>,
+    ICommandHandler<UpdateQuestProgressCommand>
 
 {
     private readonly IRequestEventQueue _requestQueue;
@@ -143,31 +147,43 @@ public class CommandHandler : ICommandHandler<EquipItemCommand>,
 
     public Task<CommandResult> HandleAsync(UseSkillCommand command, CancellationToken cancellationToken = default)
         => HandleSimple(command, command.CharacterId, "CommandHandler.UseSkill",
-            meta => new SkillUseRequestedEvent(meta, command.CharacterId, command.SkillId, command.TargetPosition), null, cancellationToken);
+            meta => new SkillUsageRequestedEvent(meta, command.CharacterId, command.SkillId, command.TargetId), null, cancellationToken);
 
     public Task<CommandResult> HandleAsync(LearnSkillCommand command, CancellationToken cancellationToken = default)
         => HandleSimple(command, command.CharacterId, "CommandHandler.LearnSkill",
-            meta => new SkillLearnRequestedEvent(meta, command.CharacterId, command.SkillId), null, cancellationToken);
+            meta => new SkillLearnRequestedEvent(meta, command.CharacterId, command.Skill), null, cancellationToken);
 
     public Task<CommandResult> HandleAsync(LevelUpSkillCommand command, CancellationToken cancellationToken = default)
         => HandleSimple(command, command.CharacterId, "CommandHandler.LevelUpSkill",
             meta => new SkillLevelUpRequestedEvent(meta, command.CharacterId, command.SkillId), null, cancellationToken);
 
-    public Task<CommandResult> HandleAsync(UnLearnSkillCommand command, CancellationToken cancellationToken = default)
-        => HandleSimple(command, command.CharacterId, "CommandHandler.UnLearnSkill",
+    public Task<CommandResult> HandleAsync(UnlearnSkillCommand command, CancellationToken cancellationToken = default)
+        => HandleSimple(command, command.CharacterId, "CommandHandler.UnlearnSkill",
             meta => new SkillUnlearnRequestedEvent(meta, command.CharacterId, command.SkillId), null, cancellationToken);
 
     public Task<CommandResult> HandleAsync(DieCommand command, CancellationToken cancellationToken = default)
         => HandleSimple(command, command.CharacterId, "CommandHandler.Die",
-            meta => new CharacterDieRequestedEvent(meta, command.CharacterId), null, cancellationToken);
+            meta => new CharacterDeathRequestedEvent(meta, command.CharacterId, command.KillerId), null, cancellationToken);
 
     public Task<CommandResult> HandleAsync(GainExperienceCommand command, CancellationToken cancellationToken = default)
         => HandleSimple(command, command.CharacterId, "CommandHandler.GainExperience",
-            meta => new ExperienceGainRequestedEvent(meta, command.CharacterId, command.Amount), null, cancellationToken);
+            meta => new ExperienceGainRequestedEvent(meta, command.CharacterId, command.ExperienceAmount), null, cancellationToken);
 
     public Task<CommandResult> HandleAsync(LevelUpCommand command, CancellationToken cancellationToken = default)
         => HandleSimple(command, command.CharacterId, "CommandHandler.LevelUp",
             meta => new CharacterLevelUpRequestedEvent(meta, command.CharacterId), null, cancellationToken);
+
+    public Task<CommandResult> HandleAsync(AcceptQuestCommand command, CancellationToken cancellationToken = default)
+        => HandleSimple(command, command.CharacterId, "CommandHandler.AcceptQuest",
+            meta => new QuestAcceptRequestedEvent(meta, command.CharacterId, command.QuestId), null, cancellationToken);
+
+    public Task<CommandResult> HandleAsync(CompleteQuestCommand command, CancellationToken cancellationToken = default)
+        => HandleSimple(command, command.CharacterId, "CommandHandler.CompleteQuest",
+            meta => new QuestCompleteRequestedEvent(meta, command.CharacterId, command.QuestId), null, cancellationToken);
+
+    public Task<CommandResult> HandleAsync(UpdateQuestProgressCommand command, CancellationToken cancellationToken = default)
+        => HandleSimple(command, command.CharacterId, "CommandHandler.UpdateQuestProgress",
+            meta => new QuestProgressUpdateRequestedEvent(meta, command.CharacterId, command.QuestId, command.ObjectiveType, command.Progress), null, cancellationToken);
 
     public async Task<CommandResult> HandleAsync(CreateCharacterCommand command, CancellationToken cancellationToken = default)
     {

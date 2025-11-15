@@ -26,7 +26,7 @@ public static class CommandHandlersRegistrationExtensions
         services.AddScoped<ICommandHandler<UseSkillCommand>, CommandHandler>();
         services.AddScoped<ICommandHandler<LearnSkillCommand>, CommandHandler>();
         services.AddScoped<ICommandHandler<LevelUpSkillCommand>, CommandHandler>();
-        services.AddScoped<ICommandHandler<UnLearnSkillCommand>, CommandHandler>();
+        services.AddScoped<ICommandHandler<UnlearnSkillCommand>, CommandHandler>();
         services.AddScoped<ICommandHandler<DieCommand>, CommandHandler>();
 
         return services;

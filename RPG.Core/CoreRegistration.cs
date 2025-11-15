@@ -10,6 +10,7 @@ using RPG.Core.Services.SkillService;
 using RPG.Core.Services.StatsService;
 using RPG.Core.Services.World;
 using RPG.Core.Services.NpcServices;
+using RPG.Core.Services;
 using RPG.Domain.Interfaces;
 
 namespace RPG.Core;
@@ -28,6 +29,8 @@ public static class CoreRegistration
         services.AddSingleton<IWorldStateService, WorldStateService>();
         services.AddSingleton<IWorldSessionManager, WorldSessionManager>();
         services.AddSingleton<IBehaviorRegistry, BehaviorRegistry>();
+        services.AddSingleton<IQuestService, QuestService>();
+        services.AddSingleton<ICharacterDeathService, CharacterDeathService>();
         return services;
     }
 }
