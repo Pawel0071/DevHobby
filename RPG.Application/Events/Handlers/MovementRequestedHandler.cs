@@ -65,10 +65,11 @@ public sealed class MovementRequestedHandler : IRequestedEventHandler
         // bezpośredni broadcast stanu ruchu do klientów
         var update = new CharacterStateUpdate(
             req.CharacterId,
+            character.Class,
             character.CurrentLocation,
             IsMoving: true,
             IsRotating: null,
-            Rotation: character.CurrentLocation?.Rotation,
+            Rotation: character.CurrentLocation?.Direction,
             Timestamp: DateTime.UtcNow);
         await _stateBroadcaster.BroadcastAsync(update, ct);
     }
@@ -84,10 +85,11 @@ public sealed class MovementRequestedHandler : IRequestedEventHandler
 
         var update = new CharacterStateUpdate(
             req.CharacterId,
+            character.Class,
             location,
             IsMoving: false,
             IsRotating: null,
-            Rotation: location?.Rotation,
+            Rotation: location?.Direction,
             Timestamp: DateTime.UtcNow);
         await _stateBroadcaster.BroadcastAsync(update, ct);
     }
@@ -103,6 +105,7 @@ public sealed class MovementRequestedHandler : IRequestedEventHandler
 
         var update = new CharacterStateUpdate(
             req.CharacterId,
+            character.Class,
             character.CurrentLocation,
             IsMoving: null,
             IsRotating: true,
@@ -121,6 +124,7 @@ public sealed class MovementRequestedHandler : IRequestedEventHandler
 
         var update = new CharacterStateUpdate(
             req.CharacterId,
+            character.Class,
             character.CurrentLocation,
             IsMoving: null,
             IsRotating: false,

@@ -11,12 +11,20 @@ message Stats {
   int32 vitality = 6;
   int32 magicResist = 7;
   int32 natureResist = 8;
-  int32 misticResist = 9;
-  int32 armor = 10;
-  int32 critChance = 11;
-  int32 hitChance = 12;
-  int32 attackSpeed = 13;
-  int32 moveSpeed = 14;
+  int32 fireResist = 9;
+  int32 frostResist = 10;
+  int32 armor = 11;
+  int32 critChance = 12;
+  int32 critDamage = 13;
+  int32 hitChance = 14;
+  int32 attackSpeed = 15;
+  int32 moveSpeed = 16;
+  int32 meleeAttackPower = 17;
+  int32 rangedAttackPower = 18;
+  int32 magicAttackPower = 19;
+  int32 natureAttackPower = 20;
+  int32 fireAttackPower = 21;
+  int32 frostAttackPower = 22;
 }
 
 message Item {

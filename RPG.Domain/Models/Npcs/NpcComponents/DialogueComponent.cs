@@ -4,8 +4,11 @@ namespace RPG.Domain.Models.Npcs.NpcComponents;
 ///     Component for NPCs that can engage in dialogue.
 ///     Uses dialogue behavior trees for dynamic conversations.
 /// </summary>
-public class DialogueComponent : INpcComponent
+public class DialogueComponent : NpcComponentBase
 {
+    public override string ComponentName => "Dialogue";
+    public override string ComponentType => "Dialogue";
+
     /// <summary>
     ///     Name of the dialogue script to use (e.g., "quest-giver", "merchant", "guard")
     /// </summary>

@@ -136,9 +136,9 @@ public sealed record AiDirective(
         return new Location
         {
             Position = location.Position,
-            Rotation = location.Rotation,
+            Direction = location.Direction,
             MapId = location.MapId,
-            ZoneName = location.ZoneName,
+            MapName = location.MapName,
             WorldId = location.WorldId
         };
     }

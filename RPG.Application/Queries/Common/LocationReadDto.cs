@@ -15,10 +15,10 @@ public sealed class LocationReadDto
         X = loc?.Position.X ?? 0f,
         Y = loc?.Position.Y ?? 0f,
         Z = loc?.Position.Z ?? 0f,
-        WorldId = loc?.WorldId?.ToString(),
+        WorldId = loc?.WorldId.ToString(),
         MapId = loc?.MapId ?? string.Empty,
-        ZoneName = loc?.ZoneName ?? string.Empty,
-        Rotation = loc?.Rotation ?? 0f
+        ZoneName = loc?.MapName ?? string.Empty,
+        Rotation = loc?.Direction ?? 0f
     };
 }
 

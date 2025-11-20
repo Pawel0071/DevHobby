@@ -247,7 +247,7 @@ public sealed class GameServerFactory : WebApplicationFactory<IntegrationEntryPo
                         Agility = 6,
                         MagicResist = 2,
                         NatureResist = 2,
-                        MisticResist = 2,
+                        FireResist = 2,
                         Armor = 5,
                         CritChance = 1,
                         HitChance = 90,

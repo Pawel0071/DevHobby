@@ -32,8 +32,8 @@ public class EquipmentServiceTests
         var item = CreateItem("Sword");
         const EquipmentSlot slot = EquipmentSlot.Weapon1;
 
-        _inventoryMock.Setup(i => i.Contains(character.GetBackpackInventoryContainer(), item)).Returns(true.ToResult());
-        _inventoryMock.Setup(i => i.RemoveItem(character.GetBackpackInventoryContainer(), item))
+        _inventoryMock.Setup(i => i.Contains(character.BackpackInventory, item)).Returns(true.ToResult());
+        _inventoryMock.Setup(i => i.RemoveItem(character.BackpackInventory, item))
             .Returns(true.ToResult());
 
         var result = _service.Equip(character, slot, item);
@@ -49,7 +49,7 @@ public class EquipmentServiceTests
         var item = CreateItem("Shield");
         const EquipmentSlot slot = EquipmentSlot.Weapon2;
 
-        _inventoryMock.Setup(i => i.Contains(character.GetBackpackInventoryContainer(), item))
+        _inventoryMock.Setup(i => i.Contains(character.BackpackInventory, item))
             .Returns(false.ToResult());
 
         var result = _service.Equip(character, slot, item);
@@ -67,7 +67,7 @@ public class EquipmentServiceTests
         const EquipmentSlot slot = EquipmentSlot.Head;
         character.Equipments[slot] = item;
 
-        _inventoryMock.Setup(i => i.AddItem(character.GetBackpackInventoryContainer(), item)).Returns(true.ToResult());
+        _inventoryMock.Setup(i => i.AddItem(character.BackpackInventory, item)).Returns(true.ToResult());
 
         var result = _service.Unequip(character, slot);
 
@@ -94,8 +94,8 @@ public class EquipmentServiceTests
         var item = CreateItem("Bow");
         const EquipmentSlot slot = EquipmentSlot.Weapon1;
 
-        _inventoryMock.Setup(i => i.Contains(character.GetBackpackInventoryContainer(), item)).Returns(true.ToResult());
-        _inventoryMock.Setup(i => i.RemoveItem(character.GetBackpackInventoryContainer(), item))
+        _inventoryMock.Setup(i => i.Contains(character.BackpackInventory, item)).Returns(true.ToResult());
+        _inventoryMock.Setup(i => i.RemoveItem(character.BackpackInventory, item))
             .Returns(true.ToResult());
 
         var result = _service.Swap(character, slot, item);
@@ -132,7 +132,7 @@ public class EquipmentServiceTests
 
     private static Character CreateCharacter()
     {
-        return new Character(Guid.NewGuid(), CharacterClass.Monk) { Id = Guid.NewGuid(), Name = "Rogue" };
+        return new Character(Guid.NewGuid(), CharacterClass.Monk) { Id = Guid.NewGuid(), Name = "Rogue", Class = CharacterClass.Monk };
     }
 
     private static Item CreateItem(string name)

@@ -8,7 +8,12 @@ using RPG.Domain.Models.Skills;
 
 namespace RPG.Domain.Models;
 
-public sealed class Character : IDomainModel, IItemContainer, IStats, ILevel, ISkillsContainer
+public sealed class Character : IDomainModel,
+    IItemContainer,
+    ILevel,
+    ISkillAndCombat,
+    IMovable,
+    ISession
 {
     public Character(
         Guid sessionId,
@@ -33,89 +38,52 @@ public sealed class Character : IDomainModel, IItemContainer, IStats, ILevel, IS
 
     public required Guid Id { get; init; }
     public required string Name { get; init; }
+    public required CharacterClass Class { get; init; }
+    public HashSet<string> StatusEffects { get; set; }
 
-    // Player & Session
-    public Guid PlayerId { get; set; }
-    public Guid SessionId { get; set; }
+    // IMovable
+    public Location SpawnLocation { get; set; }
+    public Location CurrentLocation { get; set; }
+    public Guid? WorldId => CurrentLocation.WorldId;
+    public bool IsMoving { get; set; }
+    public bool IsRotating { get; set; }
 
-    public CharacterClass Class { get; set; }
+    //ISession
+    public Guid PlayerId { get; init; }
+    public Guid SessionId { get; init; }
+    public bool IsOnline { get; set; }
+    public DateTime LastUpdated { get; set; }
 
-    // Containers (private)
+    // IItemContainer
     private InventoryContainer BankStorageContainer { get; }
     private InventoryContainer BackpackInventoryContainer { get; }
     private EquipmentContainer EquipmentContainer { get; }
-    private StatsContainer BaseStatsContainer { get; }
-    private StatsContainer ModifiedStatsContainer { get; }
-    private SkillsContainer SkillsContainer { get; }
-
-    // Public collections exposed from containers
     public IList<InventorySlot> BankStorage => BankStorageContainer.Inventory;
     public IList<InventorySlot> BackpackInventory => BackpackInventoryContainer.Inventory;
     public IDictionary<EquipmentSlot, Item> Equipments => EquipmentContainer.Equipments;
-    public int Level { get; set; }
-    public long Experience { get; set; }
-    public long ExperienceToNextLevel { get; set; }
-    public IDictionary<Skill, SkillAvailability> Skills => SkillsContainer.Skills;
-    public IDictionary<Skill, DateTime> ActiveSkills => SkillsContainer.ActiveSkills;
-    public IDictionary<StatsProperty, int> BaseStats => BaseStatsContainer.Stats;
-    public IDictionary<StatsProperty, int> ModifiedStats => ModifiedStatsContainer.Stats;
 
-    // Health & Resource
+    // IStats
     public int CurrentHealth { get; set; }
     public int MaxHealth { get; set; }
     public int CurrentResource { get; set; }
     public int MaxResource { get; set; }
-    public Location CurrentLocation { get; private set; }
-    public bool IsMoving { get; private set; }
-    public bool IsRotating { get; private set; }
-    public bool IsOnline { get; set; }
+    private StatsContainer BaseStatsContainer { get; }
+    private StatsContainer ModifiedStatsContainer { get; }
+    public IDictionary<StatsProperty, int> BaseStats => BaseStatsContainer.Stats;
+    public IDictionary<StatsProperty, int> ModifiedStats => ModifiedStatsContainer.Stats;
+
+    // ILevel
+    public int Level { get; set; }
+    public long Experience { get; set; }
+    public long ExperienceToNextLevel { get; set; }
+
+    // ISkills
+    private SkillsContainer SkillsContainer { get; }
+    public IDictionary<Skill, SkillAvailability> Skills => SkillsContainer.Skills;
+    public IDictionary<Skill, DateTime> ActiveSkills => SkillsContainer.ActiveSkills;
+
+    // ISkillAndCombat & ICombatTarget
+    public bool IsAlive => CurrentHealth > 0;
     public bool IsInCombat { get; set; }
-    public DateTime LastUpdated { get; set; }
-    public HashSet<string> StatusEffects { get; set; }
-
-    // Container accessors for services
-    public IInventoryContainer GetBankStorageContainer()
-    {
-        return BankStorageContainer;
-    }
-
-    public IInventoryContainer GetBackpackInventoryContainer()
-    {
-        return BackpackInventoryContainer;
-    }
-
-    public IEquipmentContainer GetEquipmentContainer()
-    {
-        return EquipmentContainer;
-    }
-
-    public IStatsContainer GetBaseStatsContainer()
-    {
-        return BaseStatsContainer;
-    }
-
-    public IStatsContainer GetModifiedStatsContainer()
-    {
-        return ModifiedStatsContainer;
-    }
-
-    public ISkillsContainer GetSkillsContainer()
-    {
-        return SkillsContainer;
-    }
-
-    public void SetCurrentLocation(Location location)
-    {
-        CurrentLocation = location ?? throw new ArgumentNullException(nameof(location));
-    }
-
-    public void SetMovementState(bool isMoving)
-    {
-        IsMoving = isMoving;
-    }
-
-    public void SetRotationState(bool isRotating)
-    {
-        IsRotating = isRotating;
-    }
 }
+

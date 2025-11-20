@@ -43,11 +43,11 @@ public class CharacterStateBroadcaster : ICharacterStateBroadcaster
     {
         var timestamp = update.Timestamp == default ? DateTime.UtcNow : update.Timestamp;
         var baseLocation = CloneLocation(update.Location) ?? new Location();
-        var rotation = update.Rotation ?? baseLocation.Rotation;
+        var rotation = update.Rotation ?? baseLocation.Direction;
         var isMoving = update.IsMoving ?? false;
         var isRotating = update.IsRotating ?? false;
 
-        return new CharacterStateSnapshot(update.CharacterId, baseLocation, isMoving, isRotating, rotation, timestamp);
+        return new CharacterStateSnapshot(update.CharacterId, update.Class, baseLocation, isMoving, isRotating, rotation, timestamp);
     }
 
     private CharacterStateSnapshot Merge(CharacterStateSnapshot existing, CharacterStateUpdate update)
@@ -55,14 +55,14 @@ public class CharacterStateBroadcaster : ICharacterStateBroadcaster
         var timestamp = update.Timestamp == default ? DateTime.UtcNow : update.Timestamp;
         var location = CloneLocation(update.Location) ?? CloneLocation(existing.Location) ?? new Location();
         var rotation = update.Rotation
-                        ?? update.Location?.Rotation
+                        ?? update.Location?.Direction
                         ?? existing.Rotation;
         var isMoving = update.IsMoving ?? existing.IsMoving;
         var isRotating = update.IsRotating ?? existing.IsRotating;
 
-        location.Rotation = rotation;
+        location.Direction = rotation;
 
-        return new CharacterStateSnapshot(update.CharacterId, location, isMoving, isRotating, rotation, timestamp);
+        return new CharacterStateSnapshot(update.CharacterId, update.Class, location, isMoving, isRotating, rotation, timestamp);
     }
 
     private static Location? CloneLocation(Location? source)
@@ -75,9 +75,9 @@ public class CharacterStateBroadcaster : ICharacterStateBroadcaster
         return new Location
         {
             Position = source.Position,
-            Rotation = source.Rotation,
+            Direction = source.Direction,
             MapId = source.MapId,
-            ZoneName = source.ZoneName,
+            MapName = source.MapName,
             WorldId = source.WorldId
         };
     }

@@ -1,6 +1,6 @@
 using RPG.Domain.Enums;
 
-namespace RPG.Domain.Common.Interfaces;
+namespace RPG.Domain.Interfaces;
 
 public interface IStats
 {

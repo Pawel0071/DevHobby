@@ -33,7 +33,8 @@ public class CharacterModelMapperTests
         )
         {
             Id = Guid.NewGuid(),
-            Name = "Geralt"
+            Name = "Geralt",
+            Class = CharacterClass.Warrior
         };
 
         // Act
@@ -57,7 +58,8 @@ public class CharacterModelMapperTests
         {
             Id = Guid.NewGuid(),
             Name = "Test",
-            PlayerId = playerId
+            PlayerId = playerId,
+            Class = CharacterClass.Mage
         };
 
         // Act
@@ -99,7 +101,8 @@ public class CharacterModelMapperTests
         {
             Id = Guid.NewGuid(),
             Name = "Geralt",
-            PlayerId = Guid.NewGuid()
+            PlayerId = Guid.NewGuid(),
+            Class = CharacterClass.Assassin
         };
 
         // Act - convert to document and back
@@ -121,7 +124,8 @@ public class CharacterModelMapperTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
             Id = Guid.NewGuid(),
-            Name = "Test"
+            Name = "Test",
+            Class = CharacterClass.Warrior
             // PlayerId not set (default Guid.Empty)
         };
 
@@ -141,7 +145,8 @@ public class CharacterModelMapperTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
             Id = Guid.NewGuid(),
-            Name = "EmptyInventoryTest"
+            Name = "EmptyInventoryTest",
+            Class = CharacterClass.Warrior
         };
 
         // Act
@@ -161,15 +166,16 @@ public class CharacterModelMapperTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
             Id = Guid.NewGuid(),
-            Name = "LocationHero"
+            Name = "LocationHero",
+            Class = CharacterClass.Warrior
         };
 
         var worldId = Guid.NewGuid();
         var location = Location.Create(new Vector3(5, 1, -3), worldId, "Map-1", "Zone-9");
-        location.Rotation = 180f;
-        character.SetCurrentLocation(location);
-    character.SetMovementState(true);
-    character.SetRotationState(true);
+        location.Direction = 180f;
+        character.CurrentLocation = location;
+    character.IsMoving = true;
+    character.IsRotating = true;
 
         var document = _mapper.ToPersistence(character);
 
@@ -216,8 +222,8 @@ public class CharacterModelMapperTests
         character.CurrentLocation.Position.Z.Should().Be(9f);
         character.CurrentLocation.WorldId.Should().Be(worldId);
         character.CurrentLocation.MapId.Should().Be("Map-77");
-        character.CurrentLocation.ZoneName.Should().Be("Dungeon");
-        character.CurrentLocation.Rotation.Should().Be(90f);
+        character.CurrentLocation.MapName.Should().Be("Dungeon");
+        character.CurrentLocation.Direction.Should().Be(90f);
         character.IsMoving.Should().BeTrue();
         character.IsRotating.Should().BeFalse();
     }

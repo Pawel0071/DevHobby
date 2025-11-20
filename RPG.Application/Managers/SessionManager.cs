@@ -42,7 +42,7 @@ public sealed class SessionManager : ISessionManager
         if (location != null)
         {
             session.CurrentWorldId = location.WorldId;
-            session.CurrentZoneId = location.ZoneName;
+            session.CurrentZoneId = location.MapName;
         }
 
         await _repo.UpsertAsync(session, ct);

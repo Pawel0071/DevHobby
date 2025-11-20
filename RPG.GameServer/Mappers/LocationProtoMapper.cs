@@ -13,29 +13,30 @@ public class LocationProtoMapper
     {
         return new ProtoLocation
         {
-            X = location.Position.X,
-            Y = location.Position.Y,
-            Z = location.Position.Z,
-            WorldId = location.WorldId?.ToString() ?? string.Empty,
+            WorldId = location.WorldId.ToString(),
             MapId = location.MapId ?? string.Empty,
-            ZoneName = location.ZoneName ?? string.Empty,
-            Rotation = location.Rotation
+            Position = new Vector3
+            {
+                X = location.Position.X,
+                Y = location.Position.Y,
+                Z = location.Position.Z
+            },
+            Rotation = new RotationState
+            {
+                IsRotating = location.Direction != 0,
+                Direction = location.Direction
+            }
         };
     }
 
     public DomainLocation ToDomain(ProtoLocation proto)
     {
         var worldId = Guid.TryParse(proto.WorldId, out var wId) ? wId : Guid.Empty;
-        var location = DomainLocation.Create(
-            (float)proto.X,
-            (float)proto.Y,
-            (float)proto.Z,
-            worldId,
-            proto.MapId,
-            proto.ZoneName
-        );
-        location.Rotation = proto.Rotation;
+        var x = proto.Position?.X ?? 0;
+        var y = proto.Position?.Y ?? 0;
+        var z = proto.Position?.Z ?? 0;
+        var location = DomainLocation.Create((float)x, (float)y, (float)z, worldId, proto.MapId, string.Empty);
+        location.Direction = proto.Rotation?.Direction ?? 0;
         return location;
     }
 }
-

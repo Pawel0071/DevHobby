@@ -40,3 +40,4 @@ packages/
 
 # Others
 .fake/
+/.vs/CopilotSnapshots

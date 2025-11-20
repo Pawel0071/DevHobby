@@ -25,8 +25,8 @@ public class GameDeltaBufferTests
             Position = new Vector3(1f, 2f, 3f),
             WorldId = worldId,
             MapId = "map-1",
-            ZoneName = "zone-1",
-            Rotation = 90f
+            MapName = "zone-1",
+            Direction = 90f
         };
 
         var characterLocation = new Location
@@ -34,8 +34,8 @@ public class GameDeltaBufferTests
             Position = new Vector3(4f, 5f, 6f),
             WorldId = worldId,
             MapId = "map-2",
-            ZoneName = "zone-2",
-            Rotation = 180f
+            MapName = "zone-2",
+            Direction = 180f
         };
 
         var delta = new GameDeltaUpdate

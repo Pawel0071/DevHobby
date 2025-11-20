@@ -35,7 +35,7 @@ public sealed class BehaviorRegistry : IBehaviorRegistry
         // Combat-centric
         if (combat != null)
         {
-            var skills = combat.GetSkillsContainer().Skills.Keys.ToArray();
+            var skills = npc.Skills.Keys.ToArray();
             Skill? primary = skills.FirstOrDefault();
 
             // Boss

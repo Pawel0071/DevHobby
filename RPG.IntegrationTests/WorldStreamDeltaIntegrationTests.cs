@@ -44,15 +44,17 @@ public class WorldStreamDeltaIntegrationTests : IClassFixture<TestContainersFixt
         var character = new DomainCharacter(sessionId, CharacterClass.Warrior)
         {
             Id = characterId,
-            Name = "TestCharacter"
+            Name = "TestCharacter",
+            CurrentLocation = new DomainLocation
+            {
+                Position = Vector3.Zero,
+                WorldId = worldId,
+                MapId = "map-stream",
+                MapName = "zone-stream"
+            },
+            Class = CharacterClass.Warrior
         };
-        character.SetCurrentLocation(new DomainLocation
-        {
-            Position = Vector3.Zero,
-            WorldId = worldId,
-            MapId = "map-stream",
-            ZoneName = "zone-stream"
-        });
+        ;
         await repo.UpsertAsync(character);
 
         await SeedWorldStateAsync(repo, worldId, new[] { characterId }, null, null);
@@ -76,7 +78,7 @@ public class WorldStreamDeltaIntegrationTests : IClassFixture<TestContainersFixt
             Position = new Vector3(10, 0, 5),
             WorldId = worldId,
             MapId = "map-stream",
-            ZoneName = "zone-stream"
+            MapName = "zone-stream"
         };
 
         var deltaUpdate = new GameDeltaUpdate
@@ -158,7 +160,7 @@ public class WorldStreamDeltaIntegrationTests : IClassFixture<TestContainersFixt
             Position = Vector3.Zero,
             WorldId = worldId,
             MapId = "map-npc",
-            ZoneName = "zone-npc"
+            MapName = "zone-npc"
         }, worldId);
         npc.GetType().GetProperty("Id")!.SetValue(npc, npcId);
         await repo.UpsertAsync(npc);
@@ -169,7 +171,7 @@ public class WorldStreamDeltaIntegrationTests : IClassFixture<TestContainersFixt
             Position = Vector3.Zero,
             WorldId = worldId,
             MapId = "map-obj",
-            ZoneName = "zone-obj"
+            MapName = "zone-obj"
         }, worldId, "zone-obj");
         mapObject.GetType().GetProperty("Id")!.SetValue(mapObject, mapObjectId);
         mapObject.IsActive = true;
@@ -197,7 +199,7 @@ public class WorldStreamDeltaIntegrationTests : IClassFixture<TestContainersFixt
             Position = new Vector3(5, 0, 3),
             WorldId = worldId,
             MapId = "map-npc",
-            ZoneName = "zone-npc"
+            MapName = "zone-npc"
         };
 
         var deltaUpdate = new GameDeltaUpdate

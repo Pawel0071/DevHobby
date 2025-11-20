@@ -11,21 +11,22 @@ public class Location
     public Location()
     {
         Position = Vector3.Zero;
+        Direction = 0;
     }
 
     public Vector3 Position { get; set; }
-    public Guid? WorldId { get; set; }
+    public Guid WorldId { get; set; }
     public string MapId { get; set; } = string.Empty;
-    public string ZoneName { get; set; } = string.Empty;
-    public float Rotation { get; set; } // Yaw rotation in degrees (0-360)
+    public string MapName { get; set; } = string.Empty;
+    public float Direction { get; set; } // Yaw direction in degrees (0-360) X-Y plane
 
     public static Location Create(Vector3 position, Guid worldId, string mapId = "", string zoneName = "")
     {
-        return new Location { Position = position, WorldId = worldId, MapId = mapId, ZoneName = zoneName };
+        return new Location { Position = position, WorldId = worldId, MapId = mapId, MapName = zoneName };
     }
 
     public static Location Create(float x, float y, float z, Guid worldId, string mapId = "", string zoneName = "")
     {
-        return new Location { Position = new Vector3(x, y, z), WorldId = worldId, MapId = mapId, ZoneName = zoneName };
+        return new Location { Position = new Vector3(x, y, z), WorldId = worldId, MapId = mapId, MapName = zoneName };
     }
 }

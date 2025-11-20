@@ -35,4 +35,12 @@ public class NpcDocument : IPersistenceModel
 
     // Components stored as JSON strings
     public List<ComponentData> Components { get; set; } = new();
+
+    // Skills (Skill ID -> SkillAvailability)
+    public Dictionary<string, string> Skills { get; set; } = new(); // Skill ID -> SkillAvailability enum as string
+    public Dictionary<string, DateTime> ActiveSkills { get; set; } = new(); // Skill ID -> Activation time
+
+    // Timestamps
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }

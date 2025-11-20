@@ -76,7 +76,7 @@ public class NpcCombatService : INpcCombatService
             location?.Position.X ?? 0f,
             location?.Position.Y ?? 0f,
             location?.Position.Z ?? 0f,
-            location?.Rotation ?? 0f,
+            location?.Direction ?? 0f,
             occurrence);
 
         try
@@ -99,9 +99,9 @@ public class NpcCombatService : INpcCombatService
         return new Location
         {
             Position = source.Position,
-            Rotation = source.Rotation,
+            Direction = source.Direction,
             MapId = source.MapId,
-            ZoneName = source.ZoneName,
+            MapName = source.MapName,
             WorldId = source.WorldId
         };
     }

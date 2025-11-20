@@ -6,7 +6,7 @@ namespace RPG.Domain.Models.Npcs.NpcComponents;
 /// <summary>
 ///     Component for NPCs that drop loot and give rewards when killed.
 /// </summary>
-public class LootableComponent : INpcComponent
+public class LootableComponent : NpcComponentBase
 {
     private LootContainer LootTableContainer { get; } = new(20); // Default 20 loot slots
 
@@ -32,4 +32,7 @@ public class LootableComponent : INpcComponent
     {
         return LootTableContainer;
     }
+
+    public override string ComponentName => "Lootable";
+    public override string ComponentType => "Lootable";
 }

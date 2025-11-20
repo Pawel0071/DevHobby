@@ -1,11 +1,14 @@
+using RPG.Domain.Models.Npcs.NpcComponents;
+
 namespace RPG.Domain.Models.Npcs.NpcComponents;
 
 /// <summary>
 ///     Defines AI behavior profile for this NPC.
 /// </summary>
-public class AiComponent : INpcComponent
+public class AiComponent : NpcComponentBase
 {
-    public string ComponentType => "AI";
+    public override string ComponentName => "AI";
+    public override string ComponentType => "AI";
 
     /// <summary>
     ///     AI profile name (e.g., "Aggressive", "Passive", "PatrolGuard", "Merchant").
@@ -65,4 +68,3 @@ public class PatrolConfig
     /// </summary>
     public float StopDistance { get; set; } = 0.5f;
 }
-

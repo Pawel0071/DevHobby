@@ -6,4 +6,12 @@ namespace RPG.Domain.Models.Npcs;
 /// </summary>
 public interface INpcComponent
 {
+    Guid OwnerId { get; }
+    Npc? Owner { get; }
+    bool IsAttached { get; }
+    string ComponentName { get; }
+    string ComponentType { get; }
+    void Attach(Npc owner);
+    void Detach();
+    void Tick(TimeSpan deltaTime);
 }

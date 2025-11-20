@@ -197,7 +197,7 @@ public class CharacterGrpcCommand
                 });
 
                 Console.WriteLine(reply.Success
-                    ? "[CLI] Rotation started."
+                    ? "[CLI] Direction started."
                     : $"[CLI] Failed to start rotation: {reply.ErrorCode} {reply.Message}");
             }
             catch (RpcException ex)
@@ -228,7 +228,7 @@ public class CharacterGrpcCommand
                 Console.WriteLine($"[CLI] Calling CharacterService.StopRotation for {characterId} at {DateTime.UtcNow:O}");
                 var reply = await client.StopRotationAsync(new CharacterIdRequest { CharacterId = characterId.ToString() });
                 Console.WriteLine(reply.Success
-                    ? "[CLI] Rotation stopped."
+                    ? "[CLI] Direction stopped."
                     : $"[CLI] Failed to stop rotation: {reply.ErrorCode} {reply.Message}");
             }
             catch (RpcException ex)

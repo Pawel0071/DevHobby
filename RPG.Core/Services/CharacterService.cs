@@ -5,11 +5,11 @@ using RPG.Infrastructure.Interfaces;
 
 namespace RPG.Core.Services;
 
-public sealed class CharacterDeathService : ICharacterDeathService
+public sealed class CharacterService : ICharacterService
 {
-    private readonly ILogger<CharacterDeathService> _logger;
+    private readonly ILogger<CharacterService> _logger;
 
-    public CharacterDeathService(ILogger<CharacterDeathService> logger)
+    public CharacterService(ILogger<CharacterService> logger)
     {
         _logger = logger;
     }

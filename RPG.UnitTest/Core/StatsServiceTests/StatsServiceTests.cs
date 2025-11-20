@@ -25,7 +25,7 @@ public class StatsServiceTests
     {
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
-            Id = Guid.NewGuid(), Name = "TestWarrior"
+            Id = Guid.NewGuid(), Name = "TestWarrior", Class = CharacterClass.Warrior
         };
 
         // start with base/modified stats zeros
@@ -48,7 +48,7 @@ public class StatsServiceTests
     [Fact]
     public void UnModifyStats_ShouldRemoveModifier_AndUpdateDerivedValues()
     {
-        var character = new Character(Guid.NewGuid(), CharacterClass.Mage) { Id = Guid.NewGuid(), Name = "TestMage" };
+        var character = new Character(Guid.NewGuid(), CharacterClass.Mage) { Id = Guid.NewGuid(), Name = "TestMage", Class = CharacterClass.Mage };
 
         // prepare initial modified stats
         character.ModifiedStats[StatsProperty.Vitality] = 5;
@@ -73,7 +73,7 @@ public class StatsServiceTests
     [Fact]
     public void InitStats_ShouldInitializeBaseAndModifiedStats()
     {
-        var character = new Character(Guid.NewGuid(), CharacterClass.Druid) { Id = Guid.NewGuid(), Name = "InitTest" };
+        var character = new Character(Guid.NewGuid(), CharacterClass.Druid) { Id = Guid.NewGuid(), Name = "InitTest", Class = CharacterClass.Druid };
 
         // call explicit interface implementation
         var result = ((IStatsService)_service).InitStats(character);

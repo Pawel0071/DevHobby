@@ -108,7 +108,8 @@ public class LevelingServiceTests
             Level = level,
             Experience = xp,
             ExperienceToNextLevel = xpToNext,
-            Name = "Name"
+            Name = "Name",
+            Class = CharacterClass.Druid
         };
     }
 }

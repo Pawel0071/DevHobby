@@ -8,36 +8,42 @@
   </PropertyGroup>
 
   <ItemGroup>
-  <PackageReference Include="FluentAssertions" Version="6.12.1"/>
+  <PackageReference Include="FluentAssertions" Version="6.12.1" />
   <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
   <PackageReference Include="Grpc.Tools" Version="2.71.0" PrivateAssets="All" />
   <PackageReference Include="Google.Protobuf" Version="3.30.2" />
   <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.10" />
-  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0"/>
-  <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0"/>
-  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
-    <PackageReference Include="MongoDB.Driver" Version="2.19.0"/>
-    <PackageReference Include="Moq" Version="4.20.72"/>
-    <PackageReference Include="RabbitMQ.Client" Version="7.1.2"/>
-    <PackageReference Include="StackExchange.Redis" Version="2.9.32"/>
-    <PackageReference Include="Testcontainers" Version="3.10.0"/>
-    <PackageReference Include="Testcontainers.MongoDb" Version="3.10.0"/>
-    <PackageReference Include="Testcontainers.RabbitMq" Version="3.10.0"/>
-    <PackageReference Include="Testcontainers.Redis" Version="3.10.0"/>
-    <PackageReference Include="xunit" Version="2.9.2"/>
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2"/>
-    <PackageReference Include="coverlet.collector" Version="6.0.2"/>
+  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+  <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
+  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.19.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="RabbitMQ.Client" Version="7.1.2" />
+    <PackageReference Include="StackExchange.Redis" Version="2.9.32" />
+    <PackageReference Include="Testcontainers" Version="3.10.0" />
+    <PackageReference Include="Testcontainers.MongoDb" Version="3.10.0" />
+    <PackageReference Include="Testcontainers.RabbitMq" Version="3.10.0" />
+    <PackageReference Include="Testcontainers.Redis" Version="3.10.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="coverlet.collector" Version="6.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RedisWarmUp\RedisWarmUp.csproj"/>
-    <ProjectReference Include="..\RPG.Infrastructure\RPG.Infrastructure.csproj"/>
-    <ProjectReference Include="..\RPG.PersistenceService\RPG.PersistenceService.csproj"/>
-    <ProjectReference Include="..\RPG.GameServer\RPG.GameServer.csproj"/>
-    <ProjectReference Include="..\RPG.WorldSeeder\RPG.WorldSeeder.csproj"/>
+    <ProjectReference Include="..\RedisWarmUp\RedisWarmUp.csproj" />
+    <ProjectReference Include="..\RPG.Abstractions\RPG.Abstractions.csproj" />
+    <ProjectReference Include="..\RPG.AI\RPG.AI.csproj" />
+    <ProjectReference Include="..\RPG.Application\RPG.Application.csproj" />
+    <ProjectReference Include="..\RPG.CircuitBreaker\RPG.CircuitBreaker.csproj" />
+    <ProjectReference Include="..\RPG.Core\RPG.Core.csproj" />
+    <ProjectReference Include="..\RPG.Domain\RPG.Domain.csproj" />
+    <ProjectReference Include="..\RPG.Infrastructure\RPG.Infrastructure.csproj" />
+    <ProjectReference Include="..\RPG.PersistenceService\RPG.PersistenceService.csproj" />
+    <ProjectReference Include="..\RPG.GameServer\RPG.GameServer.csproj" />
+    <ProjectReference Include="..\RPG.WorldSeeder\RPG.WorldSeeder.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit"/>
+    <Using Include="Xunit" />
   </ItemGroup>
 </Project>

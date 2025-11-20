@@ -12,18 +12,18 @@ public sealed class CharacterDeathRequestedHandler : IRequestedEventHandler
 {
     private readonly IModelRepository _repository;
     private readonly IGameStateBroadcaster _broadcaster;
-    private readonly ICharacterDeathService _deathService;
+    private readonly ICharacterService _service;
     private readonly ILogger<CharacterDeathRequestedHandler> _logger;
 
     public CharacterDeathRequestedHandler(
         IModelRepository repository,
         IGameStateBroadcaster broadcaster,
-        ICharacterDeathService deathService,
+        ICharacterService service,
         ILogger<CharacterDeathRequestedHandler> logger)
     {
         _repository = repository;
         _broadcaster = broadcaster;
-        _deathService = deathService;
+        _service = service;
         _logger = logger;
     }
 
@@ -42,7 +42,7 @@ public sealed class CharacterDeathRequestedHandler : IRequestedEventHandler
         }
 
         // Call Core Service for death logic
-        var result = await _deathService.HandleDeathAsync(character, ct).ConfigureAwait(false);
+        var result = await _service.HandleDeathAsync(character, ct).ConfigureAwait(false);
         if (!result.Success)
         {
             _logger.Error($"Failed to handle death for character {character.Id}: {result.Message}");

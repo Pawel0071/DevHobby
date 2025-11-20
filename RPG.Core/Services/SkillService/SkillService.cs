@@ -47,11 +47,9 @@ public class SkillService : ISkillService
         return true.ToResult();
     }
 
-    public ServiceResult<bool> UseSkill(Character character, Skill skill)
+    public ServiceResult<bool> UseSkill(ISkillAndCombat character, Skill skill)
     {
-        var skillsContainer = character.GetSkillsContainer();
-
-    if (!TryGetSkillEntry(skillsContainer, skill, out var trackedSkill, out var availability))
+        if (!TryGetSkillEntry(character.Skills, skill, out var trackedSkill, out var availability))
         {
             _logger.Warn($"Character '{character.Id}' attempted to use unknown skill '{skill.Name}'.");
             return ErrorCodeDefinition.SkillNotKnown.ToFail<bool>("Postać nie zna tej umiejętności.");
@@ -70,8 +68,8 @@ public class SkillService : ISkillService
             return resourceCheck;
         }
 
-    ConsumeResources(character, trackedSkill);
-    skillsContainer.ActiveSkills[trackedSkill] = DateTime.UtcNow;
+        ConsumeResources(character, trackedSkill);
+        character.ActiveSkills[trackedSkill] = DateTime.UtcNow;
 
         _logger.Info($"Character '{character.Id}' used skill '{skill.Name}'.");
         return true.ToResult();
@@ -79,9 +77,7 @@ public class SkillService : ISkillService
 
     public ServiceResult<bool> LearnSkill(Character character, Skill skill)
     {
-        var skillsContainer = character.GetSkillsContainer();
-
-    if (skillsContainer.Skills.Keys.Any(existing => existing.Id == skill.Id))
+        if (character.Skills.Keys.Any(existing => existing.Id == skill.Id))
         {
             _logger.Warn($"Character '{character.Id}' already knows skill '{skill.Name}'.");
             return ErrorCodeDefinition.SkillAlreadyKnown.ToFail<bool>("Umiejętność jest już znana.");
@@ -93,23 +89,21 @@ public class SkillService : ISkillService
             return requirementCheck;
         }
 
-    skillsContainer.Skills[skill] = SkillAvailability.Available;
+        character.Skills[skill] = SkillAvailability.Available;
         _logger.Info($"Character '{character.Id}' learned skill '{skill.Name}'.");
         return true.ToResult();
     }
 
     public ServiceResult<bool> UnlearnSkill(Character character, Skill skill)
     {
-        var skillsContainer = character.GetSkillsContainer();
-
-        if (!TryGetSkillEntry(skillsContainer, skill, out var trackedSkill, out _))
+        if (!TryGetSkillEntry(character.Skills, skill, out var trackedSkill, out _))
         {
             _logger.Warn($"Character '{character.Id}' cannot unlearn unknown skill '{skill.Name}'.");
             return ErrorCodeDefinition.SkillNotKnown.ToFail<bool>("Umiejętność nie jest znana.");
         }
 
-    skillsContainer.Skills.Remove(trackedSkill);
-    skillsContainer.ActiveSkills.Remove(trackedSkill);
+        character.Skills.Remove(trackedSkill);
+        character.ActiveSkills.Remove(trackedSkill);
 
         _logger.Info($"Character '{character.Id}' unlearned skill '{skill.Name}'.");
         return true.ToResult();
@@ -117,20 +111,19 @@ public class SkillService : ISkillService
 
     private void RefreshSkillAvailability(Character character)
     {
-        var skillsContainer = character.GetSkillsContainer();
-        var snapshot = skillsContainer.Skills.Keys.ToList();
+        var snapshot = character.Skills.Keys.ToList();
 
         foreach (var trackedSkill in snapshot)
         {
             var requirementCheck = EnsureSkillPrerequisites(character, trackedSkill, requireResourceCapacity: true);
             if (requirementCheck.Success)
             {
-                skillsContainer.Skills[trackedSkill] = SkillAvailability.Available;
+                character.Skills[trackedSkill] = SkillAvailability.Available;
             }
             else
             {
-                skillsContainer.Skills[trackedSkill] = SkillAvailability.UnAvailable;
-                skillsContainer.ActiveSkills.Remove(trackedSkill);
+                character.Skills[trackedSkill] = SkillAvailability.UnAvailable;
+                character.ActiveSkills.Remove(trackedSkill);
             }
         }
     }
@@ -143,11 +136,9 @@ public class SkillService : ISkillService
             return;
         }
 
-        var skillsContainer = character.GetSkillsContainer();
-
         foreach (var skillId in grantComponent.SkillIds)
         {
-            if (!TryGetSkillById(skillsContainer, skillId, out var grantedSkill) || grantedSkill is null)
+            if (!TryGetSkillById(character.Skills, skillId, out var grantedSkill) || grantedSkill is null)
             {
                 continue;
             }
@@ -161,11 +152,11 @@ public class SkillService : ISkillService
                 }
             }
 
-            skillsContainer.Skills[grantedSkill] = availability;
+            character.Skills[grantedSkill] = availability;
 
             if (availability == SkillAvailability.UnAvailable)
             {
-                skillsContainer.ActiveSkills.Remove(grantedSkill);
+                character.ActiveSkills.Remove(grantedSkill);
             }
         }
     }
@@ -231,7 +222,7 @@ public class SkillService : ISkillService
 
             if (requirementComponent.RequiredSkillIds is { Count: > 0 })
             {
-                var skillsContainer = character.GetSkillsContainer();
+                var skillsContainer = character.Skills;
                 foreach (var requiredSkillId in requirementComponent.RequiredSkillIds)
                 {
                     if (!TryGetSkillById(skillsContainer, requiredSkillId, out _))
@@ -254,7 +245,7 @@ public class SkillService : ISkillService
         return true.ToResult();
     }
 
-    private ServiceResult<bool> EnsureResourceAvailability(Character character, Skill skill, bool useCurrentResource)
+    private ServiceResult<bool> EnsureResourceAvailability(ISkillAndCombat character, Skill skill, bool useCurrentResource)
     {
         var resourceComponent = skill.GetComponent<ResourceCostComponent>();
         if (resourceComponent?.Costs is not { Count: > 0 })
@@ -273,7 +264,7 @@ public class SkillService : ISkillService
         return true.ToResult();
     }
 
-    private void ConsumeResources(Character character, Skill skill)
+    private void ConsumeResources(ISkillAndCombat character, Skill skill)
     {
         var resourceComponent = skill.GetComponent<ResourceCostComponent>();
         if (resourceComponent?.Costs is not { Count: > 0 } || !resourceComponent.ConsumeOnCast)
@@ -360,7 +351,7 @@ public class SkillService : ISkillService
             .ToLowerInvariant();
     }
 
-    private static int GetStatValue(Character character, StatsProperty statProperty)
+    private static int GetStatValue(ISkillAndCombat character, StatsProperty statProperty)
     {
         if (character.ModifiedStats.TryGetValue(statProperty, out var modifiedValue))
         {
@@ -375,16 +366,16 @@ public class SkillService : ISkillService
         return 0;
     }
 
-    private static bool TryGetSkillEntry(ISkillsContainer container, Skill skill, out Skill trackedSkill, out SkillAvailability availability)
+    private static bool TryGetSkillEntry(IDictionary<Skill, SkillAvailability> container, Skill skill, out Skill trackedSkill, out SkillAvailability availability)
     {
-        if (container.Skills.TryGetValue(skill, out availability))
+        if (container.TryGetValue(skill, out availability))
         {
             trackedSkill = skill;
             return true;
         }
 
-        trackedSkill = container.Skills.Keys.FirstOrDefault(s => s.Id == skill.Id) ?? skill;
-        if (container.Skills.TryGetValue(trackedSkill, out availability))
+        trackedSkill = container.Keys.FirstOrDefault(s => s.Id == skill.Id) ?? skill;
+        if (container.TryGetValue(trackedSkill, out availability))
         {
             return true;
         }
@@ -393,9 +384,9 @@ public class SkillService : ISkillService
         return false;
     }
 
-    private static bool TryGetSkillById(ISkillsContainer container, Guid id, out Skill? skill)
+    private static bool TryGetSkillById(IDictionary<Skill, SkillAvailability> container, Guid id, out Skill? skill)
     {
-        skill = container.Skills.Keys.FirstOrDefault(s => s.Id == id);
+        skill = container.Keys.FirstOrDefault(s => s.Id == id);
         return skill != null;
     }
 }

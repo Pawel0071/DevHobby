@@ -35,8 +35,7 @@ public class NpcAiServiceTests
         var mocks = CreateService();
         var service = mocks.Service;
         var npc = BuildNpc();
-        var combat = npc.Components.OfType<CombatComponent>().First();
-        var skill = combat.GetSkillsContainer().Skills.Keys.First();
+        var skill = npc.Skills.Keys.First();
         var target = BuildPlayer(new Vector3(3f, 0f, 0f), npc.WorldId);
 
         var context = new AiContext { Self = npc };
@@ -48,11 +47,10 @@ public class NpcAiServiceTests
 
         var log = await InvokeExecuteDirectivesAsync(service, npc, context, directives, playerLookup, CancellationToken.None);
 
-        mocks.Combat.Verify(c => c.HandleSkillUsageAsync(
+        mocks.Combat.Verify(c => c.SkillAttackAsync(
             npc,
-            It.Is<Skill>(s => s.Id == skill.Id),
-            It.Is<Guid?>(id => id == target.Id),
-            It.IsAny<CancellationToken>()), Times.Once);
+            target,
+            It.Is<Guid>(id => id == skill.Id)), Times.Once);
 
         log.Should().ContainSingle(entry => entry.Contains(skill.Name, StringComparison.OrdinalIgnoreCase));
         context.ThreatTable.Should().ContainKey(target.Id);
@@ -105,7 +103,7 @@ public class NpcAiServiceTests
         Mock<IModelRepository> DocumentRepository,
         Mock<IMovementService> Movement,
         Mock<ICharacterStateBroadcaster> Broadcaster,
-        Mock<INpcCombatService> Combat,
+        Mock<ICombatService> Combat,
         Mock<IRabbitMqPublisher> Publisher,
         Mock<ILogger<NpcAiService>> Logger,
         Mock<IGameStateBroadcaster> StateBroadcaster,
@@ -115,7 +113,7 @@ public class NpcAiServiceTests
         var documentRepository = new Mock<IModelRepository>();
         var movement = new Mock<IMovementService>();
         var broadcaster = new Mock<ICharacterStateBroadcaster>();
-        var combat = new Mock<INpcCombatService>();
+        var combat = new Mock<ICombatService>();
         var publisher = new Mock<IRabbitMqPublisher>();
         var logger = new Mock<ILogger<NpcAiService>>();
         var stateBroadcaster = new Mock<IGameStateBroadcaster>();
@@ -173,7 +171,7 @@ public class NpcAiServiceTests
         var worldId = Guid.NewGuid();
         var spawn = Location.Create(Vector3.Zero, worldId);
         var npc = Npc.Create("Test NPC", "Test NPC", spawn, worldId);
-        npc.SetCurrentLocation(spawn);
+        npc.CurrentLocation = spawn;
         npc.CurrentHealth = 150;
         npc.MaxHealth = 150;
 
@@ -185,7 +183,7 @@ public class NpcAiServiceTests
 
         var skill = RPG.Domain.Models.Skills.Skill.Create("Slash", "Basic attack");
         skill.Tags.Add("basic-attack");
-        combat.GetSkillsContainer().LearnSkill(skill);
+        npc.Skills[skill] = RPG.Domain.Enums.SkillAvailability.Available;
 
         npc.Components.Add(combat);
         return npc;
@@ -196,15 +194,16 @@ public class NpcAiServiceTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
             Id = Guid.NewGuid(),
-            Name = $"Player-{Guid.NewGuid():N}"
+            Name = $"Player-{Guid.NewGuid():N}",
+            Class = CharacterClass.Warrior
         };
 
         character.MaxHealth = 200;
         character.CurrentHealth = 200;
 
         var location = Location.Create(position, worldId);
-        character.SetCurrentLocation(location);
-        character.SetMovementState(true);
+        character.CurrentLocation = location;
+        character.IsMoving = true;
         return character;
     }
 }

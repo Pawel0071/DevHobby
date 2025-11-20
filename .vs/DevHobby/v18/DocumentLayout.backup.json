@@ -1,0 +1,631 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "W:\\Repositories\\DevHobby\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{55C72406-49DD-4364-99C5-463F79931FE9}|RPG.CLI\\RPG.CLI.csproj|w:\\repositories\\devhobby\\rpg.cli\\scenarios\\documentrepositoryscenariorunner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{55C72406-49DD-4364-99C5-463F79931FE9}|RPG.CLI\\RPG.CLI.csproj|solutionrelative:rpg.cli\\scenarios\\documentrepositoryscenariorunner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|w:\\repositories\\devhobby\\rpg.worldseeder\\seeders\\npccomponentfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|solutionrelative:rpg.worldseeder\\seeders\\npccomponentfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7046125D-C792-47EE-B2E2-9A5068AD8955}|RPG.Infrastructure\\RPG.Infrastructure.csproj|w:\\repositories\\devhobby\\rpg.infrastructure\\mappers\\npcmodelmapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7046125D-C792-47EE-B2E2-9A5068AD8955}|RPG.Infrastructure\\RPG.Infrastructure.csproj|solutionrelative:rpg.infrastructure\\mappers\\npcmodelmapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\core\\npcservicestests\\npcaiservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\core\\npcservicestests\\npcaiservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\core\\movementservicetests\\movementservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\core\\movementservicetests\\movementservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\infrastructure\\mappers\\charactermodelmappertests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\infrastructure\\mappers\\charactermodelmappertests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{000184FB-E31A-4B47-AAD9-1952BDDCF711}|RPG.IntegrationTests\\RPG.IntegrationTests.csproj|w:\\repositories\\devhobby\\rpg.integrationtests\\aitickworlddeltaintegrationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{000184FB-E31A-4B47-AAD9-1952BDDCF711}|RPG.IntegrationTests\\RPG.IntegrationTests.csproj|solutionrelative:rpg.integrationtests\\aitickworlddeltaintegrationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{000184FB-E31A-4B47-AAD9-1952BDDCF711}|RPG.IntegrationTests\\RPG.IntegrationTests.csproj|w:\\repositories\\devhobby\\rpg.integrationtests\\rpg.integrationtests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{000184FB-E31A-4B47-AAD9-1952BDDCF711}|RPG.IntegrationTests\\RPG.IntegrationTests.csproj|solutionrelative:rpg.integrationtests\\rpg.integrationtests.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7448DBEC-AFF0-4A28-87F0-1C5A29CAF095}|RPG.GameServer\\RPG.GameServer.csproj|w:\\repositories\\devhobby\\rpg.gameserver\\mappers\\npcprotomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7448DBEC-AFF0-4A28-87F0-1C5A29CAF095}|RPG.GameServer\\RPG.GameServer.csproj|solutionrelative:rpg.gameserver\\mappers\\npcprotomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7448DBEC-AFF0-4A28-87F0-1C5A29CAF095}|RPG.GameServer\\RPG.GameServer.csproj|w:\\repositories\\devhobby\\rpg.gameserver\\mappers\\mapobjectprotomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7448DBEC-AFF0-4A28-87F0-1C5A29CAF095}|RPG.GameServer\\RPG.GameServer.csproj|solutionrelative:rpg.gameserver\\mappers\\mapobjectprotomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{911ED0F1-CC24-4947-AE0A-D7CE659EFE50}|RPG.Domain\\RPG.Domain.csproj|w:\\repositories\\devhobby\\rpg.domain\\rpg.domain.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{911ED0F1-CC24-4947-AE0A-D7CE659EFE50}|RPG.Domain\\RPG.Domain.csproj|solutionrelative:rpg.domain\\rpg.domain.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{911ED0F1-CC24-4947-AE0A-D7CE659EFE50}|RPG.Domain\\RPG.Domain.csproj|w:\\repositories\\devhobby\\rpg.domain\\models\\worldstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{911ED0F1-CC24-4947-AE0A-D7CE659EFE50}|RPG.Domain\\RPG.Domain.csproj|solutionrelative:rpg.domain\\models\\worldstate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7448DBEC-AFF0-4A28-87F0-1C5A29CAF095}|RPG.GameServer\\RPG.GameServer.csproj|w:\\repositories\\devhobby\\rpg.gameserver\\rpg.gameserver.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{7448DBEC-AFF0-4A28-87F0-1C5A29CAF095}|RPG.GameServer\\RPG.GameServer.csproj|solutionrelative:rpg.gameserver\\rpg.gameserver.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7448DBEC-AFF0-4A28-87F0-1C5A29CAF095}|RPG.GameServer\\RPG.GameServer.csproj|w:\\repositories\\devhobby\\rpg.gameserver\\mappers\\questprotomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7448DBEC-AFF0-4A28-87F0-1C5A29CAF095}|RPG.GameServer\\RPG.GameServer.csproj|solutionrelative:rpg.gameserver\\mappers\\questprotomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7448DBEC-AFF0-4A28-87F0-1C5A29CAF095}|RPG.GameServer\\RPG.GameServer.csproj|w:\\repositories\\devhobby\\rpg.gameserver\\mappers\\characterprotomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7448DBEC-AFF0-4A28-87F0-1C5A29CAF095}|RPG.GameServer\\RPG.GameServer.csproj|solutionrelative:rpg.gameserver\\mappers\\characterprotomapper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{067FCFD8-7B96-46C6-BE22-3A199D95146A}|RPG.Abstractions\\RPG.Abstractions.csproj|w:\\repositories\\devhobby\\rpg.abstractions\\rpg.abstractions.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{067FCFD8-7B96-46C6-BE22-3A199D95146A}|RPG.Abstractions\\RPG.Abstractions.csproj|solutionrelative:rpg.abstractions\\rpg.abstractions.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\core\\inventoryservicetests\\inventoryservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\core\\inventoryservicetests\\inventoryservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\core\\inventoryservicetests\\inventoryserviceedgecasestests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\core\\inventoryservicetests\\inventoryserviceedgecasestests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\application\\characterstatebroadcastertests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\application\\characterstatebroadcastertests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\application\\movementrequestedhandlertests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\application\\movementrequestedhandlertests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\core\\equipmentserivcetests\\equipmentservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\core\\equipmentserivcetests\\equipmentservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\core\\statsservicetests\\statsservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\core\\statsservicetests\\statsservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\core\\levelingservicetests\\levelingservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\core\\levelingservicetests\\levelingservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\core\\skillservicetests\\skillservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\core\\skillservicetests\\skillservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\application\\charactercommandhandlermovementtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\application\\charactercommandhandlermovementtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\infrastructure\\mappers\\locationmappertests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\infrastructure\\mappers\\locationmappertests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|w:\\repositories\\devhobby\\rpg.unittest\\core\\npcaitests\\utilityactioncatalogtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{99BA259E-6EF8-4044-8E77-4D6999A198FE}|RPG.UnitTest\\RPG.UnitTest.csproj|solutionrelative:rpg.unittest\\core\\npcaitests\\utilityactioncatalogtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|w:\\repositories\\devhobby\\rpg.worldseeder\\seeders\\seedmodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|solutionrelative:rpg.worldseeder\\seeders\\seedmodels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|w:\\repositories\\devhobby\\rpg.worldseeder\\seeders\\seeddataloader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|solutionrelative:rpg.worldseeder\\seeders\\seeddataloader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|w:\\repositories\\devhobby\\rpg.worldseeder\\seeders\\itemseedreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|solutionrelative:rpg.worldseeder\\seeders\\itemseedreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|w:\\repositories\\devhobby\\rpg.worldseeder\\seeders\\skillcomponentsfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|solutionrelative:rpg.worldseeder\\seeders\\skillcomponentsfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|w:\\repositories\\devhobby\\rpg.worldseeder\\seeders\\skillseedreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|solutionrelative:rpg.worldseeder\\seeders\\skillseedreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|w:\\repositories\\devhobby\\rpg.worldseeder\\seeders\\mapobjectseedreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|solutionrelative:rpg.worldseeder\\seeders\\mapobjectseedreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|w:\\repositories\\devhobby\\rpg.worldseeder\\seeders\\npcseedreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|solutionrelative:rpg.worldseeder\\seeders\\npcseedreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|w:\\repositories\\devhobby\\rpg.worldseeder\\seeders\\worldstateseedreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FDDC1CC2-3165-488C-83DB-7974EAB0703A}|RPG.WorldSeeder\\RPG.WorldSeeder.csproj|solutionrelative:rpg.worldseeder\\seeders\\worldstateseedreader.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "NpcComponentFactory.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\NpcComponentFactory.cs",
+              "RelativeDocumentMoniker": "RPG.WorldSeeder\\Seeders\\NpcComponentFactory.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\NpcComponentFactory.cs",
+              "RelativeToolTip": "RPG.WorldSeeder\\Seeders\\NpcComponentFactory.cs",
+              "ViewState": "AgIAACgAAAAAAAAAAAAwwDcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T18:16:22.856Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "SkillComponentsFactory.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\SkillComponentsFactory.cs",
+              "RelativeDocumentMoniker": "RPG.WorldSeeder\\Seeders\\SkillComponentsFactory.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\SkillComponentsFactory.cs",
+              "RelativeToolTip": "RPG.WorldSeeder\\Seeders\\SkillComponentsFactory.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAIBQwCcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T18:15:57.11Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "ItemSeedReader.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\ItemSeedReader.cs",
+              "RelativeDocumentMoniker": "RPG.WorldSeeder\\Seeders\\ItemSeedReader.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\ItemSeedReader.cs",
+              "RelativeToolTip": "RPG.WorldSeeder\\Seeders\\ItemSeedReader.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAIBJwDMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T18:15:51.549Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "DocumentRepositoryScenarioRunner.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.CLI\\Scenarios\\DocumentRepositoryScenarioRunner.cs",
+              "RelativeDocumentMoniker": "RPG.CLI\\Scenarios\\DocumentRepositoryScenarioRunner.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.CLI\\Scenarios\\DocumentRepositoryScenarioRunner.cs",
+              "RelativeToolTip": "RPG.CLI\\Scenarios\\DocumentRepositoryScenarioRunner.cs",
+              "ViewState": "AgIAAJoEAABgZmZmZmYiwLIEAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T14:32:30.661Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "SkillSeedReader.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\SkillSeedReader.cs",
+              "RelativeDocumentMoniker": "RPG.WorldSeeder\\Seeders\\SkillSeedReader.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\SkillSeedReader.cs",
+              "RelativeToolTip": "RPG.WorldSeeder\\Seeders\\SkillSeedReader.cs",
+              "ViewState": "AgIAACcAAAAAAAAAAABBwDUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T18:16:02.321Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "NpcModelMapper.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.Infrastructure\\Mappers\\NpcModelMapper.cs",
+              "RelativeDocumentMoniker": "RPG.Infrastructure\\Mappers\\NpcModelMapper.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.Infrastructure\\Mappers\\NpcModelMapper.cs",
+              "RelativeToolTip": "RPG.Infrastructure\\Mappers\\NpcModelMapper.cs",
+              "ViewState": "AgIAAPsAAAAAAAAAAAAQwP4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T14:16:27.677Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "WorldStateSeedReader.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\WorldStateSeedReader.cs",
+              "RelativeDocumentMoniker": "RPG.WorldSeeder\\Seeders\\WorldStateSeedReader.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\WorldStateSeedReader.cs",
+              "RelativeToolTip": "RPG.WorldSeeder\\Seeders\\WorldStateSeedReader.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAIBQwDIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T18:16:39.551Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "SeedDataLoader.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\SeedDataLoader.cs",
+              "RelativeDocumentMoniker": "RPG.WorldSeeder\\Seeders\\SeedDataLoader.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\SeedDataLoader.cs",
+              "RelativeToolTip": "RPG.WorldSeeder\\Seeders\\SeedDataLoader.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T18:15:45.452Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "SeedModels.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\SeedModels.cs",
+              "RelativeDocumentMoniker": "RPG.WorldSeeder\\Seeders\\SeedModels.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\SeedModels.cs",
+              "RelativeToolTip": "RPG.WorldSeeder\\Seeders\\SeedModels.cs",
+              "ViewState": "AgIAAMwAAAAAAAAAAIBQwOMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T17:40:47.902Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "UtilityActionCatalogTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\NPCAiTests\\UtilityActionCatalogTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Core\\NPCAiTests\\UtilityActionCatalogTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\NPCAiTests\\UtilityActionCatalogTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Core\\NPCAiTests\\UtilityActionCatalogTests.cs",
+              "ViewState": "AgIAAD4AAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T17:14:41.611Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "CharacterModelMapperTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Infrastructure\\Mappers\\CharacterModelMapperTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Infrastructure\\Mappers\\CharacterModelMapperTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Infrastructure\\Mappers\\CharacterModelMapperTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Infrastructure\\Mappers\\CharacterModelMapperTests.cs",
+              "ViewState": "AgIAAHcAAAAA2szMzMwUwOQAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T15:42:44.859Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "LevelingServiceTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\LevelingServiceTests\\LevelingServiceTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Core\\LevelingServiceTests\\LevelingServiceTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\LevelingServiceTests\\LevelingServiceTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Core\\LevelingServiceTests\\LevelingServiceTests.cs",
+              "ViewState": "AgIAAG8AAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T15:42:24.503Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "StatsServiceTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\StatsServiceTests\\StatsServiceTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Core\\StatsServiceTests\\StatsServiceTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\StatsServiceTests\\StatsServiceTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Core\\StatsServiceTests\\StatsServiceTests.cs",
+              "ViewState": "AgIAABsAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T15:42:04.326Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AiTickWorldDeltaIntegrationTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.IntegrationTests\\AiTickWorldDeltaIntegrationTests.cs",
+              "RelativeDocumentMoniker": "RPG.IntegrationTests\\AiTickWorldDeltaIntegrationTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.IntegrationTests\\AiTickWorldDeltaIntegrationTests.cs",
+              "RelativeToolTip": "RPG.IntegrationTests\\AiTickWorldDeltaIntegrationTests.cs",
+              "ViewState": "AgIAACMAAABAZmZmZuYnwA0AAABBAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T15:38:39.681Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "SkillServiceTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\SkillServiceTests\\SkillServiceTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Core\\SkillServiceTests\\SkillServiceTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\SkillServiceTests\\SkillServiceTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Core\\SkillServiceTests\\SkillServiceTests.cs",
+              "ViewState": "AgIAAKQAAAAAAAAAAABBwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T15:42:35.748Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "MapObjectSeedReader.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\MapObjectSeedReader.cs",
+              "RelativeDocumentMoniker": "RPG.WorldSeeder\\Seeders\\MapObjectSeedReader.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\MapObjectSeedReader.cs",
+              "RelativeToolTip": "RPG.WorldSeeder\\Seeders\\MapObjectSeedReader.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T18:16:11.458Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "NpcSeedReader.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\NpcSeedReader.cs",
+              "RelativeDocumentMoniker": "RPG.WorldSeeder\\Seeders\\NpcSeedReader.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.WorldSeeder\\Seeders\\NpcSeedReader.cs",
+              "RelativeToolTip": "RPG.WorldSeeder\\Seeders\\NpcSeedReader.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T18:16:30.498Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "CharacterCommandHandlerMovementTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Application\\CharacterCommandHandlerMovementTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Application\\CharacterCommandHandlerMovementTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Application\\CharacterCommandHandlerMovementTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Application\\CharacterCommandHandlerMovementTests.cs",
+              "ViewState": "AgIAAD0AAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T15:43:10.83Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MovementServiceTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\MovementServiceTests\\MovementServiceTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Core\\MovementServiceTests\\MovementServiceTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\MovementServiceTests\\MovementServiceTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Core\\MovementServiceTests\\MovementServiceTests.cs",
+              "ViewState": "AgIAAHkAAAAAAAAAAAApwIYAAABRAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T15:00:02.249Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "LocationMapperTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Infrastructure\\Mappers\\LocationMapperTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Infrastructure\\Mappers\\LocationMapperTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Infrastructure\\Mappers\\LocationMapperTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Infrastructure\\Mappers\\LocationMapperTests.cs",
+              "ViewState": "AgIAAC4AAAAAAAAAAIBQwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T15:55:14.063Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "RPG.IntegrationTests",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.IntegrationTests\\RPG.IntegrationTests.csproj",
+              "RelativeDocumentMoniker": "RPG.IntegrationTests\\RPG.IntegrationTests.csproj",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.IntegrationTests\\RPG.IntegrationTests.csproj",
+              "RelativeToolTip": "RPG.IntegrationTests\\RPG.IntegrationTests.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAABJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-11-19T14:35:53.541Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "InventoryServiceTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\InventoryServiceTests\\InventoryServiceTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Core\\InventoryServiceTests\\InventoryServiceTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\InventoryServiceTests\\InventoryServiceTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Core\\InventoryServiceTests\\InventoryServiceTests.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T14:59:44.102Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "InventoryServiceEdgeCasesTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\InventoryServiceTests\\InventoryServiceEdgeCasesTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Core\\InventoryServiceTests\\InventoryServiceEdgeCasesTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\InventoryServiceTests\\InventoryServiceEdgeCasesTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Core\\InventoryServiceTests\\InventoryServiceEdgeCasesTests.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T14:59:51.629Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "CharacterStateBroadcasterTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Application\\CharacterStateBroadcasterTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Application\\CharacterStateBroadcasterTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Application\\CharacterStateBroadcasterTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Application\\CharacterStateBroadcasterTests.cs",
+              "ViewState": "AgIAADEAAAAAAAAAAABBwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T15:00:12.767Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "NpcAiServiceTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\NPCServicesTests\\NpcAiServiceTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Core\\NPCServicesTests\\NpcAiServiceTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\NPCServicesTests\\NpcAiServiceTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Core\\NPCServicesTests\\NpcAiServiceTests.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAAQwCAAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T15:00:36.935Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "MovementRequestedHandlerTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Application\\MovementRequestedHandlerTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Application\\MovementRequestedHandlerTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Application\\MovementRequestedHandlerTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Application\\MovementRequestedHandlerTests.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T15:00:19.815Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "EquipmentServiceTests.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\EquipmentSerivceTests\\EquipmentServiceTests.cs",
+              "RelativeDocumentMoniker": "RPG.UnitTest\\Core\\EquipmentSerivceTests\\EquipmentServiceTests.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.UnitTest\\Core\\EquipmentSerivceTests\\EquipmentServiceTests.cs",
+              "RelativeToolTip": "RPG.UnitTest\\Core\\EquipmentSerivceTests\\EquipmentServiceTests.cs",
+              "ViewState": "AgIAAIYAAAAAAAAAAABBwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T15:00:27.911Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "QuestProtoMapper.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.GameServer\\Mappers\\QuestProtoMapper.cs",
+              "RelativeDocumentMoniker": "RPG.GameServer\\Mappers\\QuestProtoMapper.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.GameServer\\Mappers\\QuestProtoMapper.cs",
+              "RelativeToolTip": "RPG.GameServer\\Mappers\\QuestProtoMapper.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T14:22:14.158Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "CharacterProtoMapper.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.GameServer\\Mappers\\CharacterProtoMapper.cs",
+              "RelativeDocumentMoniker": "RPG.GameServer\\Mappers\\CharacterProtoMapper.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.GameServer\\Mappers\\CharacterProtoMapper.cs",
+              "RelativeToolTip": "RPG.GameServer\\Mappers\\CharacterProtoMapper.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T14:22:07.516Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "WorldState.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.Domain\\Models\\WorldState.cs",
+              "RelativeDocumentMoniker": "RPG.Domain\\Models\\WorldState.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.Domain\\Models\\WorldState.cs",
+              "RelativeToolTip": "RPG.Domain\\Models\\WorldState.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T14:21:35.733Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "RPG.Domain",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.Domain\\RPG.Domain.csproj",
+              "RelativeDocumentMoniker": "RPG.Domain\\RPG.Domain.csproj",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.Domain\\RPG.Domain.csproj",
+              "RelativeToolTip": "RPG.Domain\\RPG.Domain.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-11-19T14:21:28.562Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "NpcProtoMapper.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.GameServer\\Mappers\\NpcProtoMapper.cs",
+              "RelativeDocumentMoniker": "RPG.GameServer\\Mappers\\NpcProtoMapper.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.GameServer\\Mappers\\NpcProtoMapper.cs",
+              "RelativeToolTip": "RPG.GameServer\\Mappers\\NpcProtoMapper.cs",
+              "ViewState": "AgIAAMwAAAAAmpmZmRkmwBMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T14:12:36.96Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "RPG.GameServer",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.GameServer\\RPG.GameServer.csproj",
+              "RelativeDocumentMoniker": "RPG.GameServer\\RPG.GameServer.csproj",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.GameServer\\RPG.GameServer.csproj",
+              "RelativeToolTip": "RPG.GameServer\\RPG.GameServer.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAIAwwEMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-11-19T14:12:28.243Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "MapObjectProtoMapper.cs",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.GameServer\\Mappers\\MapObjectProtoMapper.cs",
+              "RelativeDocumentMoniker": "RPG.GameServer\\Mappers\\MapObjectProtoMapper.cs",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.GameServer\\Mappers\\MapObjectProtoMapper.cs",
+              "RelativeToolTip": "RPG.GameServer\\Mappers\\MapObjectProtoMapper.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T14:08:21.019Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "RPG.Abstractions",
+              "DocumentMoniker": "W:\\Repositories\\DevHobby\\RPG.Abstractions\\RPG.Abstractions.csproj",
+              "RelativeDocumentMoniker": "RPG.Abstractions\\RPG.Abstractions.csproj",
+              "ToolTip": "W:\\Repositories\\DevHobby\\RPG.Abstractions\\RPG.Abstractions.csproj",
+              "RelativeToolTip": "RPG.Abstractions\\RPG.Abstractions.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-11-19T14:06:17.621Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{269a02dc-6af8-11d3-bdc4-00c04f688e50}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

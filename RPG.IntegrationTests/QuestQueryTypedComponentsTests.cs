@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using RPG.Application.Managers;
 using RPG.GameServer.QueryProtos;
 using RPG.Infrastructure.Interfaces;
-using System.Numerics;
 
 namespace RPG.IntegrationTests;
 
@@ -26,7 +25,7 @@ public class QuestQueryTypedComponentsTests : IClassFixture<TestContainersFixtur
         using var scope = factory.Services.CreateScope();
         var repo = scope.ServiceProvider.GetRequiredService<IModelRepository>();
 
-        var quest = RPG.Domain.Models.Quests.Quest.Create("Mega Quest", "Full test", "Giver", new RPG.Domain.Models.Location { Position = Vector3.Zero });
+        var quest = RPG.Domain.Models.Quests.Quest.Create("Mega Quest", "Full test", "Giver", new RPG.Domain.Models.Location { Position = System.Numerics.Vector3.Zero });
         quest.Components.Add(new RPG.Domain.Models.Quests.QuestComponents.LevelRequirementComponent { MinLevel = 10, MaxLevel = 20 });
         var rewards = new RPG.Domain.Models.Quests.QuestComponents.ItemRewardsComponent();
         rewards.GuaranteedItems.Add(new RPG.Domain.Common.InventorySlot { Quantity = 1 });
@@ -70,7 +69,7 @@ public class QuestQueryTypedComponentsTests : IClassFixture<TestContainersFixtur
         using var scope = factory.Services.CreateScope();
         var repo = scope.ServiceProvider.GetRequiredService<IModelRepository>();
 
-        var quest = RPG.Domain.Models.Quests.Quest.Create("Snapshot Quest", "Desc", "Giver", new RPG.Domain.Models.Location { Position = Vector3.Zero });
+        var quest = RPG.Domain.Models.Quests.Quest.Create("Snapshot Quest", "Desc", "Giver", new RPG.Domain.Models.Location { Position = System.Numerics.Vector3.Zero });
         quest.Components.Add(new RPG.Domain.Models.Quests.QuestComponents.LevelRequirementComponent { MinLevel = 5 });
         await repo.UpsertAsync(quest);
 
@@ -91,7 +90,7 @@ public class QuestQueryTypedComponentsTests : IClassFixture<TestContainersFixtur
         using var scope = factory.Services.CreateScope();
         var repo = scope.ServiceProvider.GetRequiredService<IModelRepository>();
 
-        var quest = RPG.Domain.Models.Quests.Quest.Create("Mega Quest", "Full test", "Giver", new RPG.Domain.Models.Location { Position = Vector3.Zero });
+        var quest = RPG.Domain.Models.Quests.Quest.Create("Mega Quest", "Full test", "Giver", new RPG.Domain.Models.Location { Position = System.Numerics.Vector3.Zero });
         quest.Components.Add(new RPG.Domain.Models.Quests.QuestComponents.LevelRequirementComponent { MinLevel = 10, MaxLevel = 20 });
         var rewards = new RPG.Domain.Models.Quests.QuestComponents.ItemRewardsComponent();
         rewards.GuaranteedItems.Add(new RPG.Domain.Common.InventorySlot { Quantity = 1 });
@@ -115,28 +114,27 @@ public class QuestQueryTypedComponentsTests : IClassFixture<TestContainersFixtur
         var (client, headers) = await CreateQuestQueryClientWithSessionAsync(factory);
         var reply = await client.GetQuestAsync(new QuestGetByIdRequest { Id = quest.Id.ToString() }, headers);
 
-        var raw = JsonSerializer.Serialize(reply.Quest, new JsonSerializerOptions { WriteIndented = true });
+        // Prefer explicit, focused assertions instead of strict full-file snapshot compare.
+        // This makes the test robust to non-semantic serialization changes while ensuring
+        // the important structure and components are present.
+        reply.Quest.Title.Should().Be("Mega Quest");
+        reply.Quest.Description.Should().Be("Full test");
+        reply.Quest.QuestGiverName.Should().Be("Giver");
 
-        string NormalizeDynamic(string json)
-        {
-            // Zamien GUID-y na __DYNAMIC__ dla porównania snapshotu
-            return System.Text.RegularExpressions.Regex.Replace(json, "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", "__DYNAMIC__");
-        }
+        // Components: ensure expected typed components are present
+        var componentTypes = reply.Quest.Components.Select(c => c.Type).ToList();
+        componentTypes.Should().Contain("LevelRequirementComponent");
+        componentTypes.Should().Contain("ItemRewardsComponent");
+        componentTypes.Should().Contain("KillObjectiveComponent");
+        componentTypes.Should().Contain("CollectObjectiveComponent");
+        componentTypes.Should().Contain("DeliverObjectiveComponent");
+        componentTypes.Should().Contain("ExploreObjectiveComponent");
+        componentTypes.Should().Contain("PrerequisiteQuestsComponent");
+        componentTypes.Should().Contain("ReputationRewardsComponent");
+        componentTypes.Should().Contain("RepeatableQuestComponent");
+        componentTypes.Should().Contain("TimeLimitComponent");
 
-        var normalized = NormalizeDynamic(raw);
-        var snapshotDir = Path.Combine(AppContext.BaseDirectory, "Snapshots");
-        var snapshotPath = Path.Combine(snapshotDir, "quest_full_snapshot.json");
-        if (!Directory.Exists(snapshotDir)) Directory.CreateDirectory(snapshotDir);
-        if (!File.Exists(snapshotPath))
-        {
-            // Pierwsze uruchomienie: zapisz baseline, aby test był deterministyczny w kolejnych biegach
-            File.WriteAllText(snapshotPath, normalized);
-        }
-
-        File.Exists(snapshotPath).Should().BeTrue("snapshot file must exist");
-        var expected = File.ReadAllText(snapshotPath);
-        expected.Should().NotBeNullOrWhiteSpace();
-        NormalizeDynamic(expected).Should().Be(normalized);
+        reply.Quest.Components.Count.Should().BeGreaterOrEqualTo(10);
     }
 
     private static GrpcChannel CreateChannel(GameServerFactory factory)

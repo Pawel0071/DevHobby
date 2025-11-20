@@ -32,7 +32,7 @@ public class EquipmentService : IEquipmentService
     {
         _logger.Debug($"Attempting to equip item '{item.Name}' to slot '{slot}' for character '{character.Id}'.");
 
-        var backpack = character.GetBackpackInventoryContainer();
+        var backpack = character.BackpackInventory;
 
         if (!_inventoryService.Contains(backpack, item).Result)
         {
@@ -115,7 +115,7 @@ public class EquipmentService : IEquipmentService
             return ErrorCodeDefinition.InvalidOperation.ToFail<bool>("Slot jest pusty.");
         }
 
-        var addResult = _inventoryService.AddItem(character.GetBackpackInventoryContainer(), item);
+        var addResult = _inventoryService.AddItem(character.BackpackInventory, item);
         if (!addResult.Success)
         {
             _logger.Error($"Failed to add item '{item.Name}' back to inventory: {addResult.Message}");
@@ -132,7 +132,7 @@ public class EquipmentService : IEquipmentService
     {
         _logger.Debug($"Swapping item '{item.Name}' into slot '{slot}' for character '{character.Id}'.");
 
-        if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), item).Result)
+        if (!_inventoryService.Contains(character.BackpackInventory, item).Result)
         {
             _logger.Warn($"Item '{item.Name}' not found in inventory. Cannot swap.");
             return ErrorCodeDefinition.ItemNotFound.ToFail<bool>("Przedmiot nie znajduje się w ekwipunku.");

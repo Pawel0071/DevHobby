@@ -360,7 +360,7 @@ public static class UtilityActionCatalog
     {
         var route = new List<Location>(waypointCount);
         var basePosition = spawn.Position;
-        var worldId = spawn.WorldId ?? Guid.Empty;
+        var worldId = spawn.WorldId;
 
         for (var i = 0; i < waypointCount; i++)
         {
@@ -373,8 +373,8 @@ public static class UtilityActionCatalog
                 0f,
                 distance * MathF.Sin(radians));
 
-            var waypoint = Location.Create(basePosition + offset, worldId, spawn.MapId, spawn.ZoneName);
-            waypoint.Rotation = angle % 360f;
+            var waypoint = Location.Create(basePosition + offset, worldId, spawn.MapId, spawn.MapName);
+            waypoint.Direction = angle % 360f;
             route.Add(waypoint);
         }
 

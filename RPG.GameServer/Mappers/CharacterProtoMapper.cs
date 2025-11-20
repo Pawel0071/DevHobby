@@ -1,8 +1,8 @@
 using RPG.GameServer.Protos;
-using DomainCharacter = RPG.Domain.Models.Character;
 using RPG.Domain.Enums;
 using RPG.Domain.Containers;
 using CharacterClass = RPG.Domain.Enums.CharacterClass;
+using DomainCharacter = RPG.Domain.Models.Character;
 
 namespace RPG.GameServer.Mappers;
 
@@ -11,11 +11,10 @@ namespace RPG.GameServer.Mappers;
 /// </summary>
 public class CharacterProtoMapper
 {
-    private readonly RPG.Infrastructure.Interfaces.ILogger<CharacterProtoMapper> _logger;
+    private readonly Infrastructure.Interfaces.ILogger<CharacterProtoMapper> _logger;
     private readonly LocationProtoMapper _locationMapper;
 
-    public CharacterProtoMapper(
-        RPG.Infrastructure.Interfaces.ILogger<CharacterProtoMapper> logger,
+    public CharacterProtoMapper(Infrastructure.Interfaces.ILogger<CharacterProtoMapper> logger,
         LocationProtoMapper locationMapper)
     {
         _logger = logger;
@@ -43,11 +42,24 @@ public class CharacterProtoMapper
         {
             Id = characterId,
             Name = bc.Name,
-            Level = bc.Level > 0 ? bc.Level : 1,
-            MaxHealth = bc.MaxHealth > 0 ? bc.MaxHealth : 100,
-            CurrentHealth = bc.CurrentHealth > 0 ? bc.CurrentHealth : (bc.MaxHealth > 0 ? bc.MaxHealth : 100),
-            MaxResource = bc.MaxMana > 0 ? bc.MaxMana : 60,
-            CurrentResource = bc.CurrentMana > 0 ? bc.CurrentMana : 0
+            Level = bc.Level > 0
+                ? bc.Level
+                : 1,
+            MaxHealth = bc.MaxHealth > 0
+                ? bc.MaxHealth
+                : 100,
+            CurrentHealth = bc.CurrentHealth > 0
+                ? bc.CurrentHealth
+                : (bc.MaxHealth > 0
+                    ? bc.MaxHealth
+                    : 100),
+            MaxResource = bc.MaxMana > 0
+                ? bc.MaxMana
+                : 60,
+            CurrentResource = bc.CurrentMana > 0
+                ? bc.CurrentMana
+                : 0,
+            Class = cls
         };
 
         // Stats → BaseStats
@@ -61,12 +73,20 @@ public class CharacterProtoMapper
             character.BaseStats[StatsProperty.Vitality] = bc.Stats.Vitality;
             character.BaseStats[StatsProperty.MagicResist] = bc.Stats.MagicResist;
             character.BaseStats[StatsProperty.NatureResist] = bc.Stats.NatureResist;
-            character.BaseStats[StatsProperty.MisticResist] = bc.Stats.MisticResist;
+            character.BaseStats[StatsProperty.FireResist] = bc.Stats.FireResist;
+            character.BaseStats[StatsProperty.FrostResist] = bc.Stats.FrostResist;
             character.BaseStats[StatsProperty.Armor] = bc.Stats.Armor;
             character.BaseStats[StatsProperty.CritChance] = bc.Stats.CritChance;
+            character.BaseStats[StatsProperty.CritDamage] = bc.Stats.CritDamage;
             character.BaseStats[StatsProperty.HitChance] = bc.Stats.HitChance;
             character.BaseStats[StatsProperty.AttackSpeed] = bc.Stats.AttackSpeed;
             character.BaseStats[StatsProperty.MoveSpeed] = bc.Stats.MoveSpeed;
+            character.BaseStats[StatsProperty.MeleeAttackPower] = bc.Stats.MeleeAttackPower;
+            character.BaseStats[StatsProperty.RangedAttackPower] = bc.Stats.RangedAttackPower;
+            character.BaseStats[StatsProperty.MagicAttackPower] = bc.Stats.MagicAttackPower;
+            character.BaseStats[StatsProperty.NatureAttackPower] = bc.Stats.NatureAttackPower;
+            character.BaseStats[StatsProperty.FireAttackPower] = bc.Stats.FireAttackPower;
+            character.BaseStats[StatsProperty.FrostAttackPower] = bc.Stats.FrostAttackPower;
 
             character.ModifiedStats[StatsProperty.MoveSpeed] = bc.Stats.MoveSpeed;
         }
@@ -77,17 +97,17 @@ public class CharacterProtoMapper
         var z = (float)(bc.Position?.Z ?? 0);
         var worldId = Guid.TryParse(bc.Position?.WorldId, out var parsedWorldId) ? parsedWorldId : Guid.Empty;
         var location = RPG.Domain.Models.Location.Create(x, y, z, worldId, bc.Position?.MapId ?? string.Empty, bc.Position?.ZoneName ?? string.Empty);
-        location.Rotation = bc.Position != null ? bc.Position.Rotation : bc.Rotation;
-        character.SetCurrentLocation(location);
+        location.Direction = bc.Position != null ? bc.Position.Rotation : bc.Rotation;
+        character.CurrentLocation =location;
 
         // Movement flags
-        character.SetMovementState(bc.IsMoving);
-        character.SetRotationState(bc.IsRotating);
+        character.IsMoving = bc.IsMoving;
+        character.IsRotating = bc.IsRotating ;
 
         // Equipment → Domain
         if (pc.Equipment is not null)
         {
-            var eq = character.GetEquipmentContainer();
+            var eq = character.Equipments;
             if (pc.Equipment.Head is not null)
                 eq[EquipmentSlot.Head] = ToItem(pc.Equipment.Head);
             if (pc.Equipment.Chest is not null)
@@ -119,13 +139,15 @@ public class CharacterProtoMapper
         // Inventory → Domain
         if (pc.Inventory is { Count: > 0 })
         {
-            var inv = character.GetBackpackInventoryContainer();
+            var inv = character.BackpackInventory;
+            var capacity = inv.Count;
             var index = 0;
             foreach (var protoItem in pc.Inventory)
             {
                 if (protoItem == null) continue;
-                if (index >= inv.Capacity) break;
-                inv[index] = ToItem(protoItem);
+                if (index >= capacity) break;
+                inv[index].Item = ToItem(protoItem);
+                inv[index].Quantity = 1;
                 index++;
             }
         }
@@ -172,4 +194,3 @@ public class CharacterProtoMapper
             : CharacterClass.Warrior;
     }
 }
-

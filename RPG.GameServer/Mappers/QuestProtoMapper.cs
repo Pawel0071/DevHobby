@@ -1,6 +1,8 @@
-using RPG.GameServer.QueryProtos;
-using DomainQuest = RPG.Domain.Models.Quests.Quest;
+using System.Text.Json;
 using RPG.Domain.Models.Quests.QuestComponents;
+using DomainQuest = RPG.Domain.Models.Quests.Quest;
+using RPG.Infrastructure.Interfaces;
+using RPG.GameServer.QueryProtos;
 
 namespace RPG.GameServer.Mappers;
 
@@ -9,11 +11,10 @@ namespace RPG.GameServer.Mappers;
 /// </summary>
 public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
 {
-    private readonly RPG.Infrastructure.Interfaces.ILogger<QuestProtoMapper> _logger;
+    private readonly Infrastructure.Interfaces.ILogger<QuestProtoMapper> _logger;
     private readonly LocationProtoMapper _locationMapper;
 
-    public QuestProtoMapper(
-        RPG.Infrastructure.Interfaces.ILogger<QuestProtoMapper> logger,
+    public QuestProtoMapper(Infrastructure.Interfaces.ILogger<QuestProtoMapper> logger,
         LocationProtoMapper locationMapper)
     {
         _logger = logger;
@@ -167,7 +168,7 @@ public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
             proto.Components.Add(new Component
             {
                 Type = component.GetType().Name,
-                Data = System.Text.Json.JsonSerializer.Serialize(component, component.GetType())
+                DataJson = JsonSerializer.Serialize(component, component.GetType())
             });
         }
 
@@ -328,4 +329,3 @@ public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
         return quest;
     }
 }
-

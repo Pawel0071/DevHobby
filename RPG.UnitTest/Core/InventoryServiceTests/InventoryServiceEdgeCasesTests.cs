@@ -33,7 +33,7 @@ public class InventoryServiceEdgeCasesTests
         var mock = new Mock<IInventoryContainer>();
         mock.Setup(c => c.Inventory).Returns(new List<InventorySlot>());
 
-        var result = _service.FreeSpace(mock.Object);
+        var result = _service.FreeSpace(mock.Object.Inventory);
 
         result.Result.Should().Be(0);
     }

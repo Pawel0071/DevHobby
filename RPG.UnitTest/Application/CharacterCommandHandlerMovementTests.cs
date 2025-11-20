@@ -57,9 +57,10 @@ public class CharacterCommandHandlerMovementTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
             Id = Guid.NewGuid(),
-            Name = "Mover"
+            Name = "Mover",
+            Class = CharacterClass.Warrior
         };
-        character.SetCurrentLocation(Location.Create(Vector3.Zero, Guid.NewGuid()));
+        character.CurrentLocation = Location.Create(Vector3.Zero, Guid.NewGuid());
         character.ModifiedStats[StatsProperty.MoveSpeed] = 5;
 
         _characterRepository.Setup(repo => repo.GetByIdAsync<Character>(character.Id, It.IsAny<CancellationToken>())).ReturnsAsync(character);
@@ -78,9 +79,10 @@ public class CharacterCommandHandlerMovementTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Mage)
         {
             Id = Guid.NewGuid(),
-            Name = "Static"
+            Name = "Static",
+            Class = CharacterClass.Mage
         };
-        character.SetCurrentLocation(Location.Create(Vector3.Zero, Guid.NewGuid()));
+        character.CurrentLocation = Location.Create(Vector3.Zero, Guid.NewGuid());
         character.ModifiedStats[StatsProperty.MoveSpeed] = 5;
 
         _characterRepository.Setup(repo => repo.GetByIdAsync<Character>(character.Id, It.IsAny<CancellationToken>())).ReturnsAsync(character);
@@ -100,10 +102,11 @@ public class CharacterCommandHandlerMovementTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
             Id = Guid.NewGuid(),
-            Name = "Stopper"
+            Name = "Stopper",
+            Class = CharacterClass.Warrior
         };
         var location = Location.Create(new Vector3(2, 0, 3), Guid.NewGuid());
-        character.SetCurrentLocation(location);
+        character.CurrentLocation = location;
 
         _characterRepository.Setup(repo => repo.GetByIdAsync<Character>(character.Id, It.IsAny<CancellationToken>())).ReturnsAsync(character);
 
@@ -121,10 +124,11 @@ public class CharacterCommandHandlerMovementTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Mage)
         {
             Id = Guid.NewGuid(),
-            Name = "Spinner"
+            Name = "Spinner",
+            Class = CharacterClass.Mage
         };
         var location = Location.Create(Vector3.Zero, Guid.NewGuid());
-        character.SetCurrentLocation(location);
+        character.CurrentLocation = location;
 
         _characterRepository.Setup(repo => repo.GetByIdAsync<Character>(character.Id, It.IsAny<CancellationToken>())).ReturnsAsync(character);
 
@@ -142,9 +146,10 @@ public class CharacterCommandHandlerMovementTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
             Id = Guid.NewGuid(),
-            Name = "Confused"
+            Name = "Confused",
+            Class = CharacterClass.Warrior
         };
-        character.SetCurrentLocation(Location.Create(Vector3.Zero, Guid.NewGuid()));
+        character.CurrentLocation = Location.Create(Vector3.Zero, Guid.NewGuid());
 
         _characterRepository.Setup(repo => repo.GetByIdAsync<Character>(character.Id, It.IsAny<CancellationToken>())).ReturnsAsync(character);
 
@@ -162,11 +167,12 @@ public class CharacterCommandHandlerMovementTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Mage)
         {
             Id = Guid.NewGuid(),
-            Name = "Drifter"
+            Name = "Drifter",
+            Class = CharacterClass.Mage
         };
         var location = Location.Create(Vector3.Zero, Guid.NewGuid());
-        location.Rotation = 135f;
-        character.SetCurrentLocation(location);
+        location.Direction = 135f;
+        character.CurrentLocation = location;
 
         _characterRepository.Setup(repo => repo.GetByIdAsync<Character>(character.Id, It.IsAny<CancellationToken>())).ReturnsAsync(character);
 

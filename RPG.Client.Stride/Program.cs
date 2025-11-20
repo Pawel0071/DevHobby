@@ -2197,7 +2197,7 @@ internal sealed class GraphicsClientGame : Game
             AddRow(grid, 3, "Pos X", _posXField);
             AddRow(grid, 4, "Pos Y", _posYField);
             AddRow(grid, 5, "Pos Z", _posZField);
-            AddRow(grid, 6, "Rotation", _rotationField);
+            AddRow(grid, 6, "Direction", _rotationField);
             AddRow(grid, 7, "Scale", _scaleField);
             AddRow(grid, 8, "Texture", _textureField);
 
@@ -2263,7 +2263,7 @@ internal sealed class GraphicsClientGame : Game
 
             if (!float.TryParse(_rotationField.Text, NumberStyles.Float, CultureInfo.InvariantCulture, out var rotation))
             {
-                _game.EnqueueLog("Editor: Rotation value must be numeric.");
+                _game.EnqueueLog("Editor: Direction value must be numeric.");
                 return;
             }
 

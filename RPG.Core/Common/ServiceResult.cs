@@ -2,6 +2,9 @@ using RPG.Domain.Common;
 
 namespace RPG.Core.Common;
 
+/// <summary>
+/// Generic ServiceResult for operations that return data
+/// </summary>
 public readonly record struct ServiceResult<TResult>(
     bool Success,
     ErrorCodeDefinition Error,

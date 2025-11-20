@@ -25,7 +25,8 @@ public class MovementRequestedHandlerTests
         var character = new Character(characterId, CharacterClass.Warrior, null, null)
         {
             Id = characterId,
-            Name = "Test"
+            Name = "Test",
+            Class = CharacterClass.Warrior
         };
         character.ModifiedStats[StatsProperty.MoveSpeed] = 5;
 
@@ -34,7 +35,7 @@ public class MovementRequestedHandlerTests
             .ReturnsAsync(character);
 
         var movement = new Mock<IMovementService>();
-        movement.Setup(m => m.Move(character, It.IsAny<System.Numerics.Vector3>(), 0.1f, null, true))
+        movement.Setup(m => m.Move(character, It.IsAny<System.Numerics.Vector3>(), 0.1f, null, It.IsAny<bool>()))
             .Returns(ServiceResult<Location>.Ok(character.CurrentLocation));
 
         var dispatcher = new Mock<IGameEventDispatcher>();

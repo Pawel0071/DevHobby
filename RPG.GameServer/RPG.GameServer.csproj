@@ -60,6 +60,8 @@
     <ProjectReference Include="..\RPG.Application\RPG.Application.csproj"/>
     <ProjectReference Include="..\RPG.Core\RPG.Core.csproj"/>
     <ProjectReference Include="..\RPG.AI\RPG.AI.csproj"/>
+    <ProjectReference Include="..\RPG.Domain\RPG.Domain.csproj"/>
+    <ProjectReference Include="..\RPG.Infrastructure\RPG.Infrastructure.csproj"/>
   </ItemGroup>
 
 </Project>

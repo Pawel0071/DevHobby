@@ -8,7 +8,7 @@ namespace RPG.Domain.Models.Npcs.NpcComponents;
 ///     Component for NPCs that teach skills or train characters.
 ///     Uses SkillsContainer to store teachable skills.
 /// </summary>
-public class TrainerComponent : INpcComponent
+public class TrainerComponent : NpcComponentBase
 {
     private SkillsContainer TeachableSkillsContainer { get; } = new();
 
@@ -29,4 +29,7 @@ public class TrainerComponent : INpcComponent
     {
         return TeachableSkillsContainer;
     }
+
+    public override string ComponentName => "Trainer";
+    public override string ComponentType => "Trainer";
 }

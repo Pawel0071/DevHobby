@@ -24,7 +24,7 @@ public class InventoryServiceTests
         var item = CreateItem("Potion", 10);
         var container = CreateContainer(new InventorySlot { Item = item, Quantity = 5 });
 
-        var result = _service.AddItem(container, item);
+        var result = _service.AddItem(container.Inventory, item);
 
         result.Success.Should().BeTrue();
         container.Inventory[0].Quantity.Should().Be(6);
@@ -36,7 +36,7 @@ public class InventoryServiceTests
         var item = CreateItem("Scroll", 5);
         var container = CreateContainer(new InventorySlot());
 
-        var result = _service.AddItem(container, item);
+        var result = _service.AddItem(container.Inventory, item);
 
         result.Success.Should().BeTrue();
         container.Inventory[0].Item.Should().Be(item);
@@ -49,7 +49,7 @@ public class InventoryServiceTests
         var item = CreateItem("Gem", 1);
         var container = CreateContainer(new InventorySlot { Item = item, Quantity = 1 });
 
-        var result = _service.AddItem(container, item);
+        var result = _service.AddItem(container.Inventory, item);
 
         result.Success.Should().BeFalse();
         result.Error.Should().Be(ErrorCodeDefinition.NoFreeSlot);
@@ -62,7 +62,7 @@ public class InventoryServiceTests
         var item = CreateItem("Arrow", 20);
         var container = CreateContainer(new InventorySlot { Item = item, Quantity = 5 });
 
-        var result = _service.RemoveItem(container, item);
+        var result = _service.RemoveItem(container.Inventory, item);
 
         result.Success.Should().BeTrue();
         container.Inventory[0].Quantity.Should().Be(4);
@@ -75,7 +75,7 @@ public class InventoryServiceTests
         var item = CreateItem("Key", 1);
         var container = CreateContainer(new InventorySlot { Item = item, Quantity = 1 });
 
-        var result = _service.RemoveItem(container, item);
+        var result = _service.RemoveItem(container.Inventory, item);
 
         result.Success.Should().BeTrue();
         container.Inventory[0].Quantity.Should().Be(0);
@@ -88,7 +88,7 @@ public class InventoryServiceTests
         var item = CreateItem("Map");
         var container = CreateContainer(new InventorySlot());
 
-        var result = _service.RemoveItem(container, item);
+        var result = _service.RemoveItem(container.Inventory, item);
 
         result.Success.Should().BeFalse();
         result.Error.Should().Be(ErrorCodeDefinition.ItemNotFound);
@@ -101,7 +101,7 @@ public class InventoryServiceTests
         var item = CreateItem("Torch");
         var container = CreateContainer(new InventorySlot { Item = item, Quantity = 1 });
 
-        var result = _service.Contains(container, item);
+        var result = _service.Contains(container.Inventory, item);
 
         result.Success.Should().BeTrue();
     }
@@ -112,7 +112,7 @@ public class InventoryServiceTests
         var item = CreateItem("Coin", 5);
         var container = CreateContainer(new InventorySlot { Item = item, Quantity = 5 });
 
-        var result = _service.IsFull(container);
+        var result = _service.IsFull(container.Inventory);
 
         result.Success.Should().BeTrue();
     }
@@ -127,7 +127,7 @@ public class InventoryServiceTests
             new InventorySlot { Item = item, Quantity = 10 }
         );
 
-        var result = _service.FreeSpace(container);
+        var result = _service.FreeSpace(container.Inventory);
 
         result.Result.Should().Be(2); // 1 empty + 1 partially filled
     }

@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RPG.GameServer.QueryProtos;
 using RPG.Infrastructure.Interfaces;
 using FluentAssertions;
-using System.Numerics;
+using Vector3 = System.Numerics.Vector3;
 
 namespace RPG.IntegrationTests;
 
@@ -24,7 +24,7 @@ public class MapObjectQuestGrpcIntegrationTests : IClassFixture<TestContainersFi
 
         // seed minimal MapObject with Container/Lockable/Door if not present
         var worldId = Guid.NewGuid();
-        var mo = RPG.Domain.Models.MapObjects.MapObject.Create("Chest", new RPG.Domain.Models.Location { Position = Vector3.One, WorldId = worldId }, worldId);
+        var mo = RPG.Domain.Models.MapObjects.MapObject.Create("Chest", new RPG.Domain.Models.Location { Position = System.Numerics.Vector3.One, WorldId = worldId }, worldId);
         mo.Components.Add(new RPG.Domain.Models.MapObjects.MapObjectComponents.ContainerComponent());
         mo.Components.Add(new RPG.Domain.Models.MapObjects.MapObjectComponents.LockableComponent { IsLocked = true, RequiredKeyItemId = "key-1", LockpickDifficulty = 3, CanBeLockpicked = true });
         mo.Components.Add(new RPG.Domain.Models.MapObjects.MapObjectComponents.DoorComponent { IsOpen = false, OpenAngle = 90 });
@@ -66,7 +66,7 @@ public class MapObjectQuestGrpcIntegrationTests : IClassFixture<TestContainersFi
         var repo = scope.ServiceProvider.GetRequiredService<IModelRepository>();
 
         // seed minimal Quest with LevelRequirement and ItemRewards
-        var q = RPG.Domain.Models.Quests.Quest.Create("Test Quest", "Desc", "Giver", new RPG.Domain.Models.Location { Position = Vector3.Zero });
+        var q = RPG.Domain.Models.Quests.Quest.Create("Test Quest", "Desc", "Giver", new RPG.Domain.Models.Location { Position = System.Numerics.Vector3.Zero });
         q.Components.Add(new RPG.Domain.Models.Quests.QuestComponents.LevelRequirementComponent { MinLevel = 5, MaxLevel = 10 });
         var rewards = new RPG.Domain.Models.Quests.QuestComponents.ItemRewardsComponent();
         rewards.GuaranteedItems.Add(new RPG.Domain.Common.InventorySlot { Quantity = 1 });

@@ -70,10 +70,11 @@ public sealed class EquipmentInventoryRequestedHandler : IRequestedEventHandler
     {
         var update = new CharacterStateUpdate(
             character.Id,
+            character.Class,
             character.CurrentLocation,
             IsMoving: null,
             IsRotating: null,
-            Rotation: character.CurrentLocation?.Rotation,
+            Rotation: character.CurrentLocation?.Direction,
             Timestamp: DateTime.UtcNow);
 
         await _stateBroadcaster.BroadcastAsync(update, ct);
@@ -85,7 +86,7 @@ public sealed class EquipmentInventoryRequestedHandler : IRequestedEventHandler
         if (character == null) return;
         var item = FindItemInContainers(character, e.ItemId);
         if (item is null) return;
-        if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), item).Result) return;
+        if (!_inventoryService.Contains(character.BackpackInventory, item).Result) return;
         if (character.Level < item.RequiredLevel) return;
         var previously = character.Equipments[e.Slot];
         var equipResult = previously is not null ? _equipmentService.Swap(character, e.Slot, item) : _equipmentService.Equip(character, e.Slot, item);
@@ -107,7 +108,7 @@ public sealed class EquipmentInventoryRequestedHandler : IRequestedEventHandler
         var item = character.Equipments[e.Slot];
         if (item is null) return;
 
-        var invFull = _inventoryService.IsFull(character.GetBackpackInventoryContainer()).Result;
+        var invFull = _inventoryService.IsFull(character.BackpackInventory).Result;
         if (invFull)
         {
             // InventoryFullEvent usunięty – można dodać RequestedEvent, jeśli będzie potrzebny
@@ -134,8 +135,8 @@ public sealed class EquipmentInventoryRequestedHandler : IRequestedEventHandler
         if (character == null) return;
         var item = FindItemInContainers(character, e.ItemId);
         if (item is null) return;
-        if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), item).Result) return;
-        var result = _inventoryService.RemoveItem(character.GetBackpackInventoryContainer(), item);
+        if (!_inventoryService.Contains(character.BackpackInventory, item).Result) return;
+        var result = _inventoryService.RemoveItem(character.BackpackInventory, item);
         if (!result.Success) return;
         await _repository.UpsertAsync(character, ct);
         await BroadcastCharacterAsync(character, ct);
@@ -147,14 +148,14 @@ public sealed class EquipmentInventoryRequestedHandler : IRequestedEventHandler
         if (character == null) return;
         var item = FindItemInContainers(character, e.ItemId);
         if (item is null) return;
-        if (!_inventoryService.Contains(character.GetBackpackInventoryContainer(), item).Result) return;
-        if (_inventoryService.IsFull(character.GetBankStorageContainer()).Result)
+        if (!_inventoryService.Contains(character.BackpackInventory, item).Result) return;
+        if (_inventoryService.IsFull(character.BankStorage).Result)
         {
             // InventoryFullEvent usunięty – można dodać RequestedEvent, jeśli będzie potrzebny
             return;
         }
-        _inventoryService.RemoveItem(character.GetBackpackInventoryContainer(), item);
-        var add = _inventoryService.AddItem(character.GetBankStorageContainer(), item);
+        _inventoryService.RemoveItem(character.BackpackInventory, item);
+        var add = _inventoryService.AddItem(character.BankStorage, item);
         if (!add.Success) return;
         await _repository.UpsertAsync(character, ct);
         await BroadcastCharacterAsync(character, ct);
@@ -166,13 +167,13 @@ public sealed class EquipmentInventoryRequestedHandler : IRequestedEventHandler
         if (character == null) return;
         var item = FindItemInContainers(character, e.ItemId);
         if (item is null) return;
-        if (_inventoryService.IsFull(character.GetBackpackInventoryContainer()).Result)
+        if (_inventoryService.IsFull(character.BackpackInventory).Result)
         {
             // InventoryFullEvent usunięty – można dodać RequestedEvent, jeśli będzie potrzebny
             return;
         }
-        _inventoryService.RemoveItem(character.GetBankStorageContainer(), item);
-        var add = _inventoryService.AddItem(character.GetBackpackInventoryContainer(), item);
+        _inventoryService.RemoveItem(character.BankStorage, item);
+        var add = _inventoryService.AddItem(character.BackpackInventory, item);
         if (!add.Success) return;
         await _repository.UpsertAsync(character, ct);
         await BroadcastCharacterAsync(character, ct);
@@ -184,10 +185,10 @@ public sealed class EquipmentInventoryRequestedHandler : IRequestedEventHandler
         if (character == null) return;
         var item = FindItemInContainers(character, e.ItemId);
         if (item is null) return;
-        const string ConsumableTag = "item:consumable";
-        var hasConsumableTag = item.Tags.Contains(ConsumableTag) || item.Tags.Contains("consumable");
-        if (!hasConsumableTag || !_tagRegistry.IsValid(ConsumableTag)) return;
-        var removeResult = _inventoryService.RemoveItem(character.GetBackpackInventoryContainer(), item);
+        const string consumableTag = "item:consumable";
+        var hasConsumableTag = item.Tags.Contains(consumableTag) || item.Tags.Contains("consumable");
+        if (!hasConsumableTag || !_tagRegistry.IsValid(consumableTag)) return;
+        var removeResult = _inventoryService.RemoveItem(character.BackpackInventory, item);
         if (!removeResult.Success) return;
         await _repository.UpsertAsync(character, ct);
         await BroadcastCharacterAsync(character, ct);

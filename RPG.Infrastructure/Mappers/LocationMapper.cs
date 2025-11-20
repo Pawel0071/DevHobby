@@ -25,10 +25,10 @@ public class LocationMapper
             X = entity.Position.X,
             Y = entity.Position.Y,
             Z = entity.Position.Z,
-            WorldId = entity.WorldId?.ToString(),
+            WorldId = entity.WorldId.ToString(),
             MapId = entity.MapId,
-            ZoneName = entity.ZoneName,
-            Rotation = entity.Rotation
+            ZoneName = entity.MapName,
+            Rotation = entity.Direction
         };
     }
 
@@ -36,16 +36,16 @@ public class LocationMapper
     {
         _logger.Debug($"Converting LocationData to Location. X={document.X}, Y={document.Y}, Z={document.Z}");
         var worldId = string.IsNullOrEmpty(document.WorldId)
-            ? (Guid?)null
+            ? Guid.Empty
             : Guid.Parse(document.WorldId);
 
         var location = Location.Create(
             new Vector3(document.X, document.Y, document.Z),
-            worldId ?? Guid.Empty,
+            worldId,
             document.MapId,
             document.ZoneName);
 
-        location.Rotation = document.Rotation;
+        location.Direction = document.Rotation;
         location.WorldId = worldId;
 
         return location;

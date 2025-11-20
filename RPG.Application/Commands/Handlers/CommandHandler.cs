@@ -30,7 +30,10 @@ public class CommandHandler : ICommandHandler<EquipItemCommand>,
     ICommandHandler<DieCommand>,
     ICommandHandler<AcceptQuestCommand>,
     ICommandHandler<CompleteQuestCommand>,
-    ICommandHandler<UpdateQuestProgressCommand>
+    ICommandHandler<UpdateQuestProgressCommand>,
+    ICommandHandler<AttackNpcCommand>,
+    ICommandHandler<NpcDamageReportedCommand>,
+    ICommandHandler<NpcRespawnCommand>
 
 {
     private readonly IRequestEventQueue _requestQueue;
@@ -191,6 +194,18 @@ public class CommandHandler : ICommandHandler<EquipItemCommand>,
         await PublishEventAsync(command as IMetadataCommand, meta => new CharacterCreateRequestedEvent(meta, command.Character), cancellationToken).ConfigureAwait(false);
         return CommandResult.Ok();
     }
+
+    public Task<CommandResult> HandleAsync(AttackNpcCommand command, CancellationToken cancellationToken = default)
+        => HandleSimple(command, command.CharacterId, "CommandHandler.AttackNpc",
+            meta => new CharacterAttackRequestedEvent(meta, command.CharacterId, command.NpcId), null, cancellationToken);
+
+    public Task<CommandResult> HandleAsync(NpcDamageReportedCommand command, CancellationToken cancellationToken = default)
+        => HandleSimple(command, command.CharacterId, "CommandHandler.NpcDamageReport",
+            meta => new NpcDamageRequestedEvent(meta, command.NpcId, command.CharacterId, command.DamageAmount), null, cancellationToken);
+
+    public Task<CommandResult> HandleAsync(NpcRespawnCommand command, CancellationToken cancellationToken = default)
+        => HandleSimple(command, command.NpcId, "CommandHandler.NpcRespawn",
+            meta => new NpcRespawnRequestedEvent(meta, command.NpcId), null, cancellationToken);
 
     private static bool TryGetDirectionVector(int direction, out Vector3 vector)
     {

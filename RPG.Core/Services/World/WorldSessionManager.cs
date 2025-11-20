@@ -61,13 +61,13 @@ public class WorldSessionManager : IWorldSessionManager
             spawnLocation = await _worldStateService
                 .DetermineSpawnLocationAsync(world, character, DefaultSpawnType, reuseExistingLocation, cancellationToken)
                 .ConfigureAwait(false);
-            spawnLocation.WorldId ??= world.WorldId;
+            spawnLocation.WorldId = world.WorldId;
             spawnLocation.MapId = string.IsNullOrWhiteSpace(spawnLocation.MapId) ? DefaultMapId : spawnLocation.MapId;
-            spawnLocation.ZoneName = string.IsNullOrWhiteSpace(spawnLocation.ZoneName) ? DefaultZoneName : spawnLocation.ZoneName;
+            spawnLocation.MapName = string.IsNullOrWhiteSpace(spawnLocation.MapName) ? DefaultZoneName : spawnLocation.MapName;
 
-            character.SetCurrentLocation(spawnLocation);
-            character.SetMovementState(false);
-            character.SetRotationState(false);
+            character.CurrentLocation = spawnLocation;
+            character.IsMoving = false;
+            character.IsRotating = false;
 
             session.CurrentWorldId = world.WorldId;
             session.CurrentLocation = spawnLocation;
@@ -189,7 +189,7 @@ public class WorldSessionManager : IWorldSessionManager
             var characterId = session.CharacterId.Value;
             characterSnapshot = await LoadCharacterAsync(characterId, cancellationToken).ConfigureAwait(false);
 
-            characterSnapshot.SetCurrentLocation(location);
+            characterSnapshot.CurrentLocation = location;
             characterSnapshot.IsOnline = true;
             characterSnapshot.IsInCombat = session.IsInCombat;
             characterSnapshot.LastUpdated = DateTime.UtcNow;
@@ -255,11 +255,10 @@ public class WorldSessionManager : IWorldSessionManager
             new HashSet<string> { "guide", "quest" });
         typeof(Npc).GetProperty("Id")!.SetValue(guideNpc, Guid.Parse("3fd82816-3cda-47c4-a0fb-12fbc9d795d4"));
         guideNpc.SetCurrentLocation(guideLocation);
-        guideNpc.IsAlive = true;
         guideNpc.LastUpdated = now;
 
         var campfireLocation = Location.Create(new Vector3(10, 5, 0), worldId, "starter.map", "starter.zone");
-        var campfire = MapObject.Create("starter.campfire", campfireLocation, worldId, campfireLocation.ZoneName);
+        var campfire = MapObject.Create("starter.campfire", campfireLocation, worldId, campfireLocation.MapName);
         typeof(MapObject).GetProperty("Id")!.SetValue(campfire, Guid.Parse("278b7195-6225-40ba-8af4-cdb339e64512"));
         campfire.DisplayName = "Campfire";
         campfire.IsActive = true;
@@ -268,7 +267,7 @@ public class WorldSessionManager : IWorldSessionManager
         campfire.State = new Dictionary<string, string> { { "temperature", "warm" } };
 
         var spawnLocation = Location.Create(new Vector3(8f, 4f, 0f), worldId, DefaultMapId, DefaultZoneName);
-        spawnLocation.Rotation = 180f;
+        spawnLocation.Direction = 180f;
 
         var spawnPoint = MapObject.Create("starter.spawn.default", CloneLocation(spawnLocation), worldId, DefaultZoneName);
         spawnPoint.DisplayName = "Arrival Beacon";
@@ -279,7 +278,7 @@ public class WorldSessionManager : IWorldSessionManager
         {
             ["spawnType"] = DefaultSpawnType,
             ["priority"] = "0",
-            ["rotation"] = spawnLocation.Rotation.ToString(CultureInfo.InvariantCulture)
+            ["rotation"] = spawnLocation.Direction.ToString(CultureInfo.InvariantCulture)
         };
 
         var world = WorldState.Hydrate(id, worldId, DefaultWorldName, now);
@@ -297,8 +296,8 @@ public class WorldSessionManager : IWorldSessionManager
 
     private static Location CloneLocation(Location location)
     {
-        var clone = Location.Create(location.Position, location.WorldId ?? DefaultWorldId, location.MapId, location.ZoneName);
-        clone.Rotation = location.Rotation;
+        var clone = Location.Create(location.Position, location.WorldId, location.MapId, location.MapName);
+        clone.Direction = location.Direction;
         return clone;
     }
 

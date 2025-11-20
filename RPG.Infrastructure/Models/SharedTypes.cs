@@ -5,10 +5,15 @@ namespace RPG.Infrastructure.Models;
 
 public class LocationData
 {
+    public LocationData()
+    {
+        WorldId = string.Empty;
+    }
+
     public float X { get; set; }
     public float Y { get; set; }
     public float Z { get; set; }
-    public string? WorldId { get; set; } // Guid as string for MongoDB
+    public string WorldId { get; set; } // Guid as string for MongoDB
     public string MapId { get; set; } = string.Empty;
     public string ZoneName { get; set; } = string.Empty;
     public float Rotation { get; set; }

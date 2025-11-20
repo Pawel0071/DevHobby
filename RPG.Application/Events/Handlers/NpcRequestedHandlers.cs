@@ -69,7 +69,7 @@ public sealed class NpcMovementRequestedHandler : IRequestedEventHandler
         };
 
         await _broadcaster.BroadcastDeltaAsync(
-            new GameDeltaUpdate { WorldId = npc.WorldId, NpcChanges = new[] { delta } }, ct);
+            new GameDeltaUpdate { WorldId = npc.CurrentLocation.WorldId, NpcChanges = new[] { delta } }, ct);
 
         _logger.Debug($"NPC {e.NpcId} moved to {e.Destination}");
     }
@@ -175,7 +175,7 @@ public sealed class NpcReturnToSpawnRequestedHandler : IRequestedEventHandler
         };
 
         await _broadcaster.BroadcastDeltaAsync(
-            new GameDeltaUpdate { WorldId = npc.WorldId, NpcChanges = new[] { delta } }, ct);
+            new GameDeltaUpdate { WorldId = npc.CurrentLocation.WorldId, NpcChanges = new[] { delta } }, ct);
 
         _logger.Info($"NPC {e.NpcId} returned to spawn");
     }

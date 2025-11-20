@@ -116,17 +116,18 @@ public class CharacterModelMapper : IModelMapper<Character, CharacterDocument>
             CurrentHealth = document.CurrentHealth,
             MaxHealth = document.MaxHealth,
             CurrentResource = document.CurrentResource,
-            MaxResource = document.MaxResource
+            MaxResource = document.MaxResource,
+            Class = characterClass
         };
 
         if (document.Location is not null)
         {
             var location = _locationMapper.ToEntity(document.Location);
-            character.SetCurrentLocation(location);
+            character.CurrentLocation = location;
         }
 
-        character.SetMovementState(document.IsMoving);
-        character.SetRotationState(document.IsRotating);
+        character.IsMoving = document.IsMoving;
+        character.IsRotating = document.IsRotating;
 
         // Map BaseStats
         foreach (var stat in document.BaseStats)

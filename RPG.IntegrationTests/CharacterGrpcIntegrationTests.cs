@@ -101,7 +101,7 @@ public class CharacterGrpcIntegrationTests : IClassFixture<TestContainersFixture
         startRotation.Success.Should().BeTrue();
 
         await AssertWithRetryAsync(factory, Guid.Parse(characterId), c => c.IsRotating, "IsRotating should be true after StartRotation");
-        await AssertWithRetryAsync(factory, Guid.Parse(characterId), c => Math.Abs(c.CurrentLocation.Rotation - 90f) < 0.01f, "Rotation should approach 90 degrees");
+        await AssertWithRetryAsync(factory, Guid.Parse(characterId), c => Math.Abs(c.CurrentLocation.Direction - 90f) < 0.01f, "Direction should approach 90 degrees");
 
         var stopRotation = await client.StopRotationAsync(new CharacterIdRequest { CharacterId = characterId }, headers);
         stopRotation.Success.Should().BeTrue();

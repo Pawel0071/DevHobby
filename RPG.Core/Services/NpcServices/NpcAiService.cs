@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using RPG.AI.Core;
 using RPG.AI.Directives;
 using RPG.AI.Utility;
@@ -52,7 +53,7 @@ public sealed class NpcAiService : INpcAiService
     private readonly IModelRepository _modelRepository;
     private readonly IMovementService _movementService;
     private readonly ICharacterStateBroadcaster _stateBroadcaster;
-    private readonly INpcCombatService _combatService;
+    private readonly ICombatService _combatService;
     private readonly IRabbitMqPublisher _publisher;
     private readonly ILogger<NpcAiService> _logger;
     private readonly UtilityAgentSettings _settings;
@@ -71,7 +72,7 @@ public sealed class NpcAiService : INpcAiService
         IModelRepository modelRepository,
         IMovementService movementService,
         ICharacterStateBroadcaster stateBroadcaster,
-        INpcCombatService combatService,
+        ICombatService combatService,
         IRabbitMqPublisher publisher,
         ILogger<NpcAiService> logger,
         IGameStateBroadcaster gameStateBroadcaster,
@@ -126,7 +127,7 @@ public sealed class NpcAiService : INpcAiService
                 {
                     var delta = new GameDeltaUpdate
                     {
-                        WorldId = npc.WorldId,
+                        WorldId = npc.CurrentLocation.WorldId,
                         NpcChanges = new[]
                         {
                             new NpcDelta
@@ -385,26 +386,6 @@ public sealed class NpcAiService : INpcAiService
             context.IsInCombat = false;
             context.CombatStartTime = null;
         }
-    }
-
-
-    private static IDictionary<string, Skill> BuildSkillLookup(CombatComponent? combat)
-    {
-        if (combat == null)
-        {
-            return new Dictionary<string, Skill>(StringComparer.OrdinalIgnoreCase);
-        }
-
-        var lookup = new Dictionary<string, Skill>(StringComparer.OrdinalIgnoreCase);
-        foreach (var skill in combat.GetSkillsContainer().Skills.Keys)
-        {
-            foreach (var key in EnumerateSkillKeys(skill))
-            {
-                lookup.TryAdd(key, skill);
-            }
-        }
-
-        return lookup;
     }
 
     private static IEnumerable<string> EnumerateSkillKeys(Skill skill)
@@ -729,38 +710,20 @@ public sealed class NpcAiService : INpcAiService
             return;
         }
 
-        var skills = BuildSkillLookup(combat);
-        Skill? skill = null;
-        Guid? skillId = null;
-        string skillName = "unknown-skill";
+        var skills = npc.Skills;
 
-        if (directive.Metadata != null)
-        {
-            if (directive.Metadata.TryGetValue("skillId", out var idObj) && TryGetGuid(idObj, out var parsedId))
-            {
-                skillId = parsedId;
-                skills.TryGetValue(parsedId.ToString("N"), out skill);
-            }
+        var skill = skills.Keys.FirstOrDefault();
 
-            if (directive.Metadata.TryGetValue("skillName", out var nameObj) && nameObj is string metadataName)
-            {
-                skillName = metadataName;
-                skill ??= skills.TryGetValue(ToKey(metadataName), out var resolvedByName) ? resolvedByName : null;
-            }
-        }
-
-        skill ??= skills.Values.FirstOrDefault();
+        // TO DO - rozszerzyć wyszukiwanie umiejętności o reakcje na dyrektywy
 
         if (skill == null)
         {
             log.Add("UseSkill directive skipped: no matching skill available.");
             return;
         }
-
-        skillName = string.IsNullOrWhiteSpace(skillName) ? skill.Name : skillName;
         var targetId = directive.TargetId;
 
-        if (targetId is Guid typedTargetId)
+        if (targetId is { } typedTargetId)
         {
             if (!playerLookup.TryGetValue(typedTargetId, out var target))
             {
@@ -774,9 +737,9 @@ public sealed class NpcAiService : INpcAiService
 
         npc.SetMovementState(false);
 
-        await _combatService.HandleSkillUsageAsync(npc, skill, targetId, cancellationToken).ConfigureAwait(false);
+        if (context.Target != null) await _combatService.SkillAttackAsync(npc, context.Target, skill.Id);
 
-        if (targetId is Guid threatId)
+        if (targetId is { } threatId)
         {
             var distance = context.Target != null && context.Target.Id == threatId
                 ? context.DistanceToTarget
@@ -795,14 +758,10 @@ public sealed class NpcAiService : INpcAiService
         context.IsInCombat = true;
         context.CombatStartTime ??= DateTime.UtcNow;
 
-        if (skillId == null)
-        {
-            skillId = skill.Id;
-        }
 
-        var targetDescription = targetId is Guid guid ? guid.ToString() : "no-target";
-        var skillIdText = skillId?.ToString() ?? skill.Id.ToString("N");
-        log.Add($"Using skill '{skillName}' ({skillIdText}) targeting {targetDescription}.");
+        var targetDescription = targetId is { } guid ? guid.ToString() : "no-target";
+        var skillIdText = skill.Id.ToString() ?? skill.Id.ToString("N");
+        log.Add($"Using skill '{skill.Name}' ({skillIdText}) targeting {targetDescription}.");
     }
 
     private async Task ExecuteBeginDialogueAsync(
@@ -1125,7 +1084,7 @@ public sealed class NpcAiService : INpcAiService
             location,
             npc.IsMoving,
             npc.IsRotating,
-            location.Rotation,
+            location.Direction,
             DateTime.UtcNow);
 
         _snapshots[npc.Id] = snapshot;
@@ -1163,17 +1122,17 @@ public sealed class NpcAiService : INpcAiService
 
     private static Character CreateCharacterFromSnapshot(CharacterStateSnapshot snapshot)
     {
-        var character = new Character(Guid.Empty, CharacterClass.Warrior)
+        var character = new Character(Guid.Empty, snapshot.Class)
         {
             Id = snapshot.CharacterId,
-            Name = $"Player-{snapshot.CharacterId.ToString()[..8]}"
+            Name = $"Player-{snapshot.CharacterId.ToString()[..8]}",
+            CurrentLocation = CloneLocation(snapshot.Location),
+            IsMoving = snapshot.IsMoving,
+            IsRotating = snapshot.IsRotating,
+            CurrentHealth = 0,
+            MaxHealth = 0,
+            Class = snapshot.Class
         };
-
-        character.SetCurrentLocation(CloneLocation(snapshot.Location));
-        character.SetMovementState(snapshot.IsMoving);
-        character.SetRotationState(snapshot.IsRotating);
-        character.CurrentHealth = 0;
-        character.MaxHealth = 0;
 
         return character;
     }
@@ -1188,9 +1147,9 @@ public sealed class NpcAiService : INpcAiService
         return new Location
         {
             Position = source.Position,
-            Rotation = source.Rotation,
+            Direction = source.Direction,
             MapId = source.MapId,
-            ZoneName = source.ZoneName,
+            MapName = source.MapName,
             WorldId = source.WorldId
         };
     }

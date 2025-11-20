@@ -10,10 +10,18 @@ public enum StatsProperty
     Vitality,
     MagicResist,
     NatureResist,
-    MisticResist,
+    FireResist,
+    FrostResist,
     Armor,
     CritChance,
+    CritDamage,
     HitChance,
     AttackSpeed,
-    MoveSpeed
+    MoveSpeed,
+    MeleeAttackPower,
+    RangedAttackPower,
+    MagicAttackPower,
+    NatureAttackPower,
+    FireAttackPower,
+    FrostAttackPower
 }

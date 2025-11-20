@@ -151,11 +151,11 @@ public class WorldStateService : IWorldStateService
             if (bestSpawn.State.TryGetValue(SpawnRotationStateKey, out var rotationText) &&
                 float.TryParse(rotationText, NumberStyles.Float, CultureInfo.InvariantCulture, out var rotationValue))
             {
-                location.Rotation = rotationValue;
+                location.Direction = rotationValue;
             }
             else if (bestSpawn.Location != null)
             {
-                location.Rotation = bestSpawn.Location.Rotation;
+                location.Direction = bestSpawn.Location.Direction;
             }
 
             EnsureDefaults(location, world.WorldId);
@@ -184,7 +184,7 @@ public class WorldStateService : IWorldStateService
         }
 
         var fallback = Location.Create(new Vector3(8f, 4f, 0f), world.WorldId, DefaultMapId, DefaultZoneName);
-        fallback.Rotation = 180f;
+        fallback.Direction = 180f;
         return fallback;
     }
 
@@ -205,8 +205,8 @@ public class WorldStateService : IWorldStateService
         {
             WorldId = location.WorldId,
             MapId = location.MapId,
-            ZoneName = location.ZoneName,
-            Rotation = location.Rotation
+            MapName = location.MapName,
+            Direction = location.Direction
         };
 
         clone.Position = location.Position;
@@ -215,15 +215,15 @@ public class WorldStateService : IWorldStateService
 
     private static void EnsureDefaults(Location location, Guid worldId)
     {
-        location.WorldId ??= worldId;
+        location.WorldId = worldId;
         if (string.IsNullOrWhiteSpace(location.MapId))
         {
             location.MapId = DefaultMapId;
         }
 
-        if (string.IsNullOrWhiteSpace(location.ZoneName))
+        if (string.IsNullOrWhiteSpace(location.MapName))
         {
-            location.ZoneName = DefaultZoneName;
+            location.MapName = DefaultZoneName;
         }
     }
 

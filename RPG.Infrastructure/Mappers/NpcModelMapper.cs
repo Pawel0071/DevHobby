@@ -63,8 +63,14 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
             BaseStats = entity.BaseStats.ToDictionary(kvp => kvp.Key.ToString(), kvp => kvp.Value),
             ModifiedStats = entity.ModifiedStats.ToDictionary(kvp => kvp.Key.ToString(), kvp => kvp.Value),
             Components = entity.Components
-                .Select(component => SerializeComponent(component))
-                .ToList()
+                .Select(SerializeComponent)
+                .ToList(),
+            Skills = entity.Skills.ToDictionary(
+                kvp => kvp.Key.Id.ToString(),
+                kvp => kvp.Value.ToString()),
+            ActiveSkills = entity.ActiveSkills.ToDictionary(
+                kvp => kvp.Key.Id.ToString(),
+                kvp => kvp.Value)
         };
     }
 
@@ -84,17 +90,21 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
         npc.CurrentHealth = document.CurrentHealth;
         npc.MaxHealth = document.MaxHealth;
 
-        if (document.CurrentLocation is not null)
-        {
-            npc.SetCurrentLocation(_locationMapper.ToEntity(document.CurrentLocation));
-        }
-        else
-        {
-            npc.SetCurrentLocation(spawnLocation);
-        }
+        npc.SetCurrentLocation(document.CurrentLocation is null
+            ? spawnLocation
+            : _locationMapper.ToEntity(document.CurrentLocation));
         npc.SetMovementState(document.IsMoving);
         npc.SetRotationState(document.IsRotating);
+
         npc.Components.Clear();
+        foreach (var componentData in document.Components)
+        {
+            var component = DeserializeComponent(componentData);
+            if (component != null)
+            {
+                npc.Components.Add(component);
+            }
+        }
 
         if (document.BaseStats is not null)
         {
@@ -118,13 +128,40 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
             }
         }
 
-        // Deserialize explicit components from document
-        foreach (var componentData in document.Components)
+        npc.Skills.Clear();
+        if (document.Skills is not null)
         {
-            var component = DeserializeComponent(componentData);
-            if (component != null)
+            foreach (var entry in document.Skills)
             {
-                npc.Components.Add(component);
+                if (!Guid.TryParse(entry.Key, out var skillId))
+                {
+                    continue;
+                }
+
+                if (!Enum.TryParse<SkillAvailability>(entry.Value, out var availability))
+                {
+                    continue;
+                }
+
+                var skillDoc = new SkillDocument { Id = skillId, Name = string.Empty };
+                var skill = _skillMapper.ToDomain(skillDoc);
+                npc.Skills[skill] = availability;
+            }
+        }
+
+        npc.ActiveSkills.Clear();
+        if (document.ActiveSkills is not null)
+        {
+            foreach (var entry in document.ActiveSkills)
+            {
+                if (!Guid.TryParse(entry.Key, out var skillId))
+                {
+                    continue;
+                }
+
+                var skillDoc = new SkillDocument { Id = skillId, Name = string.Empty };
+                var skill = _skillMapper.ToDomain(skillDoc);
+                npc.ActiveSkills[skill] = entry.Value;
             }
         }
 
@@ -132,9 +169,15 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
         var requiredTypes = TagComponentMap.GetRequiredComponentTypes(npc.Tags, TagTarget.Npc).ToList();
         foreach (var type in requiredTypes)
         {
-            if (npc.Components.Any(c => c.GetType() == type)) continue;
-            var empty = Activator.CreateInstance(type) as INpcComponent;
-            if (empty != null) npc.Components.Add(empty);
+            if (npc.Components.Any(c => c.GetType() == type))
+            {
+                continue;
+            }
+
+            if (Activator.CreateInstance(type) is INpcComponent empty)
+            {
+                npc.Components.Add(empty);
+            }
         }
 
         EnsureComponentTags(npc);
@@ -185,15 +228,7 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
         {
             AggroRange = combat.AggroRange,
             LeashRange = combat.LeashRange,
-            AiBehaviorScript = combat.AiBehaviorScript,
-            Stats = combat.Stats.ToDictionary(kvp => kvp.Key.ToString(), kvp => kvp.Value),
-            Skills = combat.Skills
-                .Select(kvp => new SkillAvailabilityEntry
-                {
-                    Skill = _skillMapper.ToPersistence(kvp.Key),
-                    Availability = kvp.Value
-                })
-                .ToList()
+            AiBehaviorScript = combat.AiBehaviorScript
         };
 
         return new ComponentData
@@ -203,7 +238,7 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
         };
     }
 
-    private INpcComponent? DeserializeComponent(ComponentData componentData)
+    public INpcComponent? DeserializeComponent(ComponentData componentData)
     {
         return componentData.Type switch
         {
@@ -220,91 +255,66 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
 
     private CombatComponent? DeserializeCombatComponent(string json)
     {
-        CombatComponentModel? model = null;
-
         try
         {
-            model = JsonSerializer.Deserialize<CombatComponentModel>(json);
+            var model = JsonSerializer.Deserialize<CombatComponentModel>(json);
+            if (model is not null)
+            {
+                return BuildCombatComponent(model);
+            }
         }
         catch (NotSupportedException ex)
         {
             _logger.Debug($"Falling back to legacy combat component deserialization: {ex.Message}");
         }
 
-        if (model is not null)
-        {
-            return BuildCombatComponent(model);
-        }
-
-        LegacyCombatComponentModel? legacyModel = null;
         try
         {
-            legacyModel = JsonSerializer.Deserialize<LegacyCombatComponentModel>(json);
+            var legacyModel = JsonSerializer.Deserialize<LegacyCombatComponentModel>(json);
+            return legacyModel is null ? null : BuildLegacyCombatComponent(legacyModel);
         }
         catch (Exception ex)
         {
             _logger.Error("Failed to deserialize combat component payload.", ex);
             return null;
         }
-
-        if (legacyModel is null)
-        {
-            return null;
-        }
-
-        return BuildLegacyCombatComponent(legacyModel);
     }
 
     private TrainerComponent? DeserializeTrainerComponent(string json)
     {
-        TrainerComponentModel? model = null;
-
         try
         {
-            model = JsonSerializer.Deserialize<TrainerComponentModel>(json);
+            var model = JsonSerializer.Deserialize<TrainerComponentModel>(json);
+            if (model is not null)
+            {
+                return BuildTrainerComponent(model);
+            }
         }
         catch (NotSupportedException ex)
         {
             _logger.Debug($"Falling back to legacy trainer component deserialization: {ex.Message}");
         }
 
-        if (model is not null)
-        {
-            return BuildTrainerComponent(model);
-        }
-
-        LegacyTrainerComponentModel? legacyModel = null;
         try
         {
-            legacyModel = JsonSerializer.Deserialize<LegacyTrainerComponentModel>(json);
+            var legacyModel = JsonSerializer.Deserialize<LegacyTrainerComponentModel>(json);
+            return legacyModel is null ? null : BuildLegacyTrainerComponent(legacyModel);
         }
         catch (Exception ex)
         {
             _logger.Error("Failed to deserialize trainer component payload.", ex);
             return null;
         }
-
-        if (legacyModel is null)
-        {
-            return null;
-        }
-
-        return BuildLegacyTrainerComponent(legacyModel);
     }
 
     private CombatComponent BuildCombatComponent(CombatComponentModel model)
     {
-        var component = new CombatComponent
+        return new CombatComponent
         {
             AggroRange = model.AggroRange,
             LeashRange = model.LeashRange,
             AiBehaviorScript = model.AiBehaviorScript ?? string.Empty
         };
-
-        ApplyStats(model.Stats, component);
-        ApplySkillEntries(model.Skills, component);
-
-        return component;
     }
 
     private CombatComponent BuildLegacyCombatComponent(LegacyCombatComponentModel model)
@@ -315,9 +325,6 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
             LeashRange = model.LeashRange,
             AiBehaviorScript = model.AiBehaviorScript ?? string.Empty
         };
-
-        ApplyStats(model.Stats, component);
-        ApplyLegacySkillEntries(model.Skills, component);
 
         return component;
     }
@@ -342,59 +349,6 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
 
         ApplyLegacyTrainerSkills(model.TeachableSkills, component);
         return component;
-    }
-
-    private static void ApplyStats(Dictionary<string, int>? stats, CombatComponent component)
-    {
-        if (stats is null)
-        {
-            return;
-        }
-
-        foreach (var stat in stats)
-        {
-            if (Enum.TryParse<StatsProperty>(stat.Key, out var statProperty))
-            {
-                component.Stats[statProperty] = stat.Value;
-            }
-        }
-    }
-
-    private void ApplySkillEntries(IEnumerable<SkillAvailabilityEntry>? entries, CombatComponent component)
-    {
-        if (entries is null)
-        {
-            return;
-        }
-
-        foreach (var entry in entries)
-        {
-            if (entry?.Skill is null)
-            {
-                continue;
-            }
-
-            var skill = _skillMapper.ToDomain(entry.Skill);
-            component.Skills[skill] = entry.Availability;
-        }
-    }
-
-    private static void ApplyLegacySkillEntries(IEnumerable<LegacySkillAvailabilityEntry>? entries, CombatComponent component)
-    {
-        if (entries is null)
-        {
-            return;
-        }
-
-        foreach (var entry in entries)
-        {
-            if (entry?.Skill is null)
-            {
-                continue;
-            }
-
-            component.Skills[entry.Skill] = entry.Availability;
-        }
     }
 
     private void ApplyTrainerSkills(IEnumerable<SkillAvailabilityEntry>? entries, TrainerComponent component)
@@ -445,8 +399,6 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
         public float AggroRange { get; set; }
         public string? AiBehaviorScript { get; set; }
         public float LeashRange { get; set; }
-        public List<SkillAvailabilityEntry>? Skills { get; set; }
-        public Dictionary<string, int>? Stats { get; set; }
     }
 
     private sealed class TrainerComponentModel
@@ -466,7 +418,6 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
         public float AggroRange { get; set; }
         public string? AiBehaviorScript { get; set; }
         public float LeashRange { get; set; }
-        public List<LegacySkillAvailabilityEntry>? Skills { get; set; }
         public Dictionary<string, int>? Stats { get; set; }
     }
 
@@ -488,12 +439,6 @@ public class NpcModelMapper : IModelMapper<Npc, NpcDocument>
         }
 
         npc.Tags.RemoveWhere(static tag => string.IsNullOrWhiteSpace(tag));
-    }
-
-    private static IEnumerable<string> ResolveComponentTags(Type componentType)
-    {
-        // Legacy method kept for backward compatibility (used nowhere now) -> return empty.
-        return Array.Empty<string>();
     }
 
     private static HashSet<string> CreateTagSet(IEnumerable<string>? tags = null)

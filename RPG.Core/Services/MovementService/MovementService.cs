@@ -5,6 +5,7 @@ using RPG.Core.Diagnostics;
 using RPG.Core.Interfaces;
 using RPG.Domain.Common;
 using RPG.Domain.Enums;
+using RPG.Domain.Interfaces;
 using RPG.Domain.Models;
 using RPG.Domain.Models.Npcs;
 using RPG.Infrastructure.Interfaces;
@@ -21,14 +22,14 @@ public class MovementService : IMovementService
         _logger = logger;
     }
 
-    public ServiceResult<Location> Move(Character character, Vector3 direction, float deltaTime, float? speedOverride = null, bool preserveFacing = false)
+    public ServiceResult<Location> Move(IMovable character, Vector3 direction, float deltaTime, float? speedOverride = null, bool preserveFacing = false)
     {
         if (character == null)
         {
             return ErrorCodeDefinition.InvalidOperation.ToFail<Location>("Character is required for movement.");
         }
 
-        using var activity = StartMovementActivity("MovementService.Move.Character", "character", character.Id);
+        using var activity = StartMovementActivity($"MovementService.Move.{character.GetType().Name}", character.GetType().Name, character.Id);
         activity?.SetTag("rpg.movement.direction", direction.ToString());
         activity?.SetTag("rpg.movement.delta_time", deltaTime);
         if (speedOverride.HasValue)
@@ -37,7 +38,7 @@ public class MovementService : IMovementService
         }
 
         var result = MoveInternal(
-            entityType: "character",
+            entityType: character.GetType().Name,
             entityId: character.Id,
             location: character.CurrentLocation,
             stats: character.ModifiedStats,
@@ -48,46 +49,13 @@ public class MovementService : IMovementService
 
         if (result.Success)
         {
-            character.SetMovementState(true);
+            character.IsMoving = true;
         }
 
         return result;
     }
 
-    public ServiceResult<Location> Move(Npc npc, Vector3 direction, float deltaTime, float? speedOverride = null, bool preserveFacing = false)
-    {
-        if (npc == null)
-        {
-            return ErrorCodeDefinition.InvalidOperation.ToFail<Location>("NPC is required for movement.");
-        }
-
-        using var activity = StartMovementActivity("MovementService.Move.Npc", "npc", npc.Id);
-        activity?.SetTag("rpg.movement.direction", direction.ToString());
-        activity?.SetTag("rpg.movement.delta_time", deltaTime);
-        if (speedOverride.HasValue)
-        {
-            activity?.SetTag("rpg.movement.speed_override", speedOverride.Value);
-        }
-
-        var result = MoveInternal(
-            entityType: "npc",
-            entityId: npc.Id,
-            location: npc.CurrentLocation,
-            stats: npc.ModifiedStats,
-            direction: direction,
-            deltaTime: deltaTime,
-            speedOverride: speedOverride,
-            preserveFacing: preserveFacing);
-
-        if (result.Success)
-        {
-            npc.SetMovementState(true);
-        }
-
-        return result;
-    }
-
-    public ServiceResult<Location> Stop(Character character)
+    public ServiceResult<Location> Stop(IMovable character)
     {
         if (character == null)
         {
@@ -99,31 +67,13 @@ public class MovementService : IMovementService
         var result = StopInternal("character", character.Id, character.CurrentLocation);
         if (result.Success)
         {
-            character.SetMovementState(false);
+            character.IsMoving = false;
         }
 
         return result;
     }
 
-    public ServiceResult<Location> Stop(Npc npc)
-    {
-        if (npc == null)
-        {
-            return ErrorCodeDefinition.InvalidOperation.ToFail<Location>("NPC is required for movement stop.");
-        }
-
-        using var activity = StartMovementActivity("MovementService.Stop.Npc", "npc", npc.Id);
-
-        var result = StopInternal("npc", npc.Id, npc.CurrentLocation);
-        if (result.Success)
-        {
-            npc.SetMovementState(false);
-        }
-
-        return result;
-    }
-
-    public ServiceResult<float> Rotate(Character character, Vector3 direction)
+    public ServiceResult<float> Rotate(IMovable character, Vector3 direction)
     {
         if (character == null)
         {
@@ -141,37 +91,13 @@ public class MovementService : IMovementService
 
         if (result.Success)
         {
-            character.SetRotationState(true);
+            character.IsRotating = true;
         }
 
         return result;
     }
 
-    public ServiceResult<float> Rotate(Npc npc, Vector3 direction)
-    {
-        if (npc == null)
-        {
-            return ErrorCodeDefinition.InvalidOperation.ToFail<float>("NPC is required for rotation.");
-        }
-
-        using var activity = StartMovementActivity("MovementService.Rotate.Npc", "npc", npc.Id);
-        activity?.SetTag("rpg.movement.direction", direction.ToString());
-
-        var result = RotateInternal(
-            entityType: "npc",
-            entityId: npc.Id,
-            location: npc.CurrentLocation,
-            direction: direction);
-
-        if (result.Success)
-        {
-            npc.SetRotationState(true);
-        }
-
-        return result;
-    }
-
-    public ServiceResult<float> StopRotation(Character character)
+    public ServiceResult<float> StopRotation(IMovable character)
     {
         if (character == null)
         {
@@ -183,7 +109,7 @@ public class MovementService : IMovementService
         var result = StopRotationInternal("character", character.Id, character.CurrentLocation);
         if (result.Success)
         {
-            character.SetRotationState(false);
+            character.IsRotating = false;
         }
 
         return result;
@@ -295,11 +221,11 @@ public class MovementService : IMovementService
         var yawDegrees = CalculateYawDegrees(normalizedDirection);
         if (float.IsNaN(yawDegrees))
         {
-            _logger.Warn($"Rotation for {entityType} {entityId} produced invalid yaw.");
+            _logger.Warn($"Direction for {entityType} {entityId} produced invalid yaw.");
             return ErrorCodeDefinition.MovementInvalidDirection.ToFail<float>("Nie udało się wyznaczyć rotacji.");
         }
 
-        location.Rotation = yawDegrees;
+        location.Direction = yawDegrees;
         _logger.Debug($"Rotated {entityType} {entityId} to yaw {yawDegrees} degrees.");
 
         return ServiceResult<float>.Ok(yawDegrees);
@@ -313,8 +239,8 @@ public class MovementService : IMovementService
             return ErrorCodeDefinition.InvalidOperation.ToFail<float>("Brak lokalizacji do zatrzymania rotacji.");
         }
 
-        _logger.Debug($"Stopping rotation for {entityType} {entityId} at yaw {location.Rotation}.");
-        return ServiceResult<float>.Ok(location.Rotation);
+        _logger.Debug($"Stopping rotation for {entityType} {entityId} at yaw {location.Direction}.");
+        return ServiceResult<float>.Ok(location.Direction);
     }
 
     private static float ResolveMoveSpeed(IDictionary<StatsProperty, int> stats)
@@ -361,7 +287,7 @@ public class MovementService : IMovementService
             return;
         }
 
-        location.Rotation = yawDegrees;
+        location.Direction = yawDegrees;
     }
 
     private static float CalculateYawDegrees(Vector3 normalizedDirection)

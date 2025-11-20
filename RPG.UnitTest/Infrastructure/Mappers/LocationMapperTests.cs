@@ -29,7 +29,7 @@ public class LocationMapperTests
         var worldId = Guid.NewGuid();
         var position = new Vector3(100.5f, 200.7f, 300.9f);
         var location = Location.Create(position, worldId, "TestMap", "TestZone");
-        location.Rotation = 45.0f;
+        location.Direction = 45.0f;
 
         // Act
         var document = _mapper.ToDocument(location);
@@ -45,12 +45,11 @@ public class LocationMapperTests
     }
 
     [Fact]
-    public void ToDocument_WithNullWorldId_ShouldMapCorrectly()
+    public void ToDocument_WithEmptyWorldId_ShouldMapCorrectly()
     {
         // Arrange
         var position = new Vector3(10, 20, 30);
         var location = Location.Create(position, Guid.Empty, "Map", "Zone");
-        location.WorldId = null;
 
         // Act
         var document = _mapper.ToDocument(location);
@@ -59,7 +58,7 @@ public class LocationMapperTests
         document.X.Should().Be(10);
         document.Y.Should().Be(20);
         document.Z.Should().Be(30);
-        document.WorldId.Should().BeNull();
+        document.WorldId.Should().Be(Guid.Empty.ToString());
     }
 
     [Fact]
@@ -67,7 +66,7 @@ public class LocationMapperTests
     {
         // Arrange
         var location = Location.Create(new Vector3(0, 0, 0), Guid.NewGuid(), "Map", "Zone");
-        location.Rotation = 0.0f;
+        location.Direction = 0.0f;
 
         // Act
         var document = _mapper.ToDocument(location);
@@ -117,12 +116,12 @@ public class LocationMapperTests
         location.Position.Z.Should().Be(450.9f);
         location.WorldId.Should().Be(worldId);
         location.MapId.Should().Be("CityMap");
-        location.ZoneName.Should().Be("Market");
-        location.Rotation.Should().Be(90.0f);
+        location.MapName.Should().Be("Market");
+        location.Direction.Should().Be(90.0f);
     }
 
     [Fact]
-    public void ToEntity_WithNullWorldId_ShouldMapToNull()
+    public void ToEntity_WithNullWorldId_ShouldMapToEmptyGuid()
     {
         // Arrange
         var document = new LocationData
@@ -140,11 +139,11 @@ public class LocationMapperTests
         var location = _mapper.ToEntity(document);
 
         // Assert
-        location.WorldId.Should().BeNull();
+        location.WorldId.Should().Be(Guid.Empty);
     }
 
     [Fact]
-    public void ToEntity_WithEmptyWorldId_ShouldMapToNull()
+    public void ToEntity_WithEmptyWorldId_ShouldMapToEmptyGuid()
     {
         // Arrange
         var document = new LocationData
@@ -162,7 +161,7 @@ public class LocationMapperTests
         var location = _mapper.ToEntity(document);
 
         // Assert
-        location.WorldId.Should().BeNull();
+        location.WorldId.Should().Be(Guid.Empty);
     }
 
     [Fact]
@@ -208,7 +207,7 @@ public class LocationMapperTests
         var location = _mapper.ToEntity(document);
 
         // Assert
-        location.Rotation.Should().Be(-45.0f);
+        location.Direction.Should().Be(-45.0f);
     }
 
     [Fact]
@@ -218,7 +217,7 @@ public class LocationMapperTests
         var worldId = Guid.NewGuid();
         var position = new Vector3(123.45f, 234.56f, 345.67f);
         var location = Location.Create(position, worldId, "TestMap", "TestZone");
-        location.Rotation = 180.0f;
+        location.Direction = 180.0f;
 
         // Act
         var document = _mapper.ToDocument(location);
@@ -230,23 +229,22 @@ public class LocationMapperTests
         roundTrippedLocation.Position.Z.Should().Be(location.Position.Z);
         roundTrippedLocation.WorldId.Should().Be(location.WorldId);
         roundTrippedLocation.MapId.Should().Be(location.MapId);
-        roundTrippedLocation.ZoneName.Should().Be(location.ZoneName);
-        roundTrippedLocation.Rotation.Should().Be(location.Rotation);
+        roundTrippedLocation.MapName.Should().Be(location.MapName);
+        roundTrippedLocation.Direction.Should().Be(location.Direction);
     }
 
     [Fact]
-    public void RoundTrip_WithNullWorldId_ShouldPreserveNull()
+    public void RoundTrip_WithEmptyWorldId_ShouldPreserveEmptyGuid()
     {
         // Arrange
         var location = Location.Create(new Vector3(50, 60, 70), Guid.Empty, "Map", "Zone");
-        location.WorldId = null;
 
         // Act
         var document = _mapper.ToDocument(location);
         var roundTrippedLocation = _mapper.ToEntity(document);
 
         // Assert
-        roundTrippedLocation.WorldId.Should().BeNull();
+        roundTrippedLocation.WorldId.Should().Be(Guid.Empty);
     }
 
     [Fact]

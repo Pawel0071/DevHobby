@@ -100,10 +100,10 @@ public class SessionServiceImpl : SessionService.SessionServiceBase
             X = location.Position.X,
             Y = location.Position.Y,
             Z = location.Position.Z,
-            WorldId = location.WorldId.HasValue ? location.WorldId.Value.ToString() : string.Empty,
+            WorldId = location.WorldId.ToString(),
             MapId = location.MapId ?? string.Empty,
-            ZoneName = location.ZoneName ?? string.Empty,
-            Rotation = location.Rotation
+            ZoneName = location.MapName ?? string.Empty,
+            Rotation = location.Direction
         };
     }
 
@@ -122,8 +122,8 @@ public class SessionServiceImpl : SessionService.SessionServiceBase
             mapId,
             zoneName);
 
-        entityLocation.WorldId = hasWorldId ? parsedWorldId : null;
-        entityLocation.Rotation = location.Rotation;
+        entityLocation.WorldId = hasWorldId ? parsedWorldId : Guid.Empty;
+        entityLocation.Direction = location.Rotation;
         return entityLocation;
     }
 

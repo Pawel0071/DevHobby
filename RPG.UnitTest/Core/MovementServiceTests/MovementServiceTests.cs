@@ -27,11 +27,12 @@ public class MovementServiceTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
             Id = Guid.NewGuid(),
-            Name = "Runner"
+            Name = "Runner",
+            Class = CharacterClass.Warrior
         };
 
         var worldId = Guid.NewGuid();
-        character.SetCurrentLocation(Location.Create(Vector3.Zero, worldId));
+        character.CurrentLocation = Location.Create(Vector3.Zero, worldId);
         character.ModifiedStats[StatsProperty.MoveSpeed] = 6;
 
         var result = _movementService.Move(character, new Vector3(1, 0, 0), deltaTime: 1.5f);
@@ -40,7 +41,7 @@ public class MovementServiceTests
         character.CurrentLocation.Position.X.Should().BeApproximately(9f, 0.0001f);
         character.CurrentLocation.Position.Y.Should().Be(0f);
         character.CurrentLocation.Position.Z.Should().Be(0f);
-        character.CurrentLocation.Rotation.Should().BeApproximately(90f, 0.0001f);
+        character.CurrentLocation.Direction.Should().BeApproximately(90f, 0.0001f);
         character.IsMoving.Should().BeTrue();
     }
 
@@ -50,20 +51,22 @@ public class MovementServiceTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
             Id = Guid.NewGuid(),
-            Name = "StrafeTester"
+            Name = "StrafeTester",
+            Class = CharacterClass.Warrior
         };
 
         var worldId = Guid.NewGuid();
         var location = Location.Create(Vector3.Zero, worldId);
-        location.Rotation = 180f;
-        character.SetCurrentLocation(location);
+        location.Direction = 180f;
+        character.CurrentLocation = location;
+        character.CurrentLocation = location;
         character.ModifiedStats[StatsProperty.MoveSpeed] = 4;
 
         var result = _movementService.Move(character, new Vector3(1, 0, 0), deltaTime: 0.5f, preserveFacing: true);
 
         result.Success.Should().BeTrue();
         character.CurrentLocation.Position.X.Should().BeApproximately(2f, 0.0001f);
-        character.CurrentLocation.Rotation.Should().BeApproximately(180f, 0.0001f);
+        character.CurrentLocation.Direction.Should().BeApproximately(180f, 0.0001f);
     }
 
     [Fact]
@@ -72,7 +75,8 @@ public class MovementServiceTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Mage)
         {
             Id = Guid.NewGuid(),
-            Name = "Static"
+            Name = "Static",
+            Class = CharacterClass.Mage
         };
 
         character.ModifiedStats[StatsProperty.MoveSpeed] = 5;
@@ -96,7 +100,7 @@ public class MovementServiceTests
         result.Success.Should().BeTrue();
     npc.CurrentLocation.Position.Y.Should().BeApproximately(8f, 0.0001f);
         npc.CurrentLocation.Position.X.Should().BeApproximately(0f, 0.0001f);
-    npc.CurrentLocation.Rotation.Should().BeApproximately(0f, 0.0001f);
+    npc.CurrentLocation.Direction.Should().BeApproximately(0f, 0.0001f);
         npc.IsMoving.Should().BeTrue();
     }
 
@@ -106,15 +110,16 @@ public class MovementServiceTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
             Id = Guid.NewGuid(),
-            Name = "Spinner"
+            Name = "Spinner",
+            Class = CharacterClass.Warrior
         };
-        character.SetCurrentLocation(Location.Create(Vector3.Zero, Guid.NewGuid()));
+        character.CurrentLocation = Location.Create(Vector3.Zero, Guid.NewGuid());
 
     var result = _movementService.Rotate(character, new Vector3(1, 1, 0));
 
         result.Success.Should().BeTrue();
         result.Result.Should().BeApproximately(45f, 0.0001f);
-        character.CurrentLocation.Rotation.Should().BeApproximately(45f, 0.0001f);
+        character.CurrentLocation.Direction.Should().BeApproximately(45f, 0.0001f);
         character.IsRotating.Should().BeTrue();
     }
 
@@ -124,9 +129,10 @@ public class MovementServiceTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Warrior)
         {
             Id = Guid.NewGuid(),
-            Name = "Shaky"
+            Name = "Shaky",
+            Class = CharacterClass.Warrior
         };
-        character.SetCurrentLocation(Location.Create(Vector3.Zero, Guid.NewGuid()));
+        character.CurrentLocation = Location.Create(Vector3.Zero, Guid.NewGuid());
 
         var result = _movementService.Rotate(character, Vector3.Zero);
 
@@ -142,11 +148,12 @@ public class MovementServiceTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Mage)
         {
             Id = Guid.NewGuid(),
-            Name = "Breaker"
+            Name = "Breaker",
+            Class = CharacterClass.Mage
         };
         var location = Location.Create(new Vector3(3, 0, -2), worldId);
-        character.SetCurrentLocation(location);
-        character.SetMovementState(true);
+        character.CurrentLocation = location;
+        character.IsMoving = true;
 
         var result = _movementService.Stop(character);
 
@@ -161,12 +168,13 @@ public class MovementServiceTests
         var character = new Character(Guid.NewGuid(), CharacterClass.Mage)
         {
             Id = Guid.NewGuid(),
-            Name = "YawKeeper"
+            Name = "YawKeeper",
+            Class = CharacterClass.Mage
         };
         var location = Location.Create(Vector3.Zero, Guid.NewGuid());
-        location.Rotation = 123.4f;
-        character.SetCurrentLocation(location);
-        character.SetRotationState(true);
+        location.Direction = 123.4f;
+        character.CurrentLocation = location;
+        character.IsRotating = true;
 
         var result = _movementService.StopRotation(character);
 

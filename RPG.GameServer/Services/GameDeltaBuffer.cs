@@ -56,10 +56,10 @@ public sealed class GameDeltaBuffer
                         X = npc.Location.Position.X,
                         Y = npc.Location.Position.Y,
                         Z = npc.Location.Position.Z,
-                        WorldId = npc.Location.WorldId?.ToString() ?? string.Empty,
+                        WorldId = npc.Location.WorldId.ToString(),
                         MapId = npc.Location.MapId ?? string.Empty,
-                        ZoneName = npc.Location.ZoneName ?? string.Empty,
-                        Rotation = npc.Location.Rotation
+                        ZoneName = npc.Location.MapName ?? string.Empty,
+                        Rotation = npc.Location.Direction
                     }
                 });
             }
@@ -74,10 +74,10 @@ public sealed class GameDeltaBuffer
                         X = ch.Location.Position.X,
                         Y = ch.Location.Position.Y,
                         Z = ch.Location.Position.Z,
-                        WorldId = ch.Location.WorldId?.ToString() ?? string.Empty,
+                        WorldId = ch.Location.WorldId.ToString(),
                         MapId = ch.Location.MapId ?? string.Empty,
-                        ZoneName = ch.Location.ZoneName ?? string.Empty,
-                        Rotation = ch.Location.Rotation
+                        ZoneName = ch.Location.MapName ?? string.Empty,
+                        Rotation = ch.Location.Direction
                     }
                 });
             }
@@ -92,10 +92,10 @@ public sealed class GameDeltaBuffer
                         X = mapObject.Location.Position.X,
                         Y = mapObject.Location.Position.Y,
                         Z = mapObject.Location.Position.Z,
-                        WorldId = mapObject.Location.WorldId?.ToString() ?? string.Empty,
+                        WorldId = mapObject.Location.WorldId.ToString(),
                         MapId = mapObject.Location.MapId ?? string.Empty,
-                        ZoneName = mapObject.Location.ZoneName ?? string.Empty,
-                        Rotation = mapObject.Location.Rotation
+                        ZoneName = mapObject.Location.MapName ?? string.Empty,
+                        Rotation = mapObject.Location.Direction
                     },
                     IsActive = mapObject.IsActive ?? false
                 });

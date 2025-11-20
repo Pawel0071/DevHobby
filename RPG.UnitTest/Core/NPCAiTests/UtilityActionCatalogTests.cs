@@ -61,7 +61,7 @@ public class UtilityActionCatalogTests
         context.TryGetBlackboardValue<Vector3>("patrol.current_wp", out var wp1).Should().BeTrue();
 
         // Dotarł
-        context.Self.SetCurrentLocation(Location.Create(wp1, context.Self.WorldId));
+        context.Self.CurrentLocation = Location.Create(wp1, context.Self.WorldId);
         context.SetBlackboardValue("patrol.arrival_time", DateTime.UtcNow.AddSeconds(-2)); // dwell minął
 
         // Powinien przejść do kolejnego waypointa
@@ -88,7 +88,7 @@ public class UtilityActionCatalogTests
             context.TryGetBlackboardValue<Vector3>("patrol.current_wp", out var wp).Should().BeTrue();
 
             // Symuluj dotarcie
-            context.Self.SetCurrentLocation(Location.Create(wp, context.Self.WorldId));
+            context.Self.CurrentLocation = Location.Create(wp, context.Self.WorldId);
 
             if (i < waypointCount)
             {

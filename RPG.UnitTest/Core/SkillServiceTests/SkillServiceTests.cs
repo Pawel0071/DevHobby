@@ -162,7 +162,7 @@ public class SkillServiceTests
         character.Equipments[EquipmentSlot.Weapon1] = weapon;
 
         var skill = CreateSkill("Arcane Blast", requiredLevel: 5, requiredClass: "Mage", requiredWeaponType: "staff", manaCost: 10);
-        character.GetSkillsContainer().Skills[skill] = SkillAvailability.UnAvailable;
+        character.Skills[skill] = SkillAvailability.UnAvailable;
 
         character.Level = 5;
         _service.AddSkillsAfterLevelUp(character);
@@ -195,7 +195,8 @@ public class SkillServiceTests
             Name = "Tester",
             Level = level,
             MaxResource = maxResource,
-            CurrentResource = currentResource
+            CurrentResource = currentResource,
+            Class = characterClass
         };
 
         return character;

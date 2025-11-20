@@ -1,9 +1,6 @@
-using System.Collections.Generic;
 using System.Numerics;
 using System.Text.Json;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using RPG.Core.Services.World;
 using RPG.Domain.Common;
 using RPG.Domain.Containers;
 using RPG.Domain.Enums;
@@ -390,7 +387,7 @@ internal static class DocumentRepositoryScenarioFactory
                 var activationTime = DateTime.UtcNow;
                 var worldId = Guid.NewGuid();
                 var location = Location.Create(new Vector3(10, 2, 0), worldId, "cli-map", "training-ground");
-                location.Rotation = 270f;
+                location.Direction = 270f;
 
                 var character = new Character(sessionId, CharacterClass.Warrior)
                 {
@@ -398,18 +395,18 @@ internal static class DocumentRepositoryScenarioFactory
                     Name = "CLI Test Character",
                     PlayerId = Guid.NewGuid(),
                     SessionId = sessionId,
+                    Class = CharacterClass.Warrior,
                     Level = 10,
                     Experience = 5000,
                     ExperienceToNextLevel = 10000,
                     CurrentHealth = 120,
                     MaxHealth = 150,
                     CurrentResource = 60,
-                    MaxResource = 80
+                    MaxResource = 80,
+                    CurrentLocation = location,
+                    IsMoving = true,
+                    IsRotating = false
                 };
-
-                character.SetCurrentLocation(location);
-                character.SetMovementState(true);
-                character.SetRotationState(false);
 
                 character.BaseStats[StatsProperty.Strength] = 12;
                 character.BaseStats[StatsProperty.Intelligence] = 8;
@@ -460,9 +457,9 @@ internal static class DocumentRepositoryScenarioFactory
 
                 var currentLocation = entity.CurrentLocation;
                 currentLocation.Position += new Vector3(3, 0, -2);
-                currentLocation.Rotation = 90f;
-                entity.SetMovementState(false);
-                entity.SetRotationState(true);
+                currentLocation.Direction = 90f;
+                entity.IsMoving = false;
+                entity.IsRotating = true;
             },
             assertDocument: (entity, document) =>
             {
@@ -525,7 +522,7 @@ internal static class DocumentRepositoryScenarioFactory
                 }
 
                 if (!string.Equals(document.Location.MapId, entity.CurrentLocation.MapId, StringComparison.Ordinal) ||
-                    !string.Equals(document.Location.ZoneName, entity.CurrentLocation.ZoneName, StringComparison.Ordinal))
+                    !string.Equals(document.Location.ZoneName, entity.CurrentLocation.MapName, StringComparison.Ordinal))
                 {
                     throw new InvalidOperationException("Character location metadata mismatch.");
                 }
@@ -1053,8 +1050,8 @@ internal static class DocumentRepositoryScenarioFactory
                 npc.Components.Add(dialogueComponent);
                 npc.Components.Add(questGiverComponent);
 
-                npc.SetMovementState(true);
-                npc.SetRotationState(false);
+                npc.IsMoving = true;
+                npc.IsRotating = false;
 
                 return npc;
             },
@@ -1072,8 +1069,8 @@ internal static class DocumentRepositoryScenarioFactory
                 var questGiver = entity.Components.OfType<QuestGiverComponent>().First();
                 questGiver.AvailableQuests.Add(Guid.NewGuid());
 
-                entity.SetMovementState(false);
-                entity.SetRotationState(true);
+                entity.IsMoving = false;
+                entity.IsRotating = true;
             },
             assertDocument: (entity, document) =>
             {
@@ -1157,8 +1154,8 @@ internal static class DocumentRepositoryScenarioFactory
                     LeashRange = 24f,
                     AiBehaviorScript = "aggressive-champion"
                 };
-                combatComponent.GetStatsContainer()[StatsProperty.Strength] = 55;
-                combatComponent.GetStatsContainer()[StatsProperty.Vitality] = 60;
+                npc.BaseStats[StatsProperty.Strength] = 55;
+                npc.BaseStats[StatsProperty.Vitality] = 60;
 
                 var lootableComponent = new LootableComponent
                 {
@@ -1184,8 +1181,8 @@ internal static class DocumentRepositoryScenarioFactory
                 npc.Components.Add(lootableComponent);
                 npc.Components.Add(trainerComponent);
 
-                npc.SetMovementState(true);
-                npc.SetRotationState(true);
+                npc.IsMoving = true;
+                npc.IsRotating = true;
 
                 return npc;
             },
@@ -1194,16 +1191,16 @@ internal static class DocumentRepositoryScenarioFactory
                 entity.Description += " The crowd cheers louder each round.";
                 entity.Level += 1;
 
+                foreach (var statKey in entity.BaseStats.Keys.ToList())
+                {
+                    entity.BaseStats[statKey] += 5;
+                }
+
                 if (entity.Components.OfType<CombatComponent>().FirstOrDefault() is { } combat)
                 {
                     combat.AggroRange += 2f;
                     combat.LeashRange += 1f;
                     combat.AiBehaviorScript = "aggressive-overdrive";
-
-                    foreach (var statKey in combat.Stats.Keys.ToList())
-                    {
-                        combat.Stats[statKey] += 5;
-                    }
                 }
 
                 if (entity.Components.OfType<LootableComponent>().FirstOrDefault() is { } lootable)
@@ -1222,8 +1219,8 @@ internal static class DocumentRepositoryScenarioFactory
                     trainer.Specialization = "Advanced Defensive Combat";
                 }
 
-                entity.SetMovementState(false);
-                entity.SetRotationState(false);
+                entity.IsMoving = false;
+                entity.IsRotating = false;
             },
             assertDocument: (entity, document) =>
             {
