@@ -34,6 +34,9 @@ public static class RequestedHandlersRegistrationExtensions
         services.AddScoped<IRequestedEventHandler, CharacterLevelUpRequestedHandler>();
         services.AddScoped<IRequestedEventHandler, CharacterDeathRequestedHandler>();
 
+        // Combat handlers
+        services.AddScoped<IRequestedEventHandler, CombatRequestedHandler>();
+
         // Quest handlers
         services.AddScoped<IRequestedEventHandler, QuestAcceptRequestedHandler>();
         services.AddScoped<IRequestedEventHandler, QuestCompleteRequestedHandler>();

@@ -50,6 +50,7 @@ public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
                 MinLevel = lvl.MinLevel,
                 MaxLevel = lvl.MaxLevel ?? 0
             };
+            proto.Components.Add(new Component { Type = nameof(LevelRequirementComponent), DataJson = JsonSerializer.Serialize(lvl, typeof(LevelRequirementComponent)) });
         }
 
         if (domain.GetComponent<ItemRewardsComponent>() is { } rewards)
@@ -68,6 +69,7 @@ public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
                     Quantity = slot.Quantity
                 });
             proto.ItemRewards = r;
+            proto.Components.Add(new Component { Type = nameof(ItemRewardsComponent), DataJson = JsonSerializer.Serialize(rewards, typeof(ItemRewardsComponent)) });
         }
 
         if (domain.GetComponent<KillObjectiveComponent>() is { } kill)
@@ -79,6 +81,7 @@ public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
                 RequiredCount = kill.RequiredCount,
                 CurrentCount = kill.CurrentCount
             };
+            proto.Components.Add(new Component { Type = nameof(KillObjectiveComponent), DataJson = JsonSerializer.Serialize(kill, typeof(KillObjectiveComponent)) });
         }
 
         if (domain.GetComponent<CollectObjectiveComponent>() is { } collect)
@@ -93,6 +96,7 @@ public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
                 });
             }
             proto.CollectObjective = c;
+            proto.Components.Add(new Component { Type = nameof(CollectObjectiveComponent), DataJson = JsonSerializer.Serialize(collect, typeof(CollectObjectiveComponent)) });
         }
 
         if (domain.GetComponent<DeliverObjectiveComponent>() is { } deliver)
@@ -111,6 +115,7 @@ public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
                 });
             }
             proto.DeliverObjective = d;
+            proto.Components.Add(new Component { Type = nameof(DeliverObjectiveComponent), DataJson = JsonSerializer.Serialize(deliver, typeof(DeliverObjectiveComponent)) });
         }
 
         if (domain.GetComponent<ExploreObjectiveComponent>() is { } explore)
@@ -122,6 +127,7 @@ public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
                 ProximityRadius = explore.ProximityRadius,
                 IsVisited = explore.IsVisited
             };
+            proto.Components.Add(new Component { Type = nameof(ExploreObjectiveComponent), DataJson = JsonSerializer.Serialize(explore, typeof(ExploreObjectiveComponent)) });
         }
 
         if (domain.GetComponent<PrerequisiteQuestsComponent>() is { } prereq)
@@ -130,6 +136,7 @@ public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
             foreach (var id in prereq.RequiredQuestIds)
                 p.RequiredQuestIds.Add(id.ToString());
             proto.PrerequisiteQuests = p;
+            proto.Components.Add(new Component { Type = nameof(PrerequisiteQuestsComponent), DataJson = JsonSerializer.Serialize(prereq, typeof(PrerequisiteQuestsComponent)) });
         }
 
         if (domain.GetComponent<ReputationRewardsComponent>() is { } rep)
@@ -138,6 +145,7 @@ public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
             foreach (var kv in rep.FactionReputations)
                 r.FactionReputations[kv.Key] = kv.Value;
             proto.ReputationRewards = r;
+            proto.Components.Add(new Component { Type = nameof(ReputationRewardsComponent), DataJson = JsonSerializer.Serialize(rep, typeof(ReputationRewardsComponent)) });
         }
 
         if (domain.GetComponent<RepeatableQuestComponent>() is { } repeat)
@@ -149,6 +157,7 @@ public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
                     ? new DateTimeOffset(repeat.LastCompletedTime.Value).ToUnixTimeMilliseconds()
                     : 0
             };
+            proto.Components.Add(new Component { Type = nameof(RepeatableQuestComponent), DataJson = JsonSerializer.Serialize(repeat, typeof(RepeatableQuestComponent)) });
         }
 
         if (domain.GetComponent<TimeLimitComponent>() is { } timeLimit)
@@ -160,14 +169,17 @@ public class QuestProtoMapper : IProtoMapper<DomainQuest, Quest>
                     ? new DateTimeOffset(timeLimit.StartTime.Value).ToUnixTimeMilliseconds()
                     : 0
             };
+            proto.Components.Add(new Component { Type = nameof(TimeLimitComponent), DataJson = JsonSerializer.Serialize(timeLimit, typeof(TimeLimitComponent)) });
         }
 
-        // Generic components as JSON
+        // Generic components as JSON (avoid duplicating already serialized typed ones)
         foreach (var component in domain.Components)
         {
+            var typeName = component.GetType().Name;
+            if (proto.Components.Any(c => c.Type == typeName)) continue; // already added
             proto.Components.Add(new Component
             {
-                Type = component.GetType().Name,
+                Type = typeName,
                 DataJson = JsonSerializer.Serialize(component, component.GetType())
             });
         }
